@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cetak Presensi KBM Generus – PPG Solo Selatan</title>
+  <meta name="description"
+    content="Format cetak resmi lembar absensi KBM Generus PPG Solo Selatan untuk Caberawit, GP Reguler, dan Pengajian Muda-Mudi Remaja.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1a56c4;
+      --primary-dark: #1240a0;
+      --gold: #d4a017;
+      --green: #2e8b57;
+      --border: #cbd5e1;
+      --bg: #e2e8f0;
+      --text: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── SCREEN ONLY TOOLBAR ── */
+    .screen-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      color: #fff;
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .screen-header-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .screen-header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .header-badge-count {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .btn-header-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-print {
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-print:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ── FILTER TOOLBAR PANEL ── */
+    .filter-panel {
+      max-width: 1300px;
+      margin: 16px auto 0;
+      padding: 0 20px;
+    }
+
+    .filter-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1.5px solid #cbd5e1;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      border-color: #2563eb;
+      background: #fff;
+    }
+
+    /* ── PRINT SHEET CONTAINER ── */
+    .sheet-wrapper {
+      max-width: 210mm;
+      margin: 20px auto 40px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .absensi-sheet {
+      background: #fff;
+      width: 100%;
+      height: 285mm;
+      max-height: 285mm;
+      padding: 8mm 10mm 8mm 10mm;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #000;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* ── SHEET KOP / HEADER ── */
+    .sheet-kop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 4px;
+      margin-bottom: 2px;
+    }
+
+    .sheet-kop-logo {
+      width: 65px;
+      height: 65px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .sheet-kop-text {
+      flex: 1;
+      text-align: center;
+    }
+
+    .sheet-kop-text h1 {
+      font-size: 12.5pt;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .sheet-kop-text h2 {
+      font-size: 11pt;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin: 2px 0 0;
+      line-height: 1.2;
+    }
+
+    .sheet-kop-text h3 {
+      font-size: 11pt;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin: 2px 0 0;
+      line-height: 1.2;
+    }
+
+    .sheet-subheader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5pt;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .sub-gender {
+      font-size: 10.5pt;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+    }
+
+    /* ── FORM TABEL RESMI ── */
+    .absensi-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 8.8pt;
+    }
+
+    .absensi-table th {
+      border: 1.2px solid #000;
+      padding: 3px 2px;
+      text-align: center;
+      font-weight: 900;
+      background: #fff;
+      line-height: 1.15;
+    }
+
+    .absensi-table td {
+      border: 1.2px solid #000;
+      padding: 1px 4px;
+      height: 21px;
+      vertical-align: middle;
+      line-height: 1.15;
+    }
+
+    .cell-no {
+      width: 30px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .cell-nama {
+      text-align: left;
+      padding-left: 6px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-size: 11pt;
+    }
+
+    .cell-jenjang {
+      width: 72px;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 11pt;
+    }
+
+    .cell-jam {
+      width: 62px;
+      text-align: center;
+    }
+
+    .cell-ket {
+      width: 44px;
+      text-align: center;
+    }
+
+    .cell-paraf {
+      width: 48px;
+      vertical-align: top !important;
+      text-align: left;
+      padding: 2px 3px !important;
+      font-size: 8pt;
+      color: #d8d8d8;
+    }
+
+    /* ── FOOTER TABEL JUMLAH ── */
+    .cell-jumlah-header {
+      text-align: center;
+      font-weight: 900;
+      font-size: 12pt;
+      letter-spacing: 0.5px;
+      height: 18px;
+    }
+
+    .cell-jumlah-label {
+      text-align: center;
+      font-size: 8pt;
+      letter-spacing: 0.3px;
+      height: 17px;
+    }
+
+    /* ── LEGENDA & KETERANGAN BAWAH ── */
+    .sheet-legend-wrap {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 8pt;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #000;
+      line-height: 1.35;
+    }
+
+    .legend-title {
+      font-weight: 900;
+      text-decoration: underline;
+      margin-bottom: 2px;
+    }
+
+    .legend-table {
+      border: none;
+      border-collapse: collapse;
+    }
+
+    .legend-table td {
+      border: none;
+      padding: 0.5px 2px;
+      vertical-align: top;
+    }
+
+    .legend-code {
+      font-weight: 900;
+      width: 14px;
+    }
+
+    .legend-sep {
+      width: 10px;
+      text-align: center;
+    }
+
+    /* ── PRINT MEDIA RULES ── */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm 8mm 10mm;
+      }
+
+      html,
+      body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .sheet-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        gap: 0 !important;
+      }
+
+      .absensi-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 0 0 0 !important;
+        width: 100% !important;
+        height: 280mm !important;
+        max-height: 280mm !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+      }
+
+      .absensi-sheet:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      .absensi-table {
+        border: 1.5px solid #000 !important;
+      }
+
+      .absensi-table th,
+      .absensi-table td {
+        border: 1.2px solid #000 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP APP BAR (NO-PRINT) -->
+  <header class="screen-header no-print">
+    <div class="screen-header-inner">
+      <div class="screen-header-title">
+        <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">print</span>
+        <span>Cetak Presensi KBM Generus</span>
+        <span class="header-badge-count" id="sheetCountBadge">1 Lembar</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a href="dashboard.html" class="btn-header-action btn-back">
+          <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
+          Dashboard
+        </a>
+        <a href="laporan-kehadiran.html" class="btn-header-action" style="background:#4338ca;color:#fff;">
+          <span class="material-symbols-outlined" style="font-size:18px;">bar_chart</span>
+          Rekap Kehadiran
+        </a>
+        <button type="button" class="btn-header-action btn-print" onclick="window.print()">
+          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+          Cetak Dokumen
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- FILTER CONTROLS (NO-PRINT) -->
+  <div class="filter-panel no-print">
+    <div class="filter-card">
+      <div class="filter-group">
+        <label>1. Format KBM</label>
+        <select id="selJenisKbm">
+          <option value="remaja">🎓 KBM Remaja (Muda-Mudi & GP)</option>
+          <option value="gp_reguler">📚 KBM GP Reguler (SMP - SMA)</option>
+          <option value="caberawit">🌱 KBM Caberawit (PAUD - SD)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>2. Wilayah Desa</label>
+        <select id="selDesa">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>3. Kelompok</label>
+        <select id="selKelompok">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>4. Pemisahan Gender</label>
+        <select id="selGender">
+          <option value="pisah" selected>🚻 Pisah Lembar (Putra & Putri)</option>
+          <option value="L">♂ Khusus Putra Saja</option>
+          <option value="P">♀ Khusus Putri Saja</option>
+          <option value="gabung">👥 Gabung (Putra & Putri)</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="grid-column: span 2;">
+        <label>5. Judul Event Tambahan (Opsional)</label>
+        <input type="text" id="iptCustomJudul" placeholder="Default: Sesuai Format KBM (Contoh: ASRAMA HADITS BESAR)" />
+      </div>
+
+      <div class="filter-group">
+        <label>6. Bulan</label>
+        <select id="selBulan">
+          <option value="JANUARI">JANUARI</option>
+          <option value="FEBRUARI">FEBRUARI</option>
+          <option value="MARET">MARET</option>
+          <option value="APRIL">APRIL</option>
+          <option value="MEI">MEI</option>
+          <option value="JUNI">JUNI</option>
+          <option value="JULI">JULI</option>
+          <option value="AGUSTUS">AGUSTUS</option>
+          <option value="SEPTEMBER" selected>SEPTEMBER</option>
+          <option value="OKTOBER">OKTOBER</option>
+          <option value="NOVEMBER">NOVEMBER</option>
+          <option value="DESEMBER">DESEMBER</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>7. Tahun</label>
+        <input type="text" id="iptTahun" value="2026" />
+      </div>
+
+      <div class="filter-group">
+        <label>8. Pengurutan</label>
+        <select id="selUrutan">
+          <option value="official">Format Resmi (Remaja → SMA → SMP)</option>
+          <option value="nama_asc">Alfabetis Nama (A - Z)</option>
+          <option value="kelas_asc">Berdasarkan Kelas/Tingkat</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>9. Baris Kosong</label>
+        <select id="selBarisKosong">
+          <option value="fill30" selected>Penuhi Halaman (Maks. 30 Baris)</option>
+          <option value="0">0 Baris Kosong (Pas Data)</option>
+          <option value="3">+3 Baris Kosong</option>
+          <option value="5">+5 Baris Kosong</option>
+          <option value="10">+10 Baris Kosong</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINTABLE SHEETS CONTAINER -->
+  <div class="sheet-wrapper" id="sheetsContainer">
+    <!-- Populated dynamically by JS -->
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script type="module">
+    import { MASTER_WILAYAH, getAllKelompok, getSiswaList, getKbmEventById } from '../src/db-master.js';
+
+    // Parse URL Params
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramEventId = urlParams.get('eventId');
+    const activeEvent = paramEventId ? getKbmEventById(paramEventId) : null;
+
+    const paramJenis = activeEvent ? activeEvent.format_kbm : (urlParams.get('jenjang') || 'remaja');
+    const paramDesa = activeEvent ? activeEvent.desa_id : (urlParams.get('desa') || 'desa-timur-1');
+    const paramKel = activeEvent ? activeEvent.kelompok_id : (urlParams.get('kelompok') || 'all');
+    const paramGender = activeEvent ? activeEvent.gender : (urlParams.get('gender') || 'pisah');
+    const paramJudul = activeEvent ? activeEvent.judul : (urlParams.get('judul') || '');
+    const paramBulan = activeEvent ? activeEvent.bulan : (urlParams.get('bulan') || 'SEPTEMBER');
+    const paramTahun = activeEvent ? activeEvent.tahun : (urlParams.get('tahun') || '2026');
+    const paramUrutan = urlParams.get('urutan') || 'official';
+    const paramBaris = urlParams.get('baris') || 'fill30';
+
+    const selJenisKbm = document.getElementById('selJenisKbm');
+    const selDesa = document.getElementById('selDesa');
+    const selKelompok = document.getElementById('selKelompok');
+    const selGender = document.getElementById('selGender');
+    const iptCustomJudul = document.getElementById('iptCustomJudul');
+    const selBulan = document.getElementById('selBulan');
+    const iptTahun = document.getElementById('iptTahun');
+    const selUrutan = document.getElementById('selUrutan');
+    const selBarisKosong = document.getElementById('selBarisKosong');
+    const sheetsContainer = document.getElementById('sheetsContainer');
+    const sheetCountBadge = document.getElementById('sheetCountBadge');
+
+    // Populate Desa
+    selDesa.innerHTML = `<option value="all">Semua Desa (Solo Selatan)</option>` +
+      MASTER_WILAYAH.desa.map(d => `<option value="${d.id}">Desa ${d.nama}</option>`).join('');
+
+    function populateKelompok(desaId, selectedKel = 'all') {
+      let kels = getAllKelompok();
+      if (desaId !== 'all') {
+        kels = kels.filter(k => k.desaId === desaId);
+      }
+      selKelompok.innerHTML = `<option value="all" ${selectedKel === 'all' || !selectedKel ? 'selected' : ''}>Semua Kelompok (Cetak Terpisah)</option>` +
+        kels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('');
+      selKelompok.value = selectedKel || 'all';
+    }
+
+    // Set Initial Form Values strictly from params/event
+    selJenisKbm.value = paramJenis;
+    selDesa.value = paramDesa;
+    populateKelompok(paramDesa, paramKel);
+    selGender.value = paramGender;
+    iptCustomJudul.value = paramJudul;
+    selBulan.value = paramBulan;
+    iptTahun.value = paramTahun;
+    selUrutan.value = paramUrutan;
+    selBarisKosong.value = paramBaris;
+
+    // Helper to get Jenjang Label like in PDF
+    function getJenjangPrintLabel(siswa, formatKbm) {
+      const k = (siswa.jenjang_kelas || '').toUpperCase();
+      if (formatKbm === 'remaja') {
+        if (k.includes('SMA') || k.includes('SMK') || k.includes('MA')) return 'SMA';
+        if (k.includes('SMP') || k.includes('MTS')) return 'SMP';
+        return 'REMAJA';
+      }
+      if (formatKbm === 'gp_reguler') {
+        if (k.includes('SMA') || k.includes('SMK') || k.includes('MA')) return 'SMA';
+        if (k.includes('SMP') || k.includes('MTS')) return 'SMP';
+        return siswa.jenjang_kelas || 'GP';
+      }
+      if (formatKbm === 'caberawit') {
+        if (k.includes('SD') || k.includes('MI')) return 'SD';
+        if (k.includes('TK')) return 'TK';
+        if (k.includes('PAUD')) return 'PAUD';
+        return siswa.jenjang_kelas || 'CABERAWIT';
+      }
+      return siswa.jenjang_kelas || '-';
+    }
+
+    // Sort students
+    function sortStudentList(list, urutan, formatKbm) {
+      if (urutan === 'official') {
+        const orderWeight = (s) => {
+          const lbl = getJenjangPrintLabel(s, formatKbm);
+          if (lbl === 'REMAJA') return 1;
+          if (lbl === 'SMA') return 2;
+          if (lbl === 'SMP') return 3;
+          if (lbl === 'SD') return 4;
+          if (lbl === 'TK') return 5;
+          if (lbl === 'PAUD') return 6;
+          return 7;
+        };
+        list.sort((a, b) => {
+          const wA = orderWeight(a);
+          const wB = orderWeight(b);
+          if (wA !== wB) return wA - wB;
+          return a.nama_lengkap.localeCompare(b.nama_lengkap);
+        });
+      } else if (urutan === 'nama_asc') {
+        list.sort((a, b) => a.nama_lengkap.localeCompare(b.nama_lengkap));
+      } else if (urutan === 'kelas_asc') {
+        list.sort((a, b) => (a.jenjang_kelas || '').localeCompare(b.jenjang_kelas || '') || a.nama_lengkap.localeCompare(b.nama_lengkap));
+      }
+    }
+
+    // Build Single Sheet HTML
+    function buildSingleSheetHtml({ kel, desa, genderLabel, customJudul, formatKbm, bulan, tahun, rows, pageIndex, totalPages }) {
+      // Determine Kop Titles
+      let titleLine1 = '';
+      if (customJudul) {
+        titleLine1 = customJudul.toUpperCase();
+      } else if (formatKbm === 'caberawit') {
+        titleLine1 = 'PRESENSI KBM CABERAWIT';
+      } else if (formatKbm === 'gp_reguler') {
+        titleLine1 = 'PRESENSI KBM GP REGULER';
+      } else {
+        titleLine1 = 'PRESENSI PENGAJIAN MUDA-MUDI';
+      }
+
+      const titleLine2 = desa ? `DESA ${desa.nama.toUpperCase()}, SOLO SELATAN` : 'SOLO SELATAN';
+
+      // Alternating Paraf Rows
+      let rowsHtml = '';
+      for (let i = 0; i < rows.length; i++) {
+        const item = rows[i];
+        const isOddRow = (i % 2 === 0);
+        const rowNum = item.no;
+
+        let parafCells = '';
+        if (isOddRow) {
+          const leftNum = rowNum;
+          const rightNum = (i + 1 < rows.length) ? rows[i + 1].no : rowNum + 1;
+          const hasNextRow = (i + 1 < rows.length);
+          const rSpan = hasNextRow ? 'rowspan="2"' : '';
+
+          parafCells = `
+            <td ${rSpan} class="cell-paraf">${leftNum}</td>
+            <td ${rSpan} class="cell-paraf">${hasNextRow ? rightNum : ''}</td>
+          `;
+        }
+
+        rowsHtml += `
+          <tr>
+            <td class="cell-no">${item.no}</td>
+            <td class="cell-nama">${item.nama}</td>
+            <td class="cell-jenjang">${item.jenjang}</td>
+            <td class="cell-jam"></td>
+            <td class="cell-ket"></td>
+            ${parafCells}
+          </tr>
+        `;
+      }
+
+      const halText = totalPages > 1 ? ` (HALAMAN ${pageIndex}/${totalPages})` : '';
+
+      return `
+        <div class="absensi-sheet">
+          <!-- KOP RESMI -->
+          <div>
+            <div class="sheet-kop">
+              <img src="../image/Logo-PPG.png" alt="Logo PPG" class="sheet-kop-logo" />
+              <div class="sheet-kop-text">
+                <h1>${titleLine1}</h1>
+                <h2>${titleLine2}</h2>
+                <h3>TAHUN ${tahun}</h3>
+              </div>
+              <img src="../image/logoKMMda.png" alt="Logo Remaja Solo Selatan" class="sheet-kop-logo" />
+            </div>
+            <hr> </br>
+            <!-- SUB-HEADER KELOMPOK & GENDER (SEBELAH KANAN) -->
+            <div class="sheet-subheader">
+              <span>KELOMPOK : ${kel.nama.toUpperCase()}${halText}</span>
+              <span class="sub-gender">${genderLabel}</span>
+            </div>
+
+            <!-- TABEL RESMI PRESENSI (MAX 30 BARIS) -->
+            <table class="absensi-table">
+              <thead>
+                <tr>
+                  <th rowspan="2" style="width:30px;">NO</th>
+                  <th rowspan="2" style="min-width:210px;">NAMA</th>
+                  <th rowspan="2" style="width:72px;">JENJANG</th>
+                  <th colspan="4">BULAN : ${bulan}</th>
+                </tr>
+                <tr>
+                  <th style="width:62px;">Jam Hadir</th>
+                  <th style="width:44px;">KET</th>
+                  <th colspan="2" style="width:96px;">Paraf</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="cell-jumlah-header">JUMLAH</td>
+                  <td colspan="2" style="border:1.2px solid #000;"></td>
+                  <td colspan="2" rowspan="4" style="border:1.2px solid #000;"></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="cell-jumlah-label">HADIR</td>
+                  <td colspan="2" style="border:1.2px solid #000;"></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="cell-jumlah-label">IJIN</td>
+                  <td colspan="2" style="border:1.2px solid #000;"></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="cell-jumlah-label">ALPHA</td>
+                  <td colspan="2" style="border:1.2px solid #000;"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- LEGENDA & KETERANGAN BAWAH (UTUH 1 HALAMAN) -->
+          <div class="sheet-legend-wrap">
+            <div>
+              <div class="legend-title">PENGISIAN KET PRESENSI</div>
+              <table class="legend-table">
+                <tr>
+                  <td class="legend-code">V</td>
+                  <td class="legend-sep">:</td>
+                  <td>HADIR</td>
+                </tr>
+                <tr>
+                  <td class="legend-code">I</td>
+                  <td class="legend-sep">:</td>
+                  <td>IJIN</td>
+                </tr>
+                <tr>
+                  <td class="legend-code">S</td>
+                  <td class="legend-sep">:</td>
+                  <td>SAKIT</td>
+                </tr>
+                <tr>
+                  <td class="legend-code">A</td>
+                  <td class="legend-sep">:</td>
+                  <td>TANPA KETERANGAN</td>
+                </tr>
+                <tr>
+                  <td class="legend-code">T</td>
+                  <td class="legend-sep">:</td>
+                  <td>HADIR &gt; 5 MENIT</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="min-width:270px;">
+              <div style="font-weight:900;margin-bottom:2px;">KETERANGAN :</div>
+              <table class="legend-table">
+                <tr>
+                  <td style="font-weight:700;width:82px;">JAM HADIR</td>
+                  <td class="legend-sep">:</td>
+                  <td>WAKTU KEHADIRAN PENGAJIAN</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;">KET</td>
+                  <td class="legend-sep">:</td>
+                  <td>SESUAI PENGISIAN KET PRESENSI</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // Master Render Function
+    function renderAllSheets() {
+      const format = selJenisKbm.value;
+      const desaId = selDesa.value;
+      const kelId = selKelompok.value;
+      const genderOpt = selGender.value;
+      const customJudul = iptCustomJudul.value.trim();
+      const bulan = selBulan.value;
+      const tahun = iptTahun.value.trim() || '2026';
+      const urutan = selUrutan.value;
+      const barisKosongOpt = selBarisKosong.value;
+
+      // 1. Determine list of kelompok
+      let targetKelompokList = [];
+      if (kelId !== 'all') {
+        const kObj = getAllKelompok().find(k => k.id === kelId);
+        if (kObj) targetKelompokList.push(kObj);
+      } else {
+        if (desaId !== 'all') {
+          targetKelompokList = getAllKelompok().filter(k => k.desaId === desaId);
+        } else {
+          targetKelompokList = getAllKelompok();
+        }
+      }
+
+      // 2. Determine target genders
+      let targetGenders = [];
+      if (genderOpt === 'pisah') {
+        targetGenders = [
+          { code: 'L', label: '(PUTRA)' },
+          { code: 'P', label: '(PUTRI)' }
+        ];
+      } else if (genderOpt === 'L') {
+        targetGenders = [{ code: 'L', label: '(PUTRA)' }];
+      } else if (genderOpt === 'P') {
+        targetGenders = [{ code: 'P', label: '(PUTRI)' }];
+      } else {
+        targetGenders = [{ code: 'ALL', label: '(PUTRA & PUTRI)' }];
+      }
+
+      const allSiswa = getSiswaList();
+      let totalSheets = 0;
+      let sheetsHtml = '';
+
+      targetKelompokList.forEach(kel => {
+        const kelDesa = MASTER_WILAYAH.desa.find(d => d.id === kel.desaId);
+
+        targetGenders.forEach(gObj => {
+          // Filter generus
+          let students = allSiswa.filter(s => {
+            if (s.kelompok_id !== kel.id) return false;
+
+            // Filter jenjang
+            if (format === 'caberawit' && s.kategori_usia !== 'caberawit') return false;
+            if (format === 'gp_reguler' && s.kategori_usia !== 'gp_reguler') return false;
+            if (format === 'remaja' && s.kategori_usia !== 'remaja' && s.kategori_usia !== 'gp_reguler') return false;
+
+            // Filter gender
+            if (gObj.code !== 'ALL' && s.jenis_kelamin !== gObj.code) return false;
+
+            return true;
+          });
+
+          // Sort
+          sortStudentList(students, urutan, format);
+
+          // Chunking by 30 (max 30 per sheet). If students.length === 0, produce 1 blank sheet with 30 empty rows!
+          const CHUNK_SIZE = 30;
+          const numChunks = Math.max(1, Math.ceil(students.length / CHUNK_SIZE));
+
+          for (let c = 0; c < numChunks; c++) {
+            const chunkStudents = students.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+            const startNo = c * CHUNK_SIZE;
+
+            let blankCount = 0;
+            if (chunkStudents.length === 0) {
+              blankCount = CHUNK_SIZE; // Selalu sediakan 30 baris jika belum ada generus di kelompok
+            } else if (barisKosongOpt === 'fill30') {
+              blankCount = CHUNK_SIZE - chunkStudents.length;
+            } else {
+              blankCount = parseInt(barisKosongOpt) || 0;
+            }
+
+            const pageRows = [];
+            chunkStudents.forEach((s, idx) => {
+              pageRows.push({
+                no: startNo + idx + 1,
+                nama: s.nama_lengkap,
+                jenjang: getJenjangPrintLabel(s, format)
+              });
+            });
+
+            for (let b = 1; b <= blankCount; b++) {
+              pageRows.push({
+                no: startNo + chunkStudents.length + b,
+                nama: '',
+                jenjang: ''
+              });
+            }
+
+            totalSheets++;
+            sheetsHtml += buildSingleSheetHtml({
+              kel,
+              desa: kelDesa || MASTER_WILAYAH.desa.find(d => d.id === kel.desaId),
+              genderLabel: gObj.label,
+              customJudul,
+              formatKbm: format,
+              bulan,
+              tahun,
+              rows: pageRows,
+              pageIndex: c + 1,
+              totalPages: numChunks
+            });
+          }
+        });
+      });
+
+      if (totalSheets === 0) {
+        sheetsContainer.innerHTML = `
+          <div style="background:#fff;padding:40px;text-align:center;border-radius:12px;border:1px solid #cbd5e1;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+            <span class="material-symbols-outlined" style="font-size:48px;color:#94a3b8;margin-bottom:12px;">search_off</span>
+            <h3 style="font-size:16px;color:#334155;margin-bottom:6px;">Tidak Ada Data Generus yang Cocok</h3>
+            <p style="font-size:13px;color:#64748b;">Silakan ubah filter wilayah, format KBM, atau pemisahan gender pada panel di atas.</p>
+          </div>
+        `;
+        sheetCountBadge.textContent = '0 Lembar';
+        return;
+      }
+
+      sheetsContainer.innerHTML = sheetsHtml;
+      sheetCountBadge.textContent = `${totalSheets} Lembar Siap Cetak`;
+    }
+
+    // Attach Listeners
+    selJenisKbm.addEventListener('change', renderAllSheets);
+    selDesa.addEventListener('change', () => {
+      populateKelompok(selDesa.value);
+      renderAllSheets();
+    });
+    selKelompok.addEventListener('change', renderAllSheets);
+    selGender.addEventListener('change', renderAllSheets);
+    iptCustomJudul.addEventListener('input', renderAllSheets);
+    selBulan.addEventListener('change', renderAllSheets);
+    iptTahun.addEventListener('input', renderAllSheets);
+    selUrutan.addEventListener('change', renderAllSheets);
+    selBarisKosong.addEventListener('change', renderAllSheets);
+
+    // Initial render
+    renderAllSheets();
+  </script>
+</body>
+
+</html>

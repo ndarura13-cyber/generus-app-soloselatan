@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masuk – PPG Solo Selatan</title>
+  <meta name="description" content="Halaman masuk pengurus dan admin PPG Solo Selatan." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+
+<body>
+
+  <!-- Back link -->
+  <a href="../index.html" class="back-link">
+    <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">arrow_back</span>
+    Kembali ke Beranda
+  </a>
+
+  <!-- Floating background shapes -->
+  <div class="login-shapes">
+    <div class="ls ls-1"></div>
+    <div class="ls ls-2"></div>
+    <div class="ls ls-3"></div>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card">
+
+    <div class="login-brand">
+      <div class="login-logo">
+        <img src="../image/icon-192.png" alt="Logo PPG" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />
+      </div>
+      <div class="login-org">PPG Solo Selatan</div>
+      <div class="login-sub">Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur</div>
+      <div class="login-title">Masuk ke Sistem</div>
+      <div class="login-desc">Gunakan email atau akun pengurus Anda yang telah disetujui</div>
+    </div>
+
+    <!-- Form Login (Support Google Saved Passwords) -->
+    <form class="login-form" id="loginForm" autocomplete="on">
+
+      <div class="error-msg" id="errorMsg">
+        Email atau kata sandi salah. Silakan coba lagi.
+      </div>
+
+      <div class="success-msg" id="successMsg" style="display:none;">
+        Pendaftaran berhasil!
+      </div>
+
+      <div class="field">
+        <label for="email">Email Pengurus</label>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <span class="material-symbols-outlined" style="font-size:18px;">mail</span>
+          </span>
+          <input type="email" id="email" name="username" autocomplete="username email" placeholder="nama@ppgsolo.org" required />
+        </div>
+      </div>
+
+      <div class="field">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label for="password">Kata Sandi</label>
+        </div>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <span class="material-symbols-outlined" style="font-size:18px;">lock</span>
+          </span>
+          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required />
+          <button type="button" class="toggle-pass" id="togglePass" aria-label="Tampilkan kata sandi">
+            <span class="material-symbols-outlined" id="eyeIcon" style="font-size:18px;">visibility</span>
+          </button>
+        </div>
+        <div class="field-hint">Tersimpan aman &amp; kompatibel dengan Google Password Manager.</div>
+      </div>
+
+      <button type="submit" class="btn-login" id="btnLogin">
+        <span class="material-symbols-outlined" style="font-size:20px;">login</span>
+        <span>Masuk ke Dashboard</span>
+      </button>
+
+    </form>
+
+    <!-- Pendaftaran Mandiri Pengurus Baru -->
+    <div class="register-prompt-box">
+      <span>Belum memiliki akun pengurus?</span>
+      <button type="button" class="btn-link-register" id="btnOpenRegister">
+        <span class="material-symbols-outlined" style="font-size:16px;">person_add</span>
+        Daftar sebagai Pengurus / Pamong
+      </button>
+    </div>
+
+    <div class="login-footer">
+      PPG Solo Selatan &bull; Portal Monitoring Terpadu
+    </div>
+  </div>
+
+  <!-- MODAL PENDAFTARAN PENGURUS BARU (Self-Registration) -->
+  <div class="modal-backdrop" id="modalRegister" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title-box">
+          <div class="icon-circle" style="background:var(--blue-light);color:var(--blue);">
+            <span class="material-symbols-outlined">how_to_reg</span>
+          </div>
+          <div>
+            <h3>Pendaftaran Pengurus Baru</h3>
+            <p>Akun dapat digunakan setelah disetujui Superadmin Daerah</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseRegister">&times;</button>
+      </div>
+
+      <form id="formRegister" class="register-form" autocomplete="on">
+        <div class="reg-field">
+          <label for="regNama">Nama Lengkap &amp; Gelar</label>
+          <input type="text" id="regNama" placeholder="Contoh: Ust. Ahmad Fauzi, S.Pd" required />
+        </div>
+
+        <div class="reg-grid-2">
+          <div class="reg-field">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" autocomplete="username email" placeholder="email@contoh.com" required />
+          </div>
+          <div class="reg-field">
+            <label for="regWa">No. WhatsApp Aktif</label>
+            <input type="tel" id="regWa" placeholder="08123456789" required />
+          </div>
+        </div>
+
+        <div class="reg-field">
+          <label for="regPassword">Buat Kata Sandi</label>
+          <input type="password" id="regPassword" autocomplete="new-password" placeholder="Minimal 6 karakter" required minlength="6" />
+        </div>
+
+        <div class="reg-grid-2">
+          <div class="reg-field">
+            <label for="regTingkatan">Tingkatan Wewenang</label>
+            <select id="regTingkatan" class="reg-select" required>
+              <option value="kelompok" selected>Pamong Kelompok</option>
+              <option value="desa">Koordinator Desa</option>
+              <option value="daerah">Pengurus PPG (Daerah)</option>
+            </select>
+          </div>
+          <div class="reg-field">
+            <label for="regPeran">Peran / Tanggung Jawab</label>
+            <select id="regPeran" class="reg-select" required>
+              <!-- Diisi otomatis oleh multi-level dropdown JavaScript -->
+            </select>
+          </div>
+        </div>
+
+        <div class="reg-grid-2">
+          <div class="reg-field">
+            <label for="regDesa">Pilih Desa</label>
+            <select id="regDesa" class="reg-select" required>
+              <!-- Diisi otomatis oleh JavaScript -->
+            </select>
+          </div>
+          <div class="reg-field" id="wrapRegKelompok">
+            <label for="regKelompok">Pilih Kelompok</label>
+            <select id="regKelompok" class="reg-select" required>
+              <!-- Diisi otomatis oleh JavaScript -->
+            </select>
+          </div>
+        </div>
+
+        <div class="approval-notice">
+          <span class="material-symbols-outlined" style="color:var(--gold);font-size:20px;">info</span>
+          <div>
+            <strong>Catatan Persetujuan:</strong>
+            Setelah mendaftar, Superadmin PPG Daerah Solo Selatan akan memverifikasi dan menyetujui akun Anda sebelum Anda dapat masuk ke Dashboard.
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" class="btn-cancel" id="btnCancelRegister">Batal</button>
+          <button type="submit" class="btn-submit-reg" id="btnSubmitReg">
+            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+            Kirim Pendaftaran
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Aggressive Cache Busting Script for Development/Fixes
+    (function forceCacheClear() {
+      const CACHE_CLEAR_FLAG = 'cache_cleared_v2.7';
+      if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
+        console.log("Forcing cache clear and Service Worker unregistration...");
+        
+        // 1. Unregister all Service Workers
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
+        
+        // 2. Clear all Cache Storage
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) {
+              caches.delete(name);
+            }
+          });
+        }
+
+        // Set flag and reload
+        localStorage.setItem(CACHE_CLEAR_FLAG, 'true');
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      }
+    })();
+  </script>
+  <script type="module" src="login.js"></script>
+</body>
+
+</html>

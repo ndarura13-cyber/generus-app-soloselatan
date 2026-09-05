@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Pembiasaan Generus Caberawit – PPG Solo Selatan</title>
+  <meta name="description"
+    content="Laporan nilai pembiasaan Generus Caberawit PPG Solo Selatan – dapat diakses publik tanpa login.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1a56c4;
+      --primary-dark: #1240a0;
+      --gold: #d4a017;
+      --green: #2e8b57;
+      --red: #e55c5c;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .site-header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .site-header a.back-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .site-header a.back-link:hover {
+      color: #fff;
+    }
+
+    .site-header-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .btn-print {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-print:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      max-width: 1100px;
+      margin: 12px auto 0;
+      padding: 0 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── MAIN ── */
+    .container {
+      max-width: 1100px;
+      margin: 16px auto 40px;
+      padding: 0 20px;
+    }
+
+    /* ── EVENT SELECTOR (when no event) ── */
+    .event-list-card {
+      background: var(--surface);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    .event-list-header {
+      background: linear-gradient(90deg, var(--gold) 0%, #f0b429 100%);
+      padding: 16px 20px;
+      color: #1a1d2e;
+    }
+
+    .event-list-header h2 {
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+
+    .event-list-header p {
+      font-size: 12px;
+      opacity: 0.75;
+    }
+
+    /* ── LAPORAN CARD ── */
+    .laporan-header-card {
+      background: var(--surface);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .laporan-org {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+    }
+
+    .laporan-org-logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .laporan-org-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .laporan-org-text strong {
+      display: block;
+      font-size: 14px;
+      color: var(--primary);
+    }
+
+    .laporan-org-text span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .laporan-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .laporan-meta-item {
+      font-size: 12px;
+    }
+
+    .laporan-meta-item label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .laporan-meta-item strong {
+      font-size: 13px;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 12px;
+      outline: none;
+      background: var(--surface);
+      min-width: 160px;
+    }
+
+    /* ── HABIT LEGEND ── */
+    .habit-legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .habit-pill {
+      background: var(--primary);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ── TABLE ── */
+    .table-card {
+      background: var(--surface);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead th {
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 12px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    thead th:nth-child(2) {
+      text-align: left;
+    }
+
+    tbody td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    tbody td:nth-child(2) {
+      text-align: left;
+      font-weight: 600;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    tfoot td {
+      padding: 10px 12px;
+      background: #f1f5f9;
+      font-weight: 700;
+      text-align: center;
+      border-top: 2px solid var(--border);
+    }
+
+    tfoot td:nth-child(2) {
+      text-align: left;
+    }
+
+    /* ── TANDA TANGAN ── */
+    .ttd-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      background: var(--surface);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      padding: 20px 24px;
+      margin-top: 8px;
+    }
+
+    .ttd-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .ttd-box .ttd-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .ttd-box .ttd-line {
+      border-top: 1px solid var(--border);
+      width: 100%;
+      padding-top: 6px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* ── STATUS BADGE ── */
+    .badge-berjalan {
+      background: #dcfce7;
+      color: #166534;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .badge-selesai {
+      background: #e2e8f0;
+      color: #475569;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+
+      .site-header,
+      .filter-bar,
+      .btn-print,
+      .breadcrumb {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .container {
+        margin: 0;
+        padding: 0 10px;
+      }
+
+      .laporan-header-card,
+      .table-card,
+      .ttd-section {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+
+      .laporan-org-logo img {
+        width: 60px;
+        height: 60px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      thead th {
+        background: #1a56c4 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .badge-berjalan,
+      .badge-selesai {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .ttd-section {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .laporan-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .site-header-title {
+        font-size: 13px;
+      }
+
+      .btn-print span+span {
+        display: none;
+      }
+
+      /* hide "Cetak / PDF" text, keep icon */
+      .filter-bar {
+        flex-direction: column;
+      }
+
+      .filter-bar select {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .table-card {
+        border-radius: 8px;
+      }
+
+      thead th,
+      tbody td,
+      tfoot td {
+        font-size: 11px;
+        padding: 7px 8px;
+      }
+
+      .event-list-card table {
+        font-size: 11px;
+      }
+
+      .event-list-card td,
+      .event-list-card th {
+        padding: 8px 6px;
+      }
+
+      .col-date {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- STICKY HEADER -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="../index.html" class="back-link">
+        <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
+        Kembali ke Beranda
+      </a>
+      <span class="site-header-title">Laporan Pembiasaan Generus</span>
+      <button class="btn-print" onclick="window.print()">
+        <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb" id="breadcrumb">
+    <a href="../index.html">Beranda</a>
+    <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
+    <span id="breadcrumbLabel">Laporan Pembiasaan</span>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container" id="mainContent">
+    <!-- Rendered by JS -->
+  </div>
+
+  <script type="module">
+    import {
+      getEventPembiasaanList,
+      getNilaiPembiasaanList,
+      getSiswaList,
+      MASTER_WILAYAH,
+      getAllKelompok,
+      calculateUmur
+    } from '../src/db-master.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('event');
+    const mainContent = document.getElementById('mainContent');
+
+    const allEvents = getEventPembiasaanList();
+    const targetEvent = allEvents.find(e => e.id === eventId);
+
+    if (!targetEvent) {
+      // SHOW EVENT LIST
+      document.getElementById('breadcrumbLabel').textContent = 'Daftar Laporan';
+
+      const eventRows = allEvents.map((e, i) => `
+        <tr>
+          <td style="text-align:center;">${i + 1}</td>
+          <td style="text-align:left;font-weight:600;">${e.judul_periode}</td>
+          <td style="text-align:center;"><span class="${e.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${e.status === 'berjalan' ? '🟢 Berjalan' : '🔒 Selesai'}</span></td>
+          <td class="col-date">${new Date(e.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+          <td style="text-align:center;"><a href="?event=${e.id}" style="padding:7px 12px;background:var(--primary);color:#fff;text-decoration:none;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">Lihat →</a></td>
+        </tr>
+      `).join('');
+
+      mainContent.innerHTML = `
+        <div class="event-list-card">
+          <div class="event-list-header">
+            <h2>📋 Daftar Laporan Pembiasaan</h2>
+            <p>Pilih periode untuk melihat rekap nilai pembiasaan Generus Caberawit (PAUD – SD)</p>
+          </div>
+          <div style="padding:16px;">
+            ${allEvents.length === 0
+          ? `<p style="text-align:center;padding:30px;color:var(--text-muted);">Belum ada laporan pembiasaan yang tersedia.</p>`
+          : `<table>
+                  <thead>
+                    <tr>
+                      <th style="width:36px;">No</th><th style="text-align:left;">Judul Periode</th><th>Status</th><th class="col-date">Dibuat</th><th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>${eventRows}</tbody>
+                </table>`
+        }
+          </div>
+        </div>
+      `;
+
+    } else {
+      // SHOW LAPORAN DETAIL
+      document.title = `Laporan: ${targetEvent.judul_periode} – PPG Solo Selatan`;
+      document.getElementById('breadcrumbLabel').textContent = targetEvent.judul_periode;
+
+      // Update breadcrumb
+      document.getElementById('breadcrumb').innerHTML = `
+        <a href="../index.html">Beranda</a>
+        <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
+        <a href="laporan-pembiasaan.html">Daftar Laporan</a>
+        <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
+        <span>${targetEvent.judul_periode}</span>
+      `;
+
+      const createdDate = new Date(targetEvent.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+      const closedDate = targetEvent.closed_at ? new Date(targetEvent.closed_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+      const printDate = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+      // Habit legend
+      const habitLegend = targetEvent.habits.map((h, i) => `<span class="habit-pill">H${i + 1}: ${h}</span>`).join('');
+
+      // Build filter options
+      const desaOptions = MASTER_WILAYAH.desa.map(d => `<option value="${d.id}">Desa ${d.nama}</option>`).join('');
+
+      mainContent.innerHTML = `
+        <!-- HEADER LAPORAN -->
+        <div class="laporan-header-card">
+          <div class="laporan-org">
+            <div class="laporan-org-logo">
+              <img src="../image/Logo-PPG.png" alt="Logo PPG" />
+            </div>
+            <div class="laporan-org-text">
+              <strong>Penggerak Pembina Generus (PPG)</strong>
+              <span>Pucangsawit 03/III, Jebres - Surakarta</span>
+            </div>
+          </div>
+          <div class="laporan-meta">
+            <div class="laporan-meta-item">
+              <label>Judul Periode</label>
+              <strong>${targetEvent.judul_periode}</strong>
+            </div>
+            <div class="laporan-meta-item">
+              <label>Kategori</label>
+              <strong>Generus Caberawit (PAUD – SD)</strong>
+            </div>
+            <div class="laporan-meta-item">
+              <label>Status Event</label>
+              <strong><span class="${targetEvent.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${targetEvent.status === 'berjalan' ? '🟢 Berjalan' : '🔒 Selesai'}</span></strong>
+            </div>
+            <div class="laporan-meta-item">
+              <label>Tanggal Dibuat</label>
+              <strong>${createdDate}</strong>
+            </div>
+            <div class="laporan-meta-item">
+              <label>Tanggal Selesai</label>
+              <strong>${closedDate}</strong>
+            </div>
+            <div class="laporan-meta-item">
+              <label>Dicetak Pada</label>
+              <strong>${printDate}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar" id="filterBar">
+          <select id="filterDesa">
+            <option value="all">-- Semua Desa --</option>
+            ${desaOptions}
+          </select>
+          <select id="filterKelompok">
+            <option value="all">-- Semua Kelompok --</option>
+          </select>
+        </div>
+
+        <!-- HABIT LEGEND -->
+        <div class="habit-legend">${habitLegend}</div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px;">No</th>
+                <th style="text-align:left;min-width:180px;">Nama Generus</th>
+                <th>Usia</th>
+                <th>Kel.</th>
+                ${targetEvent.habits.map((h, i) => `<th title="${h}">H${i + 1}</th>`).join('')}
+                <th>Total</th>
+                <th>Ket.</th>
+              </tr>
+            </thead>
+            <tbody id="tabelBody"></tbody>
+            <tfoot id="tabelFoot"></tfoot>
+          </table>
+        </div>
+
+        <!-- Mengetahui, -->
+        <div class="ttd-section">
+          <div class="ttd-box">
+            <span class="ttd-label">Pembina Kelompok</span>
+            <div class="ttd-line">( ________________________ )</div>
+          </div>
+          <div class="ttd-box">
+            <span class="ttd-label">Koordinator Desa</span>
+            <div class="ttd-line">( ________________________ )</div>
+          </div>
+          <div class="ttd-box">
+            <span class="ttd-label">Ketua PPG Daerah</span>
+            <div class="ttd-line">( ________________________ )</div>
+          </div>
+        </div>
+      `;
+
+      // Filter logic
+      const filterDesa = document.getElementById('filterDesa');
+      const filterKelompok = document.getElementById('filterKelompok');
+
+      function updateKelompokOptions() {
+        let kels = getAllKelompok();
+        if (filterDesa.value !== 'all') kels = kels.filter(k => k.desaId === filterDesa.value);
+        filterKelompok.innerHTML = '<option value="all">-- Semua Kelompok --</option>' +
+          kels.map(k => `<option value="${k.id}">Kel. ${k.nama}</option>`).join('');
+      }
+
+      filterDesa.addEventListener('change', () => { updateKelompokOptions(); renderTable(); });
+      filterKelompok.addEventListener('change', renderTable);
+      updateKelompokOptions();
+
+      function renderTable() {
+        const allSiswa = getSiswaList();
+        const allNilai = getNilaiPembiasaanList().filter(n => n.event_id === eventId);
+        const tbody = document.getElementById('tabelBody');
+        const tfoot = document.getElementById('tabelFoot');
+
+        const filtered = allSiswa.filter(s => {
+          if (s.kategori_usia !== 'caberawit') return false;
+          if (filterDesa.value !== 'all' && s.desa_id !== filterDesa.value) return false;
+          if (filterKelompok.value !== 'all' && s.kelompok_id !== filterKelompok.value) return false;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${5 + targetEvent.habits.length}" style="padding:24px;text-align:center;color:var(--text-muted);">Tidak ada data generus untuk filter ini.</td></tr>`;
+          tfoot.innerHTML = '';
+          return;
+        }
+
+        const habitTotals = new Array(targetEvent.habits.length).fill(0);
+        let grandTotal = 0;
+
+        tbody.innerHTML = filtered.map((s, idx) => {
+          const nilaiObj = allNilai.find(n => n.siswa_id === s.id);
+          const nilais = nilaiObj ? nilaiObj.nilai : new Array(targetEvent.habits.length).fill(0);
+          const total = nilais.reduce((a, b) => a + parseInt(b || 0), 0);
+          const max = targetEvent.habits.length * 100;
+          const pct = max > 0 ? Math.round((total / max) * 100) : 0;
+          const ket = pct >= 80 ? '✅ Baik' : pct >= 50 ? '⚠️ Cukup' : '❌ Kurang';
+
+          nilais.forEach((v, i) => habitTotals[i] += parseInt(v || 0));
+          grandTotal += total;
+
+          return `<tr>
+            <td>${idx + 1}</td>
+            <td style="text-align:left;">${s.nama_lengkap}</td>
+            <td>${calculateUmur(s.tanggal_lahir)}</td>
+            <td>${s.kelompok_nama || '-'}</td>
+            ${nilais.map(v => `<td>${parseInt(v) || 0}</td>`).join('')}
+            <td><strong>${total}</strong></td>
+            <td style="white-space:nowrap;">${ket}</td>
+          </tr>`;
+        }).join('');
+
+        tfoot.innerHTML = `<tr>
+          <td colspan="4" style="text-align:left;">Total Keseluruhan (${filtered.length} siswa)</td>
+          ${habitTotals.map(v => `<td>${v}</td>`).join('')}
+          <td><strong>${grandTotal}</strong></td>
+          <td>–</td>
+        </tr>`;
+      }
+
+      renderTable();
+    }
+  </script>
+</body>
+
+</html>

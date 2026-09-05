@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekap Kehadiran Pengajian Remaja – PPG Solo Selatan</title>
+  <meta name="description" content="Laporan resmi rekapitulasi kehadiran pengajian remaja daerah Solo Selatan per kelompok dan desa.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1a56c4;
+      --border: #cbd5e1;
+      --bg: #e2e8f0;
+      --text: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: #000;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── SCREEN HEADER (NO-PRINT) ── */
+    .screen-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      color: #fff;
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .screen-header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .screen-header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .btn-header-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-print {
+      background: #22c55e;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-print:hover {
+      background: #16a34a;
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-edit {
+      background: #f59e0b;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-edit:hover {
+      background: #d97706;
+    }
+
+    /* ── TOOLBAR EVENT SWITCHER (NO-PRINT) ── */
+    .filter-panel {
+      max-width: 900px;
+      margin: 16px auto 0;
+      padding: 0 15px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .filter-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-card select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1.5px solid #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      min-width: 280px;
+    }
+
+    /* ── REPORT DOCUMENT SHEET (A4) ── */
+    .doc-wrapper {
+      max-width: 210mm;
+      margin: 20px auto 40px;
+      padding: 0 10px;
+    }
+
+    .report-sheet {
+      background: #fff;
+      width: 100%;
+      min-height: 297mm;
+      padding: 8mm 12mm 10mm 12mm;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      box-sizing: border-box;
+      color: #000;
+      font-family: Arial, Helvetica, sans-serif;
+      position: relative;
+    }
+
+    /* ── KOP RESMI (SESUAI PDF) ── */
+    .sheet-kop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #000;
+      margin-bottom: 6px;
+    }
+
+    .kop-logo {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .kop-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .kop-center h1 {
+      font-size: 13pt;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .kop-center h2 {
+      font-size: 11pt;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      margin: 2px 0 0;
+      line-height: 1.2;
+    }
+
+    .kop-center p {
+      font-size: 8pt;
+      margin: 2px 0 0;
+      line-height: 1.25;
+    }
+
+    /* ── EVENT METADATA ── */
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5pt;
+      font-weight: 700;
+      margin: 6px 0;
+    }
+
+    /* ── SESI KELAS TABLE ── */
+    .sesi-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.2px solid #000;
+      margin-bottom: 8px;
+      font-size: 8.5pt;
+    }
+
+    .sesi-table th {
+      border: 1px solid #000;
+      padding: 3px 4px;
+      text-align: center;
+      font-weight: 900;
+      background: #f8fafc;
+    }
+
+    .sesi-table td {
+      border: 1px solid #000;
+      padding: 3px 6px;
+      text-align: center;
+    }
+
+    /* ── REKAPITULASI TABEL UTAMA ── */
+    .rekap-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #000;
+      font-size: 8.2pt;
+    }
+
+    .rekap-table th {
+      border: 1.2px solid #000;
+      padding: 3px 2px;
+      text-align: center;
+      font-weight: 900;
+      background: #fff;
+    }
+
+    .rekap-table td {
+      border: 1px solid #000;
+      padding: 1.5px 4px;
+      text-align: center;
+      height: 18px;
+    }
+
+    .desa-header-row td {
+      background: #f1f5f9;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.4px;
+      padding: 2px;
+      font-size: 8.5pt;
+    }
+
+    .cell-kel-name {
+      text-align: left !important;
+      padding-left: 6px !important;
+      font-weight: 500;
+    }
+
+    .subtotal-row td {
+      font-weight: 900;
+      background: #fffbeb;
+      border-top: 1.2px solid #000;
+    }
+
+    .grand-total-row td {
+      font-weight: 900;
+      background: #fef08a;
+      border-top: 2px solid #000;
+      border-bottom: 2px solid #000;
+      font-size: 8.8pt;
+    }
+
+    /* HIGHLIGHT ALFA >= 13% */
+    .alfa-high {
+      background-color: #fef08a !important;
+      font-weight: 800 !important;
+    }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      font-size: 7.5pt;
+      font-style: italic;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    /* ── PRINT MEDIA RULES ── */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 12mm 8mm 12mm;
+      }
+
+      html, body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .doc-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      .report-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .alfa-high {
+        background-color: #fef08a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .subtotal-row td,
+      .grand-total-row td,
+      .desa-header-row td {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP APP BAR (NO-PRINT) -->
+  <header class="screen-header no-print">
+    <div class="screen-header-inner">
+      <div class="screen-header-title">
+        <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">assessment</span>
+        <span>Laporan Rekap Kehadiran KBM</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a href="dashboard.html?action=absensi" class="btn-header-action btn-back">
+          <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
+          Dashboard
+        </a>
+        <a href="#" id="btnCetakAbsensiKbm" class="btn-header-action" style="background:#2563eb;color:#fff;">
+          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+          Lembar Absensi
+        </a>
+        <button type="button" class="btn-header-action btn-print" onclick="window.print()">
+          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+          Cetak Rekap (PDF)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- EVENT SWITCHER TOOLBAR (NO-PRINT) -->
+  <div class="filter-panel no-print">
+    <div class="filter-card">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="color:var(--primary);">event</span>
+        <label style="font-size:12px;font-weight:700;">Pilih Event KBM:</label>
+        <select id="selEvent">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a href="#" id="btnEditEvent" class="btn-header-action btn-edit" style="font-size:12px;padding:6px 12px;">
+          <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+          Edit Isian Laporan
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT SHEET -->
+  <div class="doc-wrapper">
+    <div class="report-sheet">
+
+      <!-- KOP RESMI -->
+      <div class="sheet-kop">
+        <img src="../image/Logo-PPG.png" alt="Logo PPG" class="kop-logo" />
+        <div class="kop-center">
+          <h1 id="kopTitle">REKAP KEHADIRAN PENGAJIAN REMAJA</h1>
+          <h2 id="kopSubTitle">KEPENGURUSAN REMAJA DAERAH SOLO SELATAN</h2>
+          <p>Sekretariat : Kompleks Masjid Roudhotul Jannah</p>
+          <p>Jl. Porong, Pucang Sawit, (03/III) , Jebres, Surakarta</p>
+        </div>
+        <img src="../image/logoKMMda.png" alt="Logo Remaja Solo Selatan" class="kop-logo" />
+      </div>
+
+      <!-- METADATA HARI, TANGGAL & JAM -->
+      <div class="meta-row">
+        <div>Hari, Tanggal &nbsp;: &nbsp;<span id="dispTanggal">Selasa, 20 Januari 2026</span></div>
+        <div>Jam &nbsp;: &nbsp;<span id="dispJam">19.30 – 21.00 WIB</span></div>
+      </div>
+
+      <!-- SESI KELAS, TEMPAT, MATERI, PENASEHAT -->
+      <table class="sesi-table">
+        <thead>
+          <tr>
+            <th style="width:25%;">Kelas</th>
+            <th style="width:22%;">Tempat</th>
+            <th style="width:25%;">Materi</th>
+            <th style="width:28%;">Penasehat / Pengisi</th>
+          </tr>
+        </thead>
+        <tbody id="sesiTbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+
+      <!-- TABEL REKAPITULASI KEHADIRAN -->
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width:24%;">Kelompok</th>
+            <th rowspan="2" style="width:9%;">Hadir</th>
+            <th rowspan="2" style="width:8%;">Ijin</th>
+            <th rowspan="2" style="width:8%;">Alfa</th>
+            <th rowspan="2" style="width:9%;">Total</th>
+            <th colspan="3" style="width:42%;">Prosentase</th>
+          </tr>
+          <tr>
+            <th style="width:14%;">Kehadiran</th>
+            <th style="width:14%;">Ijin</th>
+            <th style="width:14%;">Alfa</th>
+          </tr>
+        </thead>
+        <tbody id="rekapTbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+
+      <!-- FOOTER NOTE -->
+      <div class="footer-note">
+        *) blok berwarna yang tingkat ALFA 13% dan keatas
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { MASTER_WILAYAH, getKbmEvents, getKbmEventById } from '../src/db-master.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let eventId = urlParams.get('eventId') || 'kbm-evt-001';
+
+    const selEvent = document.getElementById('selEvent');
+    const kopTitle = document.getElementById('kopTitle');
+    const kopSubTitle = document.getElementById('kopSubTitle');
+    const dispTanggal = document.getElementById('dispTanggal');
+    const dispJam = document.getElementById('dispJam');
+    const sesiTbody = document.getElementById('sesiTbody');
+    const rekapTbody = document.getElementById('rekapTbody');
+    const btnCetakAbsensiKbm = document.getElementById('btnCetakAbsensiKbm');
+    const btnEditEvent = document.getElementById('btnEditEvent');
+
+    // Populate Events Dropdown
+    const events = getKbmEvents();
+    selEvent.innerHTML = events.map(ev =>
+      `<option value="${ev.id}" ${ev.id === eventId ? 'selected' : ''}>${ev.judul} (${ev.hari_tanggal || 'Tanggal -'})</option>`
+    ).join('');
+
+    selEvent.addEventListener('change', () => {
+      eventId = selEvent.value;
+      renderReport();
+    });
+
+    function formatPercent(val) {
+      if (isNaN(val) || !isFinite(val)) return '0.00%';
+      return val.toFixed(2) + '%';
+    }
+
+    function renderReport() {
+      const event = getKbmEventById(eventId) || events[0];
+      if (!event) return;
+
+      // Update Nav Buttons
+      btnCetakAbsensiKbm.href = `cetak-absensi.html?eventId=${event.id}`;
+      btnEditEvent.href = `dashboard.html?action=edit_rekap&eventId=${event.id}`;
+
+      // Update Titles
+      kopTitle.textContent = event.judul || 'REKAP KEHADIRAN PENGAJIAN REMAJA';
+      if (event.subjudul) kopSubTitle.textContent = event.subjudul;
+      dispTanggal.textContent = event.hari_tanggal || '-';
+      dispJam.textContent = event.jam || '-';
+
+      // Render Sesi Kelas
+      const sesiList = (event.sesi_kelas && event.sesi_kelas.length > 0)
+        ? event.sesi_kelas
+        : [{ kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1', materi: 'Seminar Senkom Kota', penasehat: 'Bp. Abdul Aziz , S.Kom., M.Cs.' }];
+
+      sesiTbody.innerHTML = sesiList.map(s => `
+        <tr>
+          <td style="font-weight:700;">${s.kelas || '-'}</td>
+          <td>${s.tempat || '-'}</td>
+          <td>${s.materi || '-'}</td>
+          <td style="font-weight:600;">${s.penasehat || '-'}</td>
+        </tr>
+      `).join('');
+
+      // Render Rekapitulasi sesuai cakupan wilayah event (Kelompok, Desa, atau Se-Daerah)
+      const rekapData = event.rekap_kehadiran || {};
+      let html = '';
+
+      let grandHadir = 0;
+      let grandIjin = 0;
+      let grandAlfa = 0;
+      let grandTotal = 0;
+
+      const desaSubtotals = [];
+
+      // Filter wilayah based on event scope
+      let scopedDesa = MASTER_WILAYAH.desa;
+
+      if (event.kelompok_id && event.kelompok_id !== 'all') {
+        scopedDesa = MASTER_WILAYAH.desa
+          .map(d => ({
+            ...d,
+            kelompok: d.kelompok.filter(k => k.id === event.kelompok_id)
+          }))
+          .filter(d => d.kelompok.length > 0);
+        
+        const kelObj = scopedDesa[0]?.kelompok[0];
+        if (kelObj) {
+          kopSubTitle.textContent = `KEPENGURUSAN REMAJA KELOMPOK ${kelObj.nama.toUpperCase()}`;
+        }
+      } else if (event.desa_id && event.desa_id !== 'all') {
+        scopedDesa = MASTER_WILAYAH.desa.filter(d => d.id === event.desa_id);
+        if (scopedDesa[0]) {
+          kopSubTitle.textContent = `KEPENGURUSAN REMAJA DESA ${scopedDesa[0].nama.toUpperCase()}`;
+        }
+      }
+
+      scopedDesa.forEach(desa => {
+        // Desa Header Row
+        html += `
+          <tr class="desa-header-row">
+            <td colspan="8">Desa ${desa.nama}</td>
+          </tr>
+        `;
+
+        let subHadir = 0;
+        let subIjin = 0;
+        let subAlfa = 0;
+        let subTotal = 0;
+
+        desa.kelompok.forEach(kel => {
+          const kData = rekapData[kel.id] || { hadir: 0, ijin: 0, alfa: 0 };
+          const h = parseInt(kData.hadir) || 0;
+          const i = parseInt(kData.ijin) || 0;
+          const a = parseInt(kData.alfa) || 0;
+          const tot = h + i + a;
+
+          subHadir += h;
+          subIjin += i;
+          subAlfa += a;
+          subTotal += tot;
+
+          const pctHadir = tot > 0 ? (h / tot) * 100 : 0;
+          const pctIjin = tot > 0 ? (i / tot) * 100 : 0;
+          const pctAlfa = tot > 0 ? (a / tot) * 100 : 0;
+          const isAlfaHigh = pctAlfa >= 13.0;
+
+          html += `
+            <tr>
+              <td class="cell-kel-name">${kel.nama}</td>
+              <td>${h}</td>
+              <td>${i}</td>
+              <td>${a}</td>
+              <td>${tot}</td>
+              <td>${formatPercent(pctHadir)}</td>
+              <td>${formatPercent(pctIjin)}</td>
+              <td class="${isAlfaHigh ? 'alfa-high' : ''}">${formatPercent(pctAlfa)}</td>
+            </tr>
+          `;
+        });
+
+        // Store subtotal
+        const pctSubHadir = subTotal > 0 ? (subHadir / subTotal) * 100 : 0;
+        const pctSubIjin = subTotal > 0 ? (subIjin / subTotal) * 100 : 0;
+        const pctSubAlfa = subTotal > 0 ? (subAlfa / subTotal) * 100 : 0;
+        const isSubAlfaHigh = pctSubAlfa >= 13.0;
+
+        desaSubtotals.push({
+          nama: `Desa ${desa.nama}`,
+          hadir: subHadir,
+          ijin: subIjin,
+          alfa: subAlfa,
+          total: subTotal,
+          pctHadir: pctSubHadir,
+          pctIjin: pctSubIjin,
+          pctAlfa: pctSubAlfa,
+          isAlfaHigh: isSubAlfaHigh
+        });
+
+        grandHadir += subHadir;
+        grandIjin += subIjin;
+        grandAlfa += subAlfa;
+        grandTotal += subTotal;
+      });
+
+      // Render Desa Subtotals only when multiple desas are present (Se-Daerah)
+      if (scopedDesa.length > 1) {
+        desaSubtotals.forEach(sub => {
+          html += `
+            <tr class="subtotal-row">
+              <td class="cell-kel-name">${sub.nama}</td>
+              <td>${sub.hadir}</td>
+              <td>${sub.ijin}</td>
+              <td>${sub.alfa}</td>
+              <td>${sub.total}</td>
+              <td>${formatPercent(sub.pctHadir)}</td>
+              <td>${formatPercent(sub.pctIjin)}</td>
+              <td class="${sub.isAlfaHigh ? 'alfa-high' : ''}">${formatPercent(sub.pctAlfa)}</td>
+            </tr>
+          `;
+        });
+      }
+
+      // Render Grand Total
+      const grandPctHadir = grandTotal > 0 ? (grandHadir / grandTotal) * 100 : 0;
+      const grandPctIjin = grandTotal > 0 ? (grandIjin / grandTotal) * 100 : 0;
+      const grandPctAlfa = grandTotal > 0 ? (grandAlfa / grandTotal) * 100 : 0;
+      const isGrandAlfaHigh = grandPctAlfa >= 13.0;
+
+      html += `
+        <tr class="grand-total-row">
+          <td style="text-align:center;font-weight:900;">Total</td>
+          <td>${grandHadir}</td>
+          <td>${grandIjin}</td>
+          <td>${grandAlfa}</td>
+          <td>${grandTotal}</td>
+          <td>${formatPercent(grandPctHadir)}</td>
+          <td>${formatPercent(grandPctIjin)}</td>
+          <td class="${isGrandAlfaHigh ? 'alfa-high' : ''}">${formatPercent(grandPctAlfa)}</td>
+        </tr>
+      `;
+
+      rekapTbody.innerHTML = html;
+    }
+
+    renderReport();
+  </script>
+</body>
+
+</html>
