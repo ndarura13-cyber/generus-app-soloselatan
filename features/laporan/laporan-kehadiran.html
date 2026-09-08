@@ -108,6 +108,92 @@
       background: #d97706;
     }
 
+    /* ── SUB NAVIGATION & BREADCRUMB ── */
+    .nav-subbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .nav-subbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .breadcrumb-trail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .breadcrumb-trail a {
+      color: #1e40af;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+
+    .breadcrumb-trail a:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+
+    .crumb-sep {
+      color: #cbd5e1;
+      font-weight: 400;
+    }
+
+    .crumb-current {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .quick-nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .quick-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #475569;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      transition: all 0.15s;
+    }
+
+    .quick-pill:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .quick-pill.active {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+      font-weight: 700;
+    }
+
     /* ── TOOLBAR EVENT SWITCHER (NO-PRINT) ── */
     .filter-panel {
       max-width: 900px;
@@ -363,35 +449,57 @@
         <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">assessment</span>
         <span>Laporan Rekap Kehadiran KBM</span>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <a href="dashboard.html?action=absensi" class="btn-header-action btn-back">
-          <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
-          Dashboard
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <a href="../../index.html" class="btn-header-action btn-back" title="Kembali ke Beranda">
+          <span class="material-symbols-outlined" style="font-size:18px;">home</span>
+          <span>Beranda</span>
         </a>
-        <a href="#" id="btnCetakAbsensiKbm" class="btn-header-action" style="background:#2563eb;color:#fff;">
-          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          Lembar Absensi
+        <a href="../dashboard/dashboard.html?action=absensi" class="btn-header-action btn-back" id="navLinkDashboard" title="Dashboard">
+          <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
+          <span>Dashboard</span>
         </a>
-        <button type="button" class="btn-header-action btn-print" onclick="window.print()">
+        <a href="cetak-absensi.html" id="btnCetakAbsensiKbm" class="btn-header-action" style="background:#2563eb;color:#fff;" title="Cetak Lembar Presensi KBM">
           <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          Cetak Rekap (PDF)
+          <span>Presensi KBM</span>
+        </a>
+        <button type="button" class="btn-header-action btn-print" onclick="window.print()" title="Cetak Rekap / Simpan PDF">
+          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+          <span>Cetak Rekap (PDF)</span>
         </button>
       </div>
     </div>
   </header>
 
+  <!-- SUB NAVIGATION & BREADCRUMB (NO-PRINT) -->
+  <div class="nav-subbar no-print">
+    <div class="nav-subbar-inner">
+      <div class="breadcrumb-trail">
+        <a href="../../index.html"><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;">home</span> Beranda</a>
+        <span class="crumb-sep">/</span>
+        <a href="../dashboard/dashboard.html?action=absensi" id="crumbDashboard">Dashboard</a>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-current">Laporan Rekap Kehadiran KBM</span>
+      </div>
+      <div class="quick-nav-pills">
+        <a href="cetak-absensi.html" class="quick-pill"><span class="material-symbols-outlined" style="font-size:14px;">description</span> Presensi KBM</a>
+        <span class="quick-pill active"><span class="material-symbols-outlined" style="font-size:14px;">bar_chart</span> Rekap Kehadiran</span>
+        <a href="laporan-pembiasaan.html" class="quick-pill"><span class="material-symbols-outlined" style="font-size:14px;">checklist</span> Laporan Pembiasaan</a>
+      </div>
+    </div>
+  </div>
+
   <!-- EVENT SWITCHER TOOLBAR (NO-PRINT) -->
   <div class="filter-panel no-print">
     <div class="filter-card">
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="material-symbols-outlined" style="color:var(--primary);">event</span>
         <label style="font-size:12px;font-weight:700;">Pilih Event KBM:</label>
         <select id="selEvent">
           <!-- Populated by JS -->
         </select>
       </div>
-      <div style="display:flex;gap:8px;">
-        <a href="#" id="btnEditEvent" class="btn-header-action btn-edit" style="font-size:12px;padding:6px 12px;">
+      <div id="wrapEditEvent" style="display:none;">
+        <a href="#" id="btnEditEvent" class="btn-header-action btn-edit" style="font-size:12px;padding:6px 14px;">
           <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
           Edit Isian Laporan
         </a>
@@ -405,14 +513,14 @@
 
       <!-- KOP RESMI -->
       <div class="sheet-kop">
-        <img src="../image/Logo-PPG.png" alt="Logo PPG" class="kop-logo" />
+        <img src="../../src/image/Logo-PPG.png" alt="Logo PPG" class="kop-logo" />
         <div class="kop-center">
           <h1 id="kopTitle">REKAP KEHADIRAN PENGAJIAN REMAJA</h1>
           <h2 id="kopSubTitle">KEPENGURUSAN REMAJA DAERAH SOLO SELATAN</h2>
           <p>Sekretariat : Kompleks Masjid Roudhotul Jannah</p>
           <p>Jl. Porong, Pucang Sawit, (03/III) , Jebres, Surakarta</p>
         </div>
-        <img src="../image/logoKMMda.png" alt="Logo Remaja Solo Selatan" class="kop-logo" />
+        <img src="../../src/image/logoKMMda.png" alt="Logo Remaja Solo Selatan" class="kop-logo" />
       </div>
 
       <!-- METADATA HARI, TANGGAL & JAM -->
@@ -467,10 +575,43 @@
   </div>
 
   <script type="module">
-    import { MASTER_WILAYAH, getKbmEvents, getKbmEventById } from '../src/db-master.js';
+    import { MASTER_WILAYAH, getKbmEvents, getKbmEventById } from '../../src/db-master.js';
 
     const urlParams = new URLSearchParams(window.location.search);
     let eventId = urlParams.get('eventId') || 'kbm-evt-001';
+
+    // Session check for Nav links and Edit Button
+    let isLoggedIn = false;
+    try {
+      const rawSession = localStorage.getItem('ppg_user_session');
+      if (rawSession) {
+        const user = JSON.parse(rawSession);
+        if (user && user.email && user.isActive !== false && user.statusApproval !== 'pending' && user.statusApproval !== 'rejected') {
+          isLoggedIn = true;
+        }
+      }
+    } catch (e) {
+      isLoggedIn = false;
+    }
+
+    const navDash = document.getElementById('navLinkDashboard');
+    const crumbDash = document.getElementById('crumbDashboard');
+    if (!isLoggedIn) {
+      if (navDash) {
+        navDash.href = '../login/login.html';
+        navDash.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">login</span><span>Masuk</span>';
+        navDash.title = 'Masuk sebagai Pengurus';
+      }
+      if (crumbDash) {
+        crumbDash.href = '../login/login.html';
+        crumbDash.textContent = 'Masuk Pengurus';
+      }
+    }
+
+    const wrapEditEvent = document.getElementById('wrapEditEvent');
+    if (wrapEditEvent) {
+      wrapEditEvent.style.display = isLoggedIn ? 'block' : 'none';
+    }
 
     const selEvent = document.getElementById('selEvent');
     const kopTitle = document.getElementById('kopTitle');
@@ -504,7 +645,9 @@
 
       // Update Nav Buttons
       btnCetakAbsensiKbm.href = `cetak-absensi.html?eventId=${event.id}`;
-      btnEditEvent.href = `dashboard.html?action=edit_rekap&eventId=${event.id}`;
+      if (isLoggedIn && btnEditEvent) {
+        btnEditEvent.href = `../dashboard/dashboard.html?action=edit_rekap&eventId=${event.id}`;
+      }
 
       // Update Titles
       kopTitle.textContent = event.judul || 'REKAP KEHADIRAN PENGAJIAN REMAJA';

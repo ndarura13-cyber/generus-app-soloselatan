@@ -10,13 +10,13 @@
   "lang": "id",
   "icons": [
     {
-      "src": "../image/icon-192.png",
+      "src": "image/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "../image/icon-512.png",
+      "src": "image/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -28,7 +28,7 @@
   ],
   "screenshots": [
     {
-      "src": "../image/hero.jpg",
+      "src": "image/hero.jpg",
       "sizes": "1280x720",
       "type": "image/jpeg",
       "form_factor": "wide",
@@ -43,7 +43,7 @@
       "url": "../index.html#program-kerja",
       "icons": [
         {
-          "src": "../image/icon-192.png",
+          "src": "image/icon-192.png",
           "sizes": "192x192"
         }
       ]
@@ -52,10 +52,10 @@
       "name": "Masuk",
       "short_name": "Login",
       "description": "Masuk ke dashboard pengurus",
-      "url": "../features/login.html",
+      "url": "../features/login/login.html",
       "icons": [
         {
-          "src": "../image/icon-192.png",
+          "src": "image/icon-192.png",
           "sizes": "192x192"
         }
       ]

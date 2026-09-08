@@ -40,85 +40,180 @@
       color: var(--text);
     }
 
-    /* ── HEADER ── */
-    .site-header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    /* ── SCREEN ONLY TOOLBAR ── */
+    .screen-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
       color: #fff;
-      padding: 0 20px;
+      padding: 12px 24px;
       position: sticky;
       top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .site-header-inner {
+    .screen-header-inner {
       max-width: 1100px;
       margin: 0 auto;
-      height: 54px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    .site-header a.back-link {
+    .screen-header-title {
       display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .header-badge-count {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .btn-header-action {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: rgba(255, 255, 255, 0.85);
-      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
       font-size: 13px;
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-
-    .site-header a.back-link:hover {
-      color: #fff;
-    }
-
-    .site-header-title {
-      font-size: 15px;
       font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
     }
 
     .btn-print {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.15);
+      background: #22c55e;
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
+      border: none;
+      box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
     }
 
     .btn-print:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-back:hover {
       background: rgba(255, 255, 255, 0.25);
     }
 
-    /* ── BREADCRUMB ── */
-    .breadcrumb {
+    /* ── SUB NAVIGATION & BREADCRUMB ── */
+    .nav-subbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav-subbar-inner {
       max-width: 1100px;
-      margin: 12px auto 0;
-      padding: 0 20px;
-      font-size: 12px;
-      color: var(--text-muted);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .breadcrumb-trail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .breadcrumb-trail a {
+      color: #1e40af;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+
+    .breadcrumb-trail a:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+
+    .crumb-sep {
+      color: #cbd5e1;
+      font-weight: 400;
+    }
+
+    .crumb-current {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .quick-nav-pills {
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
     }
 
-    .breadcrumb a {
-      color: var(--primary);
+    .quick-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
       text-decoration: none;
+      color: #475569;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      transition: all 0.15s;
     }
 
-    .breadcrumb a:hover {
-      text-decoration: underline;
+    .quick-pill:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .quick-pill.active {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+      font-weight: 700;
+    }
+
+    @media print {
+      .no-print,
+      .screen-header,
+      .nav-subbar {
+        display: none !important;
+      }
+      body {
+        background: #fff !important;
+      }
+      .container {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
     }
 
     /* ── MAIN ── */
@@ -465,25 +560,51 @@
 
 <body>
 
-  <!-- STICKY HEADER -->
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="../index.html" class="back-link">
-        <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
-        Kembali ke Beranda
-      </a>
-      <span class="site-header-title">Laporan Pembiasaan Generus</span>
-      <button class="btn-print" onclick="window.print()">
-        <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak / PDF
-      </button>
+  <!-- TOP APP BAR (NO-PRINT) -->
+  <header class="screen-header no-print">
+    <div class="screen-header-inner">
+      <div class="screen-header-title">
+        <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">checklist</span>
+        <span>Laporan Pembiasaan Generus</span>
+        <span class="header-badge-count" id="headerBadge">Caberawit</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <a href="../../index.html" class="btn-header-action btn-back" title="Kembali ke Beranda">
+          <span class="material-symbols-outlined" style="font-size:18px;">home</span>
+          <span>Beranda</span>
+        </a>
+        <a href="../dashboard/dashboard.html?action=pembiasaan" class="btn-header-action btn-back" id="navLinkDashboard" title="Dashboard">
+          <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="cetak-absensi.html" class="btn-header-action" style="background:#2563eb;color:#fff;" title="Cetak Presensi KBM">
+          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+          <span>Presensi KBM</span>
+        </a>
+        <button type="button" class="btn-header-action btn-print" onclick="window.print()" title="Cetak / Simpan PDF">
+          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+          <span>Cetak Dokumen</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- BREADCRUMB -->
-  <div class="breadcrumb" id="breadcrumb">
-    <a href="../index.html">Beranda</a>
-    <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
-    <span id="breadcrumbLabel">Laporan Pembiasaan</span>
+  <!-- SUB NAVIGATION & BREADCRUMB (NO-PRINT) -->
+  <div class="nav-subbar no-print">
+    <div class="nav-subbar-inner">
+      <div class="breadcrumb-trail" id="breadcrumbTrail">
+        <a href="../../index.html"><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;">home</span> Beranda</a>
+        <span class="crumb-sep">/</span>
+        <a href="../dashboard/dashboard.html?action=pembiasaan" id="crumbDashboard">Dashboard</a>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-current" id="breadcrumbCurrent">Daftar Laporan Pembiasaan</span>
+      </div>
+      <div class="quick-nav-pills">
+        <a href="cetak-absensi.html" class="quick-pill"><span class="material-symbols-outlined" style="font-size:14px;">description</span> Presensi KBM</a>
+        <a href="laporan-kehadiran.html" class="quick-pill"><span class="material-symbols-outlined" style="font-size:14px;">bar_chart</span> Rekap Kehadiran</a>
+        <span class="quick-pill active"><span class="material-symbols-outlined" style="font-size:14px;">checklist</span> Laporan Pembiasaan</span>
+      </div>
+    </div>
   </div>
 
   <!-- MAIN CONTENT -->
@@ -499,18 +620,47 @@
       MASTER_WILAYAH,
       getAllKelompok,
       calculateUmur
-    } from '../src/db-master.js';
+    } from '../../src/db-master.js';
 
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('event');
     const mainContent = document.getElementById('mainContent');
+
+    // Session check for Navigation Links & Breadcrumb
+    let isLoggedIn = false;
+    try {
+      const rawSession = localStorage.getItem('ppg_user_session');
+      if (rawSession) {
+        const user = JSON.parse(rawSession);
+        if (user && user.email && user.isActive !== false && user.statusApproval !== 'pending' && user.statusApproval !== 'rejected') {
+          isLoggedIn = true;
+        }
+      }
+    } catch (e) {
+      isLoggedIn = false;
+    }
+
+    const navDash = document.getElementById('navLinkDashboard');
+    const crumbDash = document.getElementById('crumbDashboard');
+    if (!isLoggedIn) {
+      if (navDash) {
+        navDash.href = '../login/login.html';
+        navDash.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">login</span><span>Masuk</span>';
+        navDash.title = 'Masuk sebagai Pengurus';
+      }
+      if (crumbDash) {
+        crumbDash.href = '../login/login.html';
+        crumbDash.textContent = 'Masuk Pengurus';
+      }
+    }
 
     const allEvents = getEventPembiasaanList();
     const targetEvent = allEvents.find(e => e.id === eventId);
 
     if (!targetEvent) {
       // SHOW EVENT LIST
-      document.getElementById('breadcrumbLabel').textContent = 'Daftar Laporan';
+      const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
+      if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Daftar Laporan Pembiasaan';
 
       const eventRows = allEvents.map((e, i) => `
         <tr>
@@ -547,16 +697,27 @@
     } else {
       // SHOW LAPORAN DETAIL
       document.title = `Laporan: ${targetEvent.judul_periode} – PPG Solo Selatan`;
-      document.getElementById('breadcrumbLabel').textContent = targetEvent.judul_periode;
 
-      // Update breadcrumb
-      document.getElementById('breadcrumb').innerHTML = `
-        <a href="../index.html">Beranda</a>
-        <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
-        <a href="laporan-pembiasaan.html">Daftar Laporan</a>
-        <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>
-        <span>${targetEvent.judul_periode}</span>
-      `;
+      const headerBadge = document.getElementById('headerBadge');
+      if (headerBadge) {
+        headerBadge.textContent = targetEvent.status === 'berjalan' ? '🟢 Aktif' : '🔒 Selesai';
+      }
+
+      // Update breadcrumb trail dynamically
+      const dashUrl = isLoggedIn ? '../dashboard/dashboard.html?action=pembiasaan' : '../login/login.html';
+      const dashLabel = isLoggedIn ? 'Dashboard' : 'Masuk Pengurus';
+      const trailEl = document.getElementById('breadcrumbTrail');
+      if (trailEl) {
+        trailEl.innerHTML = `
+          <a href="../../index.html"><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;">home</span> Beranda</a>
+          <span class="crumb-sep">/</span>
+          <a href="${dashUrl}" id="crumbDashboard">${dashLabel}</a>
+          <span class="crumb-sep">/</span>
+          <a href="laporan-pembiasaan.html">Daftar Laporan</a>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-current">${targetEvent.judul_periode}</span>
+        `;
+      }
 
       const createdDate = new Date(targetEvent.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
       const closedDate = targetEvent.closed_at ? new Date(targetEvent.closed_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
@@ -573,7 +734,7 @@
         <div class="laporan-header-card">
           <div class="laporan-org">
             <div class="laporan-org-logo">
-              <img src="../image/Logo-PPG.png" alt="Logo PPG" />
+              <img src="../../src/image/Logo-PPG.png" alt="Logo PPG" />
             </div>
             <div class="laporan-org-text">
               <strong>Penggerak Pembina Generus (PPG)</strong>

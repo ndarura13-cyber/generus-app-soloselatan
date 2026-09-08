@@ -130,9 +130,9 @@ CREATE TABLE IF NOT EXISTS siswa (
     alamat_domisili TEXT,
     domisili domisili_enum DEFAULT 'Pribumi',
     
-    -- Status
+    -- Status Sambung & Status Aktif (Hanya 'Sambung' yang dihitung aktif; 'Menikah' & 'Pindah Sambung' nonaktif)
     status_sambung status_sambung_enum DEFAULT 'Sambung',
-    status_aktif BOOLEAN DEFAULT TRUE,
+    status_aktif BOOLEAN GENERATED ALWAYS AS (status_sambung = 'Sambung') STORED,
     foto_url TEXT,
     catatan_khusus TEXT,
     
@@ -140,13 +140,119 @@ CREATE TABLE IF NOT EXISTS siswa (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexing untuk pencarian cepat
+-- Indexing untuk pencarian cepat & status aktif
 CREATE INDEX IF NOT EXISTS idx_siswa_nama ON siswa(nama_lengkap);
 CREATE INDEX IF NOT EXISTS idx_siswa_nik ON siswa(nik);
 CREATE INDEX IF NOT EXISTS idx_siswa_kelompok ON siswa(kelompok_id);
 CREATE INDEX IF NOT EXISTS idx_siswa_desa ON siswa(desa_id);
 CREATE INDEX IF NOT EXISTS idx_siswa_kategori ON siswa(kategori_usia);
 CREATE INDEX IF NOT EXISTS idx_siswa_jenjang ON siswa(jenjang_kelas);
+CREATE INDEX IF NOT EXISTS idx_siswa_status_sambung ON siswa(status_sambung);
+CREATE INDEX IF NOT EXISTS idx_siswa_status_aktif ON siswa(status_aktif);
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- VIEW KHUSUS: GENERUS AKTIF (Hanya status 'Sambung')
+-- ═══════════════════════════════════════════════════════════════════════════
+CREATE OR REPLACE VIEW v_siswa_aktif AS
+SELECT 
+    s.*,
+    EXTRACT(YEAR FROM age(CURRENT_DATE, s.tanggal_lahir))::INT AS umur_terkini,
+    d.nama_desa,
+    k.nama_kelompok
+FROM siswa s
+JOIN desa d ON s.desa_id = d.id
+JOIN kelompok k ON s.kelompok_id = k.id
+WHERE s.status_sambung = 'Sambung';
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- FUNCTION & TRIGGER: OTOMATISASI PENGUBAHAN JENJANG BERDASARKAN USIA / TAHUN
+-- ═══════════════════════════════════════════════════════════════════════════
+CREATE OR REPLACE FUNCTION fn_kalkulasi_jenjang_otomatis(
+    p_tgl_lahir DATE,
+    p_jenjang_saat_ini jenjang_kelas_enum
+)
+RETURNS TABLE (
+    kategori_baru kategori_usia_enum,
+    jenjang_baru jenjang_kelas_enum,
+    umur_hitung INT
+) AS $$
+DECLARE
+    v_umur INT;
+BEGIN
+    v_umur := EXTRACT(YEAR FROM age(CURRENT_DATE, p_tgl_lahir))::INT;
+    umur_hitung := v_umur;
+
+    -- Caberawit (PAUD s.d. 6 SD)
+    IF v_umur <= 4 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := 'PAUD';
+    ELSIF v_umur = 5 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := 'TK A';
+    ELSIF v_umur = 6 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := 'TK B';
+    ELSIF v_umur = 7 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := '1 SD';
+    ELSIF v_umur = 8 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := '2 SD';
+    ELSIF v_umur = 9 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := '3 SD';
+    ELSIF v_umur = 10 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := '4 SD';
+    ELSIF v_umur = 11 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := '5 SD';
+    ELSIF v_umur = 12 THEN
+        kategori_baru := 'caberawit'; jenjang_baru := '6 SD';
+    -- GP Reguler (1 SMP s.d. 3 SMA)
+    ELSIF v_umur = 13 THEN
+        kategori_baru := 'gp_reguler'; jenjang_baru := '1 SMP';
+    ELSIF v_umur = 14 THEN
+        kategori_baru := 'gp_reguler'; jenjang_baru := '2 SMP';
+    ELSIF v_umur = 15 THEN
+        kategori_baru := 'gp_reguler'; jenjang_baru := '3 SMP';
+    ELSIF v_umur = 16 THEN
+        kategori_baru := 'gp_reguler'; jenjang_baru := '1 SMA';
+    ELSIF v_umur = 17 THEN
+        kategori_baru := 'gp_reguler'; jenjang_baru := '2 SMA';
+    ELSIF v_umur = 18 THEN
+        kategori_baru := 'gp_reguler'; jenjang_baru := '3 SMA';
+    -- Remaja & Pra-Nikah (> 18 tahun)
+    ELSE
+        kategori_baru := 'remaja';
+        IF p_jenjang_saat_ini IN ('Mahasiswa', 'Bekerja', 'Lainnya') THEN
+            jenjang_baru := p_jenjang_saat_ini;
+        ELSIF v_umur <= 22 THEN
+            jenjang_baru := 'Pra-Nikah';
+        ELSE
+            jenjang_baru := 'Kelas Remaja';
+        END IF;
+    END IF;
+
+    RETURN NEXT;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Prosedur Batch: Kenaikan Jenjang Massal Pergantian Tahun Ajaran Baru
+CREATE OR REPLACE PROCEDURE sp_kenaikan_jenjang_tahunan()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    rec RECORD;
+    v_kat kategori_usia_enum;
+    v_jenjang jenjang_kelas_enum;
+    v_umur INT;
+BEGIN
+    FOR rec IN SELECT id, tanggal_lahir, jenjang_kelas FROM siswa WHERE status_sambung = 'Sambung' LOOP
+        SELECT kategori_baru, jenjang_baru, umur_hitung 
+        INTO v_kat, v_jenjang, v_umur
+        FROM fn_kalkulasi_jenjang_otomatis(rec.tanggal_lahir, rec.jenjang_kelas);
+        
+        UPDATE siswa
+        SET kategori_usia = v_kat,
+            jenjang_kelas = v_jenjang,
+            updated_at = NOW()
+        WHERE id = rec.id AND (kategori_usia <> v_kat OR jenjang_kelas <> v_jenjang);
+    END LOOP;
+END;
+$$;
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- 5. TABEL MUTASI SISWA (Pindah Kelompok / Cabang)
@@ -378,4 +484,56 @@ BEGIN
     (6, 'Festival Tahfidz Qur''an & Seni Olahraga Generus', 'November 2026', 'Caberawit & GP Reguler (PAUD s/d SMA)', 'Menumbuhkan motivasi hafalan Al-Qur''an, kesehatan jasmani, sportivitas, dan keakraban antar-desa.', 'Piala & Hadiah: Rp 3.500.000, Panggung: Rp 3.000.000, Konsumsi: Rp 2.500.000, Logistik: Rp 1.000.000', 10000000, 'Kompleks Olahraga Sekarpace (Desa Timur 2)', 'direncanakan', 'daerah'),
     (7, 'Musyawarah Evaluasi KBM Semester Ganjil & Rakor Akhir Tahun', 'Desember 2026', 'Seluruh Pamong & Pengurus PPG 5 Desa', 'Rekapitulasi ketercapaian materi KBM, rekap presensi, dan pelaporan keuangan tahun berjalan.', 'Laporan Cetak: Rp 1.200.000, Konsumsi Rapat Akbar: Rp 2.800.000', 4000000, 'Gedung PPG Solo Selatan', 'direncanakan', 'daerah');
 
+END $$;
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 10. SUPABASE ROW LEVEL SECURITY (RLS) & PUBLIC POLICIES
+-- Mengaktifkan RLS dan memberikan hak akses penuh (CRUD) ke anon & authenticated
+-- ═══════════════════════════════════════════════════════════════════════════
+
+ALTER TABLE daerah ENABLE ROW LEVEL SECURITY;
+ALTER TABLE desa ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kelompok ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pengurus ENABLE ROW LEVEL SECURITY;
+ALTER TABLE siswa ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mutasi_siswa ENABLE ROW LEVEL SECURITY;
+ALTER TABLE program_kerja ENABLE ROW LEVEL SECURITY;
+ALTER TABLE absensi_sesi ENABLE ROW LEVEL SECURITY;
+ALTER TABLE absensi_detail ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_pembiasaan ENABLE ROW LEVEL SECURITY;
+ALTER TABLE nilai_pembiasaan ENABLE ROW LEVEL SECURITY;
+
+-- Otomatis membuat policy CRUD untuk semua tabel publik
+DO $$
+DECLARE
+    t text;
+BEGIN
+    FOR t IN 
+        SELECT tablename 
+        FROM pg_tables 
+        WHERE schemaname = 'public' 
+          AND tablename NOT IN ('spatial_ref_sys')
+    LOOP
+        EXECUTE format('DROP POLICY IF EXISTS "Public access for all operations" ON %I', t);
+        EXECUTE format('CREATE POLICY "Public access for all operations" ON %I FOR ALL TO anon, authenticated USING (true) WITH CHECK (true)', t);
+    END LOOP;
+END $$;
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 11. SUPABASE REALTIME REPLICATION
+-- Menambahkan tabel ke publikasi realtime Supabase untuk sinkronisasi multi-device
+-- ═══════════════════════════════════════════════════════════════════════════
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE siswa;
+        ALTER PUBLICATION supabase_realtime ADD TABLE absensi_sesi;
+        ALTER PUBLICATION supabase_realtime ADD TABLE absensi_detail;
+        ALTER PUBLICATION supabase_realtime ADD TABLE event_pembiasaan;
+        ALTER PUBLICATION supabase_realtime ADD TABLE nilai_pembiasaan;
+        ALTER PUBLICATION supabase_realtime ADD TABLE program_kerja;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL; -- Lewati jika tabel sudah ada di publikasi
 END $$;

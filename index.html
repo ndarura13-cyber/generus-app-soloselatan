@@ -15,14 +15,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Generus SS" />
-  <link rel="apple-touch-icon" href="image/icon-192.png" />
+  <link rel="apple-touch-icon" href="src/image/icon-192.png" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="PPG Solo Selatan – Faham Agama &amp; 29 Karakter Luhur" />
   <meta property="og:description"
     content="Mewujudkan Generasi Penerus yang Faham Agama dan memiliki 29 Karakter Luhur." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="image/icon-512.png" />
+  <meta property="og:image" content="src/image/icon-512.png" />
 
   <!-- Google Fonts & Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -42,7 +42,7 @@
     <div class="navbar-inner container">
       <a href="#" class="brand">
         <div class="brand-logo">
-          <img src="image/icon-192.png" alt="Logo PP Generus" class="brand-img" />
+          <img src="src/image/icon-192.png" alt="Logo PP Generus" class="brand-img" />
         </div>
         <div class="brand-text">
           <span class="brand-title">PPG</span>
@@ -55,7 +55,7 @@
         <a href="#program-kerja" class="nav-link">Program Kerja</a>
         <a href="#fitur" class="nav-link">Fitur</a>
         <a href="#tentang" class="nav-link">Tentang</a>
-        <a href="features/login.html" class="btn-signin" id="btnSignIn">
+        <a href="features/login/login.html" class="btn-signin" id="btnSignIn">
           <span>Masuk</span>
           <span class="material-symbols-outlined" style="font-size:18px;">login</span>
         </a>
@@ -81,14 +81,14 @@
           if (user && user.email) {
             // Update Main Navbar Button
             btnSignIn.innerHTML = '<span>Kelola</span><span class="material-symbols-outlined" style="font-size:18px;">tune</span>';
-            btnSignIn.setAttribute('href', 'features/dashboard.html');
+            btnSignIn.setAttribute('href', 'features/dashboard/dashboard.html');
             btnSignIn.classList.add('btn-nav-active-session');
 
             // Update all Feature section login links after DOM loads
             window.addEventListener('DOMContentLoaded', () => {
-              const fiturLinks = document.querySelectorAll('.fitur-link[href="features/login.html"], .btn-signin-card[href="features/login.html"], #footerSignIn');
+              const fiturLinks = document.querySelectorAll('.fitur-link[href="features/login/login.html"], .btn-signin-card[href="features/login/login.html"], #footerSignIn');
               fiturLinks.forEach(link => {
-                link.setAttribute('href', 'features/dashboard.html');
+                link.setAttribute('href', 'features/dashboard/dashboard.html');
                 if (link.classList.contains('fitur-link')) {
                   link.innerHTML = 'Buka Fitur <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
                 } else if (link.classList.contains('btn-signin-card')) {
@@ -113,7 +113,7 @@
               const btnKelola = document.getElementById('btnKelolaData');
               const btnKelolaLabel = document.getElementById('btnKelolaLabel');
               if (btnKelola && btnKelolaLabel) {
-                btnKelola.setAttribute('href', 'features/dashboard.html?action=pembiasaan');
+                btnKelola.setAttribute('href', 'features/dashboard/dashboard.html?action=pembiasaan');
                 btnKelola.classList.add('logged-in');
                 btnKelolaLabel.textContent = 'Dashboard';
               }
@@ -122,7 +122,7 @@
               const btnKelolaAbsensi = document.getElementById('btnKelolaAbsensi');
               const btnKelolaAbsensiLabel = document.getElementById('btnKelolaAbsensiLabel');
               if (btnKelolaAbsensi && btnKelolaAbsensiLabel) {
-                btnKelolaAbsensi.setAttribute('href', 'features/dashboard.html?action=absensi');
+                btnKelolaAbsensi.setAttribute('href', 'features/dashboard/dashboard.html?action=absensi');
                 btnKelolaAbsensi.classList.add('logged-in');
                 btnKelolaAbsensiLabel.textContent = 'Dashboard';
               }
@@ -194,10 +194,10 @@
       </div>
       <div class="hero-image reveal-right">
         <div class="hero-img-wrapper">
-          <img src="image/hero.jpg" alt="Suasana belajar Generus PPG Solo Selatan" fetchpriority="high" />
-          <div class="hero-img-badge">
-            <span class="badge-num">1.250+</span>
-            <span class="badge-label">Generus Aktif</span>
+          <img src="src/image/hero.jpg" alt="Suasana belajar Generus PPG Solo Selatan" fetchpriority="high" />
+          <div class="hero-img-badge" id="heroImgBadge" data-kategori-stat="all" style="cursor:pointer;" title="Klik untuk melihat ringkasan data Generus">
+            <span class="badge-num" id="heroGenerusCount">57+</span>
+            <span class="badge-label">Generus Aktif <span style="font-size:10px;opacity:0.85;">➔</span></span>
           </div>
         </div>
       </div>
@@ -246,20 +246,20 @@
           <div class="stat-label">Usia Remaja <span style="font-size:11px;color:var(--green-dark);font-weight:700;">➔</span></div>
         </div>
 
-        <div class="stat-card reveal">
+        <div class="stat-card reveal" data-kategori-stat="desa" style="cursor:pointer;" title="Klik untuk melihat daftar wilayah">
           <div class="stat-icon" style="--ic:#7c3aed;">
             <span class="material-symbols-outlined ms-stat" style="color:#7c3aed;">location_city</span>
           </div>
           <div class="stat-num" data-target="5">5</div>
-          <div class="stat-label">Jumlah Desa</div>
+          <div class="stat-label">Jumlah Desa <span style="font-size:11px;color:#7c3aed;font-weight:700;">➔</span></div>
         </div>
 
-        <div class="stat-card reveal">
+        <div class="stat-card reveal" data-kategori-stat="kelompok" style="cursor:pointer;" title="Klik untuk melihat daftar wilayah">
           <div class="stat-icon" style="--ic:#0284c7;">
             <span class="material-symbols-outlined ms-stat" style="color:#0284c7;">home_work</span>
           </div>
           <div class="stat-num" data-target="27">27</div>
-          <div class="stat-label">Jumlah Kelompok</div>
+          <div class="stat-label">Jumlah Kelompok <span style="font-size:11px;color:#0284c7;font-weight:700;">➔</span></div>
         </div>
 
       </div>
@@ -407,7 +407,7 @@
           <h3>Program Kerja Tahunan</h3>
           <p>Kelola agenda kegiatan yayasan sepanjang tahun. Tampilkan status tiap program secara real-time kepada
             seluruh pengurus.</p>
-          <a href="features/login.html" class="fitur-link">Akses Fitur
+          <a href="features/login/login.html" class="fitur-link">Akses Fitur
             <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>
           </a>
         </div>
@@ -421,11 +421,11 @@
           <p>Pantau pembiasaan ibadah harian khusus Generus Caberawit (PAUD &ndash; SD). Rekam sholat, mengaji, dan
             akhlak secara digital.</p>
           <div class="fitur-cta-row">
-            <a href="features/laporan-pembiasaan.html" target="_blank" class="btn-publik" id="btnLaporanPublik">
+            <a href="features/laporan/laporan-pembiasaan.html" target="_blank" class="btn-publik" id="btnLaporanPublik">
               <span class="material-symbols-outlined" style="font-size:14px;">public</span>
               Laporan Publik
             </a>
-            <a href="features/login.html?redirect=pembiasaan" class="btn-kelola" id="btnKelolaData">
+            <a href="features/login/login.html?redirect=pembiasaan" class="btn-kelola" id="btnKelolaData">
               <span class="material-symbols-outlined" style="font-size:14px;">edit_note</span>
               <span id="btnKelolaLabel">Masuk & Kelola</span>
               <span class="material-symbols-outlined" style="font-size:14px;">arrow_forward</span>
@@ -440,11 +440,11 @@
           <h3>Absensi KBM Cepat</h3>
           <p>Konversi data generus ke daftar presensi fisik siap cetak resmi A4 untuk Caberawit, GP Reguler, dan Remaja.</p>
           <div class="fitur-cta-row">
-            <a href="features/cetak-absensi.html" target="_blank" class="btn-publik" id="btnCetakAbsensiLanding" style="border-color:#bbf7d0;color:#166534;background:#f0fdf4;">
+            <a href="features/laporan/cetak-absensi.html" target="_blank" class="btn-publik" id="btnCetakAbsensiLanding" style="border-color:#bbf7d0;color:#166534;background:#f0fdf4;">
               <span class="material-symbols-outlined" style="font-size:14px;">print</span>
               Lembar Cetak
             </a>
-            <a href="features/login.html?redirect=absensi" class="btn-kelola" id="btnKelolaAbsensi" style="background:#15803d;">
+            <a href="features/login/login.html?redirect=absensi" class="btn-kelola" id="btnKelolaAbsensi" style="background:#15803d;">
               <span class="material-symbols-outlined" style="font-size:14px;">settings</span>
               <span id="btnKelolaAbsensiLabel">Konfigurasi</span>
               <span class="material-symbols-outlined" style="font-size:14px;">arrow_forward</span>
@@ -460,7 +460,7 @@
           <h3>Database Generus</h3>
           <p>Data lengkap tiap Generus: NIK, alamat, jenjang, riwayat semester, status mutasi, dan dokumen pendukung.
           </p>
-          <a href="features/login.html" class="fitur-link">Akses Fitur
+          <a href="features/login/login.html" class="fitur-link">Akses Fitur
             <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>
           </a>
         </div>
@@ -482,7 +482,7 @@
           </div>
           <h3>Sign In</h3>
           <p>Masuk sebagai pengurus atau admin untuk mengakses fitur input dan pengelolaan data Generus.</p>
-          <a href="features/login.html" class="btn-signin-card">Masuk Sekarang
+          <a href="features/login/login.html" class="btn-signin-card">Masuk Sekarang
             <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>
           </a>
         </div>
@@ -550,7 +550,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <img src="image/icon-192.png" alt="Logo PP Generus" class="footer-logo-img" />
+        <img src="src/image/icon-192.png" alt="Logo PP Generus" class="footer-logo-img" />
         <div>
           <div class="footer-title">PPG Solo Selatan</div>
           <div class="footer-sub">Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur</div>
@@ -562,7 +562,7 @@
         <a href="#jenjang">Jenjang</a>
         <a href="#fitur">Fitur</a>
         <a href="#tentang">Tentang</a>
-        <a href="features/login.html" id="footerSignIn">Sign In</a>
+        <a href="features/login/login.html" id="footerSignIn">Sign In</a>
       </div>
       <div class="footer-copy">
         &copy; 2026 Penggerak Pembina Generus Solo Selatan &middot; Surakarta, Jawa Tengah
@@ -574,7 +574,7 @@
   <div class="pwa-install-bar" id="pwaInstallBar">
     <div class="pwa-install-inner">
       <div class="pwa-install-icon">
-        <img src="image/icon-192.png" alt="Icon App"
+        <img src="src/image/icon-192.png" alt="Icon App"
           style="width:36px;height:36px;border-radius:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.2);" />
       </div>
       <div class="pwa-install-text">
@@ -627,6 +627,7 @@
     </div>
   </div>
 
+  <script type="module" src="src/popup-jenjang.js"></script>
   <script type="module" src="src/app.js"></script>
 </body>
 

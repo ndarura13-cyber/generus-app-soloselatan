@@ -4,28 +4,35 @@
              Cache-First for static assets (images, icons, styles, fonts)
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'ppg-generus-v3.8';
+const CACHE_NAME = 'ppg-generus-v4.4';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/features/login.html',
-  '/features/login.css',
-  '/features/login.js',
-  '/features/dashboard.html',
-  '/features/dashboard.css',
-  '/features/dashboard.js',
-  '/features/laporan-pembiasaan.html',
-  '/features/cetak-absensi.html',
-  '/features/laporan-kehadiran.html',
+  '/features/login/login.html',
+  '/features/login/login.css',
+  '/features/login/login.js',
+  '/features/dashboard/dashboard.html',
+  '/features/dashboard/dashboard.css',
+  '/features/dashboard/dashboard.js',
+  '/features/dashboard/dashboard-common.js',
+  '/features/dashboard/dashboard-supabase.js',
+  '/features/dashboard/dashboard-pengurus.js',
+  '/features/dashboard/dashboard-proker.js',
+  '/features/dashboard/dashboard-pembiasaan.js',
+  '/features/dashboard/dashboard-generus.js',
+  '/features/dashboard/dashboard-kbm.js',
+  '/features/laporan/laporan-pembiasaan.html',
+  '/features/laporan/cetak-absensi.html',
+  '/features/laporan/laporan-kehadiran.html',
+  '/features/laporan/template-laporan.html',
   '/src/style.css',
   '/src/app.js',
   '/src/db-master.js',
   '/src/manifest.json',
-  '/image/hero.jpg',
-  '/image/icon-192.png',
-  '/image/icon-512.png',
-  '/icons/icon-192.png'
+  '/src/image/hero.jpg',
+  '/src/image/icon-192.png',
+  '/src/image/icon-512.png'
 ];
 
 /* ── 1. INSTALL EVENT ─────────────────────────────────────── */

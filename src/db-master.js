@@ -3,6 +3,8 @@
    Hirarki: Daerah (Solo Selatan) > 5 Desa > 27 Kelompok (A-Z)
    ═══════════════════════════════════════════════════════════════ */
 
+import { isSupabaseConfigured, upsertSiswaToSupabase, deleteSiswaFromSupabase } from "./supabase.js";
+
 export const MASTER_WILAYAH = {
   daerah: {
     id: "daerah-solo-selatan",
@@ -1577,6 +1579,22 @@ export function addSiswa(data) {
   };
   list.push(newSiswa);
   saveSiswaList(list);
+
+  // Background Auto-Sync ke Supabase Cloud (jika terkonfigurasi)
+  if (isSupabaseConfigured()) {
+    upsertSiswaToSupabase(newSiswa).then(res => {
+      if (res.success && res.data && res.data[0] && res.data[0].id) {
+        // Perbarui ID lokal jika Supabase menghasilkan UUID baru
+        const currentList = getSiswaList();
+        const idx = currentList.findIndex(s => s.id === newSiswa.id);
+        if (idx !== -1) {
+          currentList[idx].id = res.data[0].id;
+          saveSiswaList(currentList);
+        }
+      }
+    }).catch(err => console.warn("Background auto-sync addSiswa failed:", err));
+  }
+
   return { success: true, data: newSiswa, message: "Data Generus berhasil ditambahkan!" };
 }
 
@@ -1606,6 +1624,12 @@ export function updateSiswa(id, data) {
 
   list[idx] = { ...list[idx], ...data, updated_at: new Date().toISOString() };
   saveSiswaList(list);
+
+  // Background Auto-Sync ke Supabase Cloud
+  if (isSupabaseConfigured()) {
+    upsertSiswaToSupabase(list[idx]).catch(err => console.warn("Background auto-sync updateSiswa failed:", err));
+  }
+
   return { success: true, data: list[idx], message: "Data Generus berhasil diperbarui!" };
 }
 
@@ -1615,19 +1639,210 @@ export function deleteSiswa(id) {
   if (!item) return { success: false, message: "Data tidak ditemukan." };
   list = list.filter(s => s.id !== id);
   saveSiswaList(list);
+
+  // Background Auto-Sync ke Supabase Cloud
+  if (isSupabaseConfigured()) {
+    deleteSiswaFromSupabase(id).catch(err => console.warn("Background auto-sync deleteSiswa failed:", err));
+  }
+
   return { success: true, message: `Data "${item.nama_lengkap}" berhasil dihapus.` };
+}
+
+/* ── Status Sambung & Filter Generus Aktif ────────────────── */
+export function isSiswaAktif(siswa) {
+  if (!siswa) return false;
+  const status = (siswa.status_sambung || "Sambung").trim().toLowerCase();
+  return status === "sambung";
+}
+
+export function getSiswaAktifList() {
+  return getSiswaList().filter(isSiswaAktif);
+}
+
+export function getUmurNumber(tanggalLahir, refDate = new Date()) {
+  if (!tanggalLahir) return 0;
+  const birthDate = new Date(tanggalLahir);
+  if (isNaN(birthDate.getTime())) return 0;
+  const target = new Date(refDate);
+  let age = target.getFullYear() - birthDate.getFullYear();
+  const m = target.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && target.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return Math.max(0, age);
 }
 
 export function calculateUmur(tanggalLahir) {
   if (!tanggalLahir) return "-";
-  const birthDate = new Date(tanggalLahir);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
+  const age = getUmurNumber(tanggalLahir);
   return `${age} Tahun`;
+}
+
+/* ── Otomatisasi Penentuan Jenjang Berdasarkan Usia & Pergantian Tahun ── */
+
+/**
+ * Menentukan kategori usia dan jenjang kelas berdasarkan tanggal lahir
+ * @param {string} tanggalLahir - YYYY-MM-DD
+ * @param {string|null} currentJenjang - Jenjang saat ini untuk proteksi status Mahasiswa/Bekerja
+ * @param {Date} refDate - Tanggal referensi acuan (default hari ini)
+ */
+export function determineJenjangByAge(tanggalLahir, currentJenjang = null, refDate = new Date()) {
+  const age = getUmurNumber(tanggalLahir, refDate);
+
+  // Caberawit: Usia Dini (PAUD s.d. 6 SD)
+  if (age <= 4) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "PAUD", umur: age };
+  } else if (age === 5) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "TK A", umur: age };
+  } else if (age === 6) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "TK B", umur: age };
+  } else if (age === 7) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "1 SD", umur: age };
+  } else if (age === 8) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "2 SD", umur: age };
+  } else if (age === 9) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "3 SD", umur: age };
+  } else if (age === 10) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "4 SD", umur: age };
+  } else if (age === 11) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "5 SD", umur: age };
+  } else if (age === 12) {
+    return { kategori_usia: "caberawit", jenjang_kelas: "6 SD", umur: age };
+  }
+
+  // GP Reguler: Usia Sekolah (1 SMP s.d. 3 SMA)
+  else if (age === 13) {
+    return { kategori_usia: "gp_reguler", jenjang_kelas: "1 SMP", umur: age };
+  } else if (age === 14) {
+    return { kategori_usia: "gp_reguler", jenjang_kelas: "2 SMP", umur: age };
+  } else if (age === 15) {
+    return { kategori_usia: "gp_reguler", jenjang_kelas: "3 SMP", umur: age };
+  } else if (age === 16) {
+    return { kategori_usia: "gp_reguler", jenjang_kelas: "1 SMA", umur: age };
+  } else if (age === 17) {
+    return { kategori_usia: "gp_reguler", jenjang_kelas: "2 SMA", umur: age };
+  } else if (age === 18) {
+    return { kategori_usia: "gp_reguler", jenjang_kelas: "3 SMA", umur: age };
+  }
+
+  // Remaja & Pra-Nikah (19 tahun ke atas)
+  else {
+    // Jika generus sudah memiliki status spesifik (Mahasiswa, Bekerja, Lainnya), pertahankan statusnya
+    if (["Mahasiswa", "Bekerja", "Lainnya"].includes(currentJenjang)) {
+      return { kategori_usia: "remaja", jenjang_kelas: currentJenjang, umur: age };
+    }
+    if (age <= 22) {
+      return { kategori_usia: "remaja", jenjang_kelas: "Pra-Nikah", umur: age };
+    } else {
+      return { kategori_usia: "remaja", jenjang_kelas: "Kelas Remaja", umur: age };
+    }
+  }
+}
+
+/**
+ * Urutan kenaikan kelas 1 tingkat tahunan (Tahun Ajaran Baru)
+ */
+const JENJANG_SEQUENCE = [
+  { jenjang: "PAUD", next: "TK A", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "TK A", next: "TK B", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "TK B", next: "1 SD", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "1 SD", next: "2 SD", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "2 SD", next: "3 SD", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "3 SD", next: "4 SD", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "4 SD", next: "5 SD", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "5 SD", next: "6 SD", kat: "caberawit", nextKat: "caberawit" },
+  { jenjang: "6 SD", next: "1 SMP", kat: "caberawit", nextKat: "gp_reguler" },
+  { jenjang: "1 SMP", next: "2 SMP", kat: "gp_reguler", nextKat: "gp_reguler" },
+  { jenjang: "2 SMP", next: "3 SMP", kat: "gp_reguler", nextKat: "gp_reguler" },
+  { jenjang: "3 SMP", next: "1 SMA", kat: "gp_reguler", nextKat: "gp_reguler" },
+  { jenjang: "1 SMA", next: "2 SMA", kat: "gp_reguler", nextKat: "gp_reguler" },
+  { jenjang: "2 SMA", next: "3 SMA", kat: "gp_reguler", nextKat: "gp_reguler" },
+  { jenjang: "3 SMA", next: "Pra-Nikah", kat: "gp_reguler", nextKat: "remaja" },
+  { jenjang: "Pra-Nikah", next: "Kelas Remaja", kat: "remaja", nextKat: "remaja" }
+];
+
+export function naikkanJenjangSatuTingkat(currentJenjang) {
+  const found = JENJANG_SEQUENCE.find(j => j.jenjang.toLowerCase() === (currentJenjang || "").toLowerCase());
+  if (found) {
+    return {
+      kategori_usia: found.nextKat,
+      jenjang_kelas: found.next,
+      berubah: true
+    };
+  }
+  return { jenjang_kelas: currentJenjang, berubah: false };
+}
+
+/**
+ * Eksekusi Kenaikan Jenjang Massal untuk seluruh siswa
+ * @param {Object} options - { mode: 'age' | 'annual_step' }
+ * - 'age': Menyesuaikan kelas sesuai usia hari ini berdasarkan tanggal_lahir
+ * - 'annual_step': Menaikkan seluruh siswa sekolah 1 jenjang ke atas (+1 kelas tahunan)
+ */
+export function autoPromoteAllSiswa(options = { mode: "age" }) {
+  const mode = options.mode || "age";
+  const list = getSiswaList();
+  const changes = [];
+
+  const updatedList = list.map(siswa => {
+    // Hanya proses generus aktif (Sambung)
+    if (!isSiswaAktif(siswa)) return siswa;
+
+    let targetKat = siswa.kategori_usia;
+    let targetKelas = siswa.jenjang_kelas;
+
+    if (mode === "age") {
+      if (siswa.tanggal_lahir) {
+        const res = determineJenjangByAge(siswa.tanggal_lahir, siswa.jenjang_kelas);
+        targetKat = res.kategori_usia;
+        targetKelas = res.jenjang_kelas;
+      }
+    } else if (mode === "annual_step") {
+      const res = naikkanJenjangSatuTingkat(siswa.jenjang_kelas);
+      if (res.berubah) {
+        targetKat = res.kategori_usia;
+        targetKelas = res.jenjang_kelas;
+      }
+    }
+
+    if (targetKat !== siswa.kategori_usia || targetKelas !== siswa.jenjang_kelas) {
+      changes.push({
+        id: siswa.id,
+        nama: siswa.nama_lengkap,
+        umur: getUmurNumber(siswa.tanggal_lahir),
+        before: `${siswa.kategori_usia} - ${siswa.jenjang_kelas}`,
+        after: `${targetKat} - ${targetKelas}`,
+        desa: siswa.desa_nama,
+        kelompok: siswa.kelompok_nama
+      });
+
+      return {
+        ...siswa,
+        kategori_usia: targetKat,
+        jenjang_kelas: targetKelas,
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    return siswa;
+  });
+
+  if (changes.length > 0) {
+    saveSiswaList(updatedList);
+
+    // Background Auto-Sync pembaruan massal ke Supabase Cloud
+    if (isSupabaseConfigured()) {
+      upsertSiswaToSupabase(updatedList).catch(err => console.warn("Background auto-sync autoPromoteAllSiswa failed:", err));
+    }
+  }
+
+  return {
+    success: true,
+    mode: mode,
+    totalDiproses: list.length,
+    countChanged: changes.length,
+    changes: changes
+  };
 }
 
 /* ═══════════════════════════════════════════════════════════════

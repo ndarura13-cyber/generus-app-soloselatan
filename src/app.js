@@ -4,7 +4,7 @@
 
 'use strict';
 
-import { getProkerList, getSiswaList, MASTER_WILAYAH } from './db-master.js';
+import { getProkerList } from './db-master.js';
 
 /* ── 0. SPLASH LOADING SCREEN ─────────────────────────────── */
 (function setupLoadingScreen() {
@@ -13,7 +13,7 @@ import { getProkerList, getSiswaList, MASTER_WILAYAH } from './db-master.js';
   splash.id = 'loadingScreen';
   splash.innerHTML = `
     <div class="loading-logo-box">
-      <img src="image/icon-192.png" alt="Logo PPG Solo Selatan" />
+      <img src="src/image/icon-192.png" alt="Logo PPG Solo Selatan" />
     </div>
     <div class="loading-title">PPG Solo Selatan</div>
     <div class="loading-sub">Mewujudkan Generasi Penerus yang Faham Agama dan Memiliki 29 Karakter Luhur</div>
@@ -112,24 +112,32 @@ const countObserver = new IntersectionObserver((entries) => {
       countObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.5 });
+}, { threshold: 0.2 });
 
 function animateCounter(el) {
-  const target = parseInt(el.dataset.target);
-  const duration = 1600;
+  const target = parseInt(el.dataset.target) || 0;
+  const isPlus = el.id === 'heroGenerusCount';
+  const duration = 1400;
   const start = performance.now();
 
   function update(ts) {
     const elapsed = ts - start;
     const progress = Math.min(elapsed / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(eased * target).toLocaleString('id-ID');
-    if (progress < 1) requestAnimationFrame(update);
+    const val = Math.round(eased * target);
+    el.textContent = val.toLocaleString('id-ID') + (isPlus ? '+' : '');
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      el.textContent = target.toLocaleString('id-ID') + (isPlus ? '+' : '');
+    }
   }
   requestAnimationFrame(update);
 }
 
 counters.forEach(el => countObserver.observe(el));
+const heroCounter = document.getElementById('heroGenerusCount');
+if (heroCounter) countObserver.observe(heroCounter);
 
 /* ── 7. PROGRAM KERJA DATA & RENDER (TERINTEGRASI DATABASE) ── */
 const months = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
@@ -257,255 +265,10 @@ function renderProker() {
 
 renderProker();
 
-/* ── 7. POPUP DETAIL JENJANG GENERUS PER DESA (A-Z) ───────── */
-let KATEGORI_GENERUS_DATA = {};
 
-function normalizeKelas(cls) {
-  if (!cls) return null;
-  const c = cls.trim();
-  // Karena sekarang setiap jenjang punya pil spesifik, kita return apa adanya asalkan ada di map
-  return c;
-}
 
-function initGenerusStats() {
-  const siswaList = getSiswaList();
-  
-  KATEGORI_GENERUS_DATA = {
-    'PAUD': { name: 'PAUD (Pendidikan Anak Usia Dini)', tier: 'Caberawit', icon: 'toys', color: '#d4a017', total: 0, usia: '3 – 4 Tahun', desa: [] },
-    'TK A': { name: 'Taman Kanak-Kanak A', tier: 'Caberawit', icon: 'palette', color: '#d4a017', total: 0, usia: '5 Tahun', desa: [] },
-    'TK B': { name: 'Taman Kanak-Kanak B', tier: 'Caberawit', icon: 'palette', color: '#d4a017', total: 0, usia: '6 Tahun', desa: [] },
-    '1 SD': { name: 'Kelas 1 SD', tier: 'Caberawit', icon: 'menu_book', color: '#d4a017', total: 0, usia: '7 Tahun', desa: [] },
-    '2 SD': { name: 'Kelas 2 SD', tier: 'Caberawit', icon: 'menu_book', color: '#d4a017', total: 0, usia: '8 Tahun', desa: [] },
-    '3 SD': { name: 'Kelas 3 SD', tier: 'Caberawit', icon: 'menu_book', color: '#d4a017', total: 0, usia: '9 Tahun', desa: [] },
-    '4 SD': { name: 'Kelas 4 SD', tier: 'Caberawit', icon: 'menu_book', color: '#d4a017', total: 0, usia: '10 Tahun', desa: [] },
-    '5 SD': { name: 'Kelas 5 SD', tier: 'Caberawit', icon: 'menu_book', color: '#d4a017', total: 0, usia: '11 Tahun', desa: [] },
-    '6 SD': { name: 'Kelas 6 SD', tier: 'Caberawit', icon: 'menu_book', color: '#d4a017', total: 0, usia: '12 Tahun', desa: [] },
-    '1 SMP': { name: 'Kelas 1 SMP / Kelas 7', tier: 'GP Reguler', icon: 'school', color: '#1a56c4', total: 0, usia: '13 Tahun', desa: [] },
-    '2 SMP': { name: 'Kelas 2 SMP / Kelas 8', tier: 'GP Reguler', icon: 'school', color: '#1a56c4', total: 0, usia: '14 Tahun', desa: [] },
-    '3 SMP': { name: 'Kelas 3 SMP / Kelas 9', tier: 'GP Reguler', icon: 'school', color: '#1a56c4', total: 0, usia: '15 Tahun', desa: [] },
-    '1 SMA': { name: 'Kelas 1 SMA / Kelas 10', tier: 'GP Reguler', icon: 'history_edu', color: '#1a56c4', total: 0, usia: '16 Tahun', desa: [] },
-    '2 SMA': { name: 'Kelas 2 SMA / Kelas 11', tier: 'GP Reguler', icon: 'history_edu', color: '#1a56c4', total: 0, usia: '17 Tahun', desa: [] },
-    '3 SMA': { name: 'Kelas 3 SMA / Kelas 12', tier: 'GP Reguler', icon: 'history_edu', color: '#1a56c4', total: 0, usia: '18 Tahun', desa: [] },
-    'Pra-Nikah': { name: 'Bimbingan Pra-Nikah', tier: 'Remaja', icon: 'favorite', color: '#2e8b57', total: 0, usia: '19 – 22 Tahun', desa: [] },
-    'Kelas Remaja': { name: 'Kelas Remaja', tier: 'Remaja & Mandiri', icon: 'groups', color: '#2e8b57', total: 0, usia: '> 22 Tahun', desa: [] },
-    'Mahasiswa': { name: 'Status Mahasiswa', tier: 'Remaja / Pra-Nikah', icon: 'school', color: '#2e8b57', total: 0, usia: '19+ Tahun', desa: [] },
-    'Bekerja': { name: 'Status Bekerja', tier: 'Remaja / Pra-Nikah', icon: 'work', color: '#2e8b57', total: 0, usia: '19+ Tahun', desa: [] },
-    'Lainnya': { name: 'Status Lainnya', tier: 'Remaja / Pra-Nikah', icon: 'more_horiz', color: '#2e8b57', total: 0, usia: '19+ Tahun', desa: [] },
-    'caberawit': { name: 'Kategori Caberawit (PAUD - SD)', tier: 'Jenjang Usia Dini', icon: 'child_care', color: '#d4a017', total: 0, usia: 'PAUD, TK & SD (3 – 12 Tahun)', desa: [] },
-    'gp_reguler': { name: 'Kategori GP Reguler (SMP - SMA)', tier: 'Jenjang Usia Sekolah', icon: 'school', color: '#1a56c4', total: 0, usia: 'Kelas 1–3 SMP & 1–3 SMA (13 – 18 Tahun)', desa: [] },
-    'remaja': { name: 'Kategori Remaja & Pra-Nikah', tier: 'Jenjang Pra-Nikah & Mandiri', icon: 'diversity_3', color: '#2e8b57', total: 0, usia: '19 – 22+ Tahun', desa: [] },
-    'all': { name: 'Ringkasan Generus Solo Selatan', tier: 'Semua Jenjang & Kategori', icon: 'groups', color: '#1a56c4', total: 0, usia: '3 – 25+ Tahun', desa: [] }
-  };
 
-  // Init desa array for each key
-  Object.keys(KATEGORI_GENERUS_DATA).forEach(key => {
-    MASTER_WILAYAH.desa.forEach(d => {
-      KATEGORI_GENERUS_DATA[key].desa.push({ id: d.id, nama: d.nama, total: 0, kelompokRaw: {} });
-    });
-  });
 
-  const addCount = (k, desa, kel) => {
-    if (!k || !KATEGORI_GENERUS_DATA[k]) return;
-    KATEGORI_GENERUS_DATA[k].total++;
-    const dObj = KATEGORI_GENERUS_DATA[k].desa.find(d => d.id === desa);
-    if (dObj) {
-      dObj.total++;
-      dObj.kelompokRaw[kel] = (dObj.kelompokRaw[kel] || 0) + 1;
-    }
-  };
-
-  siswaList.forEach(s => {
-    const normKls = normalizeKelas(s.jenjang_kelas);
-    const cat = s.kategori_usia;
-    const desa = s.desa_id;
-    const kel = s.kelompok_id;
-
-    addCount(normKls, desa, kel);  // per-kelas slot (PAUD/TK/SD/1 SMP/etc)
-    addCount(cat, desa, kel);       // per-kategori (caberawit/gp_reguler/remaja)
-    addCount('all', desa, kel);     // grand total
-  });
-
-  // Build kelompok display labels from raw counts
-  Object.keys(KATEGORI_GENERUS_DATA).forEach(key => {
-    KATEGORI_GENERUS_DATA[key].desa.forEach(dObj => {
-      dObj.kelompok = Object.keys(dObj.kelompokRaw).map(kId => {
-        let kName = kId;
-        const desaMeta = MASTER_WILAYAH.desa.find(d => d.id === dObj.id);
-        if (desaMeta) {
-          const kelMeta = desaMeta.kelompok.find(k => k.id === kId);
-          if (kelMeta) kName = kelMeta.nama;
-        }
-        return `${kName} (${dObj.kelompokRaw[kId]})`;
-      });
-    });
-  });
-
-  // Update stat-card counter targets
-  const cAll = document.querySelector('.stat-card[data-kategori-stat="all"] .stat-num');
-  const cCb  = document.querySelector('.stat-card[data-kategori-stat="caberawit"] .stat-num');
-  const cGp  = document.querySelector('.stat-card[data-kategori-stat="gp_reguler"] .stat-num');
-  const cRm  = document.querySelector('.stat-card[data-kategori-stat="remaja"] .stat-num');
-
-  const setCounter = (el, val) => {
-    if (!el) return;
-    el.dataset.target = val;
-    el.textContent = val.toLocaleString('id-ID');
-  };
-  setCounter(cAll, KATEGORI_GENERUS_DATA['all'].total);
-  setCounter(cCb,  KATEGORI_GENERUS_DATA['caberawit'].total);
-  setCounter(cGp,  KATEGORI_GENERUS_DATA['gp_reguler'].total);
-  setCounter(cRm,  KATEGORI_GENERUS_DATA['remaja'].total);
-
-  // Update badge text inside jenjang cards (hero numbers)
-  const cbBadge = document.getElementById('badgeCaberawit');
-  const gpBadge = document.getElementById('badgeGP');
-  const rmBadge = document.getElementById('badgeRemaja');
-  if (cbBadge) cbBadge.textContent = `Usia Dini (${KATEGORI_GENERUS_DATA['caberawit'].total} Generus)`;
-  if (gpBadge) gpBadge.textContent = `Usia Sekolah (${KATEGORI_GENERUS_DATA['gp_reguler'].total} Generus)`;
-  if (rmBadge) rmBadge.textContent = `Remaja & Pra-Nikah (${KATEGORI_GENERUS_DATA['remaja'].total} Generus)`;
-
-  // Update hero badge in stats section
-  const heroBadge = document.getElementById('heroGenerusCount');
-  if (heroBadge) heroBadge.textContent = KATEGORI_GENERUS_DATA['all'].total.toLocaleString('id-ID') + '+';
-}
-
-initGenerusStats();
-
-const modalJenjang = document.getElementById('modalJenjangDetail');
-const mjIcon = document.getElementById('mjIcon');
-const mjBadge = document.getElementById('mjBadge');
-const mjTitle = document.getElementById('mjTitle');
-const mjTotalCount = document.getElementById('mjTotalCount');
-const mjDesaGrid = document.getElementById('mjDesaGrid');
-const btnCloseMj = document.getElementById('btnCloseMj');
-const btnOkMj = document.getElementById('btnOkMj');
-
-function openJenjangModal(kategoriKey) {
-  const data = KATEGORI_GENERUS_DATA[kategoriKey];
-  if (!data || !modalJenjang) return;
-
-  mjTitle.textContent = data.name;
-  mjBadge.innerHTML = `${data.tier} &bull; ${data.usia}`;
-  mjIcon.innerHTML = `<span class="material-symbols-outlined" style="font-size:28px;color:${data.color};">${data.icon}</span>`;
-
-  // Hitung L/P dari siswaList langsung
-  const siswaList = getSiswaList();
-  let lCount = 0, pCount = 0;
-  const isKategori = ['caberawit','gp_reguler','remaja','all'].includes(kategoriKey);
-
-  siswaList.forEach(s => {
-    const match = isKategori
-      ? (kategoriKey === 'all' || s.kategori_usia === kategoriKey)
-      : normalizeKelas(s.jenjang_kelas) === kategoriKey;
-    if (match) {
-      if (s.jenis_kelamin === 'L') lCount++;
-      else pCount++;
-    }
-  });
-  const total = lCount + pCount;
-
-  mjTotalCount.textContent = `${total} Generus`;
-
-  // Summary gender bar
-  const lPct = total > 0 ? Math.round((lCount / total) * 100) : 0;
-  const pPct = 100 - lPct;
-
-  const genderHtml = `
-    <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">
-      <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
-        <span style="min-width:56px;color:#1d4ed8;font-weight:700;">&#128102; ${lCount} L</span>
-        <div style="flex:1;height:7px;background:#e8efff;border-radius:99px;overflow:hidden;">
-          <div style="width:${lPct}%;height:100%;background:#3b82f6;border-radius:99px;"></div>
-        </div>
-        <span style="min-width:32px;font-size:11px;color:var(--text-muted);">${lPct}%</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
-        <span style="min-width:56px;color:#be185d;font-weight:700;">&#128103; ${pCount} P</span>
-        <div style="flex:1;height:7px;background:#fce7f3;border-radius:99px;overflow:hidden;">
-          <div style="width:${pPct}%;height:100%;background:#ec4899;border-radius:99px;"></div>
-        </div>
-        <span style="min-width:32px;font-size:11px;color:var(--text-muted);">${pPct}%</span>
-      </div>
-    </div>
-  `;
-
-  // Update summary section
-  const mjSummary = document.getElementById('mjSummary');
-  if (mjSummary) {
-    mjSummary.innerHTML = `
-      <div class="mj-sum-item">
-        <span class="mj-sum-label">Total ${data.tier}</span>
-        <span class="mj-sum-val" style="color:${data.color};">${total.toLocaleString('id-ID')} Generus</span>
-        ${genderHtml}
-      </div>
-      <div class="mj-sum-badge">Solo Selatan &bull; 5 Desa &bull; 27 Kelompok</div>
-    `;
-  }
-
-  // Update section title
-  const mjSecTitle = document.querySelector('.mj-section-title');
-  if (mjSecTitle) {
-    mjSecTitle.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;color:${data.color};">location_city</span> Distribusi di 5 Desa Solo Selatan`;
-  }
-
-  // Filter only desa that have data (total > 0)
-  const desaDenganData = data.desa.filter(d => d.total > 0);
-  const maxDesa = desaDenganData.length > 0 ? Math.max(...desaDenganData.map(d => d.total)) : 1;
-
-  if (desaDenganData.length === 0) {
-    mjDesaGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:24px 0;font-size:13px;">Belum ada data generus di kategori ini.</div>`;
-  } else {
-    mjDesaGrid.innerHTML = desaDenganData.map(d => {
-      const barPct = Math.round((d.total / maxDesa) * 100);
-      const kelDisplay = (d.kelompok || []).length > 0
-        ? (d.kelompok || []).slice(0, 6).map(k => `<span class="mj-kel-pill">${k}</span>`).join('')
-          + ((d.kelompok || []).length > 6 ? `<span class="mj-kel-pill" style="background:#e0e7ff;color:var(--blue);">+${d.kelompok.length - 6} lainnya</span>` : '')
-        : '<span style="font-size:11px;color:var(--text-muted);">Belum ada data</span>';
-      return `
-      <div class="mj-desa-card">
-        <div class="mj-desa-header">
-          <div class="mj-desa-name">
-            <span class="material-symbols-outlined" style="font-size:16px;color:${data.color};">location_city</span>
-            <span>Desa ${d.nama}</span>
-          </div>
-          <div class="mj-desa-count" style="border-color:${data.color}20;color:${data.color};">${d.total} Generus</div>
-        </div>
-        <div style="height:5px;background:#f1f5f9;border-radius:99px;overflow:hidden;margin:2px 0;">
-          <div style="width:${barPct}%;height:100%;background:${data.color};border-radius:99px;transition:width .5s ease;"></div>
-        </div>
-        <div class="mj-kelompok-list">${kelDisplay}</div>
-      </div>`;
-    }).join('');
-  }
-
-  modalJenjang.style.display = 'flex';
-}
-
-function closeJenjangModal() {
-  if (modalJenjang) modalJenjang.style.display = 'none';
-}
-
-document.querySelectorAll('.level-pill[data-kategori]').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const kat = btn.dataset.kategori;
-    openJenjangModal(kat);
-  });
-});
-
-document.querySelectorAll('.stat-card[data-kategori-stat]').forEach(card => {
-  card.addEventListener('click', (e) => {
-    e.preventDefault();
-    const kat = card.dataset.kategoriStat;
-    openJenjangModal(kat);
-  });
-});
-
-btnCloseMj?.addEventListener('click', closeJenjangModal);
-btnOkMj?.addEventListener('click', closeJenjangModal);
-modalJenjang?.addEventListener('click', (e) => {
-  if (e.target === modalJenjang) closeJenjangModal();
-});
 
 /* ── 7. SMOOTH SCROLL FOR ANCHOR LINKS ───────────────────── */
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -528,7 +291,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   loading.id = 'loadingScreen';
   loading.innerHTML = `
     <div class="loading-logo">
-      <img src="image/icon-192.png" alt="Logo PPG" style="width:64px;height:64px;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,0.3);margin-bottom:12px;object-fit:cover;" />
+      <img src="src/image/icon-192.png" alt="Logo PPG" style="width:64px;height:64px;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,0.3);margin-bottom:12px;object-fit:cover;" />
     </div>
     <div class="loading-title">PPG Solo Selatan</div>
     <div class="loading-sub">Building Generation with Noble Character</div>
@@ -589,7 +352,7 @@ function checkLandingSession() {
     const footerSignIn = document.getElementById('footerSignIn');
 
     if (btnSignIn) {
-      btnSignIn.href = 'features/dashboard.html';
+      btnSignIn.href = 'features/dashboard/dashboard.html';
       btnSignIn.innerHTML = `
         <span>Kelola</span>
         <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
@@ -599,7 +362,7 @@ function checkLandingSession() {
     }
 
     if (footerSignIn) {
-      footerSignIn.href = 'features/dashboard.html';
+      footerSignIn.href = 'features/dashboard/dashboard.html';
       footerSignIn.textContent = 'Kelola Dashboard';
       footerSignIn.style.color = '#f9e27d';
       footerSignIn.style.fontWeight = '700';

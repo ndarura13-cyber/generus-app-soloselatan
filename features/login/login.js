@@ -4,7 +4,7 @@
 
 'use strict';
 
-import { MASTER_WILAYAH, MASTER_STRUKTUR_PERAN, getRolesByTingkatan, getPengurusList, registerNewPengurus } from '../src/db-master.js';
+import { MASTER_WILAYAH, MASTER_STRUKTUR_PERAN, getRolesByTingkatan, getPengurusList, registerNewPengurus } from '../../src/db-master.js';
 
 // --- AUTO DIRECT IF LOGGED IN ---
 (function checkExistingSession() {
@@ -19,7 +19,7 @@ import { MASTER_WILAYAH, MASTER_STRUKTUR_PERAN, getRolesByTingkatan, getPengurus
       ) && user.isActive !== false && user.statusApproval !== 'rejected' && user.statusApproval !== 'pending';
       
       if (isValid) {
-        window.location.replace('dashboard.html');
+        window.location.replace('../dashboard/dashboard.html');
       }
     } catch(e) {}
   }
@@ -265,9 +265,9 @@ function proceedLogin(sessionData) {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
     if (redirect) {
-      window.location.href = `dashboard.html?action=${redirect}`;
+      window.location.href = `../dashboard/dashboard.html?action=${redirect}`;
     } else {
-      window.location.href = 'dashboard.html';
+      window.location.href = '../dashboard/dashboard.html';
     }
   }, 600);
 }
