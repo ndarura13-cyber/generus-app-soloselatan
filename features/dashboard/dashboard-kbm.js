@@ -426,7 +426,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
 
     // Save event & open print with Debounce & Loading Spinner to prevent spam
     let isSavingEventKbm = false;
-    document.getElementById('formCetakAbsensi')?.addEventListener('submit', (e) => {
+    document.getElementById('formCetakAbsensi')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (isSavingEventKbm) return;
       isSavingEventKbm = true;
@@ -872,7 +872,7 @@ export function renderFormRekapKehadiranModal(eventId) {
   recalculateAllRekap();
 
   // Save Rekap Function
-  function saveCurrentRekapData() {
+  async function saveCurrentRekapData() {
     // Collect Sesi List
     const collectedSesi = [];
     document.querySelectorAll('#tbodyFormSesi tr').forEach(tr => {
