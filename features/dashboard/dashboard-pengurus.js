@@ -134,8 +134,8 @@ export function renderApprovalListModal() {
         iconColor: 'var(--green-dark)',
         confirmText: 'Ya, Setujui',
         confirmBtnColor: 'var(--green-dark)',
-        onConfirm: () => {
-          approvePengurus(pId, true);
+        onConfirm: async () => {
+          await approvePengurus(pId, true);
           showToast(`Akun pengurus "${pName}" berhasil disetujui!`, 'success');
           renderApprovalListModal();
           checkPendingApprovals();
@@ -157,8 +157,8 @@ export function renderApprovalListModal() {
         iconColor: 'var(--red)',
         confirmText: 'Ya, Tolak',
         confirmBtnColor: 'var(--red)',
-        onConfirm: () => {
-          approvePengurus(pId, false);
+        onConfirm: async () => {
+          await approvePengurus(pId, false);
           showToast(`Pendaftaran akun "${pName}" telah ditolak.`, 'info');
           renderApprovalListModal();
           checkPendingApprovals();
@@ -632,8 +632,8 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '')
           iconColor: 'var(--green-dark)',
           confirmText: 'Ya, Aktifkan',
           confirmBtnColor: 'var(--green-dark)',
-          onConfirm: () => {
-            togglePengurusActive(pId, true);
+          onConfirm: async () => {
+            await togglePengurusActive(pId, true);
             showToast(`Akun pengurus "${pName}" berhasil diaktifkan kembali.`, 'success');
             renderManagePengurusModal(filterLevel, searchQuery);
             appHooks.renderKelompokGrid();
@@ -649,8 +649,8 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '')
           iconColor: 'var(--red)',
           confirmText: 'Ya, Nonaktifkan',
           confirmBtnColor: 'var(--red)',
-          onConfirm: () => {
-            togglePengurusActive(pId, false);
+          onConfirm: async () => {
+            await togglePengurusActive(pId, false);
             showToast(`Akun pengurus "${pName}" berhasil dinonaktifkan.`, 'warning');
             renderManagePengurusModal(filterLevel, searchQuery);
             appHooks.renderKelompokGrid();
@@ -787,7 +787,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
     }
   });
 
-  document.getElementById('formEditPengurus')?.addEventListener('submit', (e) => {
+  document.getElementById('formEditPengurus')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const tingkatanVal = editTingkatan.value;
     const selectedDesaOption = editDesa.options[editDesa.selectedIndex];
@@ -808,7 +808,12 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       isActive: document.getElementById('editStatusActive').value === 'true'
     };
 
-    const res = updatePengurus(p.id, updateData);
+    const submitBtn = document.querySelector('#formEditPengurus button[type="submit"]');
+    if (submitBtn) submitBtn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Menyimpan...`;
+
+    const res = await updatePengurus(p.id, updateData);
+    if (submitBtn) submitBtn.innerHTML = `Simpan Perubahan`;
+    
     if (res.success) {
       showToast(`Data pengurus "${updateData.nama}" berhasil diperbarui!`, 'success');
       appHooks.renderKelompokGrid();

@@ -239,45 +239,82 @@ export function renderKontakModal(desaId, kelompokId = null) {
   let filtered = allPengurus.filter(p => p.desaId === desaId && p.isActive !== false);
 
   let title = `Kontak Pengurus Desa ${desaNama}`;
+  let subLabel = `Desa ${desaNama}`;
   if (kelompokId && desa) {
     const kel = desa.kelompok.find(k => k.id === kelompokId);
     if (kel) {
       title = `Kontak Pengurus Kel. ${kel.nama} (Desa ${desaNama})`;
+      subLabel = `Kelompok ${kel.nama}, Desa ${desaNama}`;
       filtered = filtered.filter(p => p.kelompokId === kelompokId);
     }
   }
 
-  openModal(title, 'contacts', 'medium');
-
   if (filtered.length === 0) {
-    modalBody.innerHTML = `
-      <div style="text-align:center;padding:30px;color:var(--text-muted);">
-        <span class="material-symbols-outlined" style="font-size:40px;opacity:0.5;">person_off</span>
-        <p style="margin-top:10px;font-size:14px;">Belum ada pengurus terdaftar di wilayah ini.</p>
+    openModal(title, 'contact_phone', `
+      <div class="kontak-empty-box">
+        <span class="material-symbols-outlined">person_off</span>
+        <h4 style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Belum Ada Pengurus Terdaftar</h4>
+        <p style="font-size:12.5px;color:var(--text-muted);">Wilayah ini belum memiliki pamong atau pengurus aktif dalam database.</p>
       </div>
-    `;
+    `, 'medium');
     return;
   }
 
-  modalBody.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      ${filtered.map(p => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
-          <div>
-            <div style="font-weight:700;font-size:13.5px;color:var(--text);">${p.nama}</div>
-            <div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;align-items:center;margin-top:2px;">
-              <span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;">${p.peran || p.jabatan || 'Pengurus'}</span>
-              <span>&bull;</span>
-              <span>${p.desaNama || ''} ${p.kelompokNama ? '- Kel. ' + p.kelompokNama : ''}</span>
+  const listHtml = filtered.map(p => {
+    const waClean = (p.noWa || '').replace(/[^0-9]/g, '');
+    const waIntl = waClean ? (waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean) : '';
+    const waMsg = encodeURIComponent(`Assalamu'alaikum ${p.nama}, terkait koordinasi PPG Solo Selatan...`);
+    const asalTxt = `Kel. ${p.kelompokNama || '-'} &bull; Desa ${p.desaNama || '-'}`;
+
+    return `
+      <div class="kontak-card">
+        <div class="kontak-card-top">
+          <div class="kontak-card-main">
+            <div class="kontak-avatar">
+              ${(p.nama || 'P').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div class="kontak-name">${p.nama}</div>
+              <div class="kontak-role">${p.peran || p.jabatan || 'Pamong'}</div>
+              <div class="kontak-asal">📍 Asal: <strong>${asalTxt}</strong></div>
             </div>
           </div>
-          ${p.noWa ? `
-            <a href="https://wa.me/${p.noWa.replace(/^0/, '62').replace(/[^0-9]/g, '')}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:#25D366;color:#fff;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;">
-              <span>WhatsApp</span>
-            </a>
-          ` : '<span style="font-size:11px;color:#94a3b8;">No HP (-)</span>'}
+          <span class="kontak-status-pill">🟢 Aktif</span>
         </div>
-      `).join('')}
+
+        <div class="kontak-actions">
+          ${waIntl ? `
+            <a href="https://wa.me/${waIntl}?text=${waMsg}" target="_blank" rel="noopener" class="btn-kontak-wa">
+              <span class="material-symbols-outlined" style="font-size:16px;">chat</span> Chat WhatsApp
+            </a>
+          ` : `
+            <span class="btn-kontak-disabled">
+              <span class="material-symbols-outlined" style="font-size:16px;">phone_disabled</span> No WA (-)
+            </span>
+          `}
+          ${p.email ? `
+            <a href="mailto:${p.email}" class="btn-kontak-email">
+              <span class="material-symbols-outlined" style="font-size:16px;">mail</span> Kirim Email
+            </a>
+          ` : `
+            <span class="btn-kontak-disabled">
+              <span class="material-symbols-outlined" style="font-size:16px;">mail_lock</span> Email (-)
+            </span>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  openModal(`${title} (${filtered.length} Pengurus)`, 'contacts', `
+    <div class="kontak-modal-wrap">
+      <div class="kontak-header-desc">
+        Daftar kontak pengurus &amp; pamong yang bertanggung jawab di wilayah <strong>${subLabel}</strong>:
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${listHtml}
+      </div>
     </div>
-  `;
+  `, 'medium');
 }
+

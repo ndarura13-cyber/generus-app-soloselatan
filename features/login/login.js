@@ -116,7 +116,7 @@ modalRegister?.addEventListener('click', (e) => {
 });
 
 /* ── 4. Submit Pendaftaran Pengurus Baru ──────────────────── */
-formRegister?.addEventListener('submit', (e) => {
+document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const nama = document.getElementById('regNama').value.trim();
@@ -136,7 +136,10 @@ formRegister?.addEventListener('submit', (e) => {
     kelompokNama = kelObj ? kelObj.nama : desaObj.kelompok[0]?.nama || 'Gentan';
   }
 
-  const result = registerNewPengurus({
+  const submitBtn = document.getElementById('btnSubmitReg');
+  if (submitBtn) submitBtn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Mendaftar...`;
+
+  const result = await registerNewPengurus({
     nama,
     email,
     noWa,
@@ -148,6 +151,8 @@ formRegister?.addEventListener('submit', (e) => {
     kelompokId,
     kelompokNama,
   });
+
+  if (submitBtn) submitBtn.innerHTML = `Daftar Pengurus Baru`;
 
   if (!result.success) {
     alert(`⚠️ ${result.message}`);

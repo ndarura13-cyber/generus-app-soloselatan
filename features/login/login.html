@@ -18,7 +18,8 @@
 
   <!-- Back link -->
   <a href="../../index.html" class="back-link">
-    <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">arrow_back</span>
+    <span class="material-symbols-outlined"
+      style="font-size:18px;vertical-align:middle;margin-right:4px;">arrow_back</span>
     Kembali ke Beranda
   </a>
 
@@ -34,10 +35,9 @@
 
     <div class="login-brand">
       <div class="login-logo">
-        <img src="../../src/image/icon-192.png" alt="Logo PPG" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />
+        <img src="../../src/image/icon-192.png" alt="Logo PPG"
+          style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />
       </div>
-      <div class="login-org">PPG Solo Selatan</div>
-      <div class="login-sub">Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur</div>
       <div class="login-title">Masuk ke Sistem</div>
       <div class="login-desc">Gunakan email atau akun pengurus Anda yang telah disetujui</div>
     </div>
@@ -59,7 +59,8 @@
           <span class="field-icon">
             <span class="material-symbols-outlined" style="font-size:18px;">mail</span>
           </span>
-          <input type="email" id="email" name="username" autocomplete="username email" placeholder="nama@ppgsolo.org" required />
+          <input type="email" id="email" name="username" autocomplete="username email" placeholder="nama@ppgsolo.org"
+            required />
         </div>
       </div>
 
@@ -71,12 +72,12 @@
           <span class="field-icon">
             <span class="material-symbols-outlined" style="font-size:18px;">lock</span>
           </span>
-          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required />
+          <input type="password" id="password" name="password" autocomplete="current-password"
+            placeholder="Masukkan kata sandi" required />
           <button type="button" class="toggle-pass" id="togglePass" aria-label="Tampilkan kata sandi">
             <span class="material-symbols-outlined" id="eyeIcon" style="font-size:18px;">visibility</span>
           </button>
         </div>
-        <div class="field-hint">Tersimpan aman &amp; kompatibel dengan Google Password Manager.</div>
       </div>
 
       <button type="submit" class="btn-login" id="btnLogin">
@@ -135,7 +136,8 @@
 
         <div class="reg-field">
           <label for="regPassword">Buat Kata Sandi</label>
-          <input type="password" id="regPassword" autocomplete="new-password" placeholder="Minimal 6 karakter" required minlength="6" />
+          <input type="password" id="regPassword" autocomplete="new-password" placeholder="Minimal 6 karakter" required
+            minlength="6" />
         </div>
 
         <div class="reg-grid-2">
@@ -174,7 +176,8 @@
           <span class="material-symbols-outlined" style="color:var(--gold);font-size:20px;">info</span>
           <div>
             <strong>Catatan Persetujuan:</strong>
-            Setelah mendaftar, Superadmin PPG Daerah Solo Selatan akan memverifikasi dan menyetujui akun Anda sebelum Anda dapat masuk ke Dashboard.
+            Setelah mendaftar, Superadmin PPG Daerah Solo Selatan akan memverifikasi dan menyetujui akun Anda sebelum
+            Anda dapat masuk ke Dashboard.
           </div>
         </div>
 
@@ -195,19 +198,19 @@
       const CACHE_CLEAR_FLAG = 'cache_cleared_v2.7';
       if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
         console.log("Forcing cache clear and Service Worker unregistration...");
-        
+
         // 1. Unregister all Service Workers
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
+          navigator.serviceWorker.getRegistrations().then(function (registrations) {
+            for (let registration of registrations) {
               registration.unregister();
             }
           });
         }
-        
+
         // 2. Clear all Cache Storage
         if ('caches' in window) {
-          caches.keys().then(function(names) {
+          caches.keys().then(function (names) {
             for (let name of names) {
               caches.delete(name);
             }

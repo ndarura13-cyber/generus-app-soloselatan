@@ -386,8 +386,8 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
         iconColor: '#dc2626',
         confirmText: 'Ya, Hapus',
         confirmBtnColor: 'var(--red)',
-        onConfirm: () => {
-          deleteKbmEvent(evId);
+        onConfirm: async () => {
+          await deleteKbmEvent(evId);
           showToast('Event berhasil dihapus', 'success');
           renderCetakAbsensiModal('event_list');
         }
@@ -450,7 +450,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
       const barisVal = document.getElementById('modalSelBarisKosong').value;
 
       // Create new event
-      const newEvent = saveKbmEvent({
+      const newEvent = await saveKbmEvent({
         judul: judulVal,
         subjudul: 'KEPENGURUSAN REMAJA DAERAH SOLO SELATAN',
         format_kbm: jenjangVal,
@@ -904,7 +904,7 @@ export function renderFormRekapKehadiranModal(eventId) {
     const hariTglVal = document.getElementById('iptRekapHariTgl')?.value.trim() || event.hari_tanggal;
     const jamVal = document.getElementById('iptRekapJam')?.value.trim() || event.jam;
 
-    const updated = saveKbmEvent({
+    const updated = await saveKbmEvent({
       ...event,
       hari_tanggal: hariTglVal,
       jam: jamVal,
@@ -916,15 +916,21 @@ export function renderFormRekapKehadiranModal(eventId) {
   }
 
   // Save Rekap Button
-  document.getElementById('btnSimpanRekap')?.addEventListener('click', () => {
-    saveCurrentRekapData();
+  document.getElementById('btnSimpanRekap')?.addEventListener('click', async () => {
+    const btnSimpan = document.getElementById('btnSimpanRekap');
+    if (btnSimpan) btnSimpan.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">sync</span>`;
+    await saveCurrentRekapData();
+    if (btnSimpan) btnSimpan.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan Rekap`;
     showToast('Rekapitulasi kehadiran KBM berhasil disimpan!', 'success');
     renderCetakAbsensiModal('event_list');
   });
 
   // Save & Open PDF
-  document.getElementById('btnSimpanDanCetakLaporan')?.addEventListener('click', () => {
-    const saved = saveCurrentRekapData();
+  document.getElementById('btnSimpanDanCetakLaporan')?.addEventListener('click', async () => {
+    const btnSimpanCetak = document.getElementById('btnSimpanDanCetakLaporan');
+    if (btnSimpanCetak) btnSimpanCetak.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">sync</span>`;
+    const saved = await saveCurrentRekapData();
+    if (btnSimpanCetak) btnSimpanCetak.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">print</span> Simpan & Cetak`;
     showToast('Rekapitulasi disimpan! Membuka laporan PDF...', 'success');
     window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(saved.id)}`, '_blank');
     renderCetakAbsensiModal('event_list');

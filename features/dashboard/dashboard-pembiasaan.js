@@ -123,10 +123,14 @@ export function renderEventPembiasaanModal() {
           iconColor: '#dc2626',
           confirmText: 'Ya, Hapus Event',
           confirmBtnColor: 'var(--red)',
-          onConfirm: () => {
-            deleteEventPembiasaan(id);
-            showToast(`Event "${ev.judul_periode}" berhasil dihapus`, 'success');
-            renderEventPembiasaanModal();
+          onConfirm: async () => {
+            const res = await deleteEventPembiasaan(id);
+            if (res.success) {
+              showToast(`Event "${ev.judul_periode}" berhasil dihapus`, 'success');
+              renderEventPembiasaanModal();
+            } else {
+              showToast(`Gagal: ${res.message || res.error}`, 'error');
+            }
           }
         });
       });
@@ -303,7 +307,7 @@ export function renderCreateEventForm(editEvent = null) {
 
   document.getElementById('btnCancelCreateEvent').addEventListener('click', renderEventPembiasaanModal);
 
-  document.getElementById('formCreateEvent').addEventListener('submit', (ev) => {
+  document.getElementById('formCreateEvent').addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const judul = document.getElementById('evtJudul').value.trim();
     const habitInputEls = document.querySelectorAll('.habit-input');
@@ -312,23 +316,37 @@ export function renderCreateEventForm(editEvent = null) {
     if (!judul) return showToast('Judul periode wajib diisi!', 'warning');
     if (newHabits.length === 0) return showToast('Minimal satu pembiasaan harus diisi!', 'warning');
 
+    const btnSubmit = ev.currentTarget.querySelector('button[type="submit"]');
+    if (btnSubmit) btnSubmit.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Menyimpan...';
+
     if (isEdit) {
       const newStatus = document.getElementById('evtStatus')?.value || editEvent.status;
-      updateEventPembiasaan(editEvent.id, {
+      const res = await updateEventPembiasaan(editEvent.id, {
         judul_periode: judul,
         status: newStatus,
         habits: newHabits
       });
-      showToast(`Periode pembiasaan "${judul}" berhasil diperbarui!`, 'success');
+      if (res.success) {
+        showToast(`Periode pembiasaan "${judul}" berhasil diperbarui!`, 'success');
+        renderEventPembiasaanModal();
+      } else {
+        showToast(`Gagal: ${res.error || res.message}`, 'error');
+        if (btnSubmit) btnSubmit.innerHTML = '<span class="material-symbols-outlined">save</span> Simpan Perubahan';
+      }
     } else {
-      addEventPembiasaan({
+      const res = await addEventPembiasaan({
         judul_periode: judul,
         status: 'berjalan',
         habits: newHabits
       });
-      showToast(`Periode pembiasaan "${judul}" berhasil dibuat!`, 'success');
+      if (res.success) {
+        showToast(`Periode pembiasaan "${judul}" berhasil dibuat!`, 'success');
+        renderEventPembiasaanModal();
+      } else {
+        showToast(`Gagal: ${res.error || res.message}`, 'error');
+        if (btnSubmit) btnSubmit.innerHTML = '<span class="material-symbols-outlined">save</span> Buat Event Pembiasaan';
+      }
     }
-    renderEventPembiasaanModal();
   });
 }
 
@@ -540,7 +558,7 @@ export function renderGridRows(event) {
           return val;
         });
 
-        // Save
+        // Save asynchronously
         saveNilaiPembiasaan(event.id, siswaId, newNilais);
 
         // Update Total cell

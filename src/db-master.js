@@ -3,7 +3,22 @@
    Hirarki: Daerah (Solo Selatan) > 5 Desa > 27 Kelompok (A-Z)
    ═══════════════════════════════════════════════════════════════ */
 
-import { isSupabaseConfigured, upsertSiswaToSupabase, deleteSiswaFromSupabase } from "./supabase.js";
+import { 
+  isSupabaseConfigured, 
+  upsertSiswaToSupabase, 
+  deleteSiswaFromSupabase,
+  fetchEventPembiasaanFromSupabase,
+  upsertEventPembiasaanToSupabase,
+  deleteEventPembiasaanFromSupabase,
+  fetchNilaiPembiasaanFromSupabase,
+  upsertNilaiPembiasaanToSupabase,
+  fetchPengurusFromSupabase,
+  upsertPengurusToSupabase,
+  deletePengurusFromSupabase,
+  fetchKbmEventsFromSupabase,
+  upsertKbmEventToSupabase,
+  deleteKbmEventFromSupabase
+} from "./supabase.js";
 
 export const MASTER_WILAYAH = {
   daerah: {
@@ -940,6 +955,22 @@ export function savePengurusList(list) {
   localStorage.setItem(PENGURUS_STORAGE_KEY, JSON.stringify(list));
 }
 
+export async function syncPengurusFromSupabase() {
+  if (!isSupabaseConfigured()) return;
+  const res = await fetchPengurusFromSupabase();
+  if (res.success && res.data) {
+    savePengurusList(res.data);
+  }
+}
+
+export async function syncKbmFromSupabase() {
+  if (!isSupabaseConfigured()) return;
+  const res = await fetchKbmEventsFromSupabase();
+  if (res.success && res.data) {
+    localStorage.setItem(KBM_EVENTS_STORAGE_KEY, JSON.stringify(res.data));
+  }
+}
+
 // Ambil pengurus berdasarkan ID
 export function getPengurusById(id) {
   const list = getPengurusList();
@@ -970,32 +1001,41 @@ export function getPengurusByWilayah(desaId, kelompokId = null) {
 }
 
 // Tambah Pendaftaran Pengurus Baru (Self-Registration)
-export function registerNewPengurus(data) {
+export async function registerNewPengurus(data) {
   const list = getPengurusList();
   
-  // Cek duplikasi email
-  const exists = list.find(p => p.email.toLowerCase() === data.email.toLowerCase());
+  const exists = list.find(p => p.email && data.email && p.email.toLowerCase() === data.email.toLowerCase());
   if (exists) {
     return { success: false, message: "Email atau akun ini sudah pernah terdaftar!" };
   }
 
-  const newPengurus = {
-    id: `pengurus-${Date.now()}`,
+  let newPengurus = {
     nama: data.nama,
     email: data.email,
     password: data.password || "123456",
     noWa: data.noWa,
-    tingkatan: data.tingkatan || "kelompok", // 'daerah' | 'desa' | 'kelompok'
+    tingkatan: data.tingkatan || "kelompok",
     peran: data.peran || "pamong_caberawit",
     jabatan: data.jabatan || "Pamong Kelompok",
     desaId: data.desaId || "desa-barat",
     desaNama: data.desaNama || "Barat",
     kelompokId: data.kelompokId || "kel-gentan",
     kelompokNama: data.kelompokNama || "Gentan",
-    statusApproval: "pending", // Wajib approval dari Superadmin Daerah
+    statusApproval: "pending",
     isActive: true,
     registeredAt: new Date().toISOString(),
   };
+
+  if (isSupabaseConfigured()) {
+    const res = await upsertPengurusToSupabase(newPengurus);
+    if (res.success && res.data) {
+      newPengurus = { ...newPengurus, ...res.data };
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  } else {
+    newPengurus.id = `pengurus-${Date.now()}`;
+  }
 
   list.push(newPengurus);
   savePengurusList(list);
@@ -1008,13 +1048,23 @@ export function registerNewPengurus(data) {
 }
 
 // Approve / Tolak Pengurus oleh Superadmin
-export function approvePengurus(pengurusId, isApproved = true) {
+export async function approvePengurus(pengurusId, isApproved = true) {
   const list = getPengurusList();
   const idx = list.findIndex(p => p.id === pengurusId);
   if (idx === -1) return { success: false, message: "Data pengurus tidak ditemukan." };
 
   list[idx].statusApproval = isApproved ? "approved" : "rejected";
   list[idx].approvedAt = new Date().toISOString();
+  
+  if (isSupabaseConfigured()) {
+    const res = await upsertPengurusToSupabase(list[idx]);
+    if (res.success && res.data) {
+      list[idx] = { ...list[idx], ...res.data };
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  }
+
   savePengurusList(list);
 
   return { 
@@ -1025,13 +1075,23 @@ export function approvePengurus(pengurusId, isApproved = true) {
 }
 
 // Nonaktifkan / Aktifkan kembali Pengurus oleh Superadmin Daerah
-export function togglePengurusActive(pengurusId, makeActive) {
+export async function togglePengurusActive(pengurusId, makeActive) {
   const list = getPengurusList();
   const idx = list.findIndex(p => p.id === pengurusId);
   if (idx === -1) return { success: false, message: "Data pengurus tidak ditemukan." };
 
   list[idx].isActive = makeActive;
   list[idx].updatedAt = new Date().toISOString();
+  
+  if (isSupabaseConfigured()) {
+    const res = await upsertPengurusToSupabase(list[idx]);
+    if (res.success && res.data) {
+      list[idx] = { ...list[idx], ...res.data };
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  }
+
   savePengurusList(list);
 
   return { 
@@ -1044,14 +1104,13 @@ export function togglePengurusActive(pengurusId, makeActive) {
 }
 
 // Update / Edit Detail Pengurus & Hak Akses (Khusus Superadmin)
-export function updatePengurus(pengurusId, updateData) {
+export async function updatePengurus(pengurusId, updateData) {
   const list = getPengurusList();
   const idx = list.findIndex(p => p.id === pengurusId);
   if (idx === -1) return { success: false, message: "Data pengurus tidak ditemukan." };
 
   const roleName = updateData.peran || updateData.jabatan || list[idx].peran || list[idx].jabatan || "Pamong";
 
-  // Setiap pengurus memiliki asal kelompok dan desa
   list[idx] = {
     ...list[idx],
     nama: updateData.nama || list[idx].nama,
@@ -1072,9 +1131,17 @@ export function updatePengurus(pengurusId, updateData) {
     list[idx].password = updateData.password;
   }
 
+  if (isSupabaseConfigured()) {
+    const res = await upsertPengurusToSupabase(list[idx]);
+    if (res.success && res.data) {
+      list[idx] = { ...list[idx], ...res.data };
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  }
+
   savePengurusList(list);
 
-  // Jika mengedit akun yang sedang login, sinkronkan juga session
   try {
     const rawSession = localStorage.getItem("ppg_user_session");
     if (rawSession) {
@@ -1873,48 +1940,106 @@ export function saveEventPembiasaanList(list) {
   localStorage.setItem(EVENT_PEMBIASAAN_STORAGE_KEY, JSON.stringify(list));
 }
 
-export function addEventPembiasaan(data) {
-  const list = getEventPembiasaanList();
-  const newEvent = {
-    id: `evt-${Date.now()}`,
+// Initial Sync helper
+export async function syncPembiasaanFromSupabase() {
+  if (!isSupabaseConfigured()) return;
+  const evRes = await fetchEventPembiasaanFromSupabase();
+  if (evRes.success && evRes.data) {
+    saveEventPembiasaanList(evRes.data);
+  }
+  const nilRes = await fetchNilaiPembiasaanFromSupabase();
+  if (nilRes.success && nilRes.data) {
+    saveNilaiPembiasaanList(nilRes.data);
+  }
+}
+
+export async function addEventPembiasaan(data) {
+  let newEvent = {
     judul_periode: data.judul_periode || "Periode Baru",
     status: data.status || "berjalan",
     habits: data.habits || [],
     created_at: new Date().toISOString()
   };
+
+  if (isSupabaseConfigured()) {
+    const res = await upsertEventPembiasaanToSupabase(newEvent);
+    if (res.success && res.data) {
+      newEvent = res.data;
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  } else {
+    newEvent.id = `evt-${Date.now()}`;
+  }
+
+  const list = getEventPembiasaanList();
   list.push(newEvent);
   saveEventPembiasaanList(list);
   return { success: true, data: newEvent, message: "Event Pembiasaan berhasil ditambahkan!" };
 }
 
-export function updateEventPembiasaan(id, data) {
+export async function updateEventPembiasaan(id, data) {
   const list = getEventPembiasaanList();
   const idx = list.findIndex(e => e.id === id);
   if (idx === -1) return { success: false, message: "Event tidak ditemukan." };
-  list[idx] = {
+  
+  let updatedEvent = {
     ...list[idx],
     ...data,
     updated_at: new Date().toISOString()
   };
+
+  if (isSupabaseConfigured()) {
+    const res = await upsertEventPembiasaanToSupabase(updatedEvent);
+    if (res.success && res.data) {
+      updatedEvent = res.data;
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  }
+
+  list[idx] = updatedEvent;
   saveEventPembiasaanList(list);
   return { success: true, data: list[idx], message: "Event Pembiasaan berhasil diperbarui!" };
 }
 
-export function closeEventPembiasaan(id) {
+export async function closeEventPembiasaan(id) {
   const list = getEventPembiasaanList();
   const idx = list.findIndex(e => e.id === id);
   if (idx === -1) return { success: false, message: "Event tidak ditemukan." };
-  list[idx].status = "selesai";
-  list[idx].closed_at = new Date().toISOString();
+  
+  let updatedEvent = {
+    ...list[idx],
+    status: "selesai",
+    closed_at: new Date().toISOString()
+  };
+
+  if (isSupabaseConfigured()) {
+    const res = await upsertEventPembiasaanToSupabase(updatedEvent);
+    if (res.success && res.data) {
+      updatedEvent = res.data;
+    } else {
+      return { success: false, message: res.error || res.message };
+    }
+  }
+
+  list[idx] = updatedEvent;
   saveEventPembiasaanList(list);
   return { success: true, data: list[idx], message: "Event Pembiasaan berhasil ditutup dan diarsipkan!" };
 }
 
-export function deleteEventPembiasaan(id) {
+export async function deleteEventPembiasaan(id) {
+  if (isSupabaseConfigured()) {
+    const res = await deleteEventPembiasaanFromSupabase(id);
+    if (!res.success) {
+      return { success: false, message: res.error || res.message };
+    }
+  }
+
   let list = getEventPembiasaanList();
   list = list.filter(e => e.id !== id);
   saveEventPembiasaanList(list);
-  // Also delete values
+  
   let nilaiList = getNilaiPembiasaanList();
   nilaiList = nilaiList.filter(n => n.event_id !== id);
   saveNilaiPembiasaanList(nilaiList);
@@ -1943,13 +2068,26 @@ export function saveNilaiPembiasaanList(list) {
   localStorage.setItem(NILAI_PEMBIASAAN_STORAGE_KEY, JSON.stringify(list));
 }
 
-export function saveNilaiPembiasaan(event_id, siswa_id, nilaiArray) {
+export async function saveNilaiPembiasaan(event_id, siswa_id, nilaiArray) {
   const list = getNilaiPembiasaanList();
   const idx = list.findIndex(n => n.event_id === event_id && n.siswa_id === siswa_id);
+  
+  let newNilaiObj = { event_id, siswa_id, nilai: nilaiArray };
   if (idx > -1) {
-    list[idx].nilai = nilaiArray;
+    newNilaiObj = { ...list[idx], ...newNilaiObj };
+  }
+  
+  if (isSupabaseConfigured()) {
+    const res = await upsertNilaiPembiasaanToSupabase(newNilaiObj);
+    if (res.success && res.data) {
+      newNilaiObj = res.data;
+    }
+  }
+
+  if (idx > -1) {
+    list[idx] = newNilaiObj;
   } else {
-    list.push({ event_id, siswa_id, nilai: nilaiArray });
+    list.push(newNilaiObj);
   }
   saveNilaiPembiasaanList(list);
 }
@@ -2046,30 +2184,49 @@ export function getKbmEventById(id) {
   return list.find(ev => ev.id === id) || null;
 }
 
-export function saveKbmEvent(eventData) {
+export async function saveKbmEvent(eventData) {
   const list = getKbmEvents();
+  let savedData = { ...eventData };
+
   if (eventData.id) {
     const idx = list.findIndex(ev => ev.id === eventData.id);
     if (idx > -1) {
-      list[idx] = { ...list[idx], ...eventData, updated_at: new Date().toISOString() };
-    } else {
-      list.unshift(eventData);
+      savedData = { ...list[idx], ...eventData, updated_at: new Date().toISOString() };
     }
   } else {
-    const newId = `kbm-evt-${Date.now()}`;
-    const newEvent = {
+    savedData = {
       ...eventData,
-      id: newId,
       created_at: new Date().toISOString()
     };
-    list.unshift(newEvent);
-    eventData.id = newId;
   }
+
+  if (isSupabaseConfigured()) {
+    const res = await upsertKbmEventToSupabase(savedData);
+    if (res.success && res.data) {
+      savedData = { ...savedData, ...res.data };
+    } else {
+      console.warn("Gagal simpan KBM ke Supabase:", res.error);
+    }
+  } else if (!savedData.id) {
+    savedData.id = `kbm-evt-${Date.now()}`;
+  }
+
+  if (eventData.id) {
+    const idx = list.findIndex(ev => ev.id === savedData.id);
+    if (idx > -1) list[idx] = savedData;
+    else list.unshift(savedData);
+  } else {
+    list.unshift(savedData);
+  }
+
   localStorage.setItem(KBM_EVENTS_STORAGE_KEY, JSON.stringify(list));
-  return eventData;
+  return savedData;
 }
 
-export function deleteKbmEvent(id) {
+export async function deleteKbmEvent(id) {
+  if (isSupabaseConfigured()) {
+    await deleteKbmEventFromSupabase(id);
+  }
   const list = getKbmEvents().filter(ev => ev.id !== id);
   localStorage.setItem(KBM_EVENTS_STORAGE_KEY, JSON.stringify(list));
   return true;

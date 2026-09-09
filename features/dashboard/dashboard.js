@@ -9,7 +9,10 @@ import {
   getPengurusList,
   getPengurusDaerahList,
   updateCurrentProfile,
-  getProkerStats
+  getProkerStats,
+  syncPembiasaanFromSupabase,
+  syncPengurusFromSupabase,
+  syncKbmFromSupabase
 } from '../../src/db-master.js';
 
 import {
@@ -362,16 +365,17 @@ export function renderDesaTabs() {
 
   MASTER_WILAYAH.desa.forEach((desa) => {
     const btn = document.createElement('button');
-    btn.className = `desa-tab ${desa.id === activeDesaId ? 'active' : ''}`;
+    btn.type = 'button';
+    btn.className = `desa-tab-btn ${desa.id === activeDesaId ? 'active' : ''}`;
     btn.dataset.desa = desa.id;
     btn.innerHTML = `
-      <span class="desa-tab-name">Desa ${desa.nama}</span>
-      <span class="desa-tab-badge">${desa.kelompok.length} Kel.</span>
+      <span>Desa ${desa.nama}</span>
+      <span class="desa-count-badge">${desa.kelompok.length} Kel.</span>
     `;
 
     btn.addEventListener('click', () => {
       activeDesaId = desa.id;
-      document.querySelectorAll('.desa-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.desa-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderKelompokGrid();
     });
@@ -388,7 +392,7 @@ export function renderKelompokGrid() {
   if (!currentDesa) return;
 
   if (btnKontakDesaText) {
-    btnKontakDesaText.textContent = `Kontak Pengurus Desa ${currentDesa.nama}`;
+    btnKontakDesaText.textContent = `Kontak Koordinator Desa ${currentDesa.nama}`;
   }
 
   const allPengurus = getPengurusList();
@@ -396,42 +400,47 @@ export function renderKelompokGrid() {
 
   sortedKelompok.forEach((kel) => {
     const card = document.createElement('div');
-    card.className = 'kelompok-card';
-
     const pengurusKelompok = allPengurus.filter(
       p => p.kelompokId === kel.id && p.isActive !== false
     );
+    const hasPengurus = pengurusKelompok.length > 0;
+    card.className = `kelompok-card ${hasPengurus ? 'active-kelompok' : 'disabled-kelompok'}`;
 
     const leader = pengurusKelompok[0] || null;
     const leaderName = leader ? leader.nama : 'Belum Terdata';
     const leaderPeran = leader ? (leader.peran || leader.jabatan || 'Pamong') : 'Pamong Kelompok';
 
     card.innerHTML = `
-      <div class="kelompok-card-header">
-        <div>
-          <div class="kelompok-name">${kel.nama}</div>
-          <div class="kelompok-meta">Kelompok &bull; Desa ${currentDesa.nama}</div>
+      <div class="kel-info">
+        <div class="kel-icon">
+          <span class="material-symbols-outlined">diversity_3</span>
         </div>
-        <span class="kelompok-badge">${pengurusKelompok.length} Pengurus</span>
+        <div>
+          <div class="kel-name">${kel.nama}</div>
+          <div class="kel-pamong">${leaderPeran}: <strong>${leaderName}</strong></div>
+          <div>
+            ${hasPengurus
+              ? `<span class="badge-pengurus-count">🟢 ${pengurusKelompok.length} Pengurus</span>`
+              : `<span class="badge-pengurus-empty">⚪ Belum Ada Pengurus</span>`
+            }
+          </div>
+        </div>
       </div>
 
-      <div class="kelompok-leader">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">account_circle</span>
-        <div>
-          <span class="leader-role">${leaderPeran}</span>
-          <span class="leader-name">${leaderName}</span>
-        </div>
-      </div>
-
-      <div class="kelompok-footer">
-        <button type="button" class="btn-detail-kelompok" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" style="width:100%;border:none;background:var(--surface-2);color:var(--blue);font-weight:700;font-size:11.5px;padding:8px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:15px;">contacts</span>
-          Kontak Pengurus (${pengurusKelompok.length})
-        </button>
+      <div>
+        ${hasPengurus
+          ? `<button type="button" class="btn-view-kontak-kel" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak pengurus & pamong ${kel.nama}">
+              <span class="material-symbols-outlined" style="font-size:15px;">contacts</span>
+              <span>Kontak (${pengurusKelompok.length})</span>
+             </button>`
+          : `<button type="button" class="btn-view-kontak-empty" disabled title="Belum ada pengurus terdaftar di kelompok ${kel.nama}">
+              <span>Kosong</span>
+             </button>`
+        }
       </div>
     `;
 
-    card.querySelector('.btn-detail-kelompok')?.addEventListener('click', (e) => {
+    card.querySelector('.btn-view-kontak-kel')?.addEventListener('click', (e) => {
       e.stopPropagation();
       renderKontakModal(currentDesa.id, kel.id);
     });
@@ -439,6 +448,7 @@ export function renderKelompokGrid() {
     kelompokGridContainer.appendChild(card);
   });
 }
+
 
 btnKontakDesa?.addEventListener('click', () => {
   renderKontakModal(activeDesaId, null);
@@ -524,6 +534,9 @@ try {
   renderKelompokGrid();
   checkPendingApprovals();
   updateSupabaseStatusUI();
+  syncPembiasaanFromSupabase().catch(err => console.warn('Background sync pembiasaan failed:', err));
+  syncPengurusFromSupabase().catch(err => console.warn('Background sync pengurus failed:', err));
+  syncKbmFromSupabase().catch(err => console.warn('Background sync KBM failed:', err));
   console.log('PPG Dashboard initialized successfully.');
 } catch (err) {
   console.error('Fatal error initializing PPG Dashboard:', err);
