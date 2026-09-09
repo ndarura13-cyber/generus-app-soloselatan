@@ -180,7 +180,7 @@ loginForm?.addEventListener('submit', (e) => {
 
   // Cek pada daftar pengurus terdaftar
   const pengurusList = getPengurusList();
-  const matchedUser = pengurusList.find(p => p.email.toLowerCase() === email);
+  const matchedUser = pengurusList.find(p => (p.email && p.email.toLowerCase() === email));
 
   // 1. Jika akun belum terdaftar
   if (!matchedUser) {

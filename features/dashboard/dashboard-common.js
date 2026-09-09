@@ -32,7 +32,7 @@ if (!currentUser || !currentUser.email) {
 // Verifikasi silang akun dengan database pengurus
 const activePengurusList = getPengurusList();
 const existingAccount = activePengurusList.find(
-  p => p.email.toLowerCase() === currentUser.email.toLowerCase() || p.id === currentUser.id
+  p => (p.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) || p.id === currentUser.id
 );
 
 if (existingAccount) {

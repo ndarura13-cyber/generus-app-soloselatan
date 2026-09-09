@@ -704,9 +704,9 @@ export async function fetchPengurusFromSupabase() {
       no_wa: p.no_wa,
       tingkatan: p.tingkatan,
       peran: p.peran,
-      daerah_id: p.daerah_id,
-      desa_id: p.desa_id,
-      kelompok_id: p.kelompok_id,
+      daerahId: p.daerah_id,
+      desaId: p.desa_id,
+      kelompokId: p.kelompok_id,
       isSuperadmin: p.is_superadmin,
       statusApproval: p.status_approval,
       email: p.email,
@@ -730,9 +730,9 @@ export async function upsertPengurusToSupabase(p) {
       no_wa: p.no_wa,
       tingkatan: p.tingkatan,
       peran: p.peran,
-      daerah_id: p.daerah_id || null,
-      desa_id: p.desa_id || null,
-      kelompok_id: p.kelompok_id || null,
+      daerah_id: p.daerahId || null,
+      desa_id: p.desaId || null,
+      kelompok_id: p.kelompokId || null,
       is_superadmin: p.isSuperadmin || false,
       status_approval: p.statusApproval || 'pending',
       email: p.email || null,
@@ -759,9 +759,9 @@ export async function upsertPengurusToSupabase(p) {
         no_wa: row.no_wa,
         tingkatan: row.tingkatan,
         peran: row.peran,
-        daerah_id: row.daerah_id,
-        desa_id: row.desa_id,
-        kelompok_id: row.kelompok_id,
+        daerahId: row.daerah_id,
+        desaId: row.desa_id,
+        kelompokId: row.kelompok_id,
         isSuperadmin: row.is_superadmin,
         statusApproval: row.status_approval,
         email: row.email,
@@ -820,13 +820,14 @@ export async function fetchKbmEventsFromSupabase() {
       
       return {
         id: evt.id,
-        jenis: evt.kategori_usia === 'caberawit' ? 'kelompok' : 'desa',
-        title: evt.materi_kbm || "Event KBM",
-        date: evt.tanggal_kbm,
+        format_kbm: evt.kategori_usia === 'caberawit' ? 'kelompok' : 'desa',
+        judul: evt.materi_kbm || "Event KBM",
+        hari_tanggal: evt.tanggal_kbm,
+        jam: '19.30 - 21.00 WIB',
         kategori_usia: [evt.kategori_usia],
         materi: evt.materi_kbm,
         pengajar: "Pengajar",
-        absensi: rekapKehadiran,
+        rekap_kehadiran: rekapKehadiran,
         created_at: evt.created_at
       };
     });
@@ -848,10 +849,10 @@ export async function upsertKbmEventToSupabase(evtData) {
 
     const payload = {
       kelompok_id: validKelompokId,
-      kategori_usia: evtData.kategori_usia?.[0] || 'caberawit',
-      tanggal_kbm: evtData.date || new Date().toISOString().split('T')[0],
-      materi_kbm: evtData.title || evtData.materi || 'Materi KBM',
-      catatan_sesi: JSON.stringify(evtData.absensi || {})
+      kategori_usia: evtData.format_kbm === 'kelompok' ? 'caberawit' : 'remaja',
+      tanggal_kbm: evtData.hari_tanggal || new Date().toISOString().split('T')[0],
+      materi_kbm: evtData.judul || evtData.materi || 'Materi KBM',
+      catatan_sesi: JSON.stringify(evtData.rekap_kehadiran || {})
     };
 
     const isUuid = typeof evtData.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evtData.id);
