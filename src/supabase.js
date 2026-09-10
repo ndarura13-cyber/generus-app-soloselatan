@@ -699,3 +699,22 @@ export async function deleteKbmEventFromSupabase(id) {
     return { success: false, error: err.message };
   }
 }
+
+// --- MASTER WILAYAH ---
+export async function fetchWilayahFromSupabase() {
+  if (!isSupabaseConfigured()) return null;
+  const client = getSupabaseClient();
+  try {
+    const { data, error } = await client
+      .from('master_config')
+      .select('data')
+      .eq('id', 'master_wilayah')
+      .single();
+    if (error) throw error;
+    if (data && data.data) return data.data;
+    return null;
+  } catch (err) {
+    console.error("Supabase Error fetching Wilayah:", err.message);
+    return null;
+  }
+}

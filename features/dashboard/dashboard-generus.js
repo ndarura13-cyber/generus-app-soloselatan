@@ -63,13 +63,13 @@ export function getKelasFilterOptions(selectedJenjang, selectedKelas = 'all') {
   let defaultLabel = 'Semua Kelas / Status';
   if (selectedJenjang === 'caberawit') {
     classes = JENJANG_CONFIG.caberawit.kelas;
-    defaultLabel = 'Semua Tingkat Caberawit (PAUD - SD)';
+    defaultLabel = 'Caberawit (PAUD - SD)';
   } else if (selectedJenjang === 'gp_reguler') {
     classes = JENJANG_CONFIG.gp_reguler.kelas;
-    defaultLabel = 'Semua Kelas GP (SMP - SMA)';
+    defaultLabel = 'GP (SMP - SMA)';
   } else if (selectedJenjang === 'remaja') {
     classes = JENJANG_CONFIG.remaja.kelas;
-    defaultLabel = 'Semua Status Remaja / Dewasa';
+    defaultLabel = 'Remaja / Dewasa';
   } else {
     classes = [
       ...JENJANG_CONFIG.caberawit.kelas,
@@ -369,6 +369,16 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 }
 
 let currentSiswaFilter = { search: '', desa: 'all', kelompok: 'all', jenjang: 'all', kelas: 'all', status: 'all' };
+let currentSiswaSort = { key: 'nama_lengkap', dir: 'asc' };
+if (typeof window !== 'undefined') window.sortSiswa = (key) => {
+  if (currentSiswaSort.key === key) {
+    currentSiswaSort.dir = currentSiswaSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSiswaSort.key = key;
+    currentSiswaSort.dir = 'asc';
+  }
+  import('./dashboard-generus.js').then(m => m.renderSiswaTableRows());
+};
 
 export function renderSiswaModal() {
   updateDashboardStats();
@@ -414,10 +424,10 @@ export function renderSiswaModal() {
               1. Kategori Jenjang Usia:
             </label>
             <select id="filterSiswaJenjang" style="width:100%;padding:9px 12px;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;background:#fff;font-weight:700;color:#1e3a8a;outline:none;box-shadow:0 1px 2px rgba(0,0,0,0.04);cursor:pointer;">
-              <option value="all">🌟 Semua Kategori Jenjang (Seluruh Usia)</option>
-              <option value="caberawit" ${currentSiswaFilter.jenjang === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
-              <option value="gp_reguler" ${currentSiswaFilter.jenjang === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
-              <option value="remaja" ${currentSiswaFilter.jenjang === 'remaja' ? 'selected' : ''}>🎓 Remaja &amp; Dewasa (Muda-mudi &amp; Pra-Nikah)</option>
+              <option value="all">🌟 Semua Jenjang Usia</option>
+              <option value="caberawit" ${currentSiswaFilter.jenjang === 'caberawit' ? 'selected' : ''}>🌱 Caberawit</option>
+              <option value="gp_reguler" ${currentSiswaFilter.jenjang === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler</option>
+              <option value="remaja" ${currentSiswaFilter.jenjang === 'remaja' ? 'selected' : ''}>🎓 Remaja &amp; Dewasa</option>
             </select>
           </div>
 
@@ -450,24 +460,24 @@ export function renderSiswaModal() {
       </div>
 
       <!-- FILTER PENCARIAN & WILAYAH (DESA / KELOMPOK / STATUS SAMBUNG) -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:10px;background:#fff;padding:12px 14px;border-radius:10px;border:1px solid var(--border);align-items:center;">
-        <div style="position:relative;">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;background:#fff;padding:12px 14px;border-radius:10px;border:1px solid var(--border);align-items:center;">
+        <div style="position:relative;flex:1 1 160px;min-width:160px;">
           <input type="text" id="inputSiswaSearch" value="${currentSiswaFilter.search}" placeholder="🔍 Cari nama / NIS..." style="width:100%;padding:9px 12px 9px 32px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;" />
           <span class="material-symbols-outlined" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);">search</span>
         </div>
-        <div>
+        <div style="flex:1 1 140px;min-width:140px;">
           <select id="filterSiswaDesa" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;box-sizing:border-box;font-weight:600;">
             <option value="all">Semua Desa (5 Desa)</option>
             ${desaOptions}
           </select>
         </div>
-        <div>
+        <div style="flex:1 1 140px;min-width:140px;">
           <select id="filterSiswaKelompok" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;box-sizing:border-box;font-weight:600;">
             <option value="all">Semua Kelompok (27 Kelompok)</option>
             ${kelOptions}
           </select>
         </div>
-        <div>
+        <div style="flex:1 1 140px;min-width:140px;">
           <select id="filterSiswaStatus" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;box-sizing:border-box;font-weight:700;color:#1e293b;">
             <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>📋 Semua Status Sambung (${totalCount})</option>
             <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>🟢 Aktif: Sambung (${activeCount})</option>
@@ -475,7 +485,7 @@ export function renderSiswaModal() {
             <option value="Menikah" ${currentSiswaFilter.status === 'Menikah' ? 'selected' : ''}>💍 Menikah (${nikahCount})</option>
           </select>
         </div>
-        <div style="display:flex;gap:8px;grid-column:1 / -1;justify-content:flex-end;flex-wrap:wrap;margin-top:2px;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;flex:1 1 auto;">
           <button type="button" id="btnAutoPromoteJenjang" style="padding:9px 15px;background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(79,70,229,0.3);white-space:nowrap;" title="Kenaikan Jenjang Otomatis Sesuai Usia atau Pergantian Tahun Ajaran">
             <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span> Kenaikan Jenjang Otomatis
           </button>
@@ -493,19 +503,19 @@ export function renderSiswaModal() {
               <th style="padding:10px 8px;text-align:center;border-bottom:2px solid #cbd5e1;width:38px;">
                 <input type="checkbox" id="checkAllSiswa" title="Pilih Semua di Halaman Ini" style="cursor:pointer;width:15px;height:15px;" />
               </th>
+              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Aksi</th>
               <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">No</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Nama Lengkap</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Tempat Lahir</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Tgl Lahir</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Desa</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Kelompok</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Usia</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">L/P</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Jenjang &amp; Kelas</th>
+              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('nama_lengkap')">Nama Lengkap ↕️</th>
+              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('tempat_lahir')">Tempat Lahir ↕️</th>
+              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('tanggal_lahir')">Tgl Lahir ↕️</th>
+              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('desa_id')">Desa ↕️</th>
+              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('kelompok_id')">Kelompok ↕️</th>
+              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('usia')">Usia ↕️</th>
+              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('jenis_kelamin')">L/P ↕️</th>
+              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('kategori_usia')">Jenjang &amp; Kelas ↕️</th>
               <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">No. HP</th>
               <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Domisili</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Status</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Aksi</th>
+              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('status_sambung')">Status ↕️</th>
             </tr>
           </thead>
           <tbody id="siswaTableBody">
@@ -794,6 +804,18 @@ export function renderSiswaTableRows() {
     return true;
   });
 
+  filtered.sort((a, b) => {
+    let valA = a[currentSiswaSort.key] || '';
+    let valB = b[currentSiswaSort.key] || '';
+    if (currentSiswaSort.key === 'usia') {
+      valA = calculateUmur(a.tanggal_lahir);
+      valB = calculateUmur(b.tanggal_lahir);
+    }
+    if (valA < valB) return currentSiswaSort.dir === 'asc' ? -1 : 1;
+    if (valA > valB) return currentSiswaSort.dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   const totalFiltered = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalFiltered / siswaPageSize));
   if (siswaCurrentPage > totalPages) siswaCurrentPage = 1;
@@ -830,23 +852,6 @@ export function renderSiswaTableRows() {
         <td style="padding:8px 8px;text-align:center;">
           <input type="checkbox" class="check-siswa-row" data-id="${s.id}" style="cursor:pointer;width:15px;height:15px;" ${isChecked ? 'checked' : ''} />
         </td>
-        <td style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text-muted);font-weight:700;">${startIndex + idx + 1}</td>
-        <td style="padding:8px 12px;font-weight:700;min-width:160px;color:var(--text);">${s.nama_lengkap}</td>
-        <td style="padding:8px 12px;">${s.tempat_lahir || '-'}</td>
-        <td style="padding:8px 12px;white-space:nowrap;font-size:11px;">${tglFormatted}</td>
-        <td style="padding:8px 12px;">Desa ${s.desa_nama || '-'}</td>
-        <td style="padding:8px 12px;">Kel. ${s.kelompok_nama || '-'}</td>
-        <td style="padding:8px 12px;text-align:center;font-weight:700;">${calculateUmur(s.tanggal_lahir)} th</td>
-        <td style="padding:8px 12px;text-align:center;font-weight:700;color:${s.jenis_kelamin === 'L' ? '#1d4ed8' : '#be185d'};">${s.jenis_kelamin}</td>
-        <td style="padding:8px 12px;">
-          <span style="background:${cfg.bg};color:${cfg.color};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;display:inline-block;">${cfg.badge}</span>
-          <span style="display:block;font-size:11px;font-weight:600;margin-top:2px;color:#334155;">${s.jenjang_kelas}</span>
-        </td>
-        <td style="padding:8px 12px;font-size:11px;">${s.no_hp || '-'}</td>
-        <td style="padding:8px 12px;text-align:center;font-size:11px;">${s.domisili || '-'}</td>
-        <td style="padding:8px 12px;text-align:center;">
-          ${statusBadge}
-        </td>
         <td style="padding:8px 12px;text-align:center;white-space:nowrap;">
           <div style="display:inline-flex;gap:4px;align-items:center;">
             <button type="button" class="btn-edit-siswa" data-id="${s.id}" title="Edit Data" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:4px 7px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;">
@@ -856,6 +861,23 @@ export function renderSiswaTableRows() {
               <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
             </button>
           </div>
+        </td>
+        <td style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text-muted);font-weight:700;">${startIndex + idx + 1}</td>
+        <td style="padding:8px 12px;font-weight:700;min-width:160px;color:var(--text);">${s.nama_lengkap}</td>
+        <td style="padding:8px 12px;">${s.tempat_lahir || '-'}</td>
+        <td style="padding:8px 12px;white-space:nowrap;font-size:11px;">${tglFormatted}</td>
+        <td style="padding:8px 12px;">Desa ${s.desa_nama || '-'}</td>
+        <td style="padding:8px 12px;">Kel. ${s.kelompok_nama || '-'}</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:700;">${calculateUmur(s.tanggal_lahir)}</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:700;color:${s.jenis_kelamin === 'L' ? '#1d4ed8' : '#be185d'};">${s.jenis_kelamin}</td>
+        <td style="padding:8px 12px;">
+          <span style="background:${cfg.bg};color:${cfg.color};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;display:inline-block;">${cfg.badge}</span>
+          <span style="display:block;font-size:11px;font-weight:600;margin-top:2px;color:#334155;">${s.jenjang_kelas}</span>
+        </td>
+        <td style="padding:8px 12px;font-size:11px;">${s.no_hp || '-'}</td>
+        <td style="padding:8px 12px;text-align:center;font-size:11px;">${s.domisili || '-'}</td>
+        <td style="padding:8px 12px;text-align:center;">
+          ${statusBadge}
         </td>
       </tr>
     `;

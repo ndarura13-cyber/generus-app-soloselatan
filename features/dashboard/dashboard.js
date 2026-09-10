@@ -12,8 +12,11 @@ import {
   getProkerStats,
   syncPembiasaanFromSupabase,
   syncPengurusFromSupabase,
-  syncKbmFromSupabase
+  syncKbmFromSupabase,
+  syncSiswaFromSupabase
 } from '../../src/db-master.js';
+
+import { isSupabaseConfigured } from '../../src/supabase.js';
 
 import {
   currentUser,
@@ -454,13 +457,29 @@ btnKontakDesa?.addEventListener('click', () => {
   renderKontakModal(activeDesaId, null);
 });
 
-/* ── 5. Action Cards Listeners ─────────────────────────────── */
-btnMenuSiswa?.addEventListener('click', () => renderSiswaModal());
+/* ── 5. Action Cards Listeners ─────────────────────────────────────────────────── */
+btnMenuSiswa?.addEventListener('click', async () => {
+  showToast("Mengambil data terbaru dari server...");
+  if (isSupabaseConfigured()) await syncSiswaFromSupabase();
+  renderSiswaModal();
+});
 btnMenuProker?.addEventListener('click', () => renderProkerModal());
-btnMenuPembiasaan?.addEventListener('click', () => renderEventPembiasaanModal());
-btnMenuAbsensi?.addEventListener('click', () => renderCetakAbsensiModal());
+btnMenuPembiasaan?.addEventListener('click', async () => {
+  showToast("Mengambil data terbaru dari server...");
+  if (isSupabaseConfigured()) await syncPembiasaanFromSupabase();
+  renderEventPembiasaanModal();
+});
+btnMenuAbsensi?.addEventListener('click', async () => {
+  showToast("Mengambil data terbaru dari server...");
+  if (isSupabaseConfigured()) await syncKbmFromSupabase();
+  renderCetakAbsensiModal();
+});
 btnMenuStrukturDaerah?.addEventListener('click', () => renderStrukturDaerahModal());
-btnMenuPengurus?.addEventListener('click', () => renderManagePengurusModal('all'));
+btnMenuPengurus?.addEventListener('click', async () => {
+  showToast("Mengambil data terbaru dari server...");
+  if (isSupabaseConfigured()) await syncPengurusFromSupabase();
+  renderManagePengurusModal('all');
+});
 btnApprovalList?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnOpenApprovalModal')?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnSupabaseStatus')?.addEventListener('click', () => renderSupabaseModal(updateDashboardStats));

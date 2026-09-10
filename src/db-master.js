@@ -5,6 +5,7 @@
 
 import { 
   isSupabaseConfigured, 
+  fetchSiswaFromSupabase,
   upsertSiswaToSupabase, 
   deleteSiswaFromSupabase,
   fetchEventPembiasaanFromSupabase,
@@ -17,10 +18,11 @@ import {
   deletePengurusFromSupabase,
   fetchKbmEventsFromSupabase,
   upsertKbmEventToSupabase,
-  deleteKbmEventFromSupabase
+  deleteKbmEventFromSupabase,
+  fetchWilayahFromSupabase
 } from "./supabase.js";
 
-export const MASTER_WILAYAH = {
+export let MASTER_WILAYAH = {
   daerah: {
     id: "daerah-solo-selatan",
     nama: "Solo Selatan",
@@ -86,6 +88,16 @@ export const MASTER_WILAYAH = {
     },
   ],
 };
+
+// Fetch wilayah dari Supabase saat module ini pertama kali dimuat (Top-Level Await)
+try {
+  const supabaseWilayah = await fetchWilayahFromSupabase();
+  if (supabaseWilayah) {
+    MASTER_WILAYAH = supabaseWilayah;
+  }
+} catch (error) {
+  console.error("Failed to load MASTER_WILAYAH from Supabase:", error);
+}
 
 // Helper: Ambil semua kelompok sebagai flat array (Terurut Alfabetis)
 export function getAllKelompok() {
@@ -960,6 +972,14 @@ export async function syncPengurusFromSupabase() {
   const res = await fetchPengurusFromSupabase();
   if (res.success && res.data) {
     savePengurusList(res.data);
+  }
+}
+
+export async function syncSiswaFromSupabase() {
+  if (!isSupabaseConfigured()) return;
+  const res = await fetchSiswaFromSupabase();
+  if (res.success && res.data) {
+    saveSiswaList(res.data);
   }
 }
 
