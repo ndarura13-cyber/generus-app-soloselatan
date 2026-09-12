@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Penggerak Pembina Generus - Solo Selatan | Faham Agama &amp; 29 Karakter Luhur</title>
   <meta name="description"
-    content="Platform digital Penggerak Pembina Generus Solo Selatan – Mewujudkan Generasi Penerus yang Faham Agama dan memiliki 29 Karakter Luhur di Surakarta, Jawa Tengah." />
+    content="Platform digital Penggerak Pembina Generus Solo Selatan Mewujudkan Generasi Penerus yang Faham Agama dan memiliki 29 Karakter Luhur di Surakarta, Jawa Tengah." />
 
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="src/manifest.json" />
@@ -18,7 +18,7 @@
   <link rel="apple-touch-icon" href="src/image/icon-192.png" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="PPG Solo Selatan – Faham Agama &amp; 29 Karakter Luhur" />
+  <meta property="og:title" content="PPG Solo Selatan Faham Agama &amp; 29 Karakter Luhur" />
   <meta property="og:description"
     content="Mewujudkan Generasi Penerus yang Faham Agama dan memiliki 29 Karakter Luhur." />
   <meta property="og:type" content="website" />
@@ -31,43 +31,95 @@
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
 
-  <!-- Stylesheet -->
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandBlue: '#1a56c4',
+            brandDarkBlue: '#0f2460',
+            brandGold: '#d4a017',
+            brandGreen: '#2e8b57',
+            surface: 'rgba(255, 255, 255, 0.7)',
+            surfaceDark: 'rgba(15, 23, 42, 0.8)',
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Optional: Keep original stylesheet just in case for some complex animations/overrides not covered here -->
   <link rel="stylesheet" href="src/style.css" />
+
+  <style>
+    /* Tailwind utilities specifically needed for smooth glassmorphism overriding style.css defaults */
+    html { scroll-behavior: smooth; }
+    body { @apply bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300; }
+    
+    /* Override existing style.css header */
+    .navbar { all: unset; position: fixed; top: 0; width: 100%; z-index: 50; transition: all 0.3s ease; }
+    .navbar.scrolled { @apply bg-white/70 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200/50 dark:border-slate-800/50; }
+    
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    @media (max-width: 768px) {
+      .nav-links {
+        display: flex; flex-direction: column; position: fixed; top: 0; right: -100%; width: 260px; height: 100vh;
+        @apply bg-white dark:bg-slate-800 shadow-xl;
+        padding-top: 80px; transition: right 0.3s ease; z-index: 100;
+      }
+      .nav-links.open { right: 0; }
+    }
+    
+    .level-pill { transition: all 0.2s; }
+    .level-pill:hover { @apply transform -translate-y-1 shadow-md; }
+    .stat-card { transition: all 0.2s; }
+    .stat-card:hover { @apply transform -translate-y-1 shadow-xl; }
+  </style>
 </head>
 
-<body>
+<body class="font-sans antialiased overflow-x-hidden selection:bg-brandBlue selection:text-white">
 
   <!-- NAVBAR -->
   <header class="navbar" id="navbar">
-    <div class="navbar-inner container">
-      <a href="#" class="brand">
-        <div class="brand-logo">
-          <img src="src/image/icon-192.png" alt="Logo PP Generus" class="brand-img" />
+    <div class="container mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3 group z-50">
+        <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
+          <img src="src/image/icon-192.png" alt="Logo PP Generus" class="w-full h-full object-cover" />
         </div>
-        <div class="brand-text">
-          <span class="brand-title">PPG</span>
-          <span class="brand-sub">Solo Selatan</span>
+        <div class="flex flex-col">
+          <span class="font-bold text-lg leading-tight text-brandBlue dark:text-blue-400 tracking-tight">PPG</span>
+          <span class="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400 tracking-wider">Solo Selatan</span>
         </div>
       </a>
-      <nav class="nav-links" id="navLinks">
-        <a href="#beranda" class="nav-link active">Beranda</a>
-        <a href="#jenjang" class="nav-link">Jenjang</a>
-        <a href="#program-kerja" class="nav-link">Program Kerja</a>
-        <a href="#fitur" class="nav-link">Fitur</a>
-        <a href="#tentang" class="nav-link">Tentang</a>
-        <a href="features/login/login.html" class="btn-signin" id="btnSignIn">
+      
+      <nav class="nav-links font-medium text-sm" id="navLinks">
+        <a href="#beranda" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Beranda</a>
+        <a href="#jenjang" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Jenjang</a>
+        <a href="#program-kerja" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Program Kerja</a>
+        <a href="#fitur" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Fitur</a>
+        <a href="#tentang" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Tentang</a>
+        <a href="features/login/login.html" class="btn-signin bg-brandBlue hover:bg-blue-700 text-white px-5 py-2.5 rounded-full flex items-center gap-2 transition-all shadow-md hover:shadow-lg mt-4 md:mt-0" id="btnSignIn">
           <span>Masuk</span>
-          <span class="material-symbols-outlined" style="font-size:18px;">login</span>
+          <span class="material-symbols-outlined text-[18px]">login</span>
         </a>
       </nav>
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-        <span></span><span></span><span></span>
+      
+      <button class="hamburger md:hidden relative w-6 h-5 flex flex-col justify-between z-50 focus:outline-none" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span class="w-full h-0.5 bg-brandBlue dark:bg-brandGold rounded transition-all duration-300"></span>
+        <span class="w-full h-0.5 bg-brandBlue dark:bg-brandGold rounded transition-all duration-300"></span>
+        <span class="w-full h-0.5 bg-brandBlue dark:bg-brandGold rounded transition-all duration-300"></span>
       </button>
     </div>
   </header>
 
   <!-- MOBILE NAV OVERLAY (Landing Page) -->
-  <div class="nav-overlay" id="navOverlay"></div>
+  <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" id="navOverlay"></div>
 
   <!-- INLINE CRITICAL SCRIPT (Session & Hamburger) -->
   <script>
@@ -83,6 +135,8 @@
             btnSignIn.innerHTML = '<span>Kelola</span><span class="material-symbols-outlined" style="font-size:18px;">tune</span>';
             btnSignIn.setAttribute('href', 'features/dashboard/dashboard.html');
             btnSignIn.classList.add('btn-nav-active-session');
+            btnSignIn.classList.remove('bg-brandBlue', 'hover:bg-blue-700');
+            btnSignIn.classList.add('bg-brandDarkBlue', 'hover:bg-slate-800');
 
             // Update all Feature section login links after DOM loads
             window.addEventListener('DOMContentLoaded', () => {
@@ -93,39 +147,20 @@
                   link.innerHTML = 'Buka Fitur <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
                 } else if (link.classList.contains('btn-signin-card')) {
                   link.innerHTML = 'Kelola <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
-                  // Change the parent card to orange
                   const card = link.closest('.signin-card');
                   if (card) {
                     card.classList.add('active-session-card');
+                    card.classList.replace('bg-white', 'bg-blue-50');
+                    card.classList.replace('dark:bg-slate-800', 'dark:bg-blue-900/30');
                     const title = card.querySelector('h3');
                     if (title) title.textContent = 'Dashboard';
                     const desc = card.querySelector('p');
                     if (desc) desc.textContent = 'Anda sedang masuk. Buka Dashboard untuk mengelola data.';
-                    const icon = card.querySelector('.ms-fitur');
-                    if (icon) icon.textContent = 'tune';
                   }
                 } else if (link.id === 'footerSignIn') {
                   link.innerHTML = 'Dashboard';
                 }
               });
-
-              // Update Lembar Pembiasaan btn-kelola when logged in
-              const btnKelola = document.getElementById('btnKelolaData');
-              const btnKelolaLabel = document.getElementById('btnKelolaLabel');
-              if (btnKelola && btnKelolaLabel) {
-                btnKelola.setAttribute('href', 'features/dashboard/dashboard.html?action=pembiasaan');
-                btnKelola.classList.add('logged-in');
-                btnKelolaLabel.textContent = 'Dashboard';
-              }
-
-              // Update Absensi KBM btn-kelola when logged in
-              const btnKelolaAbsensi = document.getElementById('btnKelolaAbsensi');
-              const btnKelolaAbsensiLabel = document.getElementById('btnKelolaAbsensiLabel');
-              if (btnKelolaAbsensi && btnKelolaAbsensiLabel) {
-                btnKelolaAbsensi.setAttribute('href', 'features/dashboard/dashboard.html?action=absensi');
-                btnKelolaAbsensi.classList.add('logged-in');
-                btnKelolaAbsensiLabel.textContent = 'Dashboard';
-              }
             });
           }
         }
@@ -139,7 +174,8 @@
       function closeNav() {
         navLinksEl.classList.remove('open');
         hamburger.classList.remove('active');
-        navOverlay.classList.remove('visible');
+        navOverlay.classList.add('hidden');
+        navOverlay.classList.remove('opacity-100');
         document.body.style.overflow = '';
       }
 
@@ -148,10 +184,12 @@
           const isOpen = navLinksEl.classList.toggle('open');
           hamburger.classList.toggle('active', isOpen);
           if (isOpen) {
-            navOverlay.classList.add('visible');
+            navOverlay.classList.remove('hidden');
+            setTimeout(() => navOverlay.classList.add('opacity-100'), 10);
             document.body.style.overflow = 'hidden';
           } else {
-            navOverlay.classList.remove('visible');
+            navOverlay.classList.remove('opacity-100');
+            setTimeout(() => navOverlay.classList.add('hidden'), 300);
             document.body.style.overflow = '';
           }
         });
@@ -164,114 +202,115 @@
   </script>
 
   <!-- HERO -->
-  <section class="hero" id="beranda">
-    <div class="hero-bg-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
+  <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-slate-50 dark:bg-slate-900" id="beranda">
+    <!-- Background Decor -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brandBlue/10 dark:bg-brandBlue/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
+      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brandGold/10 dark:bg-brandGold/15 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4"></div>
     </div>
-    <div class="container hero-content">
-      <div class="hero-text reveal">
-        <div class="badge-pill">
-          <span class="badge-dot"></span>
+    
+    <div class="container mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center gap-12">
+      <div class="w-full lg:w-1/2 flex flex-col items-start text-left reveal">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-brandBlue dark:text-blue-300 text-xs font-semibold mb-6 border border-blue-200 dark:border-blue-800">
+          <span class="w-2 h-2 rounded-full bg-brandBlue animate-pulse"></span>
           Surakarta, Jawa Tengah &middot; Daerah Solo Selatan
         </div>
-        <h1 class="hero-title">
-          Penggerak <span class="gradient-text">Pembina</span><br />Generus Solo Selatan
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.15] mb-6 font-serif">
+          Penggerak <span class="text-brandBlue dark:text-blue-400">Pembina</span><br />Generus Solo Selatan
         </h1>
-        <p class="hero-tagline">Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur</p>
-        <p class="hero-desc">
-          Platform digital terpadu untuk mengelola data Generus,
-          absensi KBM, dan program kerja.
+        <p class="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-300 mb-4 border-l-4 border-brandGold pl-4">
+          Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur
         </p>
-        <div class="hero-cta">
-          <a href="#fitur" class="btn-primary">
+        <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-lg leading-relaxed">
+          Platform digital terpadu untuk mengelola data Generus,
+          absensi KBM, dan program kerja berbasis kewilayahan.
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <a href="#fitur" class="px-6 py-3 rounded-full bg-brandBlue hover:bg-blue-700 text-white font-semibold flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
             Jelajahi Fitur
-            <span class="material-symbols-outlined" style="font-size:20px;">arrow_forward</span>
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
           </a>
-          <a href="#tentang" class="btn-ghost">Tentang Kami</a>
+          <a href="#tentang" class="px-6 py-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brandBlue dark:text-brandGold font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            Tentang Kami
+          </a>
         </div>
       </div>
-      <div class="hero-image reveal-right">
-        <div class="hero-img-wrapper">
-          <img src="src/image/hero.jpg" alt="Suasana belajar Generus PPG Solo Selatan" fetchpriority="high" />
-          <div class="hero-img-badge" id="heroImgBadge" data-kategori-stat="all" style="cursor:pointer;"
-            title="Klik untuk melihat ringkasan data Generus">
-            <span class="badge-num" id="heroGenerusCount">57+</span>
-            <span class="badge-label">Generus Aktif <span style="font-size:10px;opacity:0.85;">➔</span></span>
+      
+      <div class="w-full lg:w-1/2 reveal-right">
+        <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/20 group">
+          <img src="src/image/hero.jpg" alt="Suasana belajar" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700" fetchpriority="high" />
+          <div class="absolute inset-0 bg-gradient-to-t from-brandDarkBlue/80 via-transparent to-transparent mix-blend-multiply"></div>
+          
+          <!-- Interactive Badge -->
+          <div class="absolute bottom-6 right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-4 rounded-2xl shadow-xl flex items-center gap-4 cursor-pointer hover:bg-white dark:hover:bg-slate-800 transition-colors" id="heroImgBadge" data-kategori-stat="all" title="Klik untuk melihat ringkasan data Generus">
+            <div class="text-3xl font-extrabold text-brandBlue dark:text-brandGold" id="heroGenerusCount">57+</div>
+            <div class="flex flex-col">
+              <span class="text-sm font-bold text-slate-800 dark:text-white">Generus Aktif</span>
+              <span class="text-xs text-brandBlue dark:text-brandGold font-semibold flex items-center gap-1">Lihat Detail <span class="material-symbols-outlined text-[14px]">arrow_forward</span></span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="hero-wave">
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="var(--bg)" />
-      </svg>
     </div>
   </section>
 
   <!-- STATS -->
-  <section class="stats-section">
-    <div class="container">
-      <div class="stats-grid">
-
-        <div class="stat-card reveal" data-kategori-stat="all" style="cursor:pointer;"
-          title="Klik untuk melihat ringkasan seluruh kategori &amp; jenjang">
-          <div class="stat-icon" style="--ic:#1a56c4;">
-            <span class="material-symbols-outlined ms-stat" style="color:#1a56c4;">groups</span>
+  <section class="relative z-20 -mt-10 lg:-mt-16 px-4">
+    <div class="container mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        
+        <!-- Card 1 -->
+        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-brandBlue/10 dark:border-brandBlue/30 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandBlue dark:hover:border-blue-400" data-kategori-stat="all">
+          <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-2xl">groups</span>
           </div>
-          <div class="stat-num" data-target="1250">1.250</div>
-          <div class="stat-label">Total Generus <span style="font-size:11px;color:var(--blue);font-weight:700;">➔</span>
-          </div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="1250">1250</div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Total Generus <span class="text-brandBlue">&rarr;</span></div>
         </div>
 
-        <div class="stat-card reveal" data-kategori-stat="caberawit" style="cursor:pointer;"
-          title="Klik untuk melihat rincian kelas Caberawit">
-          <div class="stat-icon" style="--ic:#d4a017;">
-            <span class="material-symbols-outlined ms-stat" style="color:#d4a017;">child_care</span>
+        <!-- Card 2 -->
+        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-brandGold/10 dark:border-brandGold/30 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandGold" data-kategori-stat="caberawit">
+          <div class="w-12 h-12 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-brandGold text-2xl">child_care</span>
           </div>
-          <div class="stat-num" data-target="410">410</div>
-          <div class="stat-label">Caberawit <span style="font-size:11px;color:var(--gold);font-weight:700;">➔</span>
-          </div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="410">410</div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Caberawit <span class="text-brandGold">&rarr;</span></div>
         </div>
 
-        <div class="stat-card reveal" data-kategori-stat="gp_reguler" style="cursor:pointer;"
-          title="Klik untuk melihat rincian kelas GP Reguler">
-          <div class="stat-icon" style="--ic:#1a56c4;">
-            <span class="material-symbols-outlined ms-stat" style="color:#1a56c4;">school</span>
+        <!-- Card 3 -->
+        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-blue-200 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandBlue" data-kategori-stat="gp_reguler">
+          <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-2xl">school</span>
           </div>
-          <div class="stat-num" data-target="560">560</div>
-          <div class="stat-label">Jenjang GP Reguler <span
-              style="font-size:11px;color:var(--blue);font-weight:700;">➔</span></div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="560">560</div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">GP Reguler <span class="text-brandBlue">&rarr;</span></div>
         </div>
 
-        <div class="stat-card reveal" data-kategori-stat="remaja" style="cursor:pointer;"
-          title="Klik untuk melihat rincian kelas Remaja &amp; Pra-Nikah">
-          <div class="stat-icon" style="--ic:#2e8b57;">
-            <span class="material-symbols-outlined ms-stat" style="color:#2e8b57;">diversity_3</span>
+        <!-- Card 4 -->
+        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-green-100 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandGreen" data-kategori-stat="remaja">
+          <div class="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-brandGreen dark:text-green-400 text-2xl">diversity_3</span>
           </div>
-          <div class="stat-num" data-target="280">280</div>
-          <div class="stat-label">Usia Remaja <span
-              style="font-size:11px;color:var(--green-dark);font-weight:700;">➔</span></div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="280">280</div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Usia Remaja <span class="text-brandGreen">&rarr;</span></div>
         </div>
 
-        <div class="stat-card reveal" data-kategori-stat="desa" style="cursor:pointer;"
-          title="Klik untuk melihat daftar wilayah">
-          <div class="stat-icon" style="--ic:#7c3aed;">
-            <span class="material-symbols-outlined ms-stat" style="color:#7c3aed;">location_city</span>
+        <!-- Card 5 -->
+        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-purple-100 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-purple-600" data-kategori-stat="desa">
+          <div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-2xl">location_city</span>
           </div>
-          <div class="stat-num" data-target="5">5</div>
-          <div class="stat-label">Jumlah Desa <span style="font-size:11px;color:#7c3aed;font-weight:700;">➔</span></div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="5">5</div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Jumlah Desa <span class="text-purple-600">&rarr;</span></div>
         </div>
 
-        <div class="stat-card reveal" data-kategori-stat="kelompok" style="cursor:pointer;"
-          title="Klik untuk melihat daftar wilayah">
-          <div class="stat-icon" style="--ic:#0284c7;">
-            <span class="material-symbols-outlined ms-stat" style="color:#0284c7;">home_work</span>
+        <!-- Card 6 -->
+        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-sky-100 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-sky-600" data-kategori-stat="kelompok">
+          <div class="w-12 h-12 rounded-full bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-2xl">home_work</span>
           </div>
-          <div class="stat-num" data-target="27">27</div>
-          <div class="stat-label">Jumlah Kelompok <span style="font-size:11px;color:#0284c7;font-weight:700;">➔</span>
-          </div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="27">27</div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Jumlah Kelompok <span class="text-sky-600">&rarr;</span></div>
         </div>
 
       </div>
@@ -279,103 +318,84 @@
   </section>
 
   <!-- JENJANG -->
-  <section class="jenjang-section" id="jenjang">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-chip">Jenjang Generus</span>
-        <h2>Jenjang Generus</h2>
-        <p>Dari usia dini hingga pra-nikah &mdash; klik label kategori usia di bawah untuk melihat rincian generus per
-          desa</p>
+  <section class="py-20 lg:py-28" id="jenjang">
+    <div class="container mx-auto px-4 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+        <span class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Jenjang Generus</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Kategori &amp; Jenjang</h2>
+        <p class="text-slate-600 dark:text-slate-400">Dari usia dini hingga pra-nikah &mdash; klik label kategori usia di bawah untuk melihat rincian generus per desa</p>
       </div>
-      <div class="jenjang-grid">
 
-        <div class="jenjang-card caberawit reveal">
-          <div class="jenjang-header">
-            <div class="jenjang-icon">
-              <span class="material-symbols-outlined ms-jenjang">child_care</span>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Caberawit -->
+        <div class="jenjang-card caberawit reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-14 h-14 bg-brandGold text-white rounded-2xl flex items-center justify-center shadow-md">
+                <span class="material-symbols-outlined text-3xl ms-jenjang">child_care</span>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">Caberawit</h3>
+                <span class="text-xs font-bold text-brandGold bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded" id="badgeCaberawit">Usia Dini</span>
+              </div>
             </div>
-            <div>
-              <h3>Caberawit</h3>
-              <span class="jenjang-badge" id="badgeCaberawit">Usia Dini (– Generus)</span>
+            <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="PAUD">PAUD</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="TK A">TK A</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="TK B">TK B</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="1 SD">1-3 SD</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="4 SD">4-6 SD</button>
             </div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Pembentukan karakter dasar melalui pembiasaan ibadah dan akhlak sejak usia dini.</p>
+            <div class="px-3 py-2 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-brandGold text-sm font-semibold text-yellow-800 dark:text-yellow-500">Fokus utama lembar pembiasaan</div>
           </div>
-          <div class="jenjang-levels" style="gap: 6px;">
-            <button type="button" class="level-pill" data-kategori="PAUD"
-              title="Klik untuk lihat rincian per desa">PAUD</button>
-            <button type="button" class="level-pill" data-kategori="TK A" title="Klik untuk lihat rincian per desa">TK
-              A</button>
-            <button type="button" class="level-pill" data-kategori="TK B" title="Klik untuk lihat rincian per desa">TK
-              B</button>
-            <button type="button" class="level-pill" data-kategori="1 SD" title="Klik untuk lihat rincian per desa">1
-              SD</button>
-            <button type="button" class="level-pill" data-kategori="2 SD" title="Klik untuk lihat rincian per desa">2
-              SD</button>
-            <button type="button" class="level-pill" data-kategori="3 SD" title="Klik untuk lihat rincian per desa">3
-              SD</button>
-            <button type="button" class="level-pill" data-kategori="4 SD" title="Klik untuk lihat rincian per desa">4
-              SD</button>
-            <button type="button" class="level-pill" data-kategori="5 SD" title="Klik untuk lihat rincian per desa">5
-              SD</button>
-            <button type="button" class="level-pill" data-kategori="6 SD" title="Klik untuk lihat rincian per desa">6
-              SD</button>
-          </div>
-          <p class="jenjang-desc">Pembentukan karakter dasar melalui pembiasaan ibadah dan akhlak sejak usia dini.</p>
-          <div class="jenjang-highlight"><span>Fokus utama lembar pembiasaan</span></div>
         </div>
 
-        <div class="jenjang-card gp reveal">
-          <div class="jenjang-header">
-            <div class="jenjang-icon">
-              <span class="material-symbols-outlined ms-jenjang">school</span>
+        <!-- GP Reguler -->
+        <div class="jenjang-card gp reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100/50 dark:bg-blue-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-14 h-14 bg-brandBlue text-white rounded-2xl flex items-center justify-center shadow-md">
+                <span class="material-symbols-outlined text-3xl ms-jenjang">school</span>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">GP Reguler</h3>
+                <span class="text-xs font-bold text-brandBlue dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded" id="badgeGP">Usia Sekolah</span>
+              </div>
             </div>
-            <div>
-              <h3>GP Reguler</h3>
-              <span class="jenjang-badge gp-badge" id="badgeGP">Usia Sekolah (– Generus)</span>
+            <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-brandBlue text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="1 SMP">1-3 SMP</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-brandBlue text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="1 SMA">1-3 SMA</button>
             </div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Penguatan aqidah, ibadah, dan kepemimpinan untuk generasi usia SMP dan SMA.</p>
+            <div class="px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-brandBlue text-sm font-semibold text-blue-800 dark:text-blue-400">Absensi KBM terstruktur</div>
           </div>
-          <div class="jenjang-levels">
-            <button type="button" class="level-pill" data-kategori="1 SMP" title="Klik untuk lihat rincian per desa">1
-              SMP</button>
-            <button type="button" class="level-pill" data-kategori="2 SMP" title="Klik untuk lihat rincian per desa">2
-              SMP</button>
-            <button type="button" class="level-pill" data-kategori="3 SMP" title="Klik untuk lihat rincian per desa">3
-              SMP</button>
-            <button type="button" class="level-pill" data-kategori="1 SMA" title="Klik untuk lihat rincian per desa">1
-              SMA</button>
-            <button type="button" class="level-pill" data-kategori="2 SMA" title="Klik untuk lihat rincian per desa">2
-              SMA</button>
-            <button type="button" class="level-pill" data-kategori="3 SMA" title="Klik untuk lihat rincian per desa">3
-              SMA</button>
-          </div>
-          <p class="jenjang-desc">Penguatan aqidah, ibadah, dan kepemimpinan untuk generasi usia SMP dan SMA.</p>
-          <div class="jenjang-highlight gp-hl"><span>Absensi KBM terstruktur</span></div>
         </div>
 
-        <div class="jenjang-card remaja reveal">
-          <div class="jenjang-header">
-            <div class="jenjang-icon">
-              <span class="material-symbols-outlined ms-jenjang">diversity_3</span>
+        <!-- Remaja -->
+        <div class="jenjang-card remaja reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-green-100/50 dark:bg-green-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-14 h-14 bg-brandGreen text-white rounded-2xl flex items-center justify-center shadow-md">
+                <span class="material-symbols-outlined text-3xl ms-jenjang">diversity_3</span>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">Remaja</h3>
+                <span class="text-xs font-bold text-brandGreen dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded" id="badgeRemaja">Pra-Nikah</span>
+              </div>
             </div>
-            <div>
-              <h3>Remaja</h3>
-              <span class="jenjang-badge rem-badge" id="badgeRemaja">Pra-Nikah (– Generus)</span>
+            <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="Pra-Nikah">Pra-Nikah</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="Mahasiswa">Mahasiswa</button>
+              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="Bekerja">Bekerja</button>
             </div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Persiapan menuju kehidupan berkeluarga dengan pembekalan nilai Islam yang kuat.</p>
+            <div class="px-3 py-2 bg-green-50 dark:bg-green-900/20 border-l-4 border-brandGreen text-sm font-semibold text-green-800 dark:text-green-400">Program khusus pra-nikah</div>
           </div>
-          <div class="jenjang-levels">
-            <button type="button" class="level-pill" data-kategori="Pra-Nikah"
-              title="Klik untuk lihat rincian per desa">Pra-Nikah (Usia 19-22)</button>
-            <button type="button" class="level-pill" data-kategori="Kelas Remaja"
-              title="Klik untuk lihat rincian per desa">Remaja (Usia > 22)</button>
-            <button type="button" class="level-pill" data-kategori="Mahasiswa"
-              title="Klik untuk lihat rincian per desa">Mahasiswa</button>
-            <button type="button" class="level-pill" data-kategori="Bekerja"
-              title="Klik untuk lihat rincian per desa">Bekerja</button>
-            <button type="button" class="level-pill" data-kategori="Lainnya"
-              title="Klik untuk lihat rincian per desa">Lainnya</button>
-          </div>
-          <p class="jenjang-desc">Persiapan menuju kehidupan berkeluarga dengan pembekalan nilai-nilai Islam yang kuat.
-          </p>
-          <div class="jenjang-highlight rem-hl"><span>Program khusus pra-nikah</span></div>
         </div>
 
       </div>
@@ -383,40 +403,39 @@
   </section>
 
   <!-- PROGRAM KERJA -->
-  <section class="proker-section" id="program-kerja">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-chip">Agenda Aktif</span>
-        <h2>Program Kerja Tahunan</h2>
-        <p>Kegiatan yang sedang dan akan berlangsung &mdash; diperbarui setiap bulan</p>
+  <section class="py-20 lg:py-28 bg-blue-50/50 dark:bg-slate-800/50" id="program-kerja">
+    <div class="container mx-auto px-4 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+        <span class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Agenda Aktif</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Program Kerja Tahunan</h2>
+        <p class="text-slate-600 dark:text-slate-400">Kegiatan yang sedang dan akan berlangsung &mdash; diperbarui setiap bulan</p>
       </div>
-      <div class="proker-container reveal">
-        <!-- Header Bar: Month indicator & Inline Status Legends -->
-        <div class="proker-header-bar">
-          <div class="month-indicator">
-            <div class="month-circle">
-              <span id="currentMonth">AGT</span>
-              <span id="currentYear">2026</span>
+      
+      <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-brandBlue/10 dark:shadow-black/20 overflow-hidden reveal border border-brandBlue/10 dark:border-slate-700">
+        <!-- Header Bar -->
+        <div class="bg-brandBlue dark:bg-brandDarkBlue p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 flex flex-col items-center justify-center text-brandBlue dark:text-blue-400 shadow-inner">
+              <span class="font-bold text-lg leading-tight" id="currentMonth">AGT</span>
+              <span class="text-xs font-semibold opacity-80" id="currentYear">2026</span>
             </div>
-            <div class="month-info-text">
-              <span class="month-info-title">Agenda Bulan Ini</span>
-              <span class="month-info-sub">Periode Aktif Generus</span>
+            <div class="text-white">
+              <div class="font-bold text-xl">Agenda Bulan Ini</div>
+              <div class="text-sm opacity-80">Periode Aktif Generus</div>
             </div>
           </div>
-
-          <div class="proker-inline-legend">
-            <div class="legend-pill"><span class="dot done"></span> Selesai</div>
-            <div class="legend-pill"><span class="dot ongoing"></span> Sedang Berlangsung</div>
-            <div class="legend-pill"><span class="dot upcoming"></span> Akan Datang</div>
-            <div class="legend-pill"><span class="dot planned"></span> Direncanakan</div>
+          
+          <div class="flex flex-wrap gap-3 text-xs font-medium text-white/90">
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span class="w-2.5 h-2.5 rounded-full bg-green-400"></span> Selesai</div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span class="w-2.5 h-2.5 rounded-full bg-brandGold"></span> Berlangsung</div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span class="w-2.5 h-2.5 rounded-full bg-blue-300"></span> Akan Datang</div>
           </div>
         </div>
 
-        <!-- Proker Timeline List -->
-        <div class="proker-list" id="prokerList"></div>
+        <div class="proker-list p-6 md:p-8" id="prokerList" style="min-height: 200px;"></div>
 
         <!-- Pagination Controls -->
-        <div class="proker-pagination" id="prokerPagination">
+        <div class="proker-pagination border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/50 flex justify-center gap-2" id="prokerPagination">
           <!-- Rendered by JS -->
         </div>
       </div>
@@ -424,77 +443,74 @@
   </section>
 
   <!-- FITUR UTAMA -->
-  <section class="fitur-section" id="fitur">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-chip">Fitur Aplikasi</span>
-        <h2>Semua yang Anda Butuhkan</h2>
+  <section class="py-20 lg:py-28" id="fitur">
+    <div class="container mx-auto px-4 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+        <span class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Fitur Aplikasi</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Semua yang Anda Butuhkan</h2>
       </div>
-      <div class="fitur-grid">
 
-        <div class="fitur-card reveal" data-delay="0">
-          <div class="fitur-icon-wrap" style="--fc:#1a56c4;">
-            <span class="material-symbols-outlined ms-fitur">calendar_month</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-3xl ms-fitur">calendar_month</span>
           </div>
-          <h3>Program Kerja Tahunan</h3>
-          <p>Kelola agenda kegiatan yayasan sepanjang tahun. Tampilkan status tiap program secara real-time kepada
-            seluruh pengurus.</p>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">Program Kerja</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Kelola agenda kegiatan yayasan sepanjang tahun. Tampilkan status tiap program secara real-time.</p>
         </div>
 
-        <div class="fitur-card reveal featured" data-delay="100">
-          <div class="featured-badge">Unggulan</div>
-          <div class="fitur-icon-wrap" style="--fc:#d4a017;">
-            <span class="material-symbols-outlined ms-fitur">checklist</span>
+        <div class="bg-gradient-to-br from-brandBlue to-blue-800 p-8 rounded-3xl shadow-xl shadow-brandBlue/20 text-white reveal transition-transform hover:-translate-y-2 relative overflow-hidden">
+          <div class="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md">Unggulan</div>
+          <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-3xl ms-fitur">checklist</span>
           </div>
-          <h3>Lembar Pembiasaan</h3>
-          <p>Pantau pembiasaan ibadah harian khusus Generus Caberawit (PAUD &ndash; SD). Rekam sholat, mengaji, dan
-            akhlak secara digital.</p>
-          <a href="features/laporan/laporan-pembiasaan.html" target="_blank" class="btn-publik" id="btnLaporanPublik">
-            <span class="material-symbols-outlined" style="font-size:14px;">public</span>
-            Laporan Publik
+          <h3 class="text-xl font-bold mb-3 text-white">Lembar Pembiasaan</h3>
+          <p class="text-white/90 text-sm leading-relaxed mb-6">Pantau pembiasaan ibadah harian khusus Generus Caberawit. Rekam sholat, mengaji, dan akhlak.</p>
+          <a href="features/laporan/laporan-pembiasaan.html" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-brandBlue text-sm font-bold rounded-full hover:bg-blue-50 transition-colors" id="btnLaporanPublik">
+            <span class="material-symbols-outlined text-[16px]">public</span> Laporan Publik
           </a>
         </div>
 
-        <div class="fitur-card reveal" data-delay="200">
-          <div class="fitur-icon-wrap" style="--fc:#2e8b57;">
-            <span class="material-symbols-outlined ms-fitur">print</span>
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
+          <div class="w-14 h-14 rounded-2xl bg-green-50 dark:bg-green-900/30 text-brandGreen dark:text-green-400 flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-3xl ms-fitur">print</span>
           </div>
-          <h3>Absensi KBM Cepat</h3>
-          <p>Konversi data generus ke daftar presensi fisik siap cetak resmi A4 untuk Caberawit, GP Reguler, dan Remaja.
-          </p>
-          <a href="features/laporan/cetak-absensi.html" target="_blank" class="btn-publik" id="btnCetakAbsensiLanding"
-            style="border-color:#bbf7d0;color:#166534;background:#f0fdf4;">
-            <span class="material-symbols-outlined" style="font-size:14px;">print</span>
-            Lembar Cetak
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">Absensi KBM Cepat</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Konversi data generus ke daftar presensi fisik siap cetak resmi A4 untuk Caberawit dan lainnya.</p>
+          <a href="features/laporan/cetak-absensi.html" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-brandGreen dark:text-green-400 text-sm font-bold rounded-full hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors" id="btnCetakAbsensiLanding">
+            <span class="material-symbols-outlined text-[16px]">print</span> Lembar Cetak
           </a>
         </div>
 
-        <div class="fitur-card reveal featured" data-delay="0">
-          <div class="featured-badge gold">Inti</div>
-          <div class="fitur-icon-wrap" style="--fc:#7c3aed;">
-            <span class="material-symbols-outlined ms-fitur">database</span>
+        <div class="bg-gradient-to-br from-brandDarkBlue to-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-900/20 text-white reveal transition-transform hover:-translate-y-2 relative overflow-hidden">
+          <div class="absolute top-4 right-4 bg-white/10 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md text-brandGold">Inti</div>
+          <div class="w-14 h-14 rounded-2xl bg-brandBlue/40 backdrop-blur-md flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-3xl ms-fitur text-brandGold">database</span>
           </div>
-          <h3>Database Generus</h3>
-          <p>Data lengkap tiap Generus: NIK, alamat, jenjang, riwayat semester, status mutasi, dan dokumen pendukung.
-          </p>
+          <h3 class="text-xl font-bold mb-3 text-white">Database Generus</h3>
+          <p class="text-white/80 text-sm leading-relaxed">Data lengkap tiap Generus: NIK, alamat, jenjang, riwayat semester, status mutasi, dan dokumen pendukung.</p>
         </div>
 
-        <div class="fitur-card reveal" data-delay="100">
-          <div class="fitur-icon-wrap" style="--fc:#e55c5c;">
-            <span class="material-symbols-outlined ms-fitur">location_on</span>
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
+          <div class="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-3xl ms-fitur">location_on</span>
           </div>
-          <h3>Info &amp; About Us</h3>
-          <p>Informasi lengkap yayasan: alamat, kontak person, peta lokasi interaktif, dan visi misi organisasi.</p>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">Info &amp; About Us</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Informasi lengkap yayasan: alamat, kontak person, peta lokasi interaktif, dan visi misi organisasi.</p>
         </div>
 
-        <div class="fitur-card reveal signin-card" data-delay="200">
-          <div class="fitur-icon-wrap" style="--fc:#fff;">
-            <span class="material-symbols-outlined ms-fitur">lock_open</span>
+        <div class="signin-card bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-600 reveal transition-transform hover:-translate-y-2 flex flex-col justify-between hover:border-brandBlue/30">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-700 text-brandBlue dark:text-blue-400 flex items-center justify-center mb-6">
+              <span class="material-symbols-outlined text-3xl ms-fitur">lock_open</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Sign In</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Masuk sebagai pengurus atau admin untuk mengakses fitur input dan pengelolaan data Generus.</p>
           </div>
-          <h3>Sign In</h3>
-          <p>Masuk sebagai pengurus atau admin untuk mengakses fitur input dan pengelolaan data Generus.</p>
-          <a href="features/login/login.html" class="btn-signin-card">Masuk Sekarang
-            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">login</span>
+          <a href="features/login/login.html" class="btn-signin-card w-full py-3 bg-brandBlue hover:bg-brandDarkBlue dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors">
+            Masuk Sekarang
+            <span class="material-symbols-outlined text-[18px]">login</span>
           </a>
         </div>
 
@@ -503,53 +519,52 @@
   </section>
 
   <!-- TENTANG -->
-  <section class="about-section" id="tentang">
-    <div class="container">
-      <div class="about-grid">
-        <div class="about-info reveal">
-          <span class="section-chip">Tentang Kami</span>
-          <h2>Yayasan Penggerak<br />Pembina Generus</h2>
-          <p class="about-desc">
-            Berdiri sejak <strong>2010</strong> di Surakarta, Jawa Tengah, kami berkomitmen
+  <section class="py-20 lg:py-28 bg-brandDarkBlue text-white" id="tentang">
+    <div class="container mx-auto px-4 lg:px-8">
+      <div class="flex flex-col lg:flex-row gap-12 items-center">
+        <div class="w-full lg:w-1/2 reveal">
+          <span class="inline-block px-3 py-1 bg-brandBlue/30 text-blue-200 border border-brandBlue/50 text-sm font-bold rounded-full mb-6">Tentang Kami</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-6 font-serif leading-tight">Yayasan Penggerak<br />Pembina Generus</h2>
+          <p class="text-blue-100 text-lg mb-8 leading-relaxed">
+            Berdiri sejak <strong class="text-white">2010</strong> di Surakarta, Jawa Tengah, kami berkomitmen
             membina generasi muda dengan nilai-nilai Islam yang kuat dan karakter mulia &mdash;
             dari usia PAUD hingga remaja pra-nikah.
           </p>
-          <div class="contact-list">
-            <div class="contact-item">
-              <div class="contact-icon">
+          <div class="space-y-4">
+            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+              <div class="w-12 h-12 rounded-full bg-brandBlue flex items-center justify-center text-white">
                 <span class="material-symbols-outlined ms-contact">mail</span>
               </div>
               <div>
-                <span class="contact-label">Email</span>
-                <a href="mailto:ppgsoloselatan@gmail.com" class="contact-val">ppgsoloselatan@gmail.com</a>
+                <div class="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">Email</div>
+                <a href="mailto:ppgsoloselatan@gmail.com" class="font-bold hover:text-brandGold transition-colors">ppgsoloselatan@gmail.com</a>
               </div>
             </div>
-            <div class="contact-item">
-              <div class="contact-icon">
+            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+              <div class="w-12 h-12 rounded-full bg-brandBlue flex items-center justify-center text-white">
                 <span class="material-symbols-outlined ms-contact">photo_camera</span>
               </div>
               <div>
-                <span class="contact-label">Instagram</span>
-                <a href="https://instagram.com/tamanmedia.id" target="_blank" rel="noopener"
-                  class="contact-val">@tamanmedia.id</a>
+                <div class="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">Instagram</div>
+                <a href="https://instagram.com/tamanmedia.id" target="_blank" rel="noopener" class="font-bold hover:text-brandGold transition-colors">@tamanmedia.id</a>
               </div>
             </div>
-            <div class="contact-item">
-              <div class="contact-icon">
+            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+              <div class="w-12 h-12 rounded-full bg-brandBlue flex items-center justify-center text-white">
                 <span class="material-symbols-outlined ms-contact">location_on</span>
               </div>
               <div>
-                <span class="contact-label">Lokasi</span>
-                <span class="contact-val">Surakarta, Jawa Tengah</span>
+                <div class="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">Lokasi</div>
+                <div class="font-bold">Surakarta, Jawa Tengah</div>
               </div>
             </div>
           </div>
         </div>
-        <div class="about-map reveal-right">
-          <div class="map-wrapper">
+        <div class="w-full lg:w-1/2 reveal-right">
+          <div class="rounded-3xl overflow-hidden border-4 border-brandBlue/30 shadow-2xl h-[400px]">
             <iframe title="Lokasi PPG Solo Selatan"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63245.67066208085!2d110.77898!3d-7.5754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a158c25d34cef%3A0x6130a1aad8e3ac5e!2sSurakarta%2C%20Jawa%20Tengah!5e0!3m2!1sid!2sid!4v1690000000000"
-              width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy"
+              width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
@@ -558,85 +573,150 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <img src="src/image/icon-192.png" alt="Logo PP Generus" class="footer-logo-img" />
-        <div>
-          <div class="footer-title">PPG Solo Selatan</div>
-          <div class="footer-sub">Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur</div>
+  <footer class="bg-[#0a1840] pt-16 pb-8 border-t border-brandBlue/20 text-blue-200">
+    <div class="container mx-auto px-4 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
+        <div class="flex items-center gap-4">
+          <img src="src/image/icon-192.png" alt="Logo PP Generus" class="w-12 h-12 rounded-xl opacity-90" />
+          <div>
+            <div class="text-white font-bold text-lg">PPG Solo Selatan</div>
+            <div class="text-sm text-blue-300">Faham Agama &amp; 29 Karakter Luhur</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-center gap-6 text-sm font-medium">
+          <a href="#beranda" class="hover:text-white transition-colors">Beranda</a>
+          <a href="#program-kerja" class="hover:text-white transition-colors">Program Kerja</a>
+          <a href="#jenjang" class="hover:text-white transition-colors">Jenjang</a>
+          <a href="#fitur" class="hover:text-white transition-colors">Fitur</a>
+          <a href="features/login/login.html" id="footerSignIn" class="text-brandGold hover:text-yellow-300 transition-colors">Sign In</a>
         </div>
       </div>
-      <div class="footer-links">
-        <a href="#beranda">Beranda</a>
-        <a href="#program-kerja">Program Kerja</a>
-        <a href="#jenjang">Jenjang</a>
-        <a href="#fitur">Fitur</a>
-        <a href="#tentang">Tentang</a>
-        <a href="features/login/login.html" id="footerSignIn">Sign In</a>
-      </div>
-      <div class="footer-copy">
+      <div class="text-center text-xs opacity-60 pt-8 border-t border-brandBlue/20">
         &copy; 2026 Penggerak Pembina Generus Solo Selatan &middot; Surakarta, Jawa Tengah
       </div>
     </div>
   </footer>
 
   <!-- PWA Install Button -->
-  <div class="pwa-install-bar" id="pwaInstallBar">
-    <div class="pwa-install-inner">
-      <div class="pwa-install-icon">
-        <img src="src/image/icon-192.png" alt="Icon App"
-          style="width:36px;height:36px;border-radius:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.2);" />
+  <div class="fixed bottom-0 left-0 w-full bg-brandBlue text-white p-4 transform translate-y-full transition-transform duration-500 z-50 flex justify-between items-center shadow-[0_-10px_40px_rgba(26,86,196,0.3)]" id="pwaInstallBar">
+    <div class="flex items-center gap-4 max-w-4xl mx-auto w-full">
+      <img src="src/image/icon-192.png" alt="Icon App" class="w-10 h-10 rounded-lg shadow-md" />
+      <div class="flex-1">
+        <div class="font-bold text-sm">Install Aplikasi Generus</div>
+        <div class="text-xs opacity-80">Akses lebih cepat dari layar utama HP Anda</div>
       </div>
-      <div class="pwa-install-text">
-        <strong>Install Aplikasi Generus</strong>
-        <span>Akses lebih cepat dari layar utama HP Anda</span>
-      </div>
-      <button class="pwa-install-btn" id="pwaInstallBtn">Install</button>
-      <button class="pwa-dismiss-btn" id="pwaDismissBtn" aria-label="Tutup">&times;</button>
+      <button class="bg-white text-brandBlue px-4 py-2 rounded-full font-bold text-sm shadow-md" id="pwaInstallBtn">Install</button>
+      <button class="text-white/60 hover:text-white text-2xl px-2" id="pwaDismissBtn" aria-label="Tutup">&times;</button>
     </div>
   </div>
 
   <!-- MODAL POPUP RINCIAN JENJANG PER DESA -->
-  <div class="modal-backdrop" id="modalJenjangDetail" style="display:none;">
-    <div class="modal-jenjang-card">
-      <div class="modal-jenjang-header">
-        <div class="modal-jenjang-title-wrap">
-          <div class="modal-jenjang-icon" id="mjIcon">
-            <span class="material-symbols-outlined">school</span>
+  <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300" id="modalJenjangDetail" style="display:none;">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700" id="mjCard">
+      <!-- Header -->
+      <div class="bg-slate-50 dark:bg-slate-900/50 p-6 flex items-start justify-between border-b border-slate-100 dark:border-slate-700">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-brandBlue text-white flex items-center justify-center shadow-md" id="mjIconWrapper">
+            <span class="material-symbols-outlined text-2xl" id="mjIcon">school</span>
           </div>
           <div>
-            <div class="modal-jenjang-badge" id="mjBadge">Kategori Generus</div>
-            <h3 class="modal-jenjang-name" id="mjTitle">Kategori: PAUD</h3>
+            <div class="text-xs font-bold text-brandBlue dark:text-brandGold mb-1" id="mjBadge">Kategori Generus</div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white" id="mjTitle">Kategori: PAUD</h3>
           </div>
         </div>
-        <button class="btn-close-mj" id="btnCloseMj" aria-label="Tutup">&times;</button>
+        <button class="text-slate-400 hover:text-red-500 bg-slate-200/50 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/30 w-8 h-8 rounded-full flex items-center justify-center transition-colors" id="btnCloseMj" aria-label="Tutup">&times;</button>
       </div>
 
-      <div class="modal-jenjang-summary" id="mjSummary">
-        <div class="mj-sum-item">
-          <span class="mj-sum-label">Total Generus di Kategori Ini</span>
-          <span class="mj-sum-val" id="mjTotalCount">95 Generus</span>
+      <!-- Summary -->
+      <div class="p-6 bg-brandBlue dark:bg-brandDarkBlue text-white" id="mjSummary">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm opacity-80">Total Generus di Kategori Ini</span>
+          <span class="text-2xl font-extrabold" id="mjTotalCount">95</span>
         </div>
-        <div class="mj-sum-badge" id="mjScope">Solo Selatan (5 Desa &bull; 27 Kelompok)</div>
+        <div class="text-xs bg-white/20 inline-block px-2 py-1 rounded backdrop-blur-sm" id="mjScope">Solo Selatan (5 Desa &bull; 27 Kelompok)</div>
       </div>
 
-      <div class="modal-jenjang-body">
-        <h4 class="mj-section-title">
-          <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">location_city</span>
-          Rincian Distribusi di 5 Desa &amp; Kelompok:
+      <!-- Body -->
+      <div class="p-6 max-h-[50vh] overflow-y-auto">
+        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-brandBlue dark:text-blue-400">location_city</span>
+          Rincian Distribusi di 5 Desa:
         </h4>
-        <div class="mj-desa-grid" id="mjDesaGrid">
+        <div class="space-y-3" id="mjDesaGrid">
           <!-- Rendered by JS -->
         </div>
       </div>
 
-      <div class="modal-jenjang-footer">
-        <span class="mj-footer-note">Data terpusat PPG Solo Selatan &bull; Real-time Database</span>
-        <button type="button" class="btn-primary-sm" id="btnOkMj">Tutup</button>
+      <!-- Footer -->
+      <div class="p-6 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+        <span class="text-[10px] text-slate-400 font-medium">Data terpusat PPG Solo Selatan</span>
+        <button type="button" class="bg-brandBlue hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold text-sm transition-colors shadow-md" id="btnOkMj">Tutup</button>
       </div>
     </div>
   </div>
+
+  <!-- FLOATING DARK MODE TOGGLE -->
+  <button id="darkModeToggle" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-lg border border-slate-200 dark:border-slate-700 text-brandBlue dark:text-brandGold flex items-center justify-center hover:scale-110 transition-transform duration-300" aria-label="Toggle Dark Mode">
+    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+    <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+  </button>
+
+  <script>
+    // Dark mode logic
+    const themeToggleBtn = document.getElementById('darkModeToggle');
+    
+    // Set theme on load based on user preference or time of day (petang)
+    function setThemeOnLoad() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        // Time based check (6 PM to 6 AM is dark)
+        const hour = new Date().getHours();
+        if (hour >= 18 || hour < 6) {
+           document.documentElement.classList.add('dark');
+        } else {
+           document.documentElement.classList.remove('dark');
+        }
+      }
+    }
+    
+    setThemeOnLoad();
+
+    themeToggleBtn.addEventListener('click', function() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    });
+
+    // Fix Modal behavior for Tailwind (since popup-jenjang.js overrides display)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.target.id === 'modalJenjangDetail' && mutation.attributeName === 'style') {
+           const modal = mutation.target;
+           const card = document.getElementById('mjCard');
+           if (modal.style.display !== 'none') {
+             // It's opening
+             modal.style.display = 'flex'; // override js 'block' to keep flex centering
+             setTimeout(() => {
+               modal.classList.remove('opacity-0', 'pointer-events-none');
+               if(card) card.classList.remove('scale-95');
+             }, 10);
+           } else {
+             // It's closing
+             modal.classList.add('opacity-0', 'pointer-events-none');
+             if(card) card.classList.add('scale-95');
+           }
+        }
+      });
+    });
+    const mjModal = document.getElementById('modalJenjangDetail');
+    if(mjModal) observer.observe(mjModal, { attributes: true });
+
+  </script>
 
   <script type="module" src="src/popup-jenjang.js"></script>
   <script type="module" src="src/app.js"></script>
