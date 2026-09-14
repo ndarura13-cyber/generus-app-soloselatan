@@ -57,7 +57,7 @@
   <!-- Optional: Keep original stylesheet just in case for some complex animations/overrides not covered here -->
   <link rel="stylesheet" href="src/style.css" />
 
-  <style>
+  <style type="text/tailwindcss">
     /* Tailwind utilities specifically needed for smooth glassmorphism overriding style.css defaults */
     html { scroll-behavior: smooth; }
     body { @apply bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300; }
@@ -80,6 +80,17 @@
     .level-pill:hover { @apply transform -translate-y-1 shadow-md; }
     .stat-card { transition: all 0.2s; }
     .stat-card:hover { @apply transform -translate-y-1 shadow-xl; }
+    
+    /* Fix Dark Mode overrides for JS generated content from style.css */
+    .dark .proker-item { background-color: transparent !important; color: #f8fafc !important; border-color: rgba(255, 255, 255, 0.1) !important; }
+    .dark .proker-item h4 { color: #f8fafc !important; }
+    .dark .proker-item p { color: #94a3b8 !important; }
+    .dark .proker-date { color: #cbd5e1 !important; }
+    .dark .page-btn { background-color: #334155 !important; color: #fff !important; border-color: #475569 !important; }
+    .dark .page-btn.active { background-color: #1a56c4 !important; border-color: #1a56c4 !important; }
+    
+    /* Force hamburger color to Tailwind brand colors, ignoring style.css */
+    .hamburger span { @apply bg-brandBlue dark:bg-brandGold !important; }
   </style>
 </head>
 
@@ -89,136 +100,163 @@
   <header class="navbar" id="navbar">
     <div class="container mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
       <a href="#" class="flex items-center gap-3 group z-50">
-        <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
+        <div
+          class="w-10 h-10 rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
           <img src="src/image/icon-192.png" alt="Logo PP Generus" class="w-full h-full object-cover" />
         </div>
         <div class="flex flex-col">
           <span class="font-bold text-lg leading-tight text-brandBlue dark:text-blue-400 tracking-tight">PPG</span>
-          <span class="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400 tracking-wider">Solo Selatan</span>
+          <span class="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400 tracking-wider">Solo
+            Selatan</span>
         </div>
       </a>
-      
+
       <nav class="nav-links font-medium text-sm" id="navLinks">
-        <a href="#beranda" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Beranda</a>
-        <a href="#jenjang" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Jenjang</a>
-        <a href="#program-kerja" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Program Kerja</a>
-        <a href="#fitur" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Fitur</a>
-        <a href="#tentang" class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Tentang</a>
-        <a href="features/login/login.html" class="btn-signin bg-brandBlue hover:bg-blue-700 text-white px-5 py-2.5 rounded-full flex items-center gap-2 transition-all shadow-md hover:shadow-lg mt-4 md:mt-0" id="btnSignIn">
+        <a href="#beranda"
+          class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Beranda</a>
+        <a href="#jenjang"
+          class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Jenjang</a>
+        <a href="#program-kerja"
+          class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Program
+          Kerja</a>
+        <a href="#fitur"
+          class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Fitur</a>
+        <a href="#tentang"
+          class="nav-link text-slate-600 dark:text-slate-300 hover:text-brandBlue dark:hover:text-brandGold transition-colors px-2 py-1">Tentang</a>
+        <a href="features/login/login.html"
+          class="btn-signin bg-brandBlue hover:bg-blue-700 text-white px-5 py-2.5 rounded-full flex items-center gap-2 transition-all shadow-md hover:shadow-lg mt-4 md:mt-0"
+          id="btnSignIn">
           <span>Masuk</span>
           <span class="material-symbols-outlined text-[18px]">login</span>
         </a>
       </nav>
-      
-      <button class="hamburger md:hidden relative w-6 h-5 flex flex-col justify-between z-50 focus:outline-none" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-        <span class="w-full h-0.5 bg-brandBlue dark:bg-brandGold rounded transition-all duration-300"></span>
-        <span class="w-full h-0.5 bg-brandBlue dark:bg-brandGold rounded transition-all duration-300"></span>
-        <span class="w-full h-0.5 bg-brandBlue dark:bg-brandGold rounded transition-all duration-300"></span>
-      </button>
+
+      <div class="flex items-center gap-4 z-50">
+        <!-- DARK MODE TOGGLE (Moved to Navbar) -->
+        <button id="darkModeToggle"
+          class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brandBlue dark:text-brandGold flex items-center justify-center hover:scale-110 transition-transform duration-300"
+          aria-label="Toggle Dark Mode">
+          <span class="material-symbols-outlined text-[20px] dark:hidden">dark_mode</span>
+          <span class="material-symbols-outlined text-[20px] hidden dark:block">light_mode</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
     </div>
   </header>
 
   <!-- MOBILE NAV OVERLAY (Landing Page) -->
-  <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" id="navOverlay"></div>
+  <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"
+    id="navOverlay"></div>
 
   <!-- INLINE CRITICAL SCRIPT (Session & Hamburger) -->
   <script>
-    (function initCriticalUI() {
-      // 1. Session Check
-      try {
-        const rawSession = localStorage.getItem('ppg_user_session');
-        const btnSignIn = document.getElementById('btnSignIn');
-        if (rawSession && btnSignIn) {
-          const user = JSON.parse(rawSession);
-          if (user && user.email) {
-            // Update Main Navbar Button
-            btnSignIn.innerHTML = '<span>Kelola</span><span class="material-symbols-outlined" style="font-size:18px;">tune</span>';
-            btnSignIn.setAttribute('href', 'features/dashboard/dashboard.html');
-            btnSignIn.classList.add('btn-nav-active-session');
-            btnSignIn.classList.remove('bg-brandBlue', 'hover:bg-blue-700');
-            btnSignIn.classList.add('bg-brandDarkBlue', 'hover:bg-slate-800');
+      (function initCriticalUI() {
+        // 1. Session Check
+        try {
+          const rawSession = localStorage.getItem('ppg_user_session');
+          const btnSignIn = document.getElementById('btnSignIn');
+          if (rawSession && btnSignIn) {
+            const user = JSON.parse(rawSession);
+            if (user && user.email) {
+              // Update Main Navbar Button
+              btnSignIn.innerHTML = '<span>Kelola</span><span class="material-symbols-outlined" style="font-size:18px;">tune</span>';
+              btnSignIn.setAttribute('href', 'features/dashboard/dashboard.html');
+              btnSignIn.classList.add('btn-nav-active-session');
+              btnSignIn.classList.remove('bg-brandBlue', 'hover:bg-blue-700');
+              btnSignIn.classList.add('bg-brandDarkBlue', 'hover:bg-slate-800');
 
-            // Update all Feature section login links after DOM loads
-            window.addEventListener('DOMContentLoaded', () => {
-              const fiturLinks = document.querySelectorAll('.fitur-link[href="features/login/login.html"], .btn-signin-card[href="features/login/login.html"], #footerSignIn');
-              fiturLinks.forEach(link => {
-                link.setAttribute('href', 'features/dashboard/dashboard.html');
-                if (link.classList.contains('fitur-link')) {
-                  link.innerHTML = 'Buka Fitur <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
-                } else if (link.classList.contains('btn-signin-card')) {
-                  link.innerHTML = 'Kelola <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
-                  const card = link.closest('.signin-card');
-                  if (card) {
-                    card.classList.add('active-session-card');
-                    card.classList.replace('bg-white', 'bg-blue-50');
-                    card.classList.replace('dark:bg-slate-800', 'dark:bg-blue-900/30');
-                    const title = card.querySelector('h3');
-                    if (title) title.textContent = 'Dashboard';
-                    const desc = card.querySelector('p');
-                    if (desc) desc.textContent = 'Anda sedang masuk. Buka Dashboard untuk mengelola data.';
+              // Update all Feature section login links after DOM loads
+              window.addEventListener('DOMContentLoaded', () => {
+                const fiturLinks = document.querySelectorAll('.fitur-link[href="features/login/login.html"], .btn-signin-card[href="features/login/login.html"], #footerSignIn');
+                fiturLinks.forEach(link => {
+                  link.setAttribute('href', 'features/dashboard/dashboard.html');
+                  if (link.classList.contains('fitur-link')) {
+                    link.innerHTML = 'Buka Fitur <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
+                  } else if (link.classList.contains('btn-signin-card')) {
+                    link.innerHTML = 'Kelola <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">arrow_forward</span>';
+                    const card = link.closest('.signin-card');
+                    if (card) {
+                      card.classList.add('active-session-card');
+                      card.classList.replace('bg-white', 'bg-blue-50');
+                      card.classList.replace('dark:bg-slate-800', 'dark:bg-blue-900/30');
+                      const title = card.querySelector('h3');
+                      if (title) title.textContent = 'Dashboard';
+                      const desc = card.querySelector('p');
+                      if (desc) desc.textContent = 'Anda sedang masuk. Buka Dashboard untuk mengelola data.';
+                    }
+                  } else if (link.id === 'footerSignIn') {
+                    link.innerHTML = 'Dashboard';
                   }
-                } else if (link.id === 'footerSignIn') {
-                  link.innerHTML = 'Dashboard';
-                }
+                });
               });
-            });
+            }
           }
+        } catch (e) { console.warn('Session check failed', e); }
+
+        // 2. Hamburger Menu
+        const hamburger = document.getElementById('hamburger');
+        const navLinksEl = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+
+        function closeNav() {
+          navLinksEl.classList.remove('open');
+          hamburger.classList.remove('active');
+          navOverlay.classList.add('hidden');
+          navOverlay.classList.remove('opacity-100');
+          document.body.style.overflow = '';
         }
-      } catch (e) { console.warn('Session check failed', e); }
 
-      // 2. Hamburger Menu
-      const hamburger = document.getElementById('hamburger');
-      const navLinksEl = document.getElementById('navLinks');
-      const navOverlay = document.getElementById('navOverlay');
-
-      function closeNav() {
-        navLinksEl.classList.remove('open');
-        hamburger.classList.remove('active');
-        navOverlay.classList.add('hidden');
-        navOverlay.classList.remove('opacity-100');
-        document.body.style.overflow = '';
-      }
-
-      if (hamburger && navLinksEl) {
-        hamburger.addEventListener('click', () => {
-          const isOpen = navLinksEl.classList.toggle('open');
-          hamburger.classList.toggle('active', isOpen);
-          if (isOpen) {
-            navOverlay.classList.remove('hidden');
-            setTimeout(() => navOverlay.classList.add('opacity-100'), 10);
-            document.body.style.overflow = 'hidden';
-          } else {
-            navOverlay.classList.remove('opacity-100');
-            setTimeout(() => navOverlay.classList.add('hidden'), 300);
-            document.body.style.overflow = '';
-          }
-        });
-        navOverlay.addEventListener('click', closeNav);
-        document.querySelectorAll('.nav-link').forEach(link => {
-          link.addEventListener('click', closeNav);
-        });
-      }
-    })();
+        if (hamburger && navLinksEl) {
+          hamburger.addEventListener('click', () => {
+            const isOpen = navLinksEl.classList.toggle('open');
+            hamburger.classList.toggle('active', isOpen);
+            if (isOpen) {
+              navOverlay.classList.remove('hidden');
+              setTimeout(() => navOverlay.classList.add('opacity-100'), 10);
+              document.body.style.overflow = 'hidden';
+            } else {
+              navOverlay.classList.remove('opacity-100');
+              setTimeout(() => navOverlay.classList.add('hidden'), 300);
+              document.body.style.overflow = '';
+            }
+          });
+          navOverlay.addEventListener('click', closeNav);
+          document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', closeNav);
+          });
+        }
+      })();
   </script>
 
   <!-- HERO -->
   <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-slate-50 dark:bg-slate-900" id="beranda">
     <!-- Background Decor -->
     <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brandBlue/10 dark:bg-brandBlue/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brandGold/10 dark:bg-brandGold/15 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4"></div>
+      <div
+        class="absolute top-0 right-0 w-[600px] h-[600px] bg-brandBlue/10 dark:bg-brandBlue/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3">
+      </div>
+      <div
+        class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brandGold/10 dark:bg-brandGold/15 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4">
+      </div>
     </div>
-    
+
     <div class="container mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center gap-12">
       <div class="w-full lg:w-1/2 flex flex-col items-start text-left reveal">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-brandBlue dark:text-blue-300 text-xs font-semibold mb-6 border border-blue-200 dark:border-blue-800">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-brandBlue dark:text-blue-300 text-xs font-semibold mb-6 border border-blue-200 dark:border-blue-800">
           <span class="w-2 h-2 rounded-full bg-brandBlue animate-pulse"></span>
           Surakarta, Jawa Tengah &middot; Daerah Solo Selatan
         </div>
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.15] mb-6 font-serif">
+        <h1
+          class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.15] mb-6 font-serif">
           Penggerak <span class="text-brandBlue dark:text-blue-400">Pembina</span><br />Generus Solo Selatan
         </h1>
-        <p class="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-300 mb-4 border-l-4 border-brandGold pl-4">
+        <p
+          class="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-300 mb-4 border-l-4 border-brandGold pl-4">
           Mewujudkan Generasi Penerus yang Faham Agama &amp; 29 Karakter Luhur
         </p>
         <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-lg leading-relaxed">
@@ -226,27 +264,36 @@
           absensi KBM, dan program kerja berbasis kewilayahan.
         </p>
         <div class="flex flex-wrap items-center gap-4">
-          <a href="#fitur" class="px-6 py-3 rounded-full bg-brandBlue hover:bg-blue-700 text-white font-semibold flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+          <a href="#fitur"
+            class="px-6 py-3 rounded-full bg-brandBlue hover:bg-blue-700 text-white font-semibold flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
             Jelajahi Fitur
             <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
           </a>
-          <a href="#tentang" class="px-6 py-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brandBlue dark:text-brandGold font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+          <a href="#tentang"
+            class="px-6 py-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brandBlue dark:text-brandGold font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
             Tentang Kami
           </a>
         </div>
       </div>
-      
+
       <div class="w-full lg:w-1/2 reveal-right">
         <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/20 group">
-          <img src="src/image/hero.jpg" alt="Suasana belajar" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700" fetchpriority="high" />
-          <div class="absolute inset-0 bg-gradient-to-t from-brandDarkBlue/80 via-transparent to-transparent mix-blend-multiply"></div>
-          
+          <img src="src/image/hero.jpg" alt="Suasana belajar"
+            class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
+            fetchpriority="high" />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-brandDarkBlue/80 via-transparent to-transparent mix-blend-multiply">
+          </div>
+
           <!-- Interactive Badge -->
-          <div class="absolute bottom-6 right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-4 rounded-2xl shadow-xl flex items-center gap-4 cursor-pointer hover:bg-white dark:hover:bg-slate-800 transition-colors" id="heroImgBadge" data-kategori-stat="all" title="Klik untuk melihat ringkasan data Generus">
+          <div
+            class="absolute bottom-6 right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-4 rounded-2xl shadow-xl flex items-center gap-4 cursor-pointer hover:bg-white dark:hover:bg-slate-800 transition-colors"
+            id="heroImgBadge" data-kategori-stat="all" title="Klik untuk melihat ringkasan data Generus">
             <div class="text-3xl font-extrabold text-brandBlue dark:text-brandGold" id="heroGenerusCount">57+</div>
             <div class="flex flex-col">
               <span class="text-sm font-bold text-slate-800 dark:text-white">Generus Aktif</span>
-              <span class="text-xs text-brandBlue dark:text-brandGold font-semibold flex items-center gap-1">Lihat Detail <span class="material-symbols-outlined text-[14px]">arrow_forward</span></span>
+              <span class="text-xs text-brandBlue dark:text-brandGold font-semibold flex items-center gap-1">Lihat
+                Detail <span class="material-symbols-outlined text-[14px]">arrow_forward</span></span>
             </div>
           </div>
         </div>
@@ -257,60 +304,97 @@
   <!-- STATS -->
   <section class="relative z-20 -mt-10 lg:-mt-16 px-4">
     <div class="container mx-auto">
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        
+      <div class="grid grid-cols-6 gap-3 md:gap-4">
+
         <!-- Card 1 -->
-        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-brandBlue/10 dark:border-brandBlue/30 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandBlue dark:hover:border-blue-400" data-kategori-stat="all">
-          <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-3">
-            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-2xl">groups</span>
+        <div
+          class="col-span-6 lg:col-span-1 stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-brandBlue/10 dark:border-brandBlue/30 rounded-2xl p-4 md:p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandBlue dark:hover:border-blue-400"
+          data-kategori-stat="all">
+          <div
+            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-2 md:mb-3">
+            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-xl md:text-2xl">groups</span>
           </div>
-          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="1250">1250</div>
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Total Generus <span class="text-brandBlue">&rarr;</span></div>
+          <div class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num"
+            data-target="1250">1250</div>
+          <div class="text-[10px] md:text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            Total Generus <span class="text-brandBlue">&rarr;</span></div>
         </div>
 
         <!-- Card 2 -->
-        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-brandGold/10 dark:border-brandGold/30 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandGold" data-kategori-stat="caberawit">
-          <div class="w-12 h-12 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center mb-3">
-            <span class="material-symbols-outlined text-brandGold text-2xl">child_care</span>
+        <div
+          class="col-span-2 lg:col-span-1 stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-brandGold/10 dark:border-brandGold/30 rounded-2xl p-3 md:p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandGold"
+          data-kategori-stat="caberawit">
+          <div
+            class="w-8 h-8 md:w-12 md:h-12 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center mb-2 md:mb-3">
+            <span class="material-symbols-outlined text-brandGold text-lg md:text-2xl">child_care</span>
           </div>
-          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="410">410</div>
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Caberawit <span class="text-brandGold">&rarr;</span></div>
+          <div class="text-lg md:text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num"
+            data-target="410">410</div>
+          <div
+            class="text-[9px] md:text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 text-center leading-tight">
+            Caberawit</div>
         </div>
 
         <!-- Card 3 -->
-        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-blue-200 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandBlue" data-kategori-stat="gp_reguler">
-          <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-3">
-            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-2xl">school</span>
+        <div
+          class="col-span-2 lg:col-span-1 stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-blue-200 dark:border-slate-700 rounded-2xl p-3 md:p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandBlue"
+          data-kategori-stat="gp_reguler">
+          <div
+            class="w-8 h-8 md:w-12 md:h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-2 md:mb-3">
+            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-lg md:text-2xl">school</span>
           </div>
-          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="560">560</div>
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">GP Reguler <span class="text-brandBlue">&rarr;</span></div>
+          <div class="text-lg md:text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num"
+            data-target="560">560</div>
+          <div
+            class="text-[9px] md:text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 text-center leading-tight">
+            GP Reguler</div>
         </div>
 
         <!-- Card 4 -->
-        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-green-100 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandGreen" data-kategori-stat="remaja">
-          <div class="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-3">
-            <span class="material-symbols-outlined text-brandGreen dark:text-green-400 text-2xl">diversity_3</span>
+        <div
+          class="col-span-2 lg:col-span-1 stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-green-100 dark:border-slate-700 rounded-2xl p-3 md:p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-brandGreen"
+          data-kategori-stat="remaja">
+          <div
+            class="w-8 h-8 md:w-12 md:h-12 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-2 md:mb-3">
+            <span
+              class="material-symbols-outlined text-brandGreen dark:text-green-400 text-lg md:text-2xl">diversity_3</span>
           </div>
-          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="280">280</div>
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Usia Remaja <span class="text-brandGreen">&rarr;</span></div>
+          <div class="text-lg md:text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num"
+            data-target="280">280</div>
+          <div
+            class="text-[9px] md:text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 text-center leading-tight">
+            Usia Remaja</div>
         </div>
 
         <!-- Card 5 -->
-        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-purple-100 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-purple-600" data-kategori-stat="desa">
-          <div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
-            <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-2xl">location_city</span>
+        <div
+          class="col-span-3 lg:col-span-1 stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-purple-100 dark:border-slate-700 rounded-2xl p-4 md:p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-purple-600"
+          data-kategori-stat="desa">
+          <div
+            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-2 md:mb-3">
+            <span
+              class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-xl md:text-2xl">location_city</span>
           </div>
-          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="5">5</div>
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Jumlah Desa <span class="text-purple-600">&rarr;</span></div>
+          <div class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="5">5
+          </div>
+          <div
+            class="text-[10px] md:text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 text-center leading-tight">
+            Jumlah Desa</div>
         </div>
 
         <!-- Card 6 -->
-        <div class="stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-sky-100 dark:border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-sky-600" data-kategori-stat="kelompok">
-          <div class="w-12 h-12 rounded-full bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-3">
-            <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-2xl">home_work</span>
+        <div
+          class="col-span-3 lg:col-span-1 stat-card reveal bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-sky-100 dark:border-slate-700 rounded-2xl p-4 md:p-5 shadow-lg flex flex-col items-center text-center cursor-pointer hover:border-sky-600"
+          data-kategori-stat="kelompok">
+          <div
+            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-2 md:mb-3">
+            <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-xl md:text-2xl">home_work</span>
           </div>
-          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="27">27</div>
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">Jumlah Kelompok <span class="text-sky-600">&rarr;</span></div>
+          <div class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white mb-1 stat-num" data-target="27">
+            27</div>
+          <div
+            class="text-[10px] md:text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 text-center leading-tight">
+            Jml. Kelompok</div>
         </div>
 
       </div>
@@ -321,80 +405,133 @@
   <section class="py-20 lg:py-28" id="jenjang">
     <div class="container mx-auto px-4 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16 reveal">
-        <span class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Jenjang Generus</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Kategori &amp; Jenjang</h2>
-        <p class="text-slate-600 dark:text-slate-400">Dari usia dini hingga pra-nikah &mdash; klik label kategori usia di bawah untuk melihat rincian generus per desa</p>
+        <span
+          class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Jenjang
+          Generus</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Kategori &amp;
+          Jenjang</h2>
+        <p class="text-slate-600 dark:text-slate-400">Dari usia dini hingga pra-nikah &mdash; klik label kategori usia
+          di bawah untuk melihat rincian generus per desa</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
+
         <!-- Caberawit -->
-        <div class="jenjang-card caberawit reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
+        <div
+          class="jenjang-card caberawit reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110">
+          </div>
           <div class="relative z-10">
             <div class="flex items-center gap-4 mb-6">
               <div class="w-14 h-14 bg-brandGold text-white rounded-2xl flex items-center justify-center shadow-md">
                 <span class="material-symbols-outlined text-3xl ms-jenjang">child_care</span>
               </div>
               <div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">Caberawit</h3>
-                <span class="text-xs font-bold text-brandGold bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded" id="badgeCaberawit">Usia Dini</span>
+                <h3
+                  class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">
+                  Caberawit</h3>
+                <span class="text-xs font-bold text-brandGold bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded"
+                  id="badgeCaberawit">Usia Dini</span>
               </div>
             </div>
             <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="PAUD">PAUD</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="TK A">TK A</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="TK B">TK B</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="1 SD">1-3 SD</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="4 SD">4-6 SD</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="PAUD">PAUD</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="TK A">TK A</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="TK B">TK B</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="1 SD">1-3 SD</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-yellow-100 dark:hover:bg-brandGold text-slate-700 dark:text-slate-200 hover:text-yellow-800 dark:hover:text-slate-900 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="4 SD">4-6 SD</button>
             </div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Pembentukan karakter dasar melalui pembiasaan ibadah dan akhlak sejak usia dini.</p>
-            <div class="px-3 py-2 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-brandGold text-sm font-semibold text-yellow-800 dark:text-yellow-500">Fokus utama lembar pembiasaan</div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Pembentukan karakter dasar melalui pembiasaan
+              ibadah dan akhlak sejak usia dini.</p>
+            <div
+              class="px-3 py-2 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-brandGold text-sm font-semibold text-yellow-800 dark:text-yellow-500">
+              Fokus utama lembar pembiasaan</div>
           </div>
         </div>
 
         <!-- GP Reguler -->
-        <div class="jenjang-card gp reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100/50 dark:bg-blue-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
+        <div
+          class="jenjang-card gp reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-blue-100/50 dark:bg-blue-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110">
+          </div>
           <div class="relative z-10">
             <div class="flex items-center gap-4 mb-6">
               <div class="w-14 h-14 bg-brandBlue text-white rounded-2xl flex items-center justify-center shadow-md">
                 <span class="material-symbols-outlined text-3xl ms-jenjang">school</span>
               </div>
               <div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">GP Reguler</h3>
-                <span class="text-xs font-bold text-brandBlue dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded" id="badgeGP">Usia Sekolah</span>
+                <h3
+                  class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">
+                  GP Reguler</h3>
+                <span
+                  class="text-xs font-bold text-brandBlue dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded"
+                  id="badgeGP">Usia Sekolah</span>
               </div>
             </div>
             <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-brandBlue text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="1 SMP">1-3 SMP</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-brandBlue text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="1 SMA">1-3 SMA</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-brandBlue text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="1 SMP">1-3 SMP</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-brandBlue text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="1 SMA">1-3 SMA</button>
             </div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Penguatan aqidah, ibadah, dan kepemimpinan untuk generasi usia SMP dan SMA.</p>
-            <div class="px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-brandBlue text-sm font-semibold text-blue-800 dark:text-blue-400">Absensi KBM terstruktur</div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Penguatan aqidah, ibadah, dan kepemimpinan untuk
+              generasi usia SMP dan SMA.</p>
+            <div
+              class="px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-brandBlue text-sm font-semibold text-blue-800 dark:text-blue-400">
+              Absensi KBM terstruktur</div>
           </div>
         </div>
 
         <!-- Remaja -->
-        <div class="jenjang-card remaja reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-green-100/50 dark:bg-green-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
+        <div
+          class="jenjang-card remaja reveal bg-white dark:bg-slate-800 rounded-3xl p-8 border border-brandBlue/5 dark:border-brandBlue/20 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:border-brandBlue/30 transition-colors">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-green-100/50 dark:bg-green-900/20 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110">
+          </div>
           <div class="relative z-10">
             <div class="flex items-center gap-4 mb-6">
               <div class="w-14 h-14 bg-brandGreen text-white rounded-2xl flex items-center justify-center shadow-md">
                 <span class="material-symbols-outlined text-3xl ms-jenjang">diversity_3</span>
               </div>
               <div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">Remaja</h3>
-                <span class="text-xs font-bold text-brandGreen dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded" id="badgeRemaja">Pra-Nikah</span>
+                <h3
+                  class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">
+                  Remaja</h3>
+                <span
+                  class="text-xs font-bold text-brandGreen dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded"
+                  id="badgeRemaja">Pra-Nikah</span>
               </div>
             </div>
             <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="Pra-Nikah">Pra-Nikah</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="Mahasiswa">Mahasiswa</button>
-              <button type="button" class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600" data-kategori="Bekerja">Bekerja</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="Pra-Nikah">Pra-Nikah</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="Mahasiswa">Mahasiswa</button>
+              <button type="button"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-brandGreen text-slate-700 dark:text-slate-200 hover:text-green-800 dark:hover:text-white text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-600"
+                data-kategori="Bekerja">Bekerja</button>
             </div>
-            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Persiapan menuju kehidupan berkeluarga dengan pembekalan nilai Islam yang kuat.</p>
-            <div class="px-3 py-2 bg-green-50 dark:bg-green-900/20 border-l-4 border-brandGreen text-sm font-semibold text-green-800 dark:text-green-400">Program khusus pra-nikah</div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Persiapan menuju kehidupan berkeluarga dengan
+              pembekalan nilai Islam yang kuat.</p>
+            <div
+              class="px-3 py-2 bg-green-50 dark:bg-green-900/20 border-l-4 border-brandGreen text-sm font-semibold text-green-800 dark:text-green-400">
+              Program khusus pra-nikah</div>
           </div>
         </div>
 
@@ -406,16 +543,23 @@
   <section class="py-20 lg:py-28 bg-blue-50/50 dark:bg-slate-800/50" id="program-kerja">
     <div class="container mx-auto px-4 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16 reveal">
-        <span class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Agenda Aktif</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Program Kerja Tahunan</h2>
-        <p class="text-slate-600 dark:text-slate-400">Kegiatan yang sedang dan akan berlangsung &mdash; diperbarui setiap bulan</p>
+        <span
+          class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Agenda
+          Aktif</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Program Kerja
+          Tahunan</h2>
+        <p class="text-slate-600 dark:text-slate-400">Kegiatan yang sedang dan akan berlangsung &mdash; diperbarui
+          setiap bulan</p>
       </div>
-      
-      <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-brandBlue/10 dark:shadow-black/20 overflow-hidden reveal border border-brandBlue/10 dark:border-slate-700">
+
+      <div
+        class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-brandBlue/10 dark:shadow-black/20 overflow-hidden reveal border border-brandBlue/10 dark:border-slate-700">
         <!-- Header Bar -->
-        <div class="bg-brandBlue dark:bg-brandDarkBlue p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div
+          class="bg-brandBlue dark:bg-brandDarkBlue p-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 flex flex-col items-center justify-center text-brandBlue dark:text-blue-400 shadow-inner">
+            <div
+              class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 flex flex-col items-center justify-center text-brandBlue dark:text-blue-400 shadow-inner">
               <span class="font-bold text-lg leading-tight" id="currentMonth">AGT</span>
               <span class="text-xs font-semibold opacity-80" id="currentYear">2026</span>
             </div>
@@ -424,18 +568,23 @@
               <div class="text-sm opacity-80">Periode Aktif Generus</div>
             </div>
           </div>
-          
+
           <div class="flex flex-wrap gap-3 text-xs font-medium text-white/90">
-            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span class="w-2.5 h-2.5 rounded-full bg-green-400"></span> Selesai</div>
-            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span class="w-2.5 h-2.5 rounded-full bg-brandGold"></span> Berlangsung</div>
-            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span class="w-2.5 h-2.5 rounded-full bg-blue-300"></span> Akan Datang</div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span
+                class="w-2.5 h-2.5 rounded-full bg-green-400"></span> Selesai</div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span
+                class="w-2.5 h-2.5 rounded-full bg-brandGold"></span> Berlangsung</div>
+            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span
+                class="w-2.5 h-2.5 rounded-full bg-blue-300"></span> Akan Datang</div>
           </div>
         </div>
 
         <div class="proker-list p-6 md:p-8" id="prokerList" style="min-height: 200px;"></div>
 
         <!-- Pagination Controls -->
-        <div class="proker-pagination border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/50 flex justify-center gap-2" id="prokerPagination">
+        <div
+          class="proker-pagination border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/50 flex justify-center gap-2"
+          id="prokerPagination">
           <!-- Rendered by JS -->
         </div>
       </div>
@@ -446,69 +595,102 @@
   <section class="py-20 lg:py-28" id="fitur">
     <div class="container mx-auto px-4 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16 reveal">
-        <span class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Fitur Aplikasi</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Semua yang Anda Butuhkan</h2>
+        <span
+          class="inline-block px-3 py-1 bg-brandBlue/10 text-brandBlue dark:text-blue-400 text-sm font-bold rounded-full mb-4 border border-brandBlue/20">Fitur
+          Aplikasi</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 font-serif">Semua yang Anda
+          Butuhkan</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
-          <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center mb-6">
+
+        <div
+          class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
+          <div
+            class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center mb-6">
             <span class="material-symbols-outlined text-3xl ms-fitur">calendar_month</span>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">Program Kerja</h3>
-          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Kelola agenda kegiatan yayasan sepanjang tahun. Tampilkan status tiap program secara real-time.</p>
+          <h3
+            class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">
+            Program Kerja</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Kelola agenda kegiatan sepanjang
+            tahun. Tampilkan status tiap program secara real-time.</p>
         </div>
 
-        <div class="bg-gradient-to-br from-brandBlue to-blue-800 p-8 rounded-3xl shadow-xl shadow-brandBlue/20 text-white reveal transition-transform hover:-translate-y-2 relative overflow-hidden">
-          <div class="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md">Unggulan</div>
+        <div
+          class="bg-gradient-to-br from-brandBlue to-blue-800 p-8 rounded-3xl shadow-xl shadow-brandBlue/20 text-white reveal transition-transform hover:-translate-y-2 relative overflow-hidden">
+          <div class="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md">
+            Unggulan</div>
           <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-6">
             <span class="material-symbols-outlined text-3xl ms-fitur">checklist</span>
           </div>
           <h3 class="text-xl font-bold mb-3 text-white">Lembar Pembiasaan</h3>
-          <p class="text-white/90 text-sm leading-relaxed mb-6">Pantau pembiasaan ibadah harian khusus Generus Caberawit. Rekam sholat, mengaji, dan akhlak.</p>
-          <a href="features/laporan/laporan-pembiasaan.html" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-brandBlue text-sm font-bold rounded-full hover:bg-blue-50 transition-colors" id="btnLaporanPublik">
+          <p class="text-white/90 text-sm leading-relaxed mb-6">Pantau pembiasaan ibadah harian khusus Generus
+            Caberawit. Rekam sholat, mengaji, dan akhlak.</p>
+          <a href="features/laporan/laporan-pembiasaan.html" target="_blank"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white text-brandBlue text-sm font-bold rounded-full hover:bg-blue-50 transition-colors"
+            id="btnLaporanPublik">
             <span class="material-symbols-outlined text-[16px]">public</span> Laporan Publik
           </a>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
-          <div class="w-14 h-14 rounded-2xl bg-green-50 dark:bg-green-900/30 text-brandGreen dark:text-green-400 flex items-center justify-center mb-6">
+        <div
+          class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
+          <div
+            class="w-14 h-14 rounded-2xl bg-green-50 dark:bg-green-900/30 text-brandGreen dark:text-green-400 flex items-center justify-center mb-6">
             <span class="material-symbols-outlined text-3xl ms-fitur">print</span>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">Absensi KBM Cepat</h3>
-          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Konversi data generus ke daftar presensi fisik siap cetak resmi A4 untuk Caberawit dan lainnya.</p>
-          <a href="features/laporan/cetak-absensi.html" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-brandGreen dark:text-green-400 text-sm font-bold rounded-full hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors" id="btnCetakAbsensiLanding">
+          <h3
+            class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">
+            Absensi KBM Cepat</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Konversi data generus ke daftar
+            presensi fisik siap cetak resmi A4 untuk Caberawit dan lainnya.</p>
+          <a href="features/laporan/cetak-absensi.html" target="_blank"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-brandGreen dark:text-green-400 text-sm font-bold rounded-full hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+            id="btnCetakAbsensiLanding">
             <span class="material-symbols-outlined text-[16px]">print</span> Lembar Cetak
           </a>
         </div>
 
-        <div class="bg-gradient-to-br from-brandDarkBlue to-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-900/20 text-white reveal transition-transform hover:-translate-y-2 relative overflow-hidden">
-          <div class="absolute top-4 right-4 bg-white/10 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md text-brandGold">Inti</div>
+        <div
+          class="bg-gradient-to-br from-brandDarkBlue to-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-900/20 text-white reveal transition-transform hover:-translate-y-2 relative overflow-hidden">
+          <div
+            class="absolute top-4 right-4 bg-white/10 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md text-brandGold">
+            Inti</div>
           <div class="w-14 h-14 rounded-2xl bg-brandBlue/40 backdrop-blur-md flex items-center justify-center mb-6">
             <span class="material-symbols-outlined text-3xl ms-fitur text-brandGold">database</span>
           </div>
           <h3 class="text-xl font-bold mb-3 text-white">Database Generus</h3>
-          <p class="text-white/80 text-sm leading-relaxed">Data lengkap tiap Generus: NIK, alamat, jenjang, riwayat semester, status mutasi, dan dokumen pendukung.</p>
+          <p class="text-white/80 text-sm leading-relaxed">Data lengkap tiap Generus: NIK, alamat, jenjang, riwayat
+            semester, status mutasi, dan dokumen pendukung.</p>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
-          <div class="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center mb-6">
+        <div
+          class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 reveal transition-transform hover:-translate-y-2 group hover:border-brandBlue/30">
+          <div
+            class="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center mb-6">
             <span class="material-symbols-outlined text-3xl ms-fitur">location_on</span>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">Info &amp; About Us</h3>
-          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Informasi lengkap yayasan: alamat, kontak person, peta lokasi interaktif, dan visi misi organisasi.</p>
+          <h3
+            class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brandBlue transition-colors">
+            Info &amp; About Us</h3>
+          <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Informasi lengkap : alamat, kontak
+            person, peta lokasi interaktif, dan visi misi organisasi.</p>
         </div>
 
-        <div class="signin-card bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-600 reveal transition-transform hover:-translate-y-2 flex flex-col justify-between hover:border-brandBlue/30">
+        <div
+          class="signin-card bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-600 reveal transition-transform hover:-translate-y-2 flex flex-col justify-between hover:border-brandBlue/30">
           <div>
-            <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-700 text-brandBlue dark:text-blue-400 flex items-center justify-center mb-6">
+            <div
+              class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-700 text-brandBlue dark:text-blue-400 flex items-center justify-center mb-6">
               <span class="material-symbols-outlined text-3xl ms-fitur">lock_open</span>
             </div>
             <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Sign In</h3>
-            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Masuk sebagai pengurus atau admin untuk mengakses fitur input dan pengelolaan data Generus.</p>
+            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Masuk sebagai pengurus atau admin
+              untuk mengakses fitur input dan pengelolaan data Generus.</p>
           </div>
-          <a href="features/login/login.html" class="btn-signin-card w-full py-3 bg-brandBlue hover:bg-brandDarkBlue dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors">
+          <a href="features/login/login.html"
+            class="btn-signin-card w-full py-3 bg-brandBlue hover:bg-brandDarkBlue dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-colors">
             Masuk Sekarang
             <span class="material-symbols-outlined text-[18px]">login</span>
           </a>
@@ -523,41 +705,72 @@
     <div class="container mx-auto px-4 lg:px-8">
       <div class="flex flex-col lg:flex-row gap-12 items-center">
         <div class="w-full lg:w-1/2 reveal">
-          <span class="inline-block px-3 py-1 bg-brandBlue/30 text-blue-200 border border-brandBlue/50 text-sm font-bold rounded-full mb-6">Tentang Kami</span>
-          <h2 class="text-3xl md:text-4xl font-extrabold mb-6 font-serif leading-tight">Yayasan Penggerak<br />Pembina Generus</h2>
+          <span
+            class="inline-block px-3 py-1 bg-brandBlue/30 text-blue-200 border border-brandBlue/50 text-sm font-bold rounded-full mb-6">Tentang
+            Kami</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-6 font-serif leading-tight">Penggerak<br />Pembina
+            Generus</h2>
           <p class="text-blue-100 text-lg mb-8 leading-relaxed">
             Berdiri sejak <strong class="text-white">2010</strong> di Surakarta, Jawa Tengah, kami berkomitmen
             membina generasi muda dengan nilai-nilai Islam yang kuat dan karakter mulia &mdash;
             dari usia PAUD hingga remaja pra-nikah.
           </p>
-          <div class="space-y-4">
-            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-              <div class="w-12 h-12 rounded-full bg-brandBlue flex items-center justify-center text-white">
-                <span class="material-symbols-outlined ms-contact">mail</span>
+          <div class="flex flex-row gap-3 md:gap-4 flex-wrap">
+            <a href="mailto:ppgsoloselatan@gmail.com"
+              class="flex items-center gap-3 bg-white/5 p-3 md:p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors flex-1 md:flex-none justify-center md:justify-start">
+              <div
+                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-brandBlue flex items-center justify-center text-white shrink-0">
+                <span class="material-symbols-outlined ms-contact text-xl md:text-2xl">mail</span>
               </div>
-              <div>
-                <div class="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">Email</div>
-                <a href="mailto:ppgsoloselatan@gmail.com" class="font-bold hover:text-brandGold transition-colors">ppgsoloselatan@gmail.com</a>
+              <div class="hidden md:block">
+                <div class="text-[10px] md:text-xs text-blue-200 font-semibold uppercase tracking-wider mb-0.5 md:mb-1">
+                  Email</div>
+                <div class="text-sm md:text-base font-bold hover:text-brandGold transition-colors truncate">
+                  ppgsoloselatan@gmail.com</div>
               </div>
-            </div>
-            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-              <div class="w-12 h-12 rounded-full bg-brandBlue flex items-center justify-center text-white">
-                <span class="material-symbols-outlined ms-contact">photo_camera</span>
+            </a>
+
+            <a href="https://instagram.com/tamanmedia.id" target="_blank" rel="noopener"
+              class="flex items-center gap-3 bg-white/5 p-3 md:p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors flex-1 md:flex-none justify-center md:justify-start">
+              <div
+                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-brandBlue flex items-center justify-center text-white shrink-0">
+                <span class="material-symbols-outlined ms-contact text-xl md:text-2xl">photo_camera</span>
               </div>
-              <div>
-                <div class="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">Instagram</div>
-                <a href="https://instagram.com/tamanmedia.id" target="_blank" rel="noopener" class="font-bold hover:text-brandGold transition-colors">@tamanmedia.id</a>
+              <div class="hidden md:block">
+                <div class="text-[10px] md:text-xs text-blue-200 font-semibold uppercase tracking-wider mb-0.5 md:mb-1">
+                  Instagram</div>
+                <div class="text-sm md:text-base font-bold hover:text-brandGold transition-colors truncate">
+                  @tamanmedia.id</div>
               </div>
-            </div>
-            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-              <div class="w-12 h-12 rounded-full bg-brandBlue flex items-center justify-center text-white">
-                <span class="material-symbols-outlined ms-contact">location_on</span>
+            </a>
+
+            <a href="https://Telegram" target="_blank" rel="noopener"
+              class="flex items-center gap-3 bg-white/5 p-3 md:p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors flex-1 md:flex-none justify-center md:justify-start">
+              <div
+                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-brandBlue flex items-center justify-center text-white shrink-0">
+                <span class="material-symbols-outlined ms-contact text-xl md:text-2xl">phone_in_talk</span>
               </div>
-              <div>
-                <div class="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">Lokasi</div>
-                <div class="font-bold">Surakarta, Jawa Tengah</div>
+              <div class="hidden md:block">
+                <div class="text-[10px] md:text-xs text-blue-200 font-semibold uppercase tracking-wider mb-0.5 md:mb-1">
+                  Telegram</div>
+                <div class="text-sm md:text-base font-bold hover:text-brandGold transition-colors truncate">
+                  @tamanmedia.id</div>
               </div>
-            </div>
+            </a>
+
+            <a href="https://facebook.com" target="_blank" rel="noopener"
+              class="flex items-center gap-3 bg-white/5 p-3 md:p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors flex-1 md:flex-none justify-center md:justify-start">
+              <div
+                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-brandBlue flex items-center justify-center text-white shrink-0">
+                <span class="material-symbols-outlined ms-contact text-xl md:text-2xl">Bolt</span>
+              </div>
+              <div class="hidden md:block">
+                <div class="text-[10px] md:text-xs text-blue-200 font-semibold uppercase tracking-wider mb-0.5 md:mb-1">
+                  Facebook</div>
+                <div class="text-sm md:text-base font-bold hover:text-brandGold transition-colors truncate">
+                  @ppgsoloselatan</div>
+              </div>
+            </a>
           </div>
         </div>
         <div class="w-full lg:w-1/2 reveal-right">
@@ -588,7 +801,8 @@
           <a href="#program-kerja" class="hover:text-white transition-colors">Program Kerja</a>
           <a href="#jenjang" class="hover:text-white transition-colors">Jenjang</a>
           <a href="#fitur" class="hover:text-white transition-colors">Fitur</a>
-          <a href="features/login/login.html" id="footerSignIn" class="text-brandGold hover:text-yellow-300 transition-colors">Sign In</a>
+          <a href="features/login/login.html" id="footerSignIn"
+            class="text-brandGold hover:text-yellow-300 transition-colors">Sign In</a>
         </div>
       </div>
       <div class="text-center text-xs opacity-60 pt-8 border-t border-brandBlue/20">
@@ -598,91 +812,86 @@
   </footer>
 
   <!-- PWA Install Button -->
-  <div class="fixed bottom-0 left-0 w-full bg-brandBlue text-white p-4 transform translate-y-full transition-transform duration-500 z-50 flex justify-between items-center shadow-[0_-10px_40px_rgba(26,86,196,0.3)]" id="pwaInstallBar">
+  <div
+    class="fixed bottom-0 left-0 w-full bg-brandBlue text-white p-4 transform translate-y-full transition-transform duration-500 z-50 flex justify-between items-center shadow-[0_-10px_40px_rgba(26,86,196,0.3)]"
+    id="pwaInstallBar">
     <div class="flex items-center gap-4 max-w-4xl mx-auto w-full">
       <img src="src/image/icon-192.png" alt="Icon App" class="w-10 h-10 rounded-lg shadow-md" />
       <div class="flex-1">
         <div class="font-bold text-sm">Install Aplikasi Generus</div>
         <div class="text-xs opacity-80">Akses lebih cepat dari layar utama HP Anda</div>
       </div>
-      <button class="bg-white text-brandBlue px-4 py-2 rounded-full font-bold text-sm shadow-md" id="pwaInstallBtn">Install</button>
-      <button class="text-white/60 hover:text-white text-2xl px-2" id="pwaDismissBtn" aria-label="Tutup">&times;</button>
+      <button class="bg-white text-brandBlue px-4 py-2 rounded-full font-bold text-sm shadow-md"
+        id="pwaInstallBtn">Install</button>
+      <button class="text-white/60 hover:text-white text-2xl px-2" id="pwaDismissBtn"
+        aria-label="Tutup">&times;</button>
     </div>
   </div>
 
   <!-- MODAL POPUP RINCIAN JENJANG PER DESA -->
-  <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300" id="modalJenjangDetail" style="display:none;">
-    <div class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700" id="mjCard">
+  <div
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"
+    id="modalJenjangDetail" style="display:none;">
+    <div
+      class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md max-h-full flex flex-col shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700"
+      id="mjCard">
+
       <!-- Header -->
-      <div class="bg-slate-50 dark:bg-slate-900/50 p-6 flex items-start justify-between border-b border-slate-100 dark:border-slate-700">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-brandBlue text-white flex items-center justify-center shadow-md" id="mjIconWrapper">
-            <span class="material-symbols-outlined text-2xl" id="mjIcon">school</span>
+      <div class="p-6 pb-5 flex items-start justify-between shrink-0">
+        <div class="flex gap-4 items-start">
+          <div
+            class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-slate-700/50 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0 mt-1"
+            id="mjIconWrapper">
+            <div id="mjIcon"></div>
           </div>
           <div>
-            <div class="text-xs font-bold text-brandBlue dark:text-brandGold mb-1" id="mjBadge">Kategori Generus</div>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white" id="mjTitle">Kategori: PAUD</h3>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white leading-tight" id="mjTitle">Kategori GP Reguler
+              (SMP-SMA)</h3>
+            <div class="text-sm text-slate-600 dark:text-slate-400 mt-1" id="mjBadge">Siswa SMP-SMA (13-18 Tahun) &bull;
+              Solo Selatan</div>
           </div>
         </div>
-        <button class="text-slate-400 hover:text-red-500 bg-slate-200/50 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/30 w-8 h-8 rounded-full flex items-center justify-center transition-colors" id="btnCloseMj" aria-label="Tutup">&times;</button>
       </div>
 
-      <!-- Summary -->
-      <div class="p-6 bg-brandBlue dark:bg-brandDarkBlue text-white" id="mjSummary">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-sm opacity-80">Total Generus di Kategori Ini</span>
-          <span class="text-2xl font-extrabold" id="mjTotalCount">95</span>
-        </div>
-        <div class="text-xs bg-white/20 inline-block px-2 py-1 rounded backdrop-blur-sm" id="mjScope">Solo Selatan (5 Desa &bull; 27 Kelompok)</div>
-      </div>
-
-      <!-- Body -->
-      <div class="p-6 max-h-[50vh] overflow-y-auto">
-        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-brandBlue dark:text-blue-400">location_city</span>
-          Rincian Distribusi di 5 Desa:
-        </h4>
-        <div class="space-y-3" id="mjDesaGrid">
-          <!-- Rendered by JS -->
-        </div>
+      <!-- Summary & Body Injection Point -->
+      <div id="mjBody" class="flex-1 overflow-y-auto min-h-0">
+        <!-- Injected via JS -->
       </div>
 
       <!-- Footer -->
-      <div class="p-6 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-        <span class="text-[10px] text-slate-400 font-medium">Data terpusat PPG Solo Selatan</span>
-        <button type="button" class="bg-brandBlue hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold text-sm transition-colors shadow-md" id="btnOkMj">Tutup</button>
+      <div class="p-6 pt-5 bg-white dark:bg-slate-800 flex justify-between items-center shrink-0">
+        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Data terpusat PPG Solo Selatan</span>
+        <button type="button"
+          class="text-brandBlue dark:text-blue-400 font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+          id="btnOkMj">Kembali</button>
       </div>
     </div>
   </div>
 
-  <!-- FLOATING DARK MODE TOGGLE -->
-  <button id="darkModeToggle" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-lg border border-slate-200 dark:border-slate-700 text-brandBlue dark:text-brandGold flex items-center justify-center hover:scale-110 transition-transform duration-300" aria-label="Toggle Dark Mode">
-    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-    <span class="material-symbols-outlined hidden dark:block">light_mode</span>
-  </button>
+  <!-- FLOATING DARK MODE TOGGLE MOVED TO NAVBAR -->
 
   <script>
     // Dark mode logic
     const themeToggleBtn = document.getElementById('darkModeToggle');
-    
+
     // Set theme on load based on user preference or time of day (petang)
     function setThemeOnLoad() {
       if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       } else {
-        // Time based check (6 PM to 6 AM is dark)
+        // Time based check (17:00 to 06:00 is dark)
         const hour = new Date().getHours();
-        if (hour >= 18 || hour < 6) {
-           document.documentElement.classList.add('dark');
+        if (hour >= 17 || hour < 6) {
+          document.documentElement.classList.add('dark');
         } else {
-           document.documentElement.classList.remove('dark');
+          document.documentElement.classList.remove('dark');
         }
       }
     }
-    
+
     setThemeOnLoad();
 
-    themeToggleBtn.addEventListener('click', function() {
+    themeToggleBtn.addEventListener('click', function () {
       if (document.documentElement.classList.contains('dark')) {
         document.documentElement.classList.remove('dark');
         localStorage.theme = 'light';
@@ -696,25 +905,25 @@
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.target.id === 'modalJenjangDetail' && mutation.attributeName === 'style') {
-           const modal = mutation.target;
-           const card = document.getElementById('mjCard');
-           if (modal.style.display !== 'none') {
-             // It's opening
-             modal.style.display = 'flex'; // override js 'block' to keep flex centering
-             setTimeout(() => {
-               modal.classList.remove('opacity-0', 'pointer-events-none');
-               if(card) card.classList.remove('scale-95');
-             }, 10);
-           } else {
-             // It's closing
-             modal.classList.add('opacity-0', 'pointer-events-none');
-             if(card) card.classList.add('scale-95');
-           }
+          const modal = mutation.target;
+          const card = document.getElementById('mjCard');
+          if (modal.style.display !== 'none') {
+            // It's opening
+            modal.style.display = 'flex'; // override js 'block' to keep flex centering
+            setTimeout(() => {
+              modal.classList.remove('opacity-0', 'pointer-events-none');
+              if (card) card.classList.remove('scale-95');
+            }, 10);
+          } else {
+            // It's closing
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            if (card) card.classList.add('scale-95');
+          }
         }
       });
     });
     const mjModal = document.getElementById('modalJenjangDetail');
-    if(mjModal) observer.observe(mjModal, { attributes: true });
+    if (mjModal) observer.observe(mjModal, { attributes: true });
 
   </script>
 

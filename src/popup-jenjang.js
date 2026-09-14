@@ -199,186 +199,147 @@ export function bukaModal(key) {
   const elIcon = document.getElementById("mjIcon");
   const elBadge = document.getElementById("mjBadge");
   const elTitle = document.getElementById("mjTitle");
-  const elTotal = document.getElementById("mjTotalCount");
-  const elSum = document.getElementById("mjSummary");
-  const elGrid = document.getElementById("mjDesaGrid");
+  const elBody = document.getElementById("mjBody");
+  const elIconWrapper = document.getElementById("mjIconWrapper");
 
   // Icon & Header
   if (elIcon) {
     elIcon.innerHTML = `<span class="material-symbols-outlined" style="font-size:28px;color:${cfg.color};">${cfg.icon}</span>`;
   }
+  if (elIconWrapper) {
+    elIconWrapper.style.backgroundColor = cfg.color + "20"; // 20% opacity of the color
+  }
   if (elBadge) {
-    elBadge.innerHTML = `${cfg.tier} &bull; ${cfg.usia}`;
-    elBadge.style.color = cfg.color;
+    elBadge.innerHTML = (isWilayah && key === "desa") ? `5 Desa Binaan &bull; Solo Selatan` 
+                      : (isWilayah && key === "kelompok") ? `27 Kelompok Binaan &bull; Solo Selatan`
+                      : (key === "all") ? `Data Terpusat &bull; Solo Selatan`
+                      : `${cfg.usia} &bull; Solo Selatan`;
   }
   if (elTitle) {
-    elTitle.textContent = cfg.name;
-  }
-  if (elTotal) {
-    elTotal.textContent = isWilayah
-      ? (key === "desa" ? "5 Desa Binaan" : "27 Kelompok Binaan")
-      : `${total.toLocaleString("id-ID")} Generus Terdaftar`;
-    elTotal.style.color = cfg.color;
+    elTitle.textContent = isWilayah ? (key === "desa" ? "Struktur Wilayah Desa" : "Struktur Wilayah Kelompok") 
+                        : (key === "all") ? "Semua Kategori Generus" 
+                        : cfg.name;
   }
 
-  // Summary Section
-  if (elSum) {
-    if (isWilayah) {
-      elSum.innerHTML = `
-        <div class="mj-sum-item">
-          <span class="mj-sum-label">Struktur Wilayah PPG Solo Selatan</span>
-          <span class="mj-sum-val" style="color:${cfg.color};">${key === "desa" ? "5 Desa Binaan" : "27 Kelompok Binaan"}</span>
-          <span style="font-size:12px;color:var(--text-muted);margin-top:4px;">Terintegrasi dengan basis data generus &amp; absensi KBM</span>
-        </div>
-        <div class="mj-sum-badge">Wilayah Resmi Solo Selatan</div>
-      `;
-    } else if (key === "all") {
-      // Ringkasan Cepat Seluruh Kategori
-      elSum.innerHTML = `
-        <div style="width:100%;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-            <div>
-              <span class="mj-sum-label">Total Generus Terdata di Database</span>
-              <span class="mj-sum-val" style="color:${cfg.color};">${total.toLocaleString("id-ID")} Generus</span>
-            </div>
-            <div class="mj-sum-badge">Real-time Database PPG Solo Selatan</div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px;margin-bottom:12px;">
-            <div style="background:#fff;border:1px solid #fed7aa;border-radius:10px;padding:8px 12px;">
-              <div style="font-size:11px;font-weight:700;color:#c2410c;">Caberawit (PAUD-SD)</div>
-              <div style="font-size:18px;font-weight:800;color:#ea580c;">${stat.cabCount} <span style="font-size:11px;font-weight:600;color:#78716c;">(${total > 0 ? Math.round(stat.cabCount / total * 100) : 0}%)</span></div>
-            </div>
-            <div style="background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 12px;">
-              <div style="font-size:11px;font-weight:700;color:#1d4ed8;">GP Reguler (SMP-SMA)</div>
-              <div style="font-size:18px;font-weight:800;color:#2563eb;">${stat.gpCount} <span style="font-size:11px;font-weight:600;color:#78716c;">(${total > 0 ? Math.round(stat.gpCount / total * 100) : 0}%)</span></div>
-            </div>
-            <div style="background:#fff;border:1px solid #bbf7d0;border-radius:10px;padding:8px 12px;">
-              <div style="font-size:11px;font-weight:700;color:#15803d;">Remaja &amp; Pra-Nikah</div>
-              <div style="font-size:18px;font-weight:800;color:#16a34a;">${stat.remCount} <span style="font-size:11px;font-weight:600;color:#78716c;">(${total > 0 ? Math.round(stat.remCount / total * 100) : 0}%)</span></div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:12px;">
-            <span style="min-width:68px;color:#1d4ed8;font-weight:700;">&#128102; ${lCount} Putra</span>
-            <div style="flex:1;height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;display:flex;">
-              <div style="width:${lPct}%;background:#3b82f6;" title="Putra: ${lPct}%"></div>
-              <div style="width:${pPct}%;background:#ec4899;" title="Putri: ${pPct}%"></div>
-            </div>
-            <span style="min-width:68px;color:#be185d;font-weight:700;text-align:right;">&#128103; ${pCount} Putri</span>
-          </div>
-        </div>
-      `;
-    } else {
-      // Kategori atau Jenjang Spesifik
-      let genderBar = "";
-      if (total > 0) {
-        genderBar = `
-          <div style="margin-top:8px;">
-            <div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:4px;">
-              <span style="min-width:64px;color:#1d4ed8;font-weight:700;">&#128102; ${lCount} Putra</span>
-              <div style="flex:1;height:7px;background:#e8efff;border-radius:99px;overflow:hidden;">
-                <div style="width:${lPct}%;height:100%;background:#3b82f6;border-radius:99px;"></div>
-              </div>
-              <span style="font-size:11px;color:var(--text-muted);">${lPct}%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
-              <span style="min-width:64px;color:#be185d;font-weight:700;">&#128103; ${pCount} Putri</span>
-              <div style="flex:1;height:7px;background:#fce7f3;border-radius:99px;overflow:hidden;">
-                <div style="width:${pPct}%;height:100%;background:#ec4899;border-radius:99px;"></div>
-              </div>
-              <span style="font-size:11px;color:var(--text-muted);">${pPct}%</span>
-            </div>
-          </div>
-        `;
-      } else {
-        genderBar = `<p style="font-size:12px;color:var(--text-muted);margin:4px 0 0;">Belum ada generus terdaftar di jenjang ini.</p>`;
-      }
+  // Body Content (Summary + Distribution)
+  let html = "";
 
-      elSum.innerHTML = `
-        <div class="mj-sum-item">
-          <span class="mj-sum-label">Total Generus di Kategori Ini</span>
-          <span class="mj-sum-val" style="color:${cfg.color};">${total.toLocaleString("id-ID")} Generus</span>
-          ${genderBar}
+  // 1. Summary Block (Solid Blue)
+  html += `
+    <div class="bg-brandBlue dark:bg-brandDarkBlue text-white p-6 pb-8 text-center relative overflow-hidden">
+      <!-- Subtle Background Detail -->
+      <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+      
+      <div class="relative z-10">
+        <h4 class="font-semibold text-sm opacity-90 mb-1">Ringkasan</h4>
+        <div class="text-5xl font-extrabold mb-1 tracking-tight">${total.toLocaleString("id-ID")}</div>
+        <div class="text-sm opacity-80 font-medium">${isWilayah ? "Total Wilayah" : "Total Generus"}</div>
+      </div>
+    </div>
+  `;
+
+  // 2. Gender Breakdown (if not wilayah and total > 0)
+  if (!isWilayah && total > 0) {
+    html += `
+      <div class="p-6 pb-2">
+        <h4 class="text-base font-bold text-slate-800 dark:text-white mb-4">Rincian Generus</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Putra -->
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
+                <span class="text-xl">&#128102;</span>
+              </div>
+              <div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Putra</div>
+                <div class="font-bold text-slate-800 dark:text-white text-sm">${lCount} Putra</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="h-1.5 flex-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full" style="width: ${lPct}%"></div>
+              </div>
+              <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 w-6">${lPct}%</span>
+            </div>
+          </div>
+          <!-- Putri -->
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center shrink-0">
+                <span class="text-xl">&#128103;</span>
+              </div>
+              <div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Putri</div>
+                <div class="font-bold text-slate-800 dark:text-white text-sm">${pCount} Putri</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="h-1.5 flex-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full bg-pink-500 rounded-full" style="width: ${pPct}%"></div>
+              </div>
+              <span class="text-[10px] font-bold text-pink-600 dark:text-pink-400 w-6">${pPct}%</span>
+            </div>
+          </div>
         </div>
-        <div class="mj-sum-badge">Solo Selatan &bull; 5 Desa &bull; 27 Kelompok</div>
-      `;
-    }
+      </div>
+    `;
+  } else if (!isWilayah) {
+    html += `
+      <div class="p-6 pb-2 text-center text-sm text-slate-500 dark:text-slate-400">
+        Belum ada data terdaftar di jenjang ini.
+      </div>
+    `;
   }
 
-  // Grid Distribusi Desa & Kelompok
-  if (elGrid) {
-    if (isWilayah) {
-      elGrid.innerHTML = (MASTER_WILAYAH.desa || []).map(function(desa) {
-        const pills = (desa.kelompok || []).map(function(k) {
-          return `<span class="mj-kel-pill">${k.nama}</span>`;
-        }).join("");
+  // 3. Desa / Kelompok Distribution Grid
+  html += `<div class="p-6 pt-4">`;
+  
+  // Memulai satu kesatuan kartu dengan garis pemisah (divide-y)
+  html += `<div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60 rounded-xl overflow-hidden divide-y divide-slate-200/60 dark:divide-slate-700/60">`;
 
-        return `
-          <div class="mj-desa-card">
-            <div class="mj-desa-header">
-              <div class="mj-desa-name">
-                <span class="material-symbols-outlined" style="font-size:16px;color:${cfg.color};">location_city</span>
-                <span>Desa ${desa.nama}</span>
-              </div>
-              <div class="mj-desa-count" style="color:${cfg.color};">${desa.kelompok.length} Kelompok</div>
-            </div>
-            <div class="mj-kelompok-list">${pills}</div>
-          </div>
-        `;
+  if (isWilayah) {
+    html += (MASTER_WILAYAH.desa || []).map(function(desa) {
+      const pills = (desa.kelompok || []).map(function(k) {
+        return `<span class="inline-block bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 mr-1.5 mb-1.5">&bull; ${k.nama}</span>`;
       }).join("");
 
-    } else if (desaSt.length === 0) {
-      elGrid.innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:30px 16px;background:var(--surface-2);border-radius:12px;border:1px dashed var(--border);">
-          <span class="material-symbols-outlined" style="font-size:32px;color:var(--text-muted);display:block;margin-bottom:6px;">folder_open</span>
-          <strong>Belum Ada Data Terdaftar</strong>
-          <p style="font-size:12px;margin:4px 0 0;">Generus pada jenjang/kategori ini belum ditambahkan ke database.</p>
+      return `
+        <div class="p-4 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-700/30 transition-colors">
+          <div class="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">location_city</span>
+            Desa ${desa.nama} <span class="font-normal text-slate-500 text-xs">(${desa.kelompok.length} Kelompok)</span>
+          </div>
+          <div>${pills}</div>
         </div>
       `;
-    } else {
-      const maxCount = Math.max.apply(null, desaSt.map(function(d) { return d.total; })) || 1;
+    }).join("");
+  } else if (desaSt.length > 0) {
+    html += desaSt.map(function(desa) {
+      const kDisplay = desa.kelompokStats.length > 0
+        ? desa.kelompokStats.map(function(k) {
+            return `<span class="text-[11.5px] text-slate-600 dark:text-slate-400 mr-2 mb-1 inline-block">&bull; ${k.nama} <span class="opacity-60">(${k.count})</span></span>`;
+          }).join("")
+        : `<span class="text-[11px] text-slate-400 italic">Belum ada data</span>`;
 
-      elGrid.innerHTML = desaSt.map(function(desa) {
-        const barPct = Math.round((desa.total / maxCount) * 100);
-        const kDisplay = desa.kelompokStats.length > 0
-          ? desa.kelompokStats.map(function(k) {
-              return `<span class="mj-kel-pill"><strong>${k.nama}</strong> (${k.count})</span>`;
-            }).join("")
-          : `<span style="font-size:10.5px;color:var(--text-muted);font-style:italic;">Belum ada data terdaftar</span>`;
-
-        // Daftar nama generus ringkas (maks 6 nama) jika jenjang spesifik
-        let namaPreview = "";
-        if (!KATEGORI_UTAMA.includes(key) && desa.siswa.length > 0) {
-          const names = desa.siswa.slice(0, 5).map(function(s) {
-            return `<span style="font-size:11px;background:#fff;border:1px solid #e2e8f0;padding:2px 6px;border-radius:4px;color:#334155;">${s.nama_lengkap} (${s.jenis_kelamin})</span>`;
-          }).join(" ");
-          const moreText = desa.siswa.length > 5 ? `<span style="font-size:11px;color:var(--blue);font-weight:600;">+${desa.siswa.length - 5} lainnya</span>` : "";
-          namaPreview = `
-            <div style="margin-top:6px;padding-top:6px;border-top:1px dashed #e2e8f0;">
-              <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;">Daftar Generus:</div>
-              <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">${names} ${moreText}</div>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="mj-desa-card">
-            <div class="mj-desa-header">
-              <div class="mj-desa-name">
-                <span class="material-symbols-outlined" style="font-size:16px;color:${cfg.color};">location_city</span>
-                <span>Desa ${desa.nama}</span>
-              </div>
-              <div class="mj-desa-count" style="color:${cfg.color};">${desa.total} Generus</div>
-            </div>
-            <div style="height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:4px 0;">
-              <div style="width:${barPct}%;height:100%;background:${cfg.color};border-radius:99px;"></div>
-            </div>
-            <div class="mj-kelompok-list">${kDisplay}</div>
-            ${namaPreview}
+      return `
+        <div class="p-4 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-700/30 transition-colors">
+          <div class="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">location_city</span>
+            Desa ${desa.nama} <span class="font-normal text-slate-500 text-xs">(${desa.total} Generus)</span>
           </div>
-        `;
-      }).join("");
-    }
+          <div class="pl-6 ml-2">${kDisplay}</div>
+        </div>
+      `;
+    }).join("");
   }
+
+  html += `</div>`; // akhir dari satu kesatuan kartu
+  html += `</div>`; // akhir padding wrapper
+  
+  if (elBody) {
+    elBody.innerHTML = html;
+  }
+
 
   // Tampilkan Modal
   modal.style.display = "flex";

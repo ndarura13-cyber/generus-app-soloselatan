@@ -196,31 +196,40 @@ function renderProker() {
     ` : '';
 
     return `
-      <div class="proker-item">
+      <div class="proker-item group/proker" data-expanded="false">
         <div class="proker-dot ${statusClass}"></div>
         <div class="proker-content">
-          <div class="proker-row-header">
-            <div class="proker-title">
+          <div class="proker-row-header cursor-pointer md:cursor-default flex items-center justify-between" onclick="if(window.innerWidth < 768) { this.closest('.proker-item').dataset.expanded = this.closest('.proker-item').dataset.expanded === 'true' ? 'false' : 'true'; }">
+            <div class="proker-title flex-1 pr-2">
               <span style="color:var(--blue);margin-right:4px;">${item.no || globalIndex}.</span> ${item.kegiatan}
             </div>
-            <span class="proker-status-badge ${statusClass}">
-              <span class="dot ${statusClass}"></span>
-              <span>${statusLabel}</span>
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="proker-status-badge ${statusClass}">
+                <span class="dot ${statusClass}"></span>
+                <span>${statusLabel}</span>
+              </span>
+              <!-- Chevron arrow for mobile accordion -->
+              <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 20px;">
+                chevron_right
+              </span>
+            </div>
           </div>
-          <div class="proker-meta">
-            <span class="proker-meta-item">
-              <span class="material-symbols-outlined ms-proker-ic">calendar_today</span>
-              <span>${item.waktu}</span>
-            </span>
-            ${tempatHtml}
-            <span class="proker-meta-sep">&bull;</span>
-            <span class="proker-meta-item">
-              <span class="material-symbols-outlined ms-proker-ic">group</span>
-              <span>${item.sasaran}</span>
-            </span>
+          <!-- Details (hidden on mobile unless expanded) -->
+          <div class="proker-details hidden md:block mt-3 md:mt-0">
+            <div class="proker-meta">
+              <span class="proker-meta-item">
+                <span class="material-symbols-outlined ms-proker-ic">calendar_today</span>
+                <span>${item.waktu}</span>
+              </span>
+              ${tempatHtml}
+              <span class="proker-meta-sep">&bull;</span>
+              <span class="proker-meta-item">
+                <span class="material-symbols-outlined ms-proker-ic">group</span>
+                <span>${item.sasaran}</span>
+              </span>
+            </div>
+            ${tujuanHtml}
           </div>
-          ${tujuanHtml}
         </div>
       </div>
     `;
