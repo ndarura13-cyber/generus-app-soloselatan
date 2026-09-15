@@ -1151,16 +1151,32 @@ export async function updatePengurus(pengurusId, updateData) {
     list[idx].password = updateData.password;
   }
 
+  savePengurusList(list);
+
   if (isSupabaseConfigured()) {
-    const res = await upsertPengurusToSupabase(list[idx]);
-    if (res.success && res.data) {
-      list[idx] = { ...list[idx], ...res.data };
-    } else {
-      return { success: false, message: res.error || res.message };
+    try {
+      const dbPayload = {
+        nama: list[idx].nama,
+        email: list[idx].email,
+        no_wa: list[idx].noWa,
+        tingkatan: list[idx].tingkatan,
+        peran: list[idx].peran,
+        jabatan: list[idx].jabatan,
+        desa_id: list[idx].desaId,
+        desa_nama: list[idx].desaNama,
+        kelompok_id: list[idx].kelompokId,
+        kelompok_nama: list[idx].kelompokNama,
+        is_active: list[idx].isActive,
+        updated_at: list[idx].updatedAt
+      };
+      if (list[idx].password) dbPayload.password = list[idx].password; 
+      
+      const { error } = await supabase.from('pengurus').update(dbPayload).eq('id', pengurusId);
+      if (error) console.error('Supabase updatePengurus error:', error);
+    } catch (e) {
+      console.error('Supabase error:', e);
     }
   }
-
-  savePengurusList(list);
 
   try {
     const rawSession = localStorage.getItem("ppg_user_session");
@@ -1185,7 +1201,7 @@ export async function updatePengurus(pengurusId, updateData) {
 }
 
 // Update Profil Pengurus yang Sedang Bertugas (Self Edit Profile)
-export function updateCurrentProfile(userId, profileData) {
+export async function updateCurrentProfile(userId, profileData) {
   const list = getPengurusList();
   const idx = list.findIndex(p => p.id === userId || p.email === profileData.email);
   const roleName = profileData.peran || profileData.jabatan || (idx !== -1 ? list[idx].peran : undefined) || "Pengurus";
@@ -1205,6 +1221,31 @@ export function updateCurrentProfile(userId, profileData) {
     }
     list[idx].updatedAt = new Date().toISOString();
     savePengurusList(list);
+
+    // Sync to Supabase
+    if (isSupabaseConfigured()) {
+      try {
+        const dbPayload = {
+          nama: list[idx].nama,
+          email: list[idx].email,
+          no_wa: list[idx].noWa,
+          peran: list[idx].peran,
+          jabatan: list[idx].jabatan,
+          desa_id: list[idx].desaId,
+          desa_nama: list[idx].desaNama,
+          kelompok_id: list[idx].kelompokId,
+          kelompok_nama: list[idx].kelompokNama,
+          updated_at: list[idx].updatedAt
+        };
+        if (list[idx].password) {
+           dbPayload.password = list[idx].password; 
+        }
+        
+        await supabase.from('pengurus').update(dbPayload).eq('id', list[idx].id);
+      } catch (e) {
+        console.error('Supabase updateCurrentProfile error:', e);
+      }
+    }
   }
 
   // Update session

@@ -284,7 +284,7 @@ export function renderSelfProfileModal() {
     }
   });
 
-  document.getElementById('formSelfProfile')?.addEventListener('submit', (e) => {
+  document.getElementById('formSelfProfile')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const newNama = document.getElementById('profNama').value.trim();
     const newEmail = document.getElementById('profEmail').value.trim();
@@ -295,7 +295,7 @@ export function renderSelfProfileModal() {
     const selectedKelOption = profKelompok.options[profKelompok.selectedIndex];
     const newPassword = document.getElementById('profPassword').value;
 
-    const res = updateCurrentProfile(currentUser.id, {
+    const res = await updateCurrentProfile(currentUser.id, {
       email: newEmail,
       nama: newNama,
       noWa: newNoWa,
@@ -334,6 +334,7 @@ export function renderSelfProfileModal() {
   });
 }
 
+document.getElementById('btnEditProfileDesktop')?.addEventListener('click', renderSelfProfileModal);
 btnEditProfile?.addEventListener('click', renderSelfProfileModal);
 
 /* ── 3. Logout Confirmation ────────────────────────────────── */
@@ -547,20 +548,37 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
 })();
 
 /* ── 7. Initial Application Boot & Rendering ──────────────── */
-try {
-  renderUserProfile();
-  renderDesaTabs();
-  renderKelompokGrid();
-  checkPendingApprovals();
-  updateSupabaseStatusUI();
-  syncPembiasaanFromSupabase().catch(err => console.warn('Background sync pembiasaan failed:', err));
-  syncPengurusFromSupabase().catch(err => console.warn('Background sync pengurus failed:', err));
-  syncKbmFromSupabase().catch(err => console.warn('Background sync KBM failed:', err));
-  console.log('PPG Dashboard initialized successfully.');
-} catch (err) {
-  console.error('Fatal error initializing PPG Dashboard:', err);
-}
+(async function initDashboard() {
+  try {
+    // Optimistic render using minimal localStorage cache
+    renderUserProfile();
+    renderDesaTabs();
+    renderKelompokGrid();
+    updateSupabaseStatusUI();
 
+    // Fetch live data from Supabase (minimizing reliance on localStorage)
+    console.log('Fetching live data from Supabase...');
+    await Promise.allSettled([
+      syncPengurusFromSupabase(),
+      syncPembiasaanFromSupabase(),
+      syncKbmFromSupabase()
+    ]);
+
+    // Cross-check session against live data and update UI
+    const livePengurus = getPengurusList();
+    const liveAccount = livePengurus.find(p => p.id === currentUser.id || p.email === currentUser.email);
+    
+    if (liveAccount) {
+      setCurrentUser({ ...currentUser, ...liveAccount });
+      renderUserProfile(); // Re-render with live data
+    }
+    
+    checkPendingApprovals();
+    console.log('PPG Dashboard initialized successfully with live data.');
+  } catch (err) {
+    console.error('Fatal error initializing PPG Dashboard:', err);
+  }
+})();
 // Auto-open modal based on URL query param
 try {
   const urlParams = new URLSearchParams(window.location.search);

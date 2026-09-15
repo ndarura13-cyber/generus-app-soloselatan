@@ -170,12 +170,18 @@ export function openModal(title, icon = 'info', contentOrSize = 'default', maybe
     else if (finalSize === 'medium') modalBox.classList.add('modal-medium');
     modalBox.scrollTop = 0;
   }
-  if (modalBackdrop) modalBackdrop.style.display = 'flex';
+  if (modalBackdrop) {
+    modalBackdrop.style.display = 'flex';
+    setTimeout(() => modalBackdrop.classList.add('show'), 10);
+  }
 }
 
 
 export function closeModal() {
-  modalBackdrop.style.display = 'none';
+  if (modalBackdrop) {
+    modalBackdrop.classList.remove('show');
+    setTimeout(() => { modalBackdrop.style.display = 'none'; }, 300);
+  }
 }
 
 btnCloseModal?.addEventListener('click', closeModal);
@@ -214,16 +220,25 @@ export function showConfirmModal(opts) {
   }
 
   currentConfirmCallback = opts.onConfirm || null;
-  confirmModalBackdrop.style.display = 'flex';
+  if (confirmModalBackdrop) {
+    confirmModalBackdrop.style.display = 'flex';
+    setTimeout(() => confirmModalBackdrop.classList.add('show'), 10);
+  }
 }
 
 btnConfirmCancel?.addEventListener('click', () => {
-  confirmModalBackdrop.style.display = 'none';
+  if (confirmModalBackdrop) {
+    confirmModalBackdrop.classList.remove('show');
+    setTimeout(() => { confirmModalBackdrop.style.display = 'none'; }, 300);
+  }
   currentConfirmCallback = null;
 });
 
 btnConfirmOk?.addEventListener('click', () => {
-  confirmModalBackdrop.style.display = 'none';
+  if (confirmModalBackdrop) {
+    confirmModalBackdrop.classList.remove('show');
+    setTimeout(() => { confirmModalBackdrop.style.display = 'none'; }, 300);
+  }
   if (typeof currentConfirmCallback === 'function') {
     currentConfirmCallback();
   }

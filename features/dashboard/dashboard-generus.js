@@ -286,11 +286,11 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
   const desaDistHtml = `
     <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;">
       <h4 style="margin:0 0 8px;font-size:12.5px;font-weight:800;color:var(--text);">
-        Sebaran Generus di 5 Desa Solo Selatan (${currentCat.title.split('(')[0]})
+        Sebaran Generus di 5 Desa Solo Selatan (${currentCat.title.split('(')[0].trim()})
       </h4>
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
         ${MASTER_WILAYAH.desa.map(d => {
-          const inDesa = currentCat.list.filter(s => s.desa_id === d.id);
+          const inDesa = currentCat.list.filter(s => s.desa_id === d.id || (s.desa_nama && d.nama && s.desa_nama.toLowerCase() === d.nama.toLowerCase()));
           return `
             <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
               <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Desa ${d.nama}</div>

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Pengurus – PPG Solo Selatan</title>
   <meta name="description" content="Dashboard Pengurus & Admin PPG Solo Selatan." />
 
-  <!-- Security & Authentication Gatekeeper (Anti-Bypass URL Guard) -->
+  <!-- Security & Authentication Gatekeeper -->
   <script>
     (function() {
       try {
@@ -30,404 +29,493 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="dashboard.css?v=4.2" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
+  <link rel="stylesheet" href="dashboard.css?v=4.6" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            brandBlue: '#1a56c4',
+            brandDarkBlue: '#0f3a8b',
+            brandGold: '#f59e0b',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      /* Keep existing functional classes for JS compatibility */
+      .modal-backdrop, .confirm-backdrop {
+        @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300;
+        display: none;
+      }
+      .modal-backdrop.show, .confirm-backdrop.show {
+        display: flex !important;
+        @apply opacity-100 pointer-events-auto;
+      }
+      
+      .modal-box {
+        @apply bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-full flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-300;
+      }
+      .modal-backdrop.show .modal-box {
+        @apply scale-100;
+      }
+      .modal-header {
+        @apply p-6 pb-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start shrink-0;
+      }
+      .modal-title-wrap {
+        @apply flex items-start gap-4;
+      }
+      .modal-icon-top {
+        @apply w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0 text-2xl;
+      }
+      .modal-title-wrap h3 {
+        @apply text-xl font-bold text-slate-900 dark:text-white mt-1;
+      }
+      .btn-close-modal {
+        @apply text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 text-2xl leading-none;
+      }
+      .modal-body {
+        @apply flex-1 overflow-y-auto p-6 space-y-4;
+      }
+
+      .confirm-card {
+        @apply bg-white dark:bg-slate-800 rounded-3xl w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-300;
+      }
+      .confirm-backdrop.show .confirm-card { @apply scale-100; }
+      .confirm-icon-box {
+        @apply w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center mb-4;
+      }
+      .confirm-icon-box .material-symbols-outlined { @apply text-3xl; }
+      .confirm-title { @apply text-lg font-bold text-slate-900 dark:text-white mb-2; }
+      .confirm-message { @apply text-sm text-slate-600 dark:text-slate-400 mb-6; }
+      .confirm-actions { @apply flex w-full gap-3; }
+      .btn-confirm-no { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors; }
+      .btn-confirm-yes { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors; }
+
+      /* Drawer Logic */
+      #dashDrawerOverlay {
+        @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300;
+      }
+      #dashDrawerOverlay.visible {
+        @apply opacity-100 pointer-events-auto;
+      }
+      #dashDrawer {
+        @apply fixed inset-y-0 left-0 w-72 md:w-80 bg-slate-50 dark:bg-slate-900 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl;
+      }
+      #dashDrawer.open {
+        @apply translate-x-0;
+      }
+      
+      /* Active menu highlighting */
+      .desa-tabs {
+        @apply flex overflow-x-auto gap-2 pb-2;
+      }
+      .desa-tabs::-webkit-scrollbar { display: none; }
+      .btn-desa-tab {
+        @apply px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors;
+      }
+      .btn-desa-tab.active {
+        @apply bg-brandBlue text-white border-brandBlue shadow-md;
+      }
+    }
+  </style>
+
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </head>
 
-<body>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans min-h-screen">
 
   <!-- TOP NAVBAR -->
-  <header class="dash-navbar">
-    <div class="container dash-nav-inner">
-      <div class="dash-brand">
-        <img src="../../src/image/icon-192.png" alt="Logo PPG" class="dash-logo" />
-        <div>
-          <div class="dash-title">PPG Solo Selatan</div>
-          <div class="dash-sub">Portal Monitoring &amp; Database</div>
+  <header class="fixed top-0 inset-x-0 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-30 transition-colors">
+    <div class="h-full px-4 md:px-6 max-w-7xl mx-auto flex items-center justify-between">
+      
+      <div class="flex items-center gap-3">
+        <button id="dashHamburger" class="p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg md:hidden transition-colors">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <!-- Back Arrow to Landing Page (Desktop Only) -->
+        <a href="../../index.html" class="hidden md:flex p-1 -ml-1 text-slate-500 hover:text-brandBlue transition-colors md:-ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 items-center justify-center">
+          <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+        </a>
+        <img src="../../src/image/icon-192.png" alt="Logo" class="hidden md:block w-8 h-8 rounded-lg" />
+        <div class="hidden sm:block">
+          <div class="font-bold text-brandBlue dark:text-blue-400 leading-tight">PPG Solo Selatan</div>
+          <div class="text-[10px] text-slate-500 uppercase tracking-widest">Portal Monitoring</div>
         </div>
       </div>
 
-      <!-- User Profile Bar (desktop) -->
-      <div class="user-profile-bar">
-        <div class="user-avatar" id="userAvatar">
-          <span class="material-symbols-outlined">account_circle</span>
-        </div>
-        <div class="user-meta">
-          <div class="user-name" id="userName">Memuat...</div>
-          <div class="user-badge" id="userBadge">Superadmin</div>
-        </div>
-        <button class="btn-supabase-status" id="btnSupabaseStatus" title="Status & Sinkronisasi Supabase Cloud" style="background:#f8fafc;border:1.5px solid #cbd5e1;color:#334155;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:all 0.2s;">
-          <span id="supabaseStatusDot" style="width:8px;height:8px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>
-          <span id="supabaseStatusText">Supabase DB</span>
+      <!-- Desktop Nav Actions -->
+      <div class="hidden md:flex items-center gap-4">
+        <!-- Supabase Status -->
+        <button id="btnSupabaseStatus" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Status Supabase">
+          <span id="supabaseStatusDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+          <span id="supabaseStatusText" class="text-xs font-bold text-slate-600 dark:text-slate-300">Supabase DB</span>
         </button>
-        <button class="btn-edit-profile" id="btnEditProfile" title="Edit Profil Saya">
-          <span class="material-symbols-outlined" style="font-size:18px;">manage_accounts</span>
-          <span class="edit-profile-text">Profil Saya</span>
-        </button>
-        <button class="btn-logout" id="btnLogout" title="Keluar dari sesi">
-          <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
-          <span class="logout-text">Keluar</span>
+        
+        <!-- Divider -->
+        <div class="w-px h-6 bg-slate-300 dark:bg-slate-700"></div>
+
+        <!-- User Profile Dropdown / Area -->
+        <div class="flex items-center gap-3">
+          <div id="btnEditProfileDesktop" class="text-right cursor-pointer hover:opacity-75 transition-opacity" title="Edit Profil">
+            <div id="userName" class="text-sm font-bold leading-tight hover:text-brandBlue transition-colors">Memuat...</div>
+            <div id="userBadge" class="text-[10px] font-semibold text-brandBlue dark:text-blue-400">Superadmin</div>
+          </div>
+          <!-- Theme Toggle replaces Avatar -->
+          <button onclick="document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-brandBlue transition-colors flex items-center justify-center border border-slate-200 dark:border-slate-700">
+             <span class="material-symbols-outlined dark:hidden text-[20px]">dark_mode</span>
+             <span class="material-symbols-outlined hidden dark:block text-[20px]">light_mode</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Theme Toggle replaces Avatar -->
+      <div class="md:hidden flex items-center">
+        <button onclick="document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-brandBlue transition-colors flex items-center justify-center border border-slate-200 dark:border-slate-700">
+           <span class="material-symbols-outlined dark:hidden text-[20px]">dark_mode</span>
+           <span class="material-symbols-outlined hidden dark:block text-[20px]">light_mode</span>
         </button>
       </div>
 
-      <!-- Hamburger Button (mobile only) -->
-      <button class="dash-hamburger" id="dashHamburger" aria-label="Buka menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
     </div>
   </header>
 
   <!-- MOBILE DRAWER OVERLAY -->
-  <div class="dash-drawer-overlay" id="dashDrawerOverlay"></div>
+  <div id="dashDrawerOverlay"></div>
 
   <!-- MOBILE DRAWER -->
-  <div class="dash-drawer" id="dashDrawer">
-    <div class="dash-drawer-header">
-      <div class="dash-brand">
-        <img src="../../src/image/icon-192.png" alt="Logo" class="dash-logo" />
-        <div>
-          <div class="dash-title" style="color:#1a56c4;">PPG Solo Selatan</div>
-          <div class="dash-sub">Portal Monitoring &amp; Database</div>
-        </div>
+  <div id="dashDrawer">
+    <!-- Header / Welcome (Mobile) -->
+    <div class="bg-brandBlue p-6 relative text-white shrink-0">
+      <div class="flex items-center gap-3 mb-4">
+         <img src="../../src/image/icon-192.png" alt="Logo" class="w-10 h-10 rounded-xl shadow-md border border-white/20" />
       </div>
-      <button class="dash-drawer-close" id="dashDrawerClose" aria-label="Tutup menu">
+      <h2 class="text-lg font-bold text-blue-200">Selamat Bertugas,</h2>
+      <div id="drawerUserName" class="text-2xl font-extrabold truncate">Pengurus</div>
+      <div id="drawerUserBadge" class="text-xs mt-1 bg-white/20 inline-block px-2 py-0.5 rounded-full">Superadmin</div>
+      
+      <button id="dashDrawerClose" class="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <div class="dash-drawer-user">
-      <div class="user-avatar" style="width:48px;height:48px;">
-        <span class="material-symbols-outlined" style="font-size:28px;">account_circle</span>
-      </div>
+
+    <!-- Drawer Nav -->
+    <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-1 bg-white dark:bg-slate-900">
+      <a href="../../index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Kembali ke Beranda
+      </a>
+      
+      <div class="mt-4 mb-2 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Navigasi</div>
+      
+      <!-- Mobile Dropdown Menu Fitur -->
       <div>
-        <div class="user-name" id="drawerUserName" style="font-size:14px;">Memuat...</div>
-        <div class="user-badge" id="drawerUserBadge" style="margin-top:4px;">Superadmin</div>
+        <button onclick="document.getElementById('mobileMenuFitur').classList.toggle('hidden'); this.querySelector('.arrow').classList.toggle('rotate-180')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined">widgets</span>
+            Menu Fitur
+          </div>
+          <span class="material-symbols-outlined arrow transition-transform">expand_more</span>
+        </button>
+        <div id="mobileMenuFitur" class="hidden pl-11 pr-4 py-2 space-y-1">
+          <button id="drawerBtnProker" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Program Kerja</button>
+          <button id="drawerBtnStruktur" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Struktur Pengurus</button>
+          <button id="drawerBtnSiswa" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Database Generus</button>
+          <button id="drawerBtnPembiasaan" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Lembar Pembiasaan</button>
+          <button id="drawerBtnAbsensi" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Absensi KBM</button>
+        </div>
+      </div>
+
+      <div class="mt-4 mb-2 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Sistem</div>
+      
+      <button id="drawerBtnSupabase" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
+        <span class="material-symbols-outlined">cloud_sync</span>
+        Koneksi Supabase
+      </button>
+      <button id="drawerBtnProfil" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Profil Saya
+      </button>
+      
+      <div class="mt-auto pt-6">
+        <button id="drawerBtnLogout" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 transition-colors font-bold">
+          <span class="material-symbols-outlined">logout</span>
+          Keluar Sesi
+        </button>
       </div>
     </div>
-    <nav class="dash-drawer-nav">
-      <a href="../../index.html" class="drawer-nav-item">
-        <span class="material-symbols-outlined">home</span>
-        <span>Beranda Utama</span>
-      </a>
-      <div class="drawer-nav-divider">Menu Fitur</div>
-      <button class="drawer-nav-item" id="drawerBtnProker">
-        <span class="material-symbols-outlined">event_note</span>
-        <span>Program Kerja Tahunan</span>
-      </button>
-      <button class="drawer-nav-item" id="drawerBtnStruktur">
-        <span class="material-symbols-outlined">diversity_2</span>
-        <span>Struktur Pengurus</span>
-      </button>
-      <button class="drawer-nav-item" id="drawerBtnSiswa">
-        <span class="material-symbols-outlined">database</span>
-        <span>Database Generus</span>
-      </button>
-      <button class="drawer-nav-item" id="drawerBtnPembiasaan">
-        <span class="material-symbols-outlined">checklist</span>
-        <span>Lembar Pembiasaan</span>
-      </button>
-      <button class="drawer-nav-item" id="drawerBtnAbsensi">
-        <span class="material-symbols-outlined">how_to_reg</span>
-        <span>Absensi KBM</span>
-      </button>
-      <div class="drawer-nav-divider">Cloud Database</div>
-      <button class="drawer-nav-item" id="drawerBtnSupabase">
-        <span class="material-symbols-outlined">cloud_sync</span>
-        <span>Koneksi Supabase Cloud</span>
-      </button>
-      <div class="drawer-nav-divider">Akun</div>
-      <button class="drawer-nav-item" id="drawerBtnProfil">
-        <span class="material-symbols-outlined">manage_accounts</span>
-        <span>Profil Saya</span>
-      </button>
-      <button class="drawer-nav-item drawer-nav-item-danger" id="drawerBtnLogout">
-        <span class="material-symbols-outlined">logout</span>
-        <span>Keluar</span>
-      </button>
-    </nav>
   </div>
 
   <!-- MAIN DASHBOARD CONTENT -->
-  <main class="container dash-main">
+  <main class="pt-24 pb-20 px-4 md:px-6 max-w-7xl mx-auto space-y-8">
 
-    <!-- WELCOME BANNER -->
-    <section class="welcome-card">
-      <div class="welcome-content">
-        <div class="welcome-chip" id="welcomeScope">
-          <span class="material-symbols-outlined" style="font-size:16px;">verified_user</span>
+    <!-- WELCOME BANNER (Desktop Only) -->
+    <section class="hidden md:flex bg-gradient-to-r from-brandBlue to-blue-700 rounded-[2rem] p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-brandBlue/20">
+      <div class="relative z-10 w-full max-w-3xl">
+        <div id="welcomeScope" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 text-xs font-bold mb-5 backdrop-blur-sm">
+          <span class="material-symbols-outlined text-[16px]">verified_user</span>
           <span id="scopeText">Daerah Solo Selatan</span>
         </div>
-        <h1 class="welcome-heading">
+        <h1 class="text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
           Selamat Bertugas, <span id="headingUserName">Pengurus</span>!
         </h1>
-        <p class="welcome-desc">
+        <p class="text-blue-100 leading-relaxed text-sm lg:text-base">
           Mewujudkan Generasi Penerus yang Faham Agama dan memiliki 29 Karakter Luhur melalui pencatatan data yang tertib dan akurat.
         </p>
       </div>
-      <div class="welcome-icon-decor">
-        <span class="material-symbols-outlined">diversity_1</span>
-      </div>
+      <span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[200px] text-white/10 z-0 transform -rotate-12 pointer-events-none">diversity_1</span>
     </section>
 
-    <!-- NOTIFIKASI PENDING APPROVAL (Hanya Tampil untuk Superadmin Daerah jika ada pengurus baru) -->
-    <section class="approval-alert-card" id="cardPendingApproval" style="display:none;">
-      <div class="alert-left">
-        <div class="alert-icon-pulse">
+    <!-- NOTIFIKASI PENDING APPROVAL -->
+    <section id="cardPendingApproval" class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm" style="display:none;">
+      <div class="flex items-start md:items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-800/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 animate-pulse">
           <span class="material-symbols-outlined">pending_actions</span>
         </div>
         <div>
-          <div class="alert-title">Pendaftaran Pengurus Baru Menunggu Persetujuan</div>
-          <div class="alert-sub" id="pendingCountText">Terdapat pamong yang menunggu verifikasi dari Superadmin Daerah.</div>
+          <h3 class="text-base md:text-lg font-bold text-amber-900 dark:text-amber-400">Pendaftaran Menunggu Persetujuan</h3>
+          <p id="pendingCountText" class="text-sm text-amber-700 dark:text-amber-500 mt-0.5">Terdapat pamong yang menunggu verifikasi dari Anda.</p>
         </div>
       </div>
-      <button type="button" class="btn-review-approval" id="btnOpenApprovalModal">
-        <span class="material-symbols-outlined" style="font-size:18px;">checklist_rtl</span>
+      <button id="btnOpenApprovalModal" class="w-full md:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-sm shadow-md transition-colors flex justify-center items-center gap-2 shrink-0">
+        <span class="material-symbols-outlined text-[18px]">checklist_rtl</span>
         Tinjau &amp; Setujui
       </button>
     </section>
 
     <!-- STATS CARDS (RINGKASAN CEPAT) -->
-    <section class="stats-overview">
-      <div class="dash-stat-card card-total" id="cardStatTotal" title="Klik untuk melihat rincian kategori &amp; jenjang kelas">
-        <div class="stat-icon-wrap" style="--bg-ic:#e8f0fd; --clr-ic:#1a56c4;">
-          <span class="material-symbols-outlined">groups</span>
+    <section class="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-5">
+      <!-- Total -->
+      <div id="cardStatTotal" class="col-span-3 md:col-span-1 bg-white dark:bg-slate-800 p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-brandBlue/30 transition-all group">
+        <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue flex justify-center items-center shrink-0 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-2xl md:text-3xl">groups</span>
         </div>
-        <div class="stat-info">
-          <span class="stat-title">Total Generus</span>
-          <div class="stat-value" id="statTotal">1.250</div>
-          <span class="stat-note">5 Desa &bull; 27 Kelompok</span>
-        </div>
-      </div>
-
-      <div class="dash-stat-card card-caberawit" id="cardStatCaberawit" title="Klik untuk melihat rincian kelas Caberawit">
-        <div class="stat-icon-wrap" style="--bg-ic:#fdf3d0; --clr-ic:#d4a017;">
-          <span class="material-symbols-outlined">child_care</span>
-        </div>
-        <div class="stat-info">
-          <span class="stat-title">Caberawit (PAUD–SD)</span>
-          <div class="stat-value" id="statCaberawit">410</div>
-          <span class="stat-note">Fokus Pembiasaan Ibadah</span>
-        </div>
-      </div>
-
-      <div class="dash-stat-card card-gp" id="cardStatGp" title="Klik untuk melihat rincian kelas GP Reguler">
-        <div class="stat-icon-wrap" style="--bg-ic:#eaf2ff; --clr-ic:#1a56c4;">
-          <span class="material-symbols-outlined">school</span>
-        </div>
-        <div class="stat-info">
-          <span class="stat-title">GP Reguler (SMP–SMA)</span>
-          <div class="stat-value" id="statGp">560</div>
-          <span class="stat-note">KBM Terstruktur &amp; Karakter</span>
-        </div>
-      </div>
-
-      <div class="dash-stat-card card-remaja" id="cardStatRemaja" title="Klik untuk melihat rincian kelas Remaja &amp; Pra-Nikah">
-        <div class="stat-icon-wrap" style="--bg-ic:#d8f3e5; --clr-ic:#2e8b57;">
-          <span class="material-symbols-outlined">diversity_3</span>
-        </div>
-        <div class="stat-info">
-          <span class="stat-title">Remaja &amp; Pra-Nikah</span>
-          <div class="stat-value" id="statRemaja">280</div>
-          <span class="stat-note">Pembekalan Pra-Nikah</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- QUICK ACTIONS / MENU UTAMA & AKSI CEPAT -->
-    <section class="section-container section-menu-utama">
-      <!-- BOLD FULL ROYAL BLUE HEADER BANNER -->
-      <div class="menu-highlight-header-banner">
-        <div class="menu-highlight-badge">
-          <span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span>
-          <span>Pusat Kendali &amp; Tata Kelola Data PPG</span>
-        </div>
-        <h2 class="menu-highlight-title">Menu Utama &amp; Aksi Cepat</h2>
-        <p class="menu-highlight-sub">Pilih modul kerja di bawah ini untuk memulai pencatatan, monitoring wilayah, dan tata kelola generasi penerus</p>
-      </div>
-
-      <div class="action-grid-wrapper">
-        <div class="action-grid">
-
-          <!-- Action 1: Database Generus -->
-          <div class="action-card action-card-purple" id="btnMenuSiswa">
-            <div class="action-badge-top">Inti</div>
-            <div class="action-icon-box" style="--card-theme:#7c3aed; --card-theme-light:#f3e8ff;">
-              <span class="material-symbols-outlined">database</span>
-            </div>
-            <h3>Database &amp; Input Generus</h3>
-            <p>Kelola profil lengkap, NIK, alamat, mutasi cabang, dan riwayat semester Generus.</p>
-            <div class="action-footer">
-              <span class="action-btn-text">Buka Database</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- Action 2: Program Kerja -->
-          <div class="action-card action-card-blue" id="btnMenuProker">
-            <div class="action-badge-top" id="badgeProkerStatus">Agenda</div>
-            <div class="action-icon-box" style="--card-theme:#1a56c4; --card-theme-light:#e8f0fd;">
-              <span class="material-symbols-outlined">event_note</span>
-            </div>
-            <h3>Program Kerja Tahunan</h3>
-            <p id="prokerCardDesc">Pantau agenda kegiatan tahunan yang berlangsung di bulan ini.</p>
-            <div class="action-footer">
-              <span class="action-btn-text" id="prokerActionText">Kelola Program</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- Action 3: Lembar Pembiasaan -->
-          <div class="action-card action-card-gold" id="btnMenuPembiasaan">
-            <div class="action-badge-top gold" id="badgePembiasaanStatus">Caberawit</div>
-            <div class="action-icon-box" style="--card-theme:#d4a017; --card-theme-light:#fef8e7;">
-              <span class="material-symbols-outlined">checklist</span>
-            </div>
-            <h3>Lembar Pembiasaan</h3>
-            <p id="pembiasaanCardDesc">Rekam dan pantau pembiasaan sholat 5 waktu, mengaji, dan akhlak anak usia dini.</p>
-            <div class="action-footer">
-              <span class="action-btn-text" id="pembiasaanActionText">Buka Pembiasaan</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- Action 4: Absensi KBM -->
-          <div class="action-card action-card-green" id="btnMenuAbsensi">
-            <div class="action-badge-top green">Siap Cetak</div>
-            <div class="action-icon-box" style="--card-theme:#2e8b57; --card-theme-light:#e6f7ee;">
-              <span class="material-symbols-outlined">print</span>
-            </div>
-            <h3>Absensi KBM Cepat</h3>
-            <p>Konversi data generus ke lembar presensi fisik siap cetak resmi A4 (Caberawit, GP Reguler, Remaja).</p>
-            <div class="action-footer">
-              <span class="action-btn-text">Cetak Presensi</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- Action 5: Struktur Pengurus PPG Solo Selatan -->
-          <div class="action-card action-card-indigo" id="btnMenuStrukturDaerah">
-            <div class="action-badge-top" style="background:#e0e7ff;color:#3730a3;">Struktur Daerah</div>
-            <div class="action-icon-box" style="--card-theme:#4338ca; --card-theme-light:#e0e7ff;">
-              <span class="material-symbols-outlined">diversity_2</span>
-            </div>
-            <h3>Pengurus PPG Solo Selatan</h3>
-            <p id="strukturCardDesc">Memuat jajaran pengurus daerah...</p>
-            <div class="action-footer">
-              <span class="action-btn-text" id="strukturActionText">Lihat Struktur Pengurus</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- Action 6: Kelola Hak Akses Pengurus (Khusus Superadmin Daerah) -->
-          <div class="action-card action-card-slate" id="btnMenuPengurus" style="display:none;">
-            <div class="action-badge-top" style="background:var(--blue-light);color:var(--blue-dark);">Superadmin</div>
-            <div class="action-icon-box" style="--card-theme:#0284c7; --card-theme-light:#e0f2fe;">
-              <span class="material-symbols-outlined">manage_accounts</span>
-            </div>
-            <h3>Kelola Hak Akses Pengurus</h3>
-            <p>Ubah detail, naikkan hak akses, dan atur status aktif akun seluruh pengurus.</p>
-            <div class="action-footer">
-              <span class="action-btn-text">Buka Pengaturan Akses</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- MONITORING WILAYAH (5 DESA & 27 KELOMPOK) -->
-    <section class="section-container" id="sectionMonitoringWilayah">
-      <div class="section-title-wrap">
         <div>
-          <h2 class="section-main-title">Peta Monitoring Wilayah (5 Desa &bull; 27 Kelompok)</h2>
-          <p class="section-main-sub">Pilih tab desa di bawah ini &mdash; klik tombol untuk melihat kontak pamong di wilayah tersebut</p>
+          <div class="text-[11px] md:text-sm font-bold text-slate-500 dark:text-slate-400">Total Generus</div>
+          <div id="statTotal" class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">1.250</div>
+          <div class="text-[10px] md:text-xs text-slate-400 mt-1 hidden md:block">5 Desa &bull; 27 Kelompok</div>
         </div>
-        <button type="button" class="btn-kontak-desa" id="btnKontakDesa">
-          <span class="material-symbols-outlined" style="font-size:18px;">support_agent</span>
-          <span id="btnKontakDesaText">Kontak Koordinator Desa</span>
+      </div>
+
+      <!-- Caberawit -->
+      <div id="cardStatCaberawit" class="col-span-1 bg-white dark:bg-slate-800 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-row md:flex-col lg:flex-row items-center md:items-start lg:items-center gap-2.5 md:gap-4 cursor-pointer hover:shadow-md hover:border-yellow-400/50 transition-all group">
+        <div class="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 flex justify-center items-center shrink-0 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-[18px] md:text-2xl">child_care</span>
+        </div>
+        <div class="text-left">
+          <div class="text-[9px] md:text-sm font-bold text-slate-500 dark:text-slate-400 leading-tight">Caberawit</div>
+          <div id="statCaberawit" class="text-base md:text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5 md:mt-1">410</div>
+        </div>
+      </div>
+
+      <!-- GP Reguler -->
+      <div id="cardStatGp" class="col-span-1 bg-white dark:bg-slate-800 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-row md:flex-col lg:flex-row items-center md:items-start lg:items-center gap-2.5 md:gap-4 cursor-pointer hover:shadow-md hover:border-blue-400/50 transition-all group">
+        <div class="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue flex justify-center items-center shrink-0 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-[18px] md:text-2xl">school</span>
+        </div>
+        <div class="text-left">
+          <div class="text-[9px] md:text-sm font-bold text-slate-500 dark:text-slate-400 leading-tight">GP Reguler</div>
+          <div id="statGp" class="text-base md:text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5 md:mt-1">560</div>
+        </div>
+      </div>
+
+      <!-- Remaja -->
+      <div id="cardStatRemaja" class="col-span-1 bg-white dark:bg-slate-800 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-row md:flex-col lg:flex-row items-center md:items-start lg:items-center gap-2.5 md:gap-4 cursor-pointer hover:shadow-md hover:border-emerald-400/50 transition-all group">
+        <div class="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex justify-center items-center shrink-0 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-[18px] md:text-2xl">diversity_3</span>
+        </div>
+        <div class="text-left">
+          <div class="text-[9px] md:text-sm font-bold text-slate-500 dark:text-slate-400 leading-tight">Remaja</div>
+          <div id="statRemaja" class="text-base md:text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5 md:mt-1">280</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTION GRID (MENU UTAMA) -->
+    <section>
+      <div class="mb-6 flex flex-col items-center text-center">
+         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold mb-3 border border-brandBlue/20">
+            <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+            Pusat Kendali Data
+         </div>
+         <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Menu Utama &amp; Aksi Cepat</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        
+        <!-- Action 1: Database Generus -->
+        <div id="btnMenuSiswa" class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col">
+          <div class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex justify-center items-center mb-5 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-3xl">database</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Database &amp; Input Generus</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Kelola profil lengkap, NIK, alamat, mutasi cabang, dan riwayat semester Generus.</p>
+          <div class="flex items-center justify-between text-sm font-bold text-purple-600 dark:text-purple-400">
+            <span>Buka Database</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Action 2: Program Kerja -->
+        <div id="btnMenuProker" class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col relative overflow-hidden">
+          <div id="badgeProkerStatus" class="absolute top-6 right-6 bg-blue-100 text-brandBlue text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Agenda</div>
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue flex justify-center items-center mb-5 group-hover:bg-brandBlue group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-3xl">event_note</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-brandBlue transition-colors">Program Kerja Tahunan</h3>
+          <p id="prokerCardDesc" class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Pantau agenda kegiatan tahunan yang berlangsung di bulan ini.</p>
+          <div class="flex items-center justify-between text-sm font-bold text-brandBlue dark:text-blue-400">
+            <span id="prokerActionText">Kelola Program</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Action 3: Lembar Pembiasaan -->
+        <div id="btnMenuPembiasaan" class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col relative overflow-hidden">
+          <div id="badgePembiasaanStatus" class="absolute top-6 right-6 bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Caberawit</div>
+          <div class="w-14 h-14 rounded-2xl bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 flex justify-center items-center mb-5 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-3xl">checklist</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-yellow-600 transition-colors">Lembar Pembiasaan</h3>
+          <p id="pembiasaanCardDesc" class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Rekam dan pantau pembiasaan sholat 5 waktu, mengaji, dan akhlak anak usia dini.</p>
+          <div class="flex items-center justify-between text-sm font-bold text-yellow-600 dark:text-yellow-500">
+            <span id="pembiasaanActionText">Buka Pembiasaan</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Action 4: Absensi KBM -->
+        <div id="btnMenuAbsensi" class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col relative overflow-hidden">
+          <div class="absolute top-6 right-6 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Siap Cetak</div>
+          <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex justify-center items-center mb-5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-3xl">print</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-emerald-600 transition-colors">Absensi KBM Cepat</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Konversi data generus ke lembar presensi fisik siap cetak resmi A4.</p>
+          <div class="flex items-center justify-between text-sm font-bold text-emerald-600 dark:text-emerald-500">
+            <span>Cetak Presensi</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Action 5: Struktur Pengurus -->
+        <div id="btnMenuStrukturDaerah" class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col relative overflow-hidden">
+          <div class="absolute top-6 right-6 bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Daerah</div>
+          <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 flex justify-center items-center mb-5 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-3xl">diversity_2</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 transition-colors">Pengurus Solo Selatan</h3>
+          <p id="strukturCardDesc" class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Memuat jajaran pengurus daerah...</p>
+          <div class="flex items-center justify-between text-sm font-bold text-indigo-600 dark:text-indigo-400">
+            <span id="strukturActionText">Lihat Struktur</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Action 6: Kelola Hak Akses (Superadmin) -->
+        <div id="btnMenuPengurus" class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col relative overflow-hidden" style="display:none;">
+          <div class="absolute top-6 right-6 bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Superadmin</div>
+          <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 flex justify-center items-center mb-5 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-3xl">manage_accounts</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-rose-600 transition-colors">Kelola Hak Akses</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Ubah detail, naikkan hak akses, dan atur status aktif akun seluruh pengurus.</p>
+          <div class="flex items-center justify-between text-sm font-bold text-rose-600 dark:text-rose-400">
+            <span>Buka Pengaturan</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MONITORING WILAYAH -->
+    <section id="sectionMonitoringWilayah">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Peta Monitoring Wilayah</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Pilih tab desa di bawah ini &mdash; klik tombol untuk melihat kontak pamong di wilayah tersebut</p>
+        </div>
+        <button id="btnKontakDesa" class="flex items-center justify-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition-colors shrink-0">
+          <span class="material-symbols-outlined text-[18px]">support_agent</span>
+          <span id="btnKontakDesaText">Kontak Koordinator</span>
         </button>
       </div>
 
       <!-- Desa Tabs -->
-      <div class="desa-tabs" id="desaTabs">
-        <!-- Rendered by JS: Barat, Tengah, Selatan, Timur 1, Timur 2 -->
+      <div id="desaTabs" class="desa-tabs">
+        <!-- Rendered by JS -->
       </div>
 
-      <!-- Kelompok Cards Container -->
-      <div class="kelompok-grid" id="kelompokGrid">
+      <!-- Kelompok Grid -->
+      <div id="kelompokGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
         <!-- Rendered by JS -->
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL POPUP UMUM (Untuk Popup Fitur Lanjutan) -->
-  <div class="modal-backdrop" id="modalBackdrop" style="display:none;">
-    <div class="modal-box" id="modalBox">
+  <!-- MODAL POPUP UMUM (Injected dynamically) -->
+  <div id="modalBackdrop" class="modal-backdrop" style="display: none;">
+    <div id="modalBox" class="modal-box">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <span class="material-symbols-outlined modal-icon-top" id="modalIcon">info</span>
+          <span id="modalIcon" class="material-symbols-outlined modal-icon-top">info</span>
           <h3 id="modalTitle">Judul Modal</h3>
         </div>
-        <button class="btn-close-modal" id="btnCloseModal">&times;</button>
+        <button id="btnCloseModal" class="btn-close-modal">&times;</button>
       </div>
-      <div class="modal-body" id="modalBody">
+      <div id="modalBody" class="modal-body">
         <!-- Konten dinamis -->
       </div>
     </div>
   </div>
 
-  <!-- REUSABLE CONFIRMATION MODAL (YES / NO QUESTION MODAL) -->
-  <div class="confirm-backdrop" id="confirmModalBackdrop" style="display:none;">
+  <!-- REUSABLE CONFIRMATION MODAL -->
+  <div id="confirmModalBackdrop" class="confirm-backdrop" style="display: none;">
     <div class="confirm-card">
-      <div class="confirm-icon-box" id="confirmIconBox">
-        <span class="material-symbols-outlined" id="confirmIcon">help</span>
+      <div id="confirmIconBox" class="confirm-icon-box">
+        <span id="confirmIcon" class="material-symbols-outlined">help</span>
       </div>
-      <h3 class="confirm-title" id="confirmTitle">Konfirmasi Tindakan</h3>
-      <p class="confirm-message" id="confirmMessage">Apakah Anda yakin ingin melanjutkan?</p>
+      <h3 id="confirmTitle" class="confirm-title">Konfirmasi Tindakan</h3>
+      <p id="confirmMessage" class="confirm-message">Apakah Anda yakin ingin melanjutkan?</p>
       <div class="confirm-actions">
-        <button type="button" class="btn-confirm-no" id="btnConfirmCancel">Batal</button>
-        <button type="button" class="btn-confirm-yes" id="btnConfirmOk">Ya, Lanjutkan</button>
+        <button id="btnConfirmCancel" class="btn-confirm-no">Batal</button>
+        <button id="btnConfirmOk" class="btn-confirm-yes">Ya, Lanjutkan</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Aggressive Cache Busting Script for Development/Fixes
+    // Theme logic and cache busting
     (function forceCacheClear() {
-      const CACHE_CLEAR_FLAG = 'cache_cleared_v4.4';
+      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v4.5_tw';
       if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
-        console.log("Forcing cache clear and Service Worker unregistration...");
-        
-        // 1. Unregister all Service Workers
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-              registration.unregister();
-            }
-          });
+          navigator.serviceWorker.getRegistrations().then(r => r.forEach(x => x.unregister()));
         }
-        
-        // 2. Clear all Cache Storage
         if ('caches' in window) {
-          caches.keys().then(function(names) {
-            for (let name of names) {
-              caches.delete(name);
-            }
-          });
+          caches.keys().then(names => names.forEach(n => caches.delete(n)));
         }
-
-        // Set flag and reload
         localStorage.setItem(CACHE_CLEAR_FLAG, 'true');
-        setTimeout(() => {
-          window.location.reload(true);
-        }, 500);
+        setTimeout(() => window.location.reload(true), 500);
       }
     })();
   </script>
-  <script type="module" src="dashboard.js?v=4.4"></script>
+  <script type="module" src="dashboard.js?v=4.5"></script>
 </body>
-
 </html>
