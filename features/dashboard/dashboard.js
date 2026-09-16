@@ -199,67 +199,67 @@ export function renderSelfProfileModal() {
   `).join('');
 
   const formHtml = `
-    <form id="formSelfProfile" style="display:flex;flex-direction:column;gap:14px;">
-      <div style="background:var(--blue-light);padding:12px 16px;border-radius:10px;border-left:4px solid var(--blue);font-size:12.5px;color:var(--blue-dark);line-height:1.5;">
+    <form id="formSelfProfile" class="flex flex-col gap-3.5">
+      <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl border-l-4 border-brandBlue text-xs text-blue-900 dark:text-blue-200">
         <strong>Perbarui Profil &amp; Asal Wilayah Anda:</strong><br/>
         Data peran dan asal kelompok Anda akan langsung disesuaikan ke seluruh sistem pembinaan.
       </div>
 
       <div>
-        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Nama Lengkap <span style="color:red;">*</span></label>
-        <input type="text" id="profNama" value="${currentUser.nama}" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Nama Lengkap <span class="text-red-500">*</span></label>
+        <input type="text" id="profNama" value="${currentUser.nama}" required class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Email Akun <span style="color:red;">*</span></label>
-          <input type="email" id="profEmail" value="${currentUser.email}" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Email Akun <span class="text-red-500">*</span></label>
+          <input type="email" id="profEmail" value="${currentUser.email}" required class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Nomor WhatsApp <span style="color:red;">*</span></label>
-          <input type="text" id="profNoWa" value="${currentUser.noWa || ''}" required placeholder="08xxxxxxxxxx" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Nomor WhatsApp <span class="text-red-500">*</span></label>
+          <input type="text" id="profNoWa" value="${currentUser.noWa || ''}" required placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Tingkatan Akses <span style="color:red;">*</span></label>
-          <select id="profTingkatan" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;font-weight:700;">
+          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Tingkatan Akses <span class="text-red-500">*</span></label>
+          <select id="profTingkatan" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue font-bold">
             <option value="kelompok" ${currentUser.tingkatan === 'kelompok' ? 'selected' : ''}>Pamong Kelompok</option>
             <option value="desa" ${currentUser.tingkatan === 'desa' ? 'selected' : ''}>Koordinator Desa</option>
             <option value="daerah" ${currentUser.tingkatan === 'daerah' ? 'selected' : ''}>🌟 Superadmin Daerah (Pengurus PPG)</option>
           </select>
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Jabatan / Peran <span style="color:red;">*</span></label>
-          <input type="text" id="profPeran" value="${currentUser.peran || currentUser.jabatan || 'Pamong'}" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Jabatan / Peran <span class="text-red-500">*</span></label>
+          <input type="text" id="profPeran" value="${currentUser.peran || currentUser.jabatan || 'Pamong'}" required class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="wrapWilayahProf">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wrapWilayahProf">
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Asal Desa <span style="color:red;">*</span></label>
-          <select id="profDesa" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Asal Desa <span class="text-red-500">*</span></label>
+          <select id="profDesa" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue">
             ${desaOptions}
           </select>
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Asal Kelompok <span style="color:red;">*</span></label>
-          <select id="profKelompok" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Asal Kelompok <span class="text-red-500">*</span></label>
+          <select id="profKelompok" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue">
             ${kelOptions}
           </select>
         </div>
       </div>
 
       <div>
-        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Ubah Kata Sandi (Opsional)</label>
-        <input type="password" id="profPassword" placeholder="Kosongkan jika tidak ingin mengubah password" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Ubah Kata Sandi (Opsional)</label>
+        <input type="password" id="profPassword" placeholder="Kosongkan jika tidak ingin mengubah password" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
       </div>
 
-      <div style="display:flex;gap:10px;margin-top:10px;">
-        <button type="button" class="btn-cancel-prof" style="flex:1;padding:12px;border:1px solid var(--border);background:#fff;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;">Batal</button>
-        <button type="submit" style="flex:2;padding:12px;border:none;background:linear-gradient(135deg, var(--blue), var(--blue-dark));color:#fff;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan Perubahan
+      <div class="flex gap-2.5 mt-2">
+        <button type="button" class="btn-cancel-prof flex-1 py-3 px-4 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[13px] hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Batal</button>
+        <button type="submit" class="flex-[2] py-3 px-4 bg-brandBlue hover:bg-brandDarkBlue text-white rounded-xl font-extrabold text-[13px] flex items-center justify-center gap-2 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan
         </button>
       </div>
     </form>
@@ -338,7 +338,7 @@ document.getElementById('btnEditProfileDesktop')?.addEventListener('click', rend
 btnEditProfile?.addEventListener('click', renderSelfProfileModal);
 
 /* ── 3. Logout Confirmation ────────────────────────────────── */
-btnLogout?.addEventListener('click', () => {
+function doLogout() {
   showConfirmModal({
     title: 'Konfirmasi Keluar Akun',
     message: 'Apakah Anda yakin ingin keluar dari sesi Dashboard PPG Solo Selatan?',
@@ -352,7 +352,10 @@ btnLogout?.addEventListener('click', () => {
       window.location.href = '../login/login.html';
     }
   });
-});
+}
+
+// Daftarkan ke semua tombol logout yang mungkin ada di DOM
+btnLogout?.addEventListener('click', doLogout);
 
 /* ── 4. Render 5 Desa Tabs & 27 Kelompok (Database Linked) ──── */
 let activeDesaId = 'desa-barat';
@@ -408,37 +411,31 @@ export function renderKelompokGrid() {
       p => p.kelompokId === kel.id && p.isActive !== false
     );
     const hasPengurus = pengurusKelompok.length > 0;
-    card.className = `kelompok-card ${hasPengurus ? 'active-kelompok' : 'disabled-kelompok'}`;
+    card.className = `kelompok-card !p-3 ${hasPengurus ? 'active-kelompok' : 'disabled-kelompok'}`;
 
     const leader = pengurusKelompok[0] || null;
     const leaderName = leader ? leader.nama : 'Belum Terdata';
     const leaderPeran = leader ? (leader.peran || leader.jabatan || 'Pamong') : 'Pamong Kelompok';
 
     card.innerHTML = `
-      <div class="kel-info">
-        <div class="kel-icon">
-          <span class="material-symbols-outlined">diversity_3</span>
+      <div class="flex items-center gap-2 overflow-hidden">
+        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-brandBlue dark:text-blue-400 flex flex-shrink-0 items-center justify-center">
+          <span class="material-symbols-outlined text-sm">diversity_3</span>
         </div>
-        <div>
-          <div class="kel-name">${kel.nama}</div>
-          <div class="kel-pamong">${leaderPeran}: <strong>${leaderName}</strong></div>
-          <div>
-            ${hasPengurus
-              ? `<span class="badge-pengurus-count">🟢 ${pengurusKelompok.length} Pengurus</span>`
-              : `<span class="badge-pengurus-empty">⚪ Belum Ada Pengurus</span>`
-            }
+        <div class="flex flex-col min-w-0">
+          <div class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate w-full">${kel.nama}</div>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400">
+            ${hasPengurus ? `<span class="text-green-600 dark:text-green-400 font-semibold">${pengurusKelompok.length} Org</span>` : '0 Org'}
           </div>
         </div>
       </div>
-
       <div>
         ${hasPengurus
-          ? `<button type="button" class="btn-view-kontak-kel" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak pengurus & pamong ${kel.nama}">
-              <span class="material-symbols-outlined" style="font-size:15px;">contacts</span>
-              <span>Kontak (${pengurusKelompok.length})</span>
+          ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak">
+              <span class="material-symbols-outlined text-[16px]">visibility</span>
              </button>`
-          : `<button type="button" class="btn-view-kontak-empty" disabled title="Belum ada pengurus terdaftar di kelompok ${kel.nama}">
-              <span>Kosong</span>
+          : `<button type="button" class="btn-view-kontak-empty flex items-center justify-center p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
+              <span class="material-symbols-outlined text-[16px]">visibility_off</span>
              </button>`
         }
       </div>
@@ -536,11 +533,66 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   document.getElementById('drawerBtnAbsensi')?.addEventListener('click', () => { closeDrawer(); renderCetakAbsensiModal(); });
   document.getElementById('drawerBtnStruktur')?.addEventListener('click', () => { closeDrawer(); renderStrukturDaerahModal(); });
   document.getElementById('drawerBtnProfil')?.addEventListener('click', () => { closeDrawer(); renderSelfProfileModal(); });
-  document.getElementById('drawerBtnSupabase')?.addEventListener('click', () => { closeDrawer(); renderSupabaseModal(updateDashboardStats); });
+  document.getElementById('drawerBtnPengurusDaerah')?.addEventListener('click', () => { closeDrawer(); renderStrukturDaerahModal(); });
   document.getElementById('drawerBtnLogout')?.addEventListener('click', () => {
     closeDrawer();
-    btnLogout?.click();
+    doLogout();
   });
+
+  // Desktop Sidebar Listeners
+  document.getElementById('sideBtnLogout')?.addEventListener('click', doLogout);
+  
+  document.getElementById('sideBtnProker')?.addEventListener('click', () => { renderProkerModal(); });
+  document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
+  document.getElementById('sideBtnSiswa')?.addEventListener('click', () => { renderSiswaModal(); });
+  document.getElementById('sideBtnPembiasaan')?.addEventListener('click', () => { renderEventPembiasaanModal(); });
+  document.getElementById('sideBtnAbsensi')?.addEventListener('click', () => { alert("Fitur Absensi KBM belum tersedia."); });
+  document.getElementById('sideBtnPengurus')?.addEventListener('click', () => { renderManagePengurusModal(); });
+  document.getElementById('sideBtnProfil')?.addEventListener('click', () => { renderSelfProfileModal(); });
+
+  // Mobile Bottom Nav Listeners
+  const mobNavHome = document.getElementById('mobNavHome');
+  const mobNavPengurus = document.getElementById('mobNavPengurus');
+  const mobNavFitur = document.getElementById('mobNavFitur');
+  const mobNavFiturIcon = document.getElementById('mobNavFiturIcon');
+  const mobDropUpMenu = document.getElementById('mobDropUpMenu');
+  const mobDropUpBackdrop = document.getElementById('mobDropUpBackdrop');
+  const mobNavProfil = document.getElementById('mobNavProfil');
+  const mobNavLogout = document.getElementById('mobNavLogout');
+
+  mobNavHome?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  mobNavPengurus?.addEventListener('click', () => { renderManagePengurusModal(); });
+  mobNavProfil?.addEventListener('click', () => { renderSelfProfileModal(); });
+  mobNavLogout?.addEventListener('click', doLogout);
+
+  const toggleDropUp = () => {
+    const isActive = mobDropUpMenu.classList.contains('active');
+    if (isActive) {
+      mobDropUpMenu.classList.remove('active');
+      mobDropUpBackdrop.classList.remove('active');
+      mobNavFiturIcon.classList.remove('rotate-180');
+    } else {
+      mobDropUpMenu.classList.add('active');
+      mobDropUpBackdrop.classList.add('active');
+      mobNavFiturIcon.classList.add('rotate-180');
+    }
+  };
+
+  mobNavFitur?.addEventListener('click', toggleDropUp);
+  mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
+
+  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProgramKerjaModal(); });
+  document.getElementById('mobBtnStruktur')?.addEventListener('click', () => { toggleDropUp(); renderStrukturDaerahModal(); });
+  document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { window.location.href = '../generus/database-generus.html'; });
+  document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { window.location.href = '../pembiasaan/pembiasaan.html'; });
+  document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); alert("Fitur Absensi KBM belum tersedia."); });
+
+  const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+  if (btnToggleSidebar) {
+    btnToggleSidebar.addEventListener('click', () => {
+      document.body.classList.toggle('sidebar-collapsed');
+    });
+  }
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeDrawer();

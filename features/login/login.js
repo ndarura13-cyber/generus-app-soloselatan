@@ -116,7 +116,17 @@ modalRegister?.addEventListener('click', (e) => {
 });
 
 /* ── 4. Submit Pendaftaran Pengurus Baru ──────────────────── */
-document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+const toggleRegPass = document.getElementById('toggleRegPass');
+const regPasswordEl = document.getElementById('regPassword');
+const eyeIconReg = document.getElementById('eyeIconReg');
+
+toggleRegPass?.addEventListener('click', () => {
+  const isPass = regPasswordEl.type === 'password';
+  regPasswordEl.type = isPass ? 'text' : 'password';
+  eyeIconReg.textContent = isPass ? 'visibility_off' : 'visibility';
+});
+
+document.getElementById('formRegister')?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const nama = document.getElementById('regNama').value.trim();
@@ -159,9 +169,17 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
     return;
   }
 
-  closeRegisterModal();
-  showSuccess(`✅ Pendaftaran berhasil! Akun "${nama}" sedang menunggu persetujuan (approval) dari Superadmin Daerah Solo Selatan.`);
-  emailEl.value = email;
+  const regSuccessMsg = document.getElementById('regSuccessMsg');
+  if (regSuccessMsg) {
+    regSuccessMsg.style.display = 'block';
+  }
+
+  setTimeout(() => {
+    closeRegisterModal();
+    if (regSuccessMsg) regSuccessMsg.style.display = 'none';
+    showSuccess(`✅ Pendaftaran berhasil! Akun "${nama}" sedang menunggu persetujuan.`);
+    emailEl.value = email;
+  }, 2500);
 });
 
 /* ── 5. Form Login Verification & Session Handler ─────────── */

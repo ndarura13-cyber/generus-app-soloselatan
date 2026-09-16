@@ -310,7 +310,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
       ${detailContentHtml}
       ${desaDistHtml}
       <div class="modal-sticky-footer" style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
-        <button type="button" class="btn-cancel-modal" style="padding:9px 18px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
+        <button type="button" class="btn-cancel-modal px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
           Tutup
         </button>
         <button type="button" id="btnBukaSeluruhDatabase" style="padding:9px 18px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(26,86,196,0.25);">
@@ -486,6 +486,14 @@ export function renderSiswaModal() {
           </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;flex:1 1 auto;">
+          <button type="button" id="btnExportCsvGenerus" title="Download data dalam format Excel CSV" style="padding:9px 12px;background:var(--surface)fff;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:800;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;color:var(--green);">file_download</span> Export CSV
+          </button>
+          <input type="file" id="inputImportCsvGenerus" accept=".csv" style="display:none;" />
+          <button type="button" id="btnImportCsvGenerus" title="Import data dari format Excel CSV" style="padding:9px 12px;background:var(--green-pastel);border:1px solid var(--green);color:var(--green-dark);border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import CSV
+          </button>
+
           <button type="button" id="btnAutoPromoteJenjang" style="padding:9px 15px;background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(79,70,229,0.3);white-space:nowrap;" title="Kenaikan Jenjang Otomatis Sesuai Usia atau Pergantian Tahun Ajaran">
             <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span> Kenaikan Jenjang Otomatis
           </button>
@@ -603,6 +611,75 @@ export function renderSiswaModal() {
 
   document.getElementById('btnTambahSiswaBaru').addEventListener('click', () => {
     renderSiswaFormModal(null);
+  });
+
+  // CSV Export & Import Logic
+  document.getElementById('btnExportCsvGenerus')?.addEventListener('click', () => {
+    const allSiswa = getSiswaList();
+    let csvContent = "\uFEFF"; // UTF-8 BOM
+    csvContent += "NAMA_LENGKAP;TEMPAT_LAHIR;TANGGAL_LAHIR;JENIS_KELAMIN;KATEGORI_USIA;JENJANG_KELAS;NAMA_AYAH;NAMA_IBU;NO_HP;DOMISILI;STATUS_SAMBUNG\n";
+
+    allSiswa.forEach(s => {
+      const clean = (str) => '"' + (str || '').toString().replace(/"/g, '""') + '"';
+      csvContent += `${clean(s.nama_lengkap)};${clean(s.tempat_lahir)};${clean(s.tanggal_lahir)};${clean(s.jenis_kelamin)};${clean(s.kategori_usia)};${clean(s.jenjang_kelas)};${clean(s.nama_ayah)};${clean(s.nama_ibu)};${clean(s.no_hp)};${clean(s.domisili)};${clean(s.status_sambung)}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Data_Generus_PPG_Solo_Selatan_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+
+  const fileInput = document.getElementById('inputImportCsvGenerus');
+  document.getElementById('btnImportCsvGenerus')?.addEventListener('click', () => {
+    fileInput?.click();
+  });
+
+  fileInput?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const text = evt.target.result;
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length > 1) {
+        let count = 0;
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(';');
+          if (cols.length >= 11) {
+            const clean = (str) => str ? str.replace(/(^"|"$)/g, '').trim() : '';
+            if (clean(cols[0])) {
+              addSiswa({
+                nama_lengkap: clean(cols[0]),
+                tempat_lahir: clean(cols[1]),
+                tanggal_lahir: clean(cols[2]),
+                jenis_kelamin: clean(cols[3]) || 'L',
+                kategori_usia: clean(cols[4]),
+                jenjang_kelas: clean(cols[5]),
+                nama_ayah: clean(cols[6]),
+                nama_ibu: clean(cols[7]),
+                no_hp: clean(cols[8]),
+                domisili: clean(cols[9]),
+                status_sambung: clean(cols[10]) || 'Sambung',
+                desa_id: currentSiswaFilter.desa !== 'all' ? currentSiswaFilter.desa : null,
+                kelompok_id: currentSiswaFilter.kelompok !== 'all' ? currentSiswaFilter.kelompok : null
+              });
+              count++;
+            }
+          }
+        }
+        alert('Berhasil mengimpor ' + count + ' data generus!');
+        renderSiswaModal();
+      } else {
+        alert('Format CSV kosong atau tidak valid.');
+      }
+    };
+    reader.readAsText(file);
   });
 
   // Initial render of rows

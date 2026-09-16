@@ -235,7 +235,7 @@ export function renderCreateEventForm(editEvent = null) {
       </div>
 
       <div class="modal-sticky-footer">
-        <button type="button" id="btnCancelCreateEvent" style="flex:1;padding:12px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;">← Batal</button>
+        <button type="button" id="btnCancelCreateEvent" style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;">← Batal</button>
         <button type="submit" style="flex:2;padding:12px;background:var(--gold);color:#1a1d2e;border:none;border-radius:8px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
           <span class="material-symbols-outlined" style="font-size:18px;">save</span> ${isEdit ? 'Simpan Perubahan' : 'Buat Event Pembiasaan'}
         </button>
@@ -390,7 +390,7 @@ export function openEditableGridEvent(eventId) {
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <h4 style="margin:0;font-size:15px;font-weight:800;color:var(--text-main);">${event.judul_periode}</h4>
-            <span style="background:${event.status === 'berjalan' ? '#dcfce7;color:#166534' : '#e2e8f0;color:#475569'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800;">
+            <span style="background:${event.status === 'berjalan' ? '#dcfce7;color:var(--green-dark)' : '#e2e8f0;color:var(--text-muted)'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800;">
               ${event.status === 'berjalan' ? '🟢 BERJALAN' : '🔒 TERKUNCI / SELESAI'}
             </span>
           </div>
@@ -405,12 +405,12 @@ export function openEditableGridEvent(eventId) {
               <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Kunci &amp; Arsipkan
             </button>
           ` : ''}
-          <button id="btnBackToEventList" style="padding:8px 12px;background:#fff;border:1px solid var(--border);border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">← Kembali</button>
+          <button id="btnBackToEventList" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">← Kembali</button>
         </div>
       </div>
 
       <!-- FILTER BAR -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;background:#f8fafc;padding:12px;border-radius:10px;border:1px solid var(--border);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;background:var(--bg);padding:12px;border-radius:10px;border:1px solid var(--border);">
         <input type="text" id="gridFilterSearch" value="${gridFilter.search || ''}" placeholder="🔍 Cari nama anak..." style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;" />
         <select id="gridFilterDesa" style="padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;">
           <option value="all">-- Semua Desa --</option>
@@ -426,7 +426,7 @@ export function openEditableGridEvent(eventId) {
       </div>
 
       <!-- GRID CONTAINER DENGAN PINNED / STICKY NAMA GENERUS -->
-      <div style="overflow:auto;border:1px solid var(--border);border-radius:8px;background:#fff;max-height:55vh;-webkit-overflow-scrolling:touch;">
+      <div style="overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--surface);max-height:55vh;-webkit-overflow-scrolling:touch;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:540px;">
           <thead style="background:var(--surface-2);position:sticky;top:0;z-index:20;">
             <tr>
@@ -531,7 +531,7 @@ export function renderGridRows(event) {
     return `
       <tr>
         <td style="padding:8px;border:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:11px;">${idx + 1}</td>
-        <td style="padding:8px 12px;border:1px solid var(--border);font-weight:600;position:sticky;left:0;background:#fff;z-index:10;box-shadow:2px 0 4px rgba(0,0,0,0.04);white-space:nowrap;">
+        <td style="padding:8px 12px;border:1px solid var(--border);font-weight:600;position:sticky;left:0;background:var(--surface);z-index:10;box-shadow:2px 0 4px rgba(0,0,0,0.04);white-space:nowrap;">
           ${s.nama_lengkap}
           <span style="display:block;font-size:10px;color:var(--text-muted);font-weight:400;">Kel. ${s.kelompok_nama || '-'}</span>
         </td>

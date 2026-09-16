@@ -47,7 +47,7 @@ export const DAFTAR_BIDANG_PPG = [
 
 
 
-export function exportProkerCsv() {
+export async function exportProkerCsv() {
   const prokerList = getProkerList();
   let csvContent = "\uFEFF"; // UTF-8 BOM
   csvContent += "NO;KEGIATAN;WAKTU;SASARAN/PESERTA;TUJUAN KEGIATAN;RINCIAN BIAYA;EST. BIAYA (RP);TEMPAT PELAKSANAAN;STATUS;PENANGGUNG JAWAB (PIC)\n";
@@ -90,7 +90,7 @@ export function exportProkerCsv() {
   URL.revokeObjectURL(url);
 }
 
-export function printProkerTable() {
+export async function printProkerTable() {
   const prokerList = getProkerList();
   const stats = getProkerStats();
   const printWindow = window.open('', '_blank');
@@ -108,7 +108,7 @@ export function printProkerTable() {
   Object.keys(grouped).sort().forEach(pic => {
     rowsHtml += `
       <tr style="background:#e2e8f0;">
-        <td colspan="9" style="padding:10px 8px;border:1px solid #cbd5e1;font-weight:bold;font-size:12px;color:#1e293b;">
+        <td colspan="9" style="padding:10px 8px;border:1px solid var(--border);font-weight:bold;font-size:12px;color:var(--text);">
           BIDANG: ${pic.toUpperCase()}
         </td>
       </tr>
@@ -116,15 +116,15 @@ export function printProkerTable() {
     grouped[pic].forEach((p, idx) => {
       rowsHtml += `
         <tr>
-          <td style="text-align:center;padding:8px;border:1px solid #cbd5e1;font-weight:bold;">${p.no || (idx + 1)}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;"><strong>${p.kegiatan}</strong></td>
-          <td style="padding:8px;border:1px solid #cbd5e1;white-space:nowrap;">${p.waktu}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;">${p.sasaran}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;font-size:11px;">${p.tujuan}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;font-size:10.5px;font-style:italic;">${p.rincianBiaya || '-'}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;text-align:right;font-weight:bold;color:#065f46;">Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;">${p.tempat}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;text-align:center;font-weight:bold;font-size:10px;">${(p.status || '').toUpperCase()}</td>
+          <td style="text-align:center;padding:8px;border:1px solid var(--border);font-weight:bold;">${p.no || (idx + 1)}</td>
+          <td style="padding:8px;border:1px solid var(--border);"><strong>${p.kegiatan}</strong></td>
+          <td style="padding:8px;border:1px solid var(--border);white-space:nowrap;">${p.waktu}</td>
+          <td style="padding:8px;border:1px solid var(--border);">${p.sasaran}</td>
+          <td style="padding:8px;border:1px solid var(--border);font-size:11px;">${p.tujuan}</td>
+          <td style="padding:8px;border:1px solid var(--border);font-size:10.5px;font-style:italic;">${p.rincianBiaya || '-'}</td>
+          <td style="padding:8px;border:1px solid var(--border);text-align:right;font-weight:bold;color:var(--green-dark);">Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</td>
+          <td style="padding:8px;border:1px solid var(--border);">${p.tempat}</td>
+          <td style="padding:8px;border:1px solid var(--border);text-align:center;font-weight:bold;font-size:10px;">${(p.status || '').toUpperCase()}</td>
         </tr>
       `;
     });
@@ -136,12 +136,12 @@ export function printProkerTable() {
     <head>
       <title>Program Kerja Tahunan PPG Solo Selatan 2026</title>
       <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 24px; color: #1e293b; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 24px; color:var(--text); }
         h2 { margin: 0 0 4px 0; color: #1a56c4; font-size: 18px; }
-        p { margin: 2px 0 16px 0; font-size: 12px; color: #64748b; }
+        p { margin: 2px 0 16px 0; font-size: 12px; color:var(--text-muted); }
         table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; }
-        th { background: #f1f5f9; padding: 8px; border: 1px solid #cbd5e1; text-align: left; font-size: 10px; text-transform: uppercase; }
-        .summary-box { display: flex; gap: 20px; font-size: 12px; padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; }
+        th { background: #f1f5f9; padding: 8px; border:1px solid var(--border); text-align: left; font-size: 10px; text-transform: uppercase; }
+        .summary-box { display: flex; gap: 20px; font-size: 12px; padding: 10px 14px; background:var(--bg); border:1px solid var(--border); border-radius: 8px; margin-bottom: 12px; }
         @media print { button { display: none; } }
       </style>
     </head>
@@ -218,7 +218,7 @@ export function formatDateRange(startDateStr, endDateStr) {
   return `${s.getDate()} ${monthNames[s.getMonth()]} ${s.getFullYear()} – ${e.getDate()} ${monthNames[e.getMonth()]} ${e.getFullYear()}`;
 }
 
-export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline') {
+export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline') {
   const isSuper = currentUser.isSuperadmin || currentUser.tingkatan === 'daerah';
   const prokerList = getProkerList();
   const stats = getProkerStats();
@@ -251,8 +251,8 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
     bannerNoticeHtml = `
       <div style="background:linear-gradient(135deg, #fef8e7 0%, #fff3cd 100%);padding:14px 18px;border-radius:12px;border:1.5px solid #fde68a;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
         <div>
-          <div style="font-size:13px;font-weight:800;color:#92400e;">🌟 Wewenang Superadmin Daerah</div>
-          <div style="font-size:12px;color:#a16207;margin-top:2px;">Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️.</div>
+          <div style="font-size:13px;font-weight:800;color:var(--gold-dark);">🌟 Wewenang Superadmin Daerah</div>
+          <div style="font-size:12px;color:var(--gold-dark);margin-top:2px;">Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️.</div>
         </div>
         <button type="button" id="btnTambahProkerBaru" style="padding:9px 16px;background:linear-gradient(135deg, var(--gold), #d49b10);color:#1a1d2e;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(212,160,23,.25);">
           <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span> Tambah Program Kerja
@@ -261,7 +261,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
     `;
   } else {
     bannerNoticeHtml = `
-      <div style="background:#f0fdf4;padding:12px 16px;border-radius:12px;border:1px solid #bbf7d0;font-size:12.5px;color:#166534;line-height:1.5;">
+      <div style="background:var(--green-pastel);padding:12px 16px;border-radius:12px;border:1px solid var(--border);font-size:12.5px;color:var(--green-dark);line-height:1.5;">
         <strong>👁️ Mode Koordinasi Wilayah (${currentUser.tingkatan === 'desa' ? 'Tingkat Desa ' + (currentUser.desaNama || '') : 'Pamong Kelompok ' + (currentUser.kelompokNama || '')}):</strong><br/>
         Berikut adalah agenda resmi Program Kerja PPG Solo Selatan beserta rincian sasaran, tujuan, waktu, dan tempat pelaksanaan kegiatan.
       </div>
@@ -288,7 +288,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
         </div>
         <div class="proker-stat-box">
           <span class="stat-label">Selesai / Terlaksana</span>
-          <span class="stat-num" style="color:#64748b;">${stats.done} Program</span>
+          <span class="stat-num" style="color:var(--text-muted);">${stats.done} Program</span>
         </div>
       </div>
       <div class="proker-stats-row-2">
@@ -320,7 +320,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
         <span class="material-symbols-outlined" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);">search</span>
       </div>
 
-      <select id="selectFilterStatus" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;cursor:pointer;">
+      <select id="selectFilterStatus" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);outline:none;cursor:pointer;">
         <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
         <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>🟢 Sedang Berlangsung</option>
         <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
@@ -328,16 +328,16 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
         <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>⚪ Selesai</option>
       </select>
 
-      <select id="selectFilterBidang" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;cursor:pointer;">
+      <select id="selectFilterBidang" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);outline:none;cursor:pointer;">
         <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>Semua Bidang (14 Bidang)</option>
         ${bidangOptions}
       </select>
 
       <div style="display:inline-flex;gap:6px;">
-        <button type="button" id="btnExportCsv" title="Download data dalam format Excel CSV" style="padding:7px 12px;background:#ffffff;border:1px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+        <button type="button" id="btnExportCsv" title="Download data dalam format Excel CSV" style="padding:7px 12px;background:var(--surface)fff;border:1px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;color:var(--green);">file_download</span> CSV
         </button>
-        <button type="button" id="btnPrintTable" title="Cetak dokumen resmi" style="padding:7px 12px;background:#ffffff;border:1px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+        <button type="button" id="btnPrintTable" title="Cetak dokumen resmi" style="padding:7px 12px;background:var(--surface)fff;border:1px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">print</span> Cetak
         </button>
       </div>
@@ -379,10 +379,10 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
         actionsCell = `
           <td style="white-space:nowrap;text-align:right;">
             <div style="display:inline-flex;gap:4px;">
-              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program Kerja" style="padding:5px 8px;border:1px solid var(--border);background:#fff;color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
+              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program Kerja" style="padding:5px 8px;border:1px solid var(--border);background:var(--surface);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
                 <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
               </button>
-              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 8px;border:1px solid #fee2e2;background:#fff;color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
+              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 8px;border:1px solid var(--border);background:var(--surface);color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
                 <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
               </button>
             </div>
@@ -396,7 +396,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
           </td>
           <td>
             <div style="font-weight:800;font-size:13px;color:var(--text);">${p.kegiatan}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">PIC: <strong style="color:#1e40af;">${p.penanggungJawab || 'Pengurus PPG'}</strong></div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">PIC: <strong style="color:var(--blue-dark);">${p.penanggungJawab || 'Pengurus PPG'}</strong></div>
           </td>
           <td style="white-space:nowrap;">
             <div style="font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px;">
@@ -405,7 +405,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
             </div>
           </td>
           <td>
-            <div style="font-weight:700;color:#1e40af;display:flex;align-items:center;gap:4px;font-size:11.5px;">
+            <div style="font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:4px;font-size:11.5px;">
               <span class="material-symbols-outlined" style="font-size:14px;">group</span>
               ${p.sasaran}
             </div>
@@ -420,7 +420,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
             <strong style="color:var(--green-dark);font-size:12.5px;">Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</strong>
           </td>
           <td>
-            <div style="font-weight:700;color:#3730a3;display:flex;align-items:center;gap:4px;font-size:11.5px;">
+            <div style="font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:4px;font-size:11.5px;">
               <span class="material-symbols-outlined" style="font-size:14px;">location_on</span>
               ${p.tempat}
             </div>
@@ -502,17 +502,17 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
 
       let superButtons = isSuper ? `
               <div style="display:inline-flex;gap:6px;align-items:center;">
-                <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program" style="padding:5px 10px;border:1px solid var(--border);background:#fff;color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
+                <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program" style="padding:5px 10px;border:1px solid var(--border);background:var(--surface);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
                   <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
                 </button>
-                <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 10px;border:1px solid #fee2e2;background:#fff;color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
+                <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 10px;border:1px solid var(--border);background:var(--surface);color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
                   <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
                 </button>
               </div>
             ` : '';
 
       return `
-              <div style="border:1px solid var(--border);border-radius:12px;padding:14px;background:#ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
+              <div style="border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--surface)fff;box-shadow:0 2px 6px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
                 <div style="flex:1;">
                   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
                     <div>
@@ -532,11 +532,11 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
                       <span class="material-symbols-outlined ms-proker-ic">calendar_today</span> ${p.waktu}
                     </span>
                     <span>&bull;</span>
-                    <span style="display:flex;align-items:center;gap:4px;color:#3730a3;font-weight:600;">
+                    <span style="display:flex;align-items:center;gap:4px;color:var(--blue-dark);font-weight:600;">
                       <span class="material-symbols-outlined ms-proker-ic">location_on</span> ${p.tempat}
                     </span>
                     <span>&bull;</span>
-                    <span style="display:flex;align-items:center;gap:4px;color:#1e40af;font-weight:600;">
+                    <span style="display:flex;align-items:center;gap:4px;color:var(--blue-dark);font-weight:600;">
                       <span class="material-symbols-outlined ms-proker-ic">group</span> ${p.sasaran}
                     </span>
                   </div>
@@ -601,10 +601,10 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
 
   // Aksi Cepat Pergantian Status Program Kerja Langsung Tersimpan
   modalBody.querySelectorAll('.proker-quick-status-change').forEach(select => {
-    select.addEventListener('change', (e) => {
+    select.addEventListener('change', async (e) => {
       const pId = select.dataset.id;
       const newStatus = select.value;
-      updateProker(pId, { status: newStatus });
+      await updateProker(pId, { status: newStatus });
       showToast(`Status program berhasil diubah menjadi: "${newStatus}"`, 'info');
       renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab);
       appHooks.renderUserProfile();
@@ -612,7 +612,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
   });
 
   modalBody.querySelectorAll('.btn-proker-edit').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const pId = btn.dataset.id;
       const prokerItem = prokerList.find(p => p.id === pId);
       if (prokerItem) renderAddEditProkerForm(prokerItem);
@@ -620,7 +620,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
   });
 
   modalBody.querySelectorAll('.btn-proker-del').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const pId = btn.dataset.id;
       const pTitle = btn.dataset.title;
 
@@ -632,8 +632,8 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
         iconColor: 'var(--red)',
         confirmText: 'Ya, Hapus',
         confirmBtnColor: 'var(--red)',
-        onConfirm: () => {
-          deleteProker(pId);
+        onConfirm: async () => {
+          await deleteProker(pId);
           showToast(`Program kerja "${pTitle}" berhasil dihapus`, 'success');
           renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab);
           appHooks.renderUserProfile();
@@ -643,7 +643,7 @@ export function renderProkerModal(filterBidang = 'all', filterStatus = 'all', se
   });
 }
 
-export function renderAddEditProkerForm(p = null) {
+export async function renderAddEditProkerForm(p = null) {
   const isEdit = !!p;
   const modalTitleText = isEdit ? `Edit Program Kerja: ${p.kegiatan}` : 'Tambah Program Kerja Baru';
   const prokerList = getProkerList();
@@ -657,9 +657,9 @@ export function renderAddEditProkerForm(p = null) {
 
   openModal(modalTitleText, isEdit ? 'edit_note' : 'add_task', `
     ${!isEdit ? `
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;background:#f8fafc;padding:10px;border-radius:8px;border:1px dashed var(--border);">
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;background:var(--bg);padding:10px;border-radius:8px;border:1px dashed var(--border);">
       <span style="font-size:11px;color:var(--text-muted);margin-right:auto;display:flex;align-items:center;">Punya banyak data? Gunakan format Excel (CSV).</span>
-      <button type="button" id="btnDownloadFormatExcel" style="padding:6px 12px;background:#ffffff;border:1px solid var(--border);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+      <button type="button" id="btnDownloadFormatExcel" style="padding:6px 12px;background:var(--surface)fff;border:1px solid var(--border);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">download</span> Unduh Format
       </button>
       <input type="file" id="inputImportCsv" accept=".csv" style="display:none;" />
@@ -672,12 +672,12 @@ export function renderAddEditProkerForm(p = null) {
       <input type="hidden" id="prokerInputNo" value="${autoNo}" />
 
       <!-- 1. PIC Bidang Penanggung Jawab di Atas -->
-      <div style="background:#f8fafc;padding:12px 14px;border:1px solid var(--border);border-radius:10px;">
-        <label style="font-size:11.5px;font-weight:800;color:#1e40af;margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+      <div style="background:var(--bg);padding:12px 14px;border:1px solid var(--border);border-radius:10px;">
+        <label style="font-size:11.5px;font-weight:800;color:var(--blue-dark);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">badge</span>
           BIDANG PENANGGUNG JAWAB (PIC) *
         </label>
-        <select id="prokerInputPic" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;background:#ffffff;color:var(--text);outline:none;">
+        <select id="prokerInputPic" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;background:var(--surface)fff;color:var(--text);outline:none;">
           <option value="">-- Pilih Salah Satu dari 14 Bidang Pengurus PPG --</option>
           ${picOptions}
         </select>
@@ -691,23 +691,23 @@ export function renderAddEditProkerForm(p = null) {
 
       <!-- 3. Fitur Date Range Picker Booking Style -->
       <div style="background:#f0f9ff;padding:14px;border:1.5px solid #bae6fd;border-radius:10px;">
-        <label style="font-size:11.5px;font-weight:800;color:#0369a1;margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+        <label style="font-size:11.5px;font-weight:800;color:var(--blue-dark);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">date_range</span>
           WAKTU PELAKSANAAN (PILIH TANGGAL / RENTANG WAKTU) *
         </label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
           <div>
-            <span style="font-size:11px;font-weight:700;color:#0284c7;display:block;margin-bottom:2px;">Tanggal Mulai</span>
-            <input type="date" id="prokerPickerStart" style="width:100%;padding:8px 10px;border:1px solid #7dd3fc;border-radius:6px;font-size:12.5px;background:#fff;" />
+            <span style="font-size:11px;font-weight:700;color:var(--blue);display:block;margin-bottom:2px;">Tanggal Mulai</span>
+            <input type="date" id="prokerPickerStart" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:var(--surface);" />
           </div>
           <div>
-            <span style="font-size:11px;font-weight:700;color:#0284c7;display:block;margin-bottom:2px;">Tanggal Selesai</span>
-            <input type="date" id="prokerPickerEnd" style="width:100%;padding:8px 10px;border:1px solid #7dd3fc;border-radius:6px;font-size:12.5px;background:#fff;" />
+            <span style="font-size:11px;font-weight:700;color:var(--blue);display:block;margin-bottom:2px;">Tanggal Selesai</span>
+            <input type="date" id="prokerPickerEnd" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:var(--surface);" />
           </div>
         </div>
         <div>
-          <span style="font-size:11px;font-weight:700;color:#0369a1;display:block;margin-bottom:2px;">Format Teks Waktu (Otomatis Terisi & Bisa Diedit):</span>
-          <input type="text" id="prokerInputWaktu" value="${isEdit ? p.waktu : ''}" placeholder="Contoh: September 2026 atau 15 – 16 Oktober 2026" required style="width:100%;padding:9px 12px;border:1px solid #7dd3fc;border-radius:6px;font-size:13px;font-weight:700;color:#0369a1;background:#fff;" />
+          <span style="font-size:11px;font-weight:700;color:var(--blue-dark);display:block;margin-bottom:2px;">Format Teks Waktu (Otomatis Terisi & Bisa Diedit):</span>
+          <input type="text" id="prokerInputWaktu" value="${isEdit ? p.waktu : ''}" placeholder="Contoh: September 2026 atau 15 – 16 Oktober 2026" required style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-weight:700;color:var(--blue-dark);background:var(--surface);" />
         </div>
       </div>
 
@@ -727,7 +727,7 @@ export function renderAddEditProkerForm(p = null) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="form-group">
           <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">STATUS KEGIATAN</label>
-          <select id="prokerInputStatus" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#fff;">
+          <select id="prokerInputStatus" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);">
             <option value="planned" ${isEdit && p.status === 'planned' ? 'selected' : ''}>🟡 Direncanakan</option>
             <option value="upcoming" ${isEdit && p.status === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
             <option value="ongoing" ${isEdit && p.status === 'ongoing' ? 'selected' : ''}>🟢 Sedang Berlangsung</option>
@@ -753,7 +753,7 @@ export function renderAddEditProkerForm(p = null) {
       </div>
 
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px;border-top:1px solid var(--border);padding-top:14px;">
-        <button type="button" class="btn-cancel-proker-form" style="padding:10px 18px;border:1px solid var(--border);background:#fff;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
+        <button type="button" class="btn-cancel-proker-form" style="padding:10px 18px;border:1px solid var(--border);background:var(--surface);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
           Kembali ke Tabel
         </button>
         <button type="submit" style="padding:10px 22px;border:none;background:linear-gradient(135deg, var(--blue), var(--blue-dark));color:#fff;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(26,86,196,.3);">
@@ -816,11 +816,11 @@ export function renderAddEditProkerForm(p = null) {
       fileInput?.click();
     });
 
-    fileInput?.addEventListener('change', (e) => {
+    fileInput?.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (evt) => {
+      reader.onload = async (evt) => {
         const text = evt.target.result;
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         if (lines.length > 1) {
@@ -829,7 +829,7 @@ export function renderAddEditProkerForm(p = null) {
             const cols = lines[i].split(';');
             if (cols.length >= 8) {
               const clean = (str) => str ? str.replace(/(^"|"$)/g, '').trim() : '';
-              addProker({
+              await addProker({
                 kegiatan: clean(cols[0]),
                 waktu: clean(cols[1]),
                 sasaran: clean(cols[2]),
@@ -855,7 +855,7 @@ export function renderAddEditProkerForm(p = null) {
     });
   }
 
-  document.getElementById('formAddEditProker')?.addEventListener('submit', (e) => {
+  document.getElementById('formAddEditProker')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const prokerDataPayload = {
@@ -873,10 +873,10 @@ export function renderAddEditProkerForm(p = null) {
     };
 
     if (isEdit) {
-      updateProker(p.id, prokerDataPayload);
+      await updateProker(p.id, prokerDataPayload);
       showToast(`Program Kerja "${prokerDataPayload.kegiatan}" berhasil diperbarui!`, 'success');
     } else {
-      addProker(prokerDataPayload);
+      await addProker(prokerDataPayload);
       showToast(`Program Kerja "${prokerDataPayload.kegiatan}" berhasil ditambahkan!`, 'success');
     }
 

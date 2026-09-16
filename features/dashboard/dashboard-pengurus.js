@@ -14,7 +14,8 @@ import {
   getPengurusDaerahList,
   approvePengurus,
   togglePengurusActive,
-  updatePengurus
+  updatePengurus,
+  deletePengurus
 } from '../../src/db-master.js';
 
 import {
@@ -104,7 +105,7 @@ export function renderApprovalListModal() {
         <button type="button" class="btn-action-approve" data-id="${p.id}" data-name="${p.nama}" style="flex:1;padding:8px 12px;border:none;background:var(--green-dark);color:#fff;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">check</span> Setujui Akun
         </button>
-        <button type="button" class="btn-action-reject" data-id="${p.id}" data-name="${p.nama}" style="padding:8px 12px;border:1px solid var(--border);background:#fff;color:#dc2626;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <button type="button" class="btn-action-reject" data-id="${p.id}" data-name="${p.nama}" style="padding:8px 12px;border:1px solid var(--border);background:var(--surface);color:#dc2626;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">close</span> Tolak
         </button>
       </div>
@@ -227,7 +228,7 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
     bannerNoticeHtml = `
       <div style="background:linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);padding:14px 18px;border-radius:12px;border:1.5px solid #c7d2fe;display:flex;align-items:center;justify-content:space-between;gap:12px;">
         <div>
-          <div style="font-size:13px;font-weight:800;color:#3730a3;">🌟 Mode Pengelolaan Superadmin</div>
+          <div style="font-size:13px;font-weight:800;color:var(--blue-dark);">🌟 Mode Pengelolaan Superadmin</div>
           <div style="font-size:12px;color:#4f46e5;margin-top:2px;">Anda memiliki hak akses penuh untuk mengubah susunan struktur, peran, dan menaikkan hak akses pengurus daerah.</div>
         </div>
         <button type="button" id="btnBukaKelolaSemua" style="padding:8px 14px;background:#4338ca;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;">
@@ -237,7 +238,7 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
     `;
   } else {
     bannerNoticeHtml = `
-      <div style="background:#f0f9ff;padding:12px 16px;border-radius:12px;border:1px solid #bae6fd;font-size:12.5px;color:#0369a1;line-height:1.5;">
+      <div style="background:#f0f9ff;padding:12px 16px;border-radius:12px;border:1px solid #bae6fd;font-size:12.5px;color:var(--blue-dark);line-height:1.5;">
         <strong>👁️ Mode Pelihat (Read-Only):</strong><br/>
         Berikut adalah jajaran Struktur Pengurus PPG Daerah Solo Selatan. Hubungi Superadmin Daerah jika membutuhkan penyesuaian susunan pengurus.
       </div>
@@ -270,14 +271,8 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
     const waMsg = encodeURIComponent(`Assalamu'alaikum ${p.nama}, terkait koordinasi PPG Solo Selatan...`);
     const asalTxt = `Kelompok ${p.kelompokNama || '-'} &bull; Desa ${p.desaNama || '-'}`;
 
+    // Halaman Struktur hanya menampilkan info & kontak — tidak ada tombol edit
     let editBtnHtml = '';
-    if (isSuper) {
-      editBtnHtml = `
-        <button type="button" class="btn-edit-struktur-p" data-id="${p.id}" style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:15px;">edit_note</span> Ubah Peran
-        </button>
-      `;
-    }
 
     return `
       <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;">
@@ -292,7 +287,7 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
               <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">📍 Asal: <strong>${asalTxt}</strong></div>
             </div>
           </div>
-          <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:#e0e7ff;color:#3730a3;white-space:nowrap;">Daerah</span>
+          <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:#e0e7ff;color:var(--blue-dark);white-space:nowrap;">Daerah</span>
         </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
@@ -300,7 +295,7 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
             <a href="https://wa.me/${waIntl}?text=${waMsg}" target="_blank" rel="noopener" style="padding:7px 12px;border-radius:8px;background:#25d366;color:#fff;font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;">
               <span class="material-symbols-outlined" style="font-size:15px;">chat</span> WhatsApp
             </a>
-            <a href="mailto:${p.email}" style="padding:7px 12px;border-radius:8px;background:#ffffff;border:1px solid var(--border);color:var(--text);font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;">
+            <a href="mailto:${p.email}" style="padding:7px 12px;border-radius:8px;background:var(--surface)fff;border:1px solid var(--border);color:var(--text);font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;">
               <span class="material-symbols-outlined" style="font-size:15px;">mail</span> Email
             </a>
           </div>
@@ -341,21 +336,21 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
           <div>
             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">Filter Asal Desa</label>
-            <select id="selectFilterDesa" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;font-family:inherit;">
+            <select id="selectFilterDesa" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);font-family:inherit;">
               ${filterDesaOptions}
             </select>
           </div>
 
           <div>
             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">Filter Asal Kelompok</label>
-            <select id="selectFilterKelompok" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;font-family:inherit;">
+            <select id="selectFilterKelompok" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);font-family:inherit;">
               ${filterKelOptions}
             </select>
           </div>
 
           <div>
             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">Filter Peran</label>
-            <select id="selectFilterPeran" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;font-family:inherit;">
+            <select id="selectFilterPeran" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);font-family:inherit;">
               <option value="all" ${filterPeran === 'all' ? 'selected' : ''}>Semua Peran (${MASTER_STRUKTUR_PERAN.daerah.roles.length})</option>
               ${MASTER_STRUKTUR_PERAN.daerah.roles.map(r => `
                 <option value="${r}" ${filterPeran === r ? 'selected' : ''}>${r}</option>
@@ -407,13 +402,7 @@ export function renderStrukturDaerahModal(filterDesa = 'all', filterKelompok = '
     document.getElementById('btnBukaKelolaSemua')?.addEventListener('click', () => {
       renderManagePengurusModal('daerah');
     });
-
-    modalBody.querySelectorAll('.btn-edit-struktur-p').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const pId = btn.dataset.id;
-        renderEditPengurusModal(pId, 'daerah', 'struktur');
-      });
-    });
+    // Tidak ada lagi listener btn-edit-struktur-p di halaman Struktur (read-only)
   }
 }
 
@@ -473,7 +462,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '')
     if (!isSelf) {
       if (isActive) {
         toggleBtnHtml = `
-          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="false" style="padding:6px 12px;border-radius:8px;border:1px solid #fca5a5;background:#fff;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="false" style="padding:6px 12px;border-radius:8px;border:1px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-outlined" style="font-size:16px;">block</span>
             Nonaktifkan
           </button>
@@ -490,10 +479,20 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '')
       toggleBtnHtml = `<span style="font-size:11px;color:var(--text-muted);font-style:italic;">(Akun Anda)</span>`;
     }
 
+    const isProtectedSuperadmin = p.isSuperadmin && !isSelf;
+
     const editBtnHtml = `
-      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:15px;">edit_note</span>
         Edit &amp; Hak Akses
+      </button>
+    `;
+
+    // Tombol hapus — tidak muncul untuk diri sendiri & hanya 1 superadmin
+    const deleteBtnHtml = isSelf ? '' : `
+      <button type="button" class="btn-hapus-pengurus" data-id="${p.id}" data-name="${p.nama}" style="padding:6px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Hapus pengurus">
+        <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
+        Hapus
       </button>
     `;
 
@@ -523,6 +522,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '')
           <div style="display:flex;gap:6px;align-items:center;">
             ${editBtnHtml}
             ${toggleBtnHtml}
+            ${deleteBtnHtml}
           </div>
         </div>
       </div>
@@ -660,6 +660,32 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '')
       }
     });
   });
+  modalBody.querySelectorAll('.btn-hapus-pengurus').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pId = btn.dataset.id;
+      const pName = btn.dataset.name;
+      showConfirmModal({
+        title: 'Hapus Akun Pengurus',
+        message: `Apakah Anda yakin ingin menghapus akun "<strong>${pName}</strong>" secara permanen?<br/><br/>Tindakan ini tidak dapat dibatalkan dan akan menghapus data pengurus dari sistem.`,
+        icon: 'delete_forever',
+        iconBg: '#fef2f2',
+        iconColor: '#dc2626',
+        confirmText: 'Ya, Hapus Permanen',
+        confirmBtnColor: '#dc2626',
+        onConfirm: async () => {
+          const res = await deletePengurus(pId);
+          if (res.success) {
+            showToast(res.message, 'success');
+            renderManagePengurusModal(filterLevel, searchQuery);
+            appHooks.renderKelompokGrid();
+            appHooks.renderUserProfile();
+          } else {
+            showToast(res.message || 'Gagal menghapus pengurus.', 'danger');
+          }
+        }
+      });
+    });
+  });
 }
 
 /* ── 4. Modal Edit Detail Pengurus & Hak Akses ──────────────── */
@@ -713,7 +739,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Tingkatan Hak Akses <span style="color:red;">*</span></label>
-          <select id="editTingkatan" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;font-weight:700;">
+          <select id="editTingkatan" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);font-weight:700;">
             <option value="kelompok" ${currentTingkat === 'kelompok' ? 'selected' : ''}>Pamong Kelompok</option>
             <option value="desa" ${currentTingkat === 'desa' ? 'selected' : ''}>Koordinator Desa</option>
             <option value="daerah" ${currentTingkat === 'daerah' ? 'selected' : ''}>🌟 Superadmin Daerah (Pengurus PPG)</option>
@@ -721,7 +747,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
         </div>
         <div>
           <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Jabatan / Peran <span style="color:red;">*</span></label>
-          <select id="editPeran" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+          <select id="editPeran" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
             ${peranOptions}
           </select>
         </div>
@@ -730,13 +756,13 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="rowWilayahSelect">
         <div>
           <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Asal Desa <span style="color:red;">*</span></label>
-          <select id="editDesa" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+          <select id="editDesa" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
             ${desaOptions}
           </select>
         </div>
         <div>
           <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Asal Kelompok <span style="color:red;">*</span></label>
-          <select id="editKelompok" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+          <select id="editKelompok" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
             ${kelOptions}
           </select>
         </div>
@@ -744,14 +770,14 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
 
       <div>
         <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Status Akun</label>
-        <select id="editStatusActive" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+        <select id="editStatusActive" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
           <option value="true" ${p.isActive !== false ? 'selected' : ''}>🟢 Aktif (Dapat Login)</option>
           <option value="false" ${p.isActive === false ? 'selected' : ''}>🔴 Dinonaktifkan (Tidak Dapat Login)</option>
         </select>
       </div>
 
       <div style="display:flex;gap:10px;margin-top:10px;">
-        <button type="button" class="btn-cancel-edit-p" style="flex:1;padding:12px;border:1px solid var(--border);background:#fff;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;">← Kembali</button>
+        <button type="button" class="btn-cancel-edit-p" style="flex:1;padding:12px;border:1px solid var(--border);background:var(--surface);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;">← Kembali</button>
         <button type="submit" style="flex:2;padding:12px;border:none;background:linear-gradient(135deg, var(--blue), var(--blue-dark));color:#fff;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
           <span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan Perubahan
         </button>

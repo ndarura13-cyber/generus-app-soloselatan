@@ -5,6 +5,86 @@
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+
+const UUID_MAP = {
+  "daerah-solo-selatan": "8a9c20cb-7011-4e43-b89b-08708bab28cd",
+  "8a9c20cb-7011-4e43-b89b-08708bab28cd": "daerah-solo-selatan",
+  "desa-barat": "d4e05c08-740f-4616-8901-550d82e40d03",
+  "d4e05c08-740f-4616-8901-550d82e40d03": "desa-barat",
+  "desa-selatan": "2567d87f-7592-4a76-80da-19c3a8cd7634",
+  "2567d87f-7592-4a76-80da-19c3a8cd7634": "desa-selatan",
+  "desa-tengah": "2382963b-d89d-4447-8b6c-5b923dabe574",
+  "2382963b-d89d-4447-8b6c-5b923dabe574": "desa-tengah",
+  "desa-timur-1": "1687efe3-f572-47b7-9e2e-ca89517ff515",
+  "1687efe3-f572-47b7-9e2e-ca89517ff515": "desa-timur-1",
+  "desa-timur-2": "84d49306-7876-4f25-9719-f356becabb2e",
+  "84d49306-7876-4f25-9719-f356becabb2e": "desa-timur-2",
+  "kel-gentan": "78f8baaf-8de5-4210-b024-bc63ca3f9363",
+  "78f8baaf-8de5-4210-b024-bc63ca3f9363": "kel-gentan",
+  "kel-pajang": "8e0f3849-86b2-4cbd-9b21-62bd0385f227",
+  "8e0f3849-86b2-4cbd-9b21-62bd0385f227": "kel-pajang",
+  "kel-sondakan": "6783debc-7157-4b7f-a25e-1be2f6bda77b",
+  "6783debc-7157-4b7f-a25e-1be2f6bda77b": "kel-sondakan",
+  "kel-songgalan": "7b56a614-5b38-4d26-97eb-a86c70c9948f",
+  "7b56a614-5b38-4d26-97eb-a86c70c9948f": "kel-songgalan",
+  "kel-teposanan": "89643ffb-02e1-40c6-860f-50fdc0d8a873",
+  "89643ffb-02e1-40c6-860f-50fdc0d8a873": "kel-teposanan",
+  "kel-joyotakan-1": "77920eac-e491-420c-8449-44b56fd5b933",
+  "77920eac-e491-420c-8449-44b56fd5b933": "kel-joyotakan-1",
+  "kel-joyotakan-2": "42c26f45-fb47-4a98-9b9b-3a18b47192c3",
+  "42c26f45-fb47-4a98-9b9b-3a18b47192c3": "kel-joyotakan-2",
+  "kel-kaliwingko": "735e57b0-f7ce-4c1d-85bd-8b754106d0e7",
+  "735e57b0-f7ce-4c1d-85bd-8b754106d0e7": "kel-kaliwingko",
+  "kel-solo-baru": "398592f8-3ca1-443d-a9a0-be6dc1916442",
+  "398592f8-3ca1-443d-a9a0-be6dc1916442": "kel-solo-baru",
+  "kel-baluwarti": "e0a289be-b6cc-45de-8d1f-ac8e45972883",
+  "e0a289be-b6cc-45de-8d1f-ac8e45972883": "kel-baluwarti",
+  "kel-mojo-1": "9c81b237-232a-4c52-8eb5-45f940cc97a0",
+  "9c81b237-232a-4c52-8eb5-45f940cc97a0": "kel-mojo-1",
+  "kel-mojo-2": "a7c1af44-0e5c-4fbb-a86f-e95bc5f179a1",
+  "a7c1af44-0e5c-4fbb-a86f-e95bc5f179a1": "kel-mojo-2",
+  "kel-sampangan": "e0a91130-16df-4bd0-82f8-36b9b3302bf9",
+  "e0a91130-16df-4bd0-82f8-36b9b3302bf9": "kel-sampangan",
+  "kel-semanggi": "29c4c4ab-b1dc-40cc-9a6f-468359bab38e",
+  "29c4c4ab-b1dc-40cc-9a6f-468359bab38e": "kel-semanggi",
+  "kel-gunung-sari": "8e04825a-8181-4289-b770-fc277f5bc91f",
+  "8e04825a-8181-4289-b770-fc277f5bc91f": "kel-gunung-sari",
+  "kel-gunung-wijil-1": "ce792de0-56b3-4a08-ad17-5f17fc97114c",
+  "ce792de0-56b3-4a08-ad17-5f17fc97114c": "kel-gunung-wijil-1",
+  "kel-gunung-wijil-2": "654556c9-d8dd-4e00-93c9-1fb9bf65476f",
+  "654556c9-d8dd-4e00-93c9-1fb9bf65476f": "kel-gunung-wijil-2",
+  "kel-kapohan": "43fbd57e-f810-49d4-800d-451f79c34a5c",
+  "43fbd57e-f810-49d4-800d-451f79c34a5c": "kel-kapohan",
+  "kel-randurejo": "15834786-4d30-4b49-947e-31b3316972e4",
+  "15834786-4d30-4b49-947e-31b3316972e4": "kel-randurejo",
+  "kel-winong": "16dd2196-77da-4c4c-a054-6ee9da6ec1f3",
+  "16dd2196-77da-4c4c-a054-6ee9da6ec1f3": "kel-winong",
+  "kel-ngasinan": "11941c31-3585-4d12-ba33-2c4b95511c33",
+  "11941c31-3585-4d12-ba33-2c4b95511c33": "kel-ngasinan",
+  "kel-ngoresan": "d24602d1-4bf0-41ad-85d8-305f5d5b0d95",
+  "d24602d1-4bf0-41ad-85d8-305f5d5b0d95": "kel-ngoresan",
+  "kel-petoran": "bcd2dd15-2111-4860-bd54-b25aa54b4806",
+  "bcd2dd15-2111-4860-bd54-b25aa54b4806": "kel-petoran",
+  "kel-pucangsawit-1": "1e7702b3-ef35-43c4-842f-369b3eb663ae",
+  "1e7702b3-ef35-43c4-842f-369b3eb663ae": "kel-pucangsawit-1",
+  "kel-pucangsawit-2": "ebaf1b25-6ec6-43d6-8f9d-4ef89928301f",
+  "ebaf1b25-6ec6-43d6-8f9d-4ef89928301f": "kel-pucangsawit-2",
+  "kel-pucangsawit-indah": "32f9c6a8-c590-4fcb-8c20-f076c949e466",
+  "32f9c6a8-c590-4fcb-8c20-f076c949e466": "kel-pucangsawit-indah",
+  "kel-sekarpace": "57941bad-744a-454b-b8ca-c7ab9bd05fc0",
+  "57941bad-744a-454b-b8ca-c7ab9bd05fc0": "kel-sekarpace"
+};
+
+function mapIdToUuid(id) {
+  if (!id) return null;
+  return UUID_MAP[id] || id;
+}
+
+function mapUuidToId(uuid) {
+  if (!uuid) return null;
+  return UUID_MAP[uuid] || uuid;
+}
+
 const STORAGE_KEY_CONFIG = "ppg_supabase_config_v1";
 
 // Default / Cached Config
@@ -225,13 +305,21 @@ export async function fetchSiswaFromSupabase() {
       .select("*")
       .order("nama_lengkap", { ascending: true });
 
-    if (error) {
-      // Fallback ke tabel siswa langsung jika view belum terpanggil
-      const fallback = await client.from("siswa").select("*").order("nama_lengkap", { ascending: true });
-      if (fallback.error) throw fallback.error;
-      return { success: true, data: fallback.data || [] };
-    }
-    return { success: true, data: data || [] };
+    const resultData = error ? (await client.from("siswa").select("*").order("nama_lengkap", { ascending: true })).data || [] : data || [];
+    
+    // Map nama_desa -> desa_nama agar sesuai standar UI
+    const mappedData = resultData.map(s => {
+      return {
+        ...s,
+        daerah_id: mapUuidToId(s.daerah_id),
+        desa_id: mapUuidToId(s.desa_id),
+        kelompok_id: mapUuidToId(s.kelompok_id),
+        desa_nama: s.nama_desa || s.desa_nama || '-',
+        kelompok_nama: s.nama_kelompok || s.kelompok_nama || '-'
+      };
+    });
+    
+    return { success: true, data: mappedData };
   } catch (err) {
     return { success: false, error: err.message };
   }
@@ -508,12 +596,13 @@ export async function fetchPengurusFromSupabase() {
       no_wa: p.no_wa,
       tingkatan: p.tingkatan,
       peran: p.peran,
-      daerahId: p.daerah_id,
-      desaId: p.desa_id,
-      kelompokId: p.kelompok_id,
+      daerahId: mapUuidToId(p.daerah_id),
+      desaId: mapUuidToId(p.desa_id),
+      kelompokId: mapUuidToId(p.kelompok_id),
       isSuperadmin: p.is_superadmin,
       statusApproval: p.status_approval,
       email: p.email,
+      password: p.password_hash,
       created_at: p.created_at,
       updated_at: p.updated_at
     }));
@@ -531,26 +620,41 @@ export async function upsertPengurusToSupabase(p) {
   try {
     const payload = {
       nama: p.nama,
-      no_wa: p.no_wa,
+      no_wa: p.noWa || p.no_wa || null,
       tingkatan: p.tingkatan,
       peran: p.peran,
-      daerah_id: p.daerahId || null,
-      desa_id: p.desaId || null,
-      kelompok_id: p.kelompokId || null,
-      is_superadmin: p.isSuperadmin || false,
-      status_approval: p.statusApproval || 'pending',
+      daerah_id: mapIdToUuid(p.daerahId || p.daerah_id) || null,
+      desa_id: mapIdToUuid(p.desaId || p.desa_id) || null,
+      kelompok_id: mapIdToUuid(p.kelompokId || p.kelompok_id) || null,
+      is_superadmin: p.isSuperadmin !== undefined ? p.isSuperadmin : (p.is_superadmin || false),
+      status_approval: p.statusApproval || p.status_approval || 'pending',
       email: p.email || null,
     };
+
+    if (p.password) payload.password_hash = p.password;
 
     const isUuid = typeof p.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(p.id);
     if (isUuid) {
       payload.id = p.id;
     }
 
-    const { data, error } = await client
-      .from("pengurus")
-      .upsert([payload], { onConflict: "id" })
-      .select();
+    let data, error;
+    
+    if (payload.id) {
+      const res = await client
+        .from("pengurus")
+        .upsert([payload], { onConflict: "id" })
+        .select();
+      data = res.data;
+      error = res.error;
+    } else {
+      const res = await client
+        .from("pengurus")
+        .insert([payload])
+        .select();
+      data = res.data;
+      error = res.error;
+    }
 
     if (error) throw error;
     
@@ -561,11 +665,13 @@ export async function upsertPengurusToSupabase(p) {
         id: row.id,
         nama: row.nama,
         no_wa: row.no_wa,
+        noWa: row.no_wa,
         tingkatan: row.tingkatan,
         peran: row.peran,
-        daerahId: row.daerah_id,
-        desaId: row.desa_id,
-        kelompokId: row.kelompok_id,
+        jabatan: row.peran,
+        daerahId: mapUuidToId(row.daerah_id),
+        desaId: mapUuidToId(row.desa_id),
+        kelompokId: mapUuidToId(row.kelompok_id),
         isSuperadmin: row.is_superadmin,
         statusApproval: row.status_approval,
         email: row.email,
@@ -716,5 +822,48 @@ export async function fetchWilayahFromSupabase() {
   } catch (err) {
     console.error("Supabase Error fetching Wilayah:", err.message);
     return null;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROKER (PROGRAM KERJA)
+   ═══════════════════════════════════════════════════════════════ */
+
+export async function fetchProkerFromSupabase() {
+  const client = getSupabase();
+  if (!client) return [];
+  try {
+    const { data, error } = await client.from('proker').select('*').order('no', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.error("Supabase Error fetching Proker:", err.message);
+    return [];
+  }
+}
+
+export async function upsertProkerToSupabase(proker) {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data, error } = await client.from('proker').upsert(proker).select().single();
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error("Supabase Error upserting Proker:", err.message);
+    return null;
+  }
+}
+
+export async function deleteProkerFromSupabase(prokerId) {
+  const client = getSupabase();
+  if (!client) return false;
+  try {
+    const { error } = await client.from('proker').delete().eq('id', prokerId);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error("Supabase Error deleting Proker:", err.message);
+    return false;
   }
 }

@@ -69,7 +69,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
   let eventListHtml = '';
   if (events.length === 0) {
     eventListHtml = `
-      <div style="text-align:center;padding:36px 20px;background:#f8fafc;border-radius:12px;border:1.5px dashed var(--border);">
+      <div style="text-align:center;padding:36px 20px;background:var(--bg);border-radius:12px;border:1.5px dashed var(--border);">
         <span class="material-symbols-outlined" style="font-size:42px;color:#94a3b8;margin-bottom:8px;">event_busy</span>
         <h4 style="margin:0;font-size:14px;color:var(--text);font-weight:700;">Belum Ada Event KBM Tersimpan</h4>
         <p style="margin:4px 0 16px;font-size:12px;color:var(--text-muted);">
@@ -92,7 +92,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
 
       <div class="proker-table-wrap" style="max-height:440px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead style="background:#f8fafc;position:sticky;top:0;z-index:5;border-bottom:2px solid #cbd5e1;">
+          <thead style="background:var(--bg);position:sticky;top:0;z-index:5;border-bottom:2px solid #cbd5e1;">
             <tr>
               <th style="padding:8px 10px;text-align:center;width:36px;">No</th>
               <th style="padding:8px 12px;text-align:left;">Nama Event / Kegiatan KBM</th>
@@ -141,11 +141,11 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
                     <span class="badge ${formatBadge}" style="font-size:11px;padding:2px 8px;">${formatName}</span>
                   </td>
                   <td style="padding:8px 12px;white-space:nowrap;">
-                    <div style="font-weight:600;color:#1e293b;">${ev.hari_tanggal || '-'}</div>
+                    <div style="font-weight:600;color:var(--text);">${ev.hari_tanggal || '-'}</div>
                     <div style="font-size:11px;color:var(--text-muted);">${ev.jam || ''}</div>
                   </td>
                   <td style="padding:8px 12px;white-space:nowrap;">
-                    <span style="font-size:11px;font-weight:700;background:#eff6ff;color:#1e40af;padding:2px 8px;border-radius:4px;display:inline-block;">
+                    <span style="font-size:11px;font-weight:700;background:var(--blue-light);color:var(--blue-dark);padding:2px 8px;border-radius:4px;display:inline-block;">
                       ${wilayahLabel}
                     </span>
                   </td>
@@ -164,10 +164,10 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
                   </td>
                   <td style="padding:8px 12px;text-align:center;white-space:nowrap;">
                     <div style="display:inline-flex;gap:4px;align-items:center;">
-                      <button type="button" class="btn-action-cetak-absensi" data-ev-id="${ev.id}" title="Cetak Lembar Presensi" style="padding:4px 8px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
+                      <button type="button" class="btn-action-cetak-absensi" data-ev-id="${ev.id}" title="Cetak Lembar Presensi" style="padding:4px 8px;background:var(--green-pastel);color:#16a34a;border:1px solid var(--border);border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
                         <span class="material-symbols-outlined" style="font-size:15px;">print</span> Cetak
                       </button>
-                      <button type="button" class="btn-action-edit-rekap" data-ev-id="${ev.id}" title="Form Isian Rekapitulasi" style="padding:4px 8px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
+                      <button type="button" class="btn-action-edit-rekap" data-ev-id="${ev.id}" title="Form Isian Rekapitulasi" style="padding:4px 8px;background:var(--blue-light);color:var(--blue);border:1px solid #bfdbfe;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
                         <span class="material-symbols-outlined" style="font-size:15px;">edit_note</span> Rekap
                       </button>
                       <button type="button" class="btn-action-cetak-laporan" data-ev-id="${ev.id}" title="Cetak Laporan PDF" style="padding:4px 8px;background:#fdf2f8;color:#db2777;border:1px solid #fbcfe8;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
@@ -185,8 +185,8 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
         </table>
       </div>
 
-      <div style="margin-top:12px;display:flex;justify-content:flex-end;">
-        <button type="button" class="btn-cancel-modal" style="padding:8px 18px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <button type="button" class="btn-cancel-modal px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
           Tutup
         </button>
       </div>
@@ -199,7 +199,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
     <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
       <span class="material-symbols-outlined" style="font-size:24px;color:#16a34a;flex-shrink:0;">print</span>
       <div>
-        <h4 style="margin:0;font-size:13px;font-weight:800;color:#166534;">Buat Event KBM &amp; Konversi ke Lembar Presensi Siap Cetak</h4>
+        <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--green-dark);">Buat Event KBM &amp; Konversi ke Lembar Presensi Siap Cetak</h4>
         <p style="margin:2px 0 0;font-size:11.5px;color:#15803d;line-height:1.4;">
           Event akan otomatis tersimpan di sistem, siap dicetak kapan saja, dan dapat langsung diisi rekap laporannya setelah KBM selesai.
         </p>
@@ -215,13 +215,13 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
             Judul Event / Kegiatan <span style="color:red">*</span>
           </label>
-          <input type="text" id="modalIptCustomJudul" value="PENGAJIAN REMAJA DAERAH SOLO SELATAN" placeholder="Contoh: PENGAJIAN REMAJA DAERAH SOLO SELATAN" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:700;color:#1e293b;font-size:12.5px;" required />
+          <input type="text" id="modalIptCustomJudul" value="PENGAJIAN REMAJA DAERAH SOLO SELATAN" placeholder="Contoh: PENGAJIAN REMAJA DAERAH SOLO SELATAN" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:var(--text);font-size:12.5px;" required />
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
             Format KBM <span style="color:red">*</span>
           </label>
-          <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:700;color:#1e3a8a;font-size:12.5px;">
+          <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:#1e3a8a;font-size:12.5px;">
             <option value="remaja" selected>🎓 Remaja (SMP - Dewasa)</option>
             <option value="gp_reguler">📚 GP Reguler (SMP - SMA)</option>
             <option value="caberawit">🌱 Caberawit (PAUD - SD)</option>
@@ -233,11 +233,11 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
       <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Hari, Tanggal Pelaksanaan</label>
-          <input type="text" id="modalIptHariTanggal" placeholder="Contoh: Selasa, 20 Januari 2026" value="Selasa, 20 Januari 2026" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-size:12px;" />
+          <input type="text" id="modalIptHariTanggal" placeholder="Contoh: Selasa, 20 Januari 2026" value="Selasa, 20 Januari 2026" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Waktu / Jam KBM</label>
-          <input type="text" id="modalIptJam" placeholder="Contoh: 19.30 – 21.00 WIB" value="19.30 – 21.00 WIB" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-size:12px;" />
+          <input type="text" id="modalIptJam" placeholder="Contoh: 19.30 – 21.00 WIB" value="19.30 – 21.00 WIB" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
         </div>
       </div>
 
@@ -245,13 +245,13 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Desa</label>
-          <select id="modalSelDesa" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:600;font-size:12.5px;">
+          <select id="modalSelDesa" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
             ${desaOptions}
           </select>
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Kelompok</label>
-          <select id="modalSelKelompok" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:600;font-size:12.5px;">
+          <select id="modalSelKelompok" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
             ${initialKelOptions}
           </select>
         </div>
@@ -261,7 +261,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Pemisahan Gender</label>
-          <select id="modalSelGender" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:600;font-size:12.5px;">
+          <select id="modalSelGender" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
             <option value="pisah" selected>🚻 Pisah Lembar (Putra &amp; Putri)</option>
             <option value="L">👦 Khusus Putra Saja</option>
             <option value="P">👧 Khusus Putri Saja</option>
@@ -270,7 +270,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Format Baris Kosong</label>
-          <select id="modalSelBarisKosong" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-size:12.5px;">
+          <select id="modalSelBarisKosong" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12.5px;">
             <option value="fill30" selected>Penuhi Halaman (Maks. 30 Baris)</option>
             <option value="0">0 (Pas Jumlah Generus)</option>
             <option value="3">+3 Baris Kosong</option>
@@ -284,7 +284,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Bulan Presensi</label>
-          <select id="modalSelBulan" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:600;font-size:12.5px;">
+          <select id="modalSelBulan" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
             <option value="JANUARI" selected>JANUARI</option>
             <option value="FEBRUARI">FEBRUARI</option>
             <option value="MARET">MARET</option>
@@ -301,7 +301,7 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Tahun</label>
-          <input type="text" id="modalIptTahun" value="2026" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:#fff;font-weight:600;font-size:12.5px;" />
+          <input type="text" id="modalIptTahun" value="2026" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;" />
         </div>
       </div>
 
@@ -310,11 +310,11 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
 
       <!-- ACTIONS -->
       <div class="modal-sticky-footer" style="margin-top:8px;display:flex;gap:8px;">
-        <button type="button" id="btnBatalKeEventList" style="flex:1;padding:11px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;">
+        <button type="button" id="btnBatalKeEventList" style="flex:1;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
           Kembali
         </button>
-        <button type="button" id="btnCetakLangsungTanpaSimpan" style="flex:1.5;padding:11px;background:#f8fafc;color:#334155;border:1.5px solid #cbd5e1;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+        <button type="button" id="btnCetakLangsungTanpaSimpan" style="flex:1.5;padding:11px;background:var(--bg);color:#334155;border:1.5px solid #cbd5e1;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
           <span class="material-symbols-outlined" style="font-size:17px;">print</span>
           Cetak Saja
         </button>
@@ -539,7 +539,7 @@ export function renderFormRekapKehadiranModal(eventId) {
         <td style="padding:6px;"><input type="text" class="ipt-sesi-materi" value="${s.materi || ''}" placeholder="misal: Seminar Senkom" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;" /></td>
         <td style="padding:6px;"><input type="text" class="ipt-sesi-penasehat" value="${s.penasehat || ''}" placeholder="misal: Bp. Abdul Aziz" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;" /></td>
         <td style="padding:6px;text-align:center;">
-          <button type="button" class="btn-hapus-sesi" data-idx="${idx}" title="Hapus Baris Kelas" style="background:#fee2e2;color:#ef4444;border:none;border-radius:6px;padding:5px 8px;cursor:pointer;">
+          <button type="button" class="btn-hapus-sesi" data-idx="${idx}" title="Hapus Baris Kelas" style="background:var(--red-light);color:#ef4444;border:none;border-radius:6px;padding:5px 8px;cursor:pointer;">
             <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
           </button>
         </td>
@@ -551,7 +551,7 @@ export function renderFormRekapKehadiranModal(eventId) {
     <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;">
       
       <!-- HEADER INFO -->
-      <div style="background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
           <span style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;">Form Rekapitulasi Kehadiran (${wilayahRekapLabel})</span>
           <h3 style="margin:2px 0 0;font-size:15px;color:var(--text);font-weight:800;">${event.judul || 'Rekap Kehadiran'}</h3>
@@ -577,13 +577,13 @@ export function renderFormRekapKehadiranModal(eventId) {
       </div>
 
       <!-- TABEL SESI KELAS & MATERI (TAMBAH BARIS DINAMIS) -->
-      <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;">
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div>
             <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--text);">Pembagian Kelas, Tempat, Materi &amp; Penasehat</h4>
             <span style="font-size:11px;color:var(--text-muted);">Tambah baris jika ada pembagian kelas (contoh: SMP, SMA, dan Dewasa).</span>
           </div>
-          <button type="button" id="btnTambahBarisSesi" style="padding:6px 12px;background:#e0f2fe;color:#0284c7;border:1px solid #bae6fd;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <button type="button" id="btnTambahBarisSesi" style="padding:6px 12px;background:#e0f2fe;color:var(--blue);border:1px solid #bae6fd;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-outlined" style="font-size:15px;">add</span>
             Tambah Baris Kelas
           </button>
@@ -608,7 +608,7 @@ export function renderFormRekapKehadiranModal(eventId) {
       </div>
 
       <!-- TABEL REKAP KEHADIRAN SESUAI WILAYAH -->
-      <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;">
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div>
             <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--text);">Input Angka Hadir, Ijin &amp; Alfa (${wilayahRekapLabel})</h4>
@@ -621,7 +621,7 @@ export function renderFormRekapKehadiranModal(eventId) {
         <div style="max-height:360px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
           <table style="width:100%;border-collapse:collapse;font-size:12px;" id="tableInputRekap">
             <thead>
-              <tr style="background:#f8fafc;position:sticky;top:0;z-index:2;border-bottom:2px solid var(--border);">
+              <tr style="background:var(--bg);position:sticky;top:0;z-index:2;border-bottom:2px solid var(--border);">
                 <th style="padding:6px 8px;text-align:left;width:22%;">Kelompok</th>
                 <th style="padding:6px 4px;text-align:center;width:11%;">Hadir</th>
                 <th style="padding:6px 4px;text-align:center;width:11%;">Ijin</th>
@@ -636,7 +636,7 @@ export function renderFormRekapKehadiranModal(eventId) {
               ${scopedDesa.map(d => {
                 let desaRows = `
                   <tr style="background:#e2e8f0;font-weight:800;">
-                    <td colspan="8" style="padding:5px 8px;color:#1e293b;">Desa ${d.nama}</td>
+                    <td colspan="8" style="padding:5px 8px;color:var(--text);">Desa ${d.nama}</td>
                   </tr>
                 `;
                 d.kelompok.forEach(kel => {
@@ -662,7 +662,7 @@ export function renderFormRekapKehadiranModal(eventId) {
                       <td style="padding:2px 4px;text-align:center;">
                         <input type="number" min="0" class="ipt-alfa" data-kel="${kel.id}" value="${a}" style="width:100%;max-width:60px;padding:4px;border:1px solid var(--border);border-radius:4px;text-align:center;font-size:12px;font-weight:700;" />
                       </td>
-                      <td class="cell-tot" id="tot_${kel.id}" style="padding:4px;text-align:center;font-weight:800;background:#f8fafc;">${tot}</td>
+                      <td class="cell-tot" id="tot_${kel.id}" style="padding:4px;text-align:center;font-weight:800;background:var(--bg);">${tot}</td>
                       <td class="cell-pct-h" id="pct_h_${kel.id}" style="padding:4px;text-align:center;font-size:11px;">${pH}%</td>
                       <td class="cell-pct-i" id="pct_i_${kel.id}" style="padding:4px;text-align:center;font-size:11px;">${pI}%</td>
                       <td class="cell-pct-a" id="pct_a_${kel.id}" style="padding:4px;text-align:center;font-size:11px;${isHigh ? 'background:#fef08a;font-weight:800;' : ''}">${pA}%</td>
@@ -672,7 +672,7 @@ export function renderFormRekapKehadiranModal(eventId) {
 
                 // Desa Subtotal Row Placeholder
                 desaRows += `
-                  <tr class="subtotal-desa-row" id="subtotal_row_${d.id}" style="background:#fffbeb;font-weight:800;border-bottom:1.5px solid #cbd5e1;">
+                  <tr class="subtotal-desa-row" id="subtotal_row_${d.id}" style="background:var(--surface)beb;font-weight:800;border-bottom:1.5px solid #cbd5e1;">
                     <td style="padding:5px 8px;">Subtotal Desa ${d.nama}</td>
                     <td style="text-align:center;" id="sub_h_${d.id}">0</td>
                     <td style="text-align:center;" id="sub_i_${d.id}">0</td>
@@ -705,7 +705,7 @@ export function renderFormRekapKehadiranModal(eventId) {
 
       <!-- ACTIONS -->
       <div class="modal-sticky-footer" style="margin-top:6px;display:flex;gap:8px;">
-        <button type="button" id="btnBackToEventList" style="flex:1;padding:12px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;">
+        <button type="button" id="btnBackToEventList" style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;">
           ← Kembali ke Event
         </button>
         <button type="button" id="btnSimpanDanCetakLaporan" style="flex:1.5;padding:12px;background:#fdf2f8;color:#db2777;border:1.5px solid #fbcfe8;border-radius:8px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;">

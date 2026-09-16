@@ -78,7 +78,7 @@ export function renderSupabaseModal(onDataSynced = null) {
 
         <!-- Tombol Aksi -->
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-          <button type="button" id="btnTestSupabaseConn" style="flex:1;min-width:140px;padding:10px 14px;background:#f1f5f9;border:1.5px solid #cbd5e1;color:#1e293b;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+          <button type="button" id="btnTestSupabaseConn" style="flex:1;min-width:140px;padding:10px 14px;background:#f1f5f9;border:1.5px solid #cbd5e1;color:var(--text);border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
             <span class="material-symbols-outlined" style="font-size:18px;">network_check</span>
             Uji Koneksi
           </button>
@@ -92,15 +92,15 @@ export function renderSupabaseModal(onDataSynced = null) {
       ${isConfigured ? `
         <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:6px;">
           <div style="font-weight:800;font-size:12.5px;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-            <span class="material-symbols-outlined" style="font-size:18px;color:#2563eb;">sync</span>
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">sync</span>
             Sinkronisasi Data Generus
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <button type="button" id="btnUploadSiswaToCloud" style="padding:10px;background:#eff6ff;border:1.5px solid #bfdbfe;color:#1d4ed8;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+            <button type="button" id="btnUploadSiswaToCloud" style="padding:10px;background:var(--blue-light);border:1.5px solid #bfdbfe;color:#1d4ed8;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
               <span class="material-symbols-outlined" style="font-size:16px;">cloud_upload</span>
               Unggah Lokal ke Cloud
             </button>
-            <button type="button" id="btnDownloadSiswaFromCloud" style="padding:10px;background:#f8fafc;border:1.5px solid #cbd5e1;color:#334155;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+            <button type="button" id="btnDownloadSiswaFromCloud" style="padding:10px;background:var(--bg);border:1.5px solid #cbd5e1;color:#334155;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
               <span class="material-symbols-outlined" style="font-size:16px;">cloud_download</span>
               Tarik Data Cloud ke Lokal
             </button>
@@ -108,8 +108,8 @@ export function renderSupabaseModal(onDataSynced = null) {
         </div>
       ` : ''}
 
-      <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;font-size:11px;color:#64748b;line-height:1.5;">
-        💡 <strong>Tips Skema:</strong> File script SQL lengkap siap pakai tersimpan di <code style="background:#e2e8f0;padding:1px 4px;border-radius:4px;color:#1e293b;">src/database_schema.sql</code>. Anda hanya perlu menyalin dan menempelkannya di menu <strong>SQL Editor</strong> Supabase lalu klik tombol <strong>Run</strong>.
+      <div style="background:var(--bg);border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text-muted);line-height:1.5;">
+        💡 <strong>Tips Skema:</strong> File script SQL lengkap siap pakai tersimpan di <code style="background:#e2e8f0;padding:1px 4px;border-radius:4px;color:var(--text);">src/database_schema.sql</code>. Anda hanya perlu menyalin dan menempelkannya di menu <strong>SQL Editor</strong> Supabase lalu klik tombol <strong>Run</strong>.
       </div>
     </div>
   `;
