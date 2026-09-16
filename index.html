@@ -909,7 +909,7 @@
           const card = document.getElementById('mjCard');
           if (modal.style.display !== 'none') {
             // It's opening
-            modal.style.display = 'flex'; // override js 'block' to keep flex centering
+            if (modal.style.display !== 'flex') modal.style.display = 'flex'; // keep flex centering
             setTimeout(() => {
               modal.classList.remove('opacity-0', 'pointer-events-none');
               if (card) card.classList.remove('scale-95');

@@ -13,7 +13,8 @@ import {
   syncPembiasaanFromSupabase,
   syncPengurusFromSupabase,
   syncKbmFromSupabase,
-  syncSiswaFromSupabase
+  syncSiswaFromSupabase,
+  syncProkerFromSupabase
 } from '../../src/db-master.js';
 
 import { isSupabaseConfigured } from '../../src/supabase.js';
@@ -546,7 +547,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   document.getElementById('sideBtnSiswa')?.addEventListener('click', () => { renderSiswaModal(); });
   document.getElementById('sideBtnPembiasaan')?.addEventListener('click', () => { renderEventPembiasaanModal(); });
-  document.getElementById('sideBtnAbsensi')?.addEventListener('click', () => { alert("Fitur Absensi KBM belum tersedia."); });
+  document.getElementById('sideBtnAbsensi')?.addEventListener('click', () => { renderCetakAbsensiModal(); });
   document.getElementById('sideBtnPengurus')?.addEventListener('click', () => { renderManagePengurusModal(); });
   document.getElementById('sideBtnProfil')?.addEventListener('click', () => { renderSelfProfileModal(); });
 
@@ -581,11 +582,11 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   mobNavFitur?.addEventListener('click', toggleDropUp);
   mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
 
-  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProgramKerjaModal(); });
+  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProkerModal(); });
   document.getElementById('mobBtnStruktur')?.addEventListener('click', () => { toggleDropUp(); renderStrukturDaerahModal(); });
-  document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { window.location.href = '../generus/database-generus.html'; });
-  document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { window.location.href = '../pembiasaan/pembiasaan.html'; });
-  document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); alert("Fitur Absensi KBM belum tersedia."); });
+  document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); renderSiswaModal(); });
+  document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { toggleDropUp(); renderEventPembiasaanModal(); });
+  document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); renderCetakAbsensiModal(); });
 
   const btnToggleSidebar = document.getElementById('btnToggleSidebar');
   if (btnToggleSidebar) {
@@ -613,7 +614,9 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     await Promise.allSettled([
       syncPengurusFromSupabase(),
       syncPembiasaanFromSupabase(),
-      syncKbmFromSupabase()
+      syncKbmFromSupabase(),
+      syncSiswaFromSupabase(),
+      syncProkerFromSupabase()
     ]);
 
     // Cross-check session against live data and update UI

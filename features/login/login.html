@@ -306,7 +306,7 @@
            const modal = mutation.target;
            const card = document.getElementById('regCard');
            if (modal.style.display !== 'none') {
-             modal.style.display = 'flex';
+             if (modal.style.display !== 'flex') modal.style.display = 'flex';
              setTimeout(() => {
                modal.classList.remove('opacity-0', 'pointer-events-none');
                if(card) card.classList.remove('scale-95');
@@ -323,7 +323,7 @@
 
     // Cache Busting
     (function forceCacheClear() {
-      const CACHE_CLEAR_FLAG = 'cache_cleared_login_v4.5_tw';
+      const CACHE_CLEAR_FLAG = 'cache_cleared_login_v4.6_fix';
       if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
         console.log("Forcing cache clear and Service Worker unregistration...");
         if ('serviceWorker' in navigator) {
@@ -341,10 +341,10 @@
           });
         }
         localStorage.setItem(CACHE_CLEAR_FLAG, 'true');
-        setTimeout(() => window.location.reload(true), 500);
+        setTimeout(() => window.location.reload(true), 300);
       }
     })();
   </script>
-  <script type="module" src="login.js?v=4.5"></script>
+  <script type="module" src="login.js?v=4.6"></script>
 </body>
 </html>
