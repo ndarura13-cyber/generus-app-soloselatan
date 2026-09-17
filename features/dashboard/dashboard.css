@@ -923,159 +923,269 @@ body {
 }
 
 .kontak-header-desc {
-  font-size: 12.5px;
-  color: var(--text-muted);
+  font-size: 13px;
+  color: #475569;
   line-height: 1.5;
-  background: var(--blue-light);
-  padding: 10px 14px;
-  border-radius: 10px;
-  border-left: 4px solid var(--blue);
+  background: #f1f5f9;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 3.5px solid #1a56c4;
+  border-top: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.kontak-card {
-  background: var(--surface-2);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
+.dark .kontak-header-desc {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: #334155;
+  border-left: 3.5px solid #3b82f6;
+  color: #94a3b8;
+}
+
+.kontak-header-desc strong {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.dark .kontak-header-desc strong {
+  color: #f1f5f9;
+}
+
+.kontak-list-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: var(--transition);
+}
+
+.kontak-card {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.dark .kontak-card {
+  background: #1e293b;
+  border-color: #334155;
 }
 
 .kontak-card:hover {
   background: #ffffff;
-  border-color: var(--blue);
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
 }
 
-.kontak-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
+.dark .kontak-card:hover {
+  background: #1e293b;
+  border-color: #475569;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
-.kontak-card-main {
+.kontak-card-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  min-width: 0;
 }
 
 .kontak-avatar {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 17px;
+  font-size: 20px;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(26, 86, 196, .25);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+}
+
+.kontak-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .kontak-name {
-  font-size: 14.5px;
-  font-weight: 800;
-  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.dark .kontak-name {
+  color: #f8fafc;
 }
 
 .kontak-role {
-  font-size: 12px;
-  color: var(--blue);
-  font-weight: 700;
-  margin-top: 1px;
+  font-size: 13px;
+  color: #2563eb;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.dark .kontak-role {
+  color: #60a5fa;
 }
 
 .kontak-asal {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 2px;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 3px;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+}
+
+.dark .kontak-asal {
+  color: #94a3b8;
+}
+
+.kontak-card-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-action-wa {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #22c55e;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-action-wa:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+}
+
+.btn-action-wa .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.btn-action-mail {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dark .btn-action-mail {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.btn-action-mail:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.dark .btn-action-mail:hover {
+  border-color: #3b82f6;
+  color: #60a5fa;
+  background: rgba(37, 99, 235, 0.15);
+}
+
+.btn-action-mail .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.btn-action-disabled {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  color: #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dark .btn-action-disabled {
+  background: #0f172a;
+  border-color: #334155;
+  color: #475569;
+}
+
+.btn-action-disabled .material-symbols-outlined {
+  font-size: 22px;
 }
 
 .kontak-status-pill {
-  font-size: 10.5px;
-  font-weight: 800;
-  padding: 3px 10px;
-  border-radius: 20px;
-  background: #e8f7ee;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: #f0fdf4;
   color: #166534;
   border: 1px solid #bbf7d0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
 }
 
-.kontak-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  border-top: 1px dashed var(--border);
-  padding-top: 12px;
+.dark .kontak-status-pill {
+  background: rgba(6, 78, 59, 0.25);
+  border-color: rgba(6, 95, 70, 0.6);
+  color: #34d399;
 }
 
-.btn-kontak-wa {
-  padding: 9px 14px;
-  border-radius: 10px;
-  background: #25d366;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  text-decoration: none;
-  box-shadow: 0 3px 8px rgba(37, 211, 102, .25);
-  transition: var(--transition);
+.kontak-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #86efac, #10b981 60%, #047857);
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.7);
+  flex-shrink: 0;
 }
 
-.btn-kontak-wa:hover {
-  background: #20ba5a;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 12px rgba(37, 211, 102, .35);
-}
-
-.btn-kontak-email {
-  padding: 9px 14px;
-  border-radius: 10px;
-  background: #ffffff;
-  border: 1.5px solid var(--border);
-  color: var(--text);
-  font-weight: 700;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  text-decoration: none;
-  transition: var(--transition);
-}
-
-.btn-kontak-email:hover {
-  border-color: var(--blue);
-  color: var(--blue);
-  background: var(--blue-light);
-  transform: translateY(-1px);
-}
-
-.btn-kontak-disabled {
-  padding: 9px 14px;
-  border-radius: 10px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #94a3b8;
-  font-size: 11.5px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+@media (max-width: 580px) {
+  .kontak-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .kontak-card-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .kontak-empty-box {
@@ -1179,29 +1289,43 @@ body {
 .modal-title-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .modal-icon-top {
-  font-size: 24px;
-  color: var(--blue);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1a56c4;
+  border: 1px solid #dbeafe;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
 }
 
 .modal-header h3 {
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .btn-close-modal {
   background: none;
   border: none;
-  font-size: 26px;
-  color: var(--text-muted);
+  font-size: 22px;
+  color: #94a3b8;
   cursor: pointer;
   line-height: 1;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
 }
 
 .btn-close-modal:hover {

@@ -265,7 +265,7 @@ export function renderKontakModal(desaId, kelompokId = null) {
   }
 
   if (filtered.length === 0) {
-    openModal(title, 'contact_phone', `
+    openModal(title, 'badge', `
       <div class="kontak-empty-box">
         <span class="material-symbols-outlined">person_off</span>
         <h4 style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Belum Ada Pengurus Terdaftar</h4>
@@ -279,54 +279,59 @@ export function renderKontakModal(desaId, kelompokId = null) {
     const waClean = (p.noWa || '').replace(/[^0-9]/g, '');
     const waIntl = waClean ? (waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean) : '';
     const waMsg = encodeURIComponent(`Assalamu'alaikum ${p.nama}, terkait koordinasi PPG Solo Selatan...`);
-    const asalTxt = `Kel. ${p.kelompokNama || '-'} &bull; Desa ${p.desaNama || '-'}`;
+    const initial = (p.nama || 'P').trim().charAt(0).toUpperCase();
+
+    const kelTxt = p.kelompokNama || (p.kelompokId && desa ? (desa.kelompok?.find(k => k.id === p.kelompokId)?.nama || '-') : '-');
+    const desaTxt = p.desaNama || desaNama;
+    const asalTxt = `Kel. ${kelTxt} &bull; Desa ${desaTxt}`;
 
     return `
       <div class="kontak-card">
-        <div class="kontak-card-top">
-          <div class="kontak-card-main">
-            <div class="kontak-avatar">
-              ${(p.nama || 'P').charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div class="kontak-name">${p.nama}</div>
-              <div class="kontak-role">${p.peran || p.jabatan || 'Pamong'}</div>
-              <div class="kontak-asal">📍 Asal: <strong>${asalTxt}</strong></div>
-            </div>
+        <div class="kontak-card-left">
+          <div class="kontak-avatar">
+            ${initial}
           </div>
-          <span class="kontak-status-pill">🟢 Aktif</span>
+          <div class="kontak-info">
+            <div class="kontak-name">${p.nama}</div>
+            <div class="kontak-role">${p.peran || p.jabatan || 'Pamong'}</div>
+            <div class="kontak-asal">📍 Asal: ${asalTxt}</div>
+          </div>
         </div>
 
-        <div class="kontak-actions">
+        <div class="kontak-card-right">
           ${waIntl ? `
-            <a href="https://wa.me/${waIntl}?text=${waMsg}" target="_blank" rel="noopener" class="btn-kontak-wa">
-              <span class="material-symbols-outlined" style="font-size:16px;">chat</span> Chat WhatsApp
+            <a href="https://wa.me/${waIntl}?text=${waMsg}" target="_blank" rel="noopener" class="btn-action-wa" title="Chat WhatsApp (${p.noWa})">
+              <span class="material-symbols-outlined">chat</span>
             </a>
           ` : `
-            <span class="btn-kontak-disabled">
-              <span class="material-symbols-outlined" style="font-size:16px;">phone_disabled</span> No WA (-)
-            </span>
+            <div class="btn-action-disabled" title="Nomor WhatsApp tidak tersedia">
+              <span class="material-symbols-outlined">chat</span>
+            </div>
           `}
           ${p.email ? `
-            <a href="mailto:${p.email}" class="btn-kontak-email">
-              <span class="material-symbols-outlined" style="font-size:16px;">mail</span> Kirim Email
+            <a href="mailto:${p.email}" class="btn-action-mail" title="Kirim Email (${p.email})">
+              <span class="material-symbols-outlined">mail</span>
             </a>
           ` : `
-            <span class="btn-kontak-disabled">
-              <span class="material-symbols-outlined" style="font-size:16px;">mail_lock</span> Email (-)
-            </span>
+            <div class="btn-action-disabled" title="Email tidak tersedia">
+              <span class="material-symbols-outlined">mail</span>
+            </div>
           `}
+          <div class="kontak-status-pill">
+            <span class="kontak-status-dot"></span>
+            <span>Aktif</span>
+          </div>
         </div>
       </div>
     `;
   }).join('');
 
-  openModal(`${title} (${filtered.length} Pengurus)`, 'contacts', `
+  openModal(`${title} (${filtered.length} Pengurus)`, 'badge', `
     <div class="kontak-modal-wrap">
       <div class="kontak-header-desc">
         Daftar kontak pengurus &amp; pamong yang bertanggung jawab di wilayah <strong>${subLabel}</strong>:
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="kontak-list-container">
         ${listHtml}
       </div>
     </div>
