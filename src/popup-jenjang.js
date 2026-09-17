@@ -341,15 +341,25 @@ export function bukaModal(key) {
   }
 
 
-  // Tampilkan Modal
+  // Tampilkan Modal dengan animasi Tailwind halus
   modal.style.display = "flex";
+  const card = document.getElementById("mjCard");
+  setTimeout(() => {
+    modal.classList.remove("opacity-0", "pointer-events-none");
+    if (card) card.classList.remove("scale-95");
+  }, 10);
   document.body.style.overflow = "hidden";
 }
 
 export function tutupModal() {
   const modal = document.getElementById("modalJenjangDetail");
   if (modal) {
-    modal.style.display = "none";
+    const card = document.getElementById("mjCard");
+    modal.classList.add("opacity-0", "pointer-events-none");
+    if (card) card.classList.add("scale-95");
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 250);
   }
   document.body.style.overflow = "";
 }

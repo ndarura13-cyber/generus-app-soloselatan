@@ -22,19 +22,19 @@ import { getProkerList } from './db-master.js';
   document.body.prepend(splash);
 
   const hideSplash = () => {
+    splash.style.pointerEvents = 'none';
+    splash.classList.add('hidden');
     setTimeout(() => {
-      splash.classList.add('hidden');
-      setTimeout(() => {
-        if (splash.parentNode) splash.parentNode.removeChild(splash);
-      }, 600);
-    }, 1100);
+      if (splash.parentNode) splash.parentNode.removeChild(splash);
+    }, 400);
   };
 
+  // Tutup splash dengan cepat agar interaksi pengguna instan
+  setTimeout(hideSplash, 600);
   if (document.readyState === 'complete') {
-    hideSplash();
+    setTimeout(hideSplash, 200);
   } else {
-    window.addEventListener('load', hideSplash);
-    setTimeout(hideSplash, 1800);
+    window.addEventListener('load', hideSplash, { once: true });
   }
 })();
 
@@ -102,6 +102,14 @@ requestAnimationFrame(() => {
     }
   });
 });
+setTimeout(() => {
+  revealEls.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 100 && rect.bottom > -100) {
+      el.classList.add('visible');
+    }
+  });
+}, 600);
 
 /* ── 6. ANIMATED STATS COUNTER ────────────────────────────── */
 const counters = document.querySelectorAll('.stat-num[data-target]');
@@ -292,30 +300,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-/* ── 8. LOADING SCREEN ────────────────────────────────────── */
-(function setupLoadingScreen() {
-  // Create loading screen dynamically
-  const loading = document.createElement('div');
-  loading.className = 'loading-screen';
-  loading.id = 'loadingScreen';
-  loading.innerHTML = `
-    <div class="loading-logo">
-      <img src="src/image/icon-192.png" alt="Logo PPG" style="width:64px;height:64px;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,0.3);margin-bottom:12px;object-fit:cover;" />
-    </div>
-    <div class="loading-title">PPG Solo Selatan</div>
-    <div class="loading-sub">Building Generation with Noble Character</div>
-    <div class="loading-bar"><div class="loading-fill"></div></div>
-  `;
-  document.body.prepend(loading);
-
-  // Hide after fonts + content loaded
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      loading.classList.add('hidden');
-      setTimeout(() => loading.remove(), 600);
-    }, 1800);
-  });
-})();
 
 /* ── 9. SCROLL TO TOP BUTTON ──────────────────────────────── */
 (function setupScrollTop() {

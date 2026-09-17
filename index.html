@@ -31,6 +31,40 @@
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
 
+  <script>
+    // Early Dark Mode check to prevent flash
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      const hour = new Date().getHours();
+      if (hour >= 17 || hour < 6) document.documentElement.classList.add('dark');
+    }
+
+    // Cache Busting & Service Worker reset
+    (function forceCacheClear() {
+      const CACHE_CLEAR_FLAG = 'cache_cleared_landing_v4.6_fix';
+      if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
+        console.log("Purging old caches and unregistering legacy service workers...");
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (registrations) {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
+        if ('caches' in window) {
+          caches.keys().then(function (names) {
+            for (let name of names) {
+              caches.delete(name);
+            }
+          });
+        }
+        localStorage.setItem(CACHE_CLEAR_FLAG, 'true');
+        setTimeout(() => window.location.reload(true), 300);
+      }
+    })();
+  </script>
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -69,11 +103,11 @@
     .nav-links { display: flex; gap: 1.5rem; align-items: center; }
     @media (max-width: 768px) {
       .nav-links {
-        display: flex; flex-direction: column; position: fixed; top: 0; right: -100%; width: 260px; height: 100vh;
+        display: flex; flex-direction: column; position: fixed; top: 0; right: -100%; left: auto !important; width: 260px; height: 100vh;
         @apply bg-white dark:bg-slate-800 shadow-xl;
         padding-top: 80px; transition: right 0.3s ease; z-index: 100;
       }
-      .nav-links.open { right: 0; }
+      .nav-links.open { right: 0 !important; left: auto !important; }
     }
     
     .level-pill { transition: all 0.2s; }
@@ -871,64 +905,23 @@
   <!-- FLOATING DARK MODE TOGGLE MOVED TO NAVBAR -->
 
   <script>
-    // Dark mode logic
+    // Dark mode toggle listener
     const themeToggleBtn = document.getElementById('darkModeToggle');
-
-    // Set theme on load based on user preference or time of day (petang)
-    function setThemeOnLoad() {
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        // Time based check (17:00 to 06:00 is dark)
-        const hour = new Date().getHours();
-        if (hour >= 17 || hour < 6) {
-          document.documentElement.classList.add('dark');
-        } else {
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', function () {
+        if (document.documentElement.classList.contains('dark')) {
           document.documentElement.classList.remove('dark');
-        }
-      }
-    }
-
-    setThemeOnLoad();
-
-    themeToggleBtn.addEventListener('click', function () {
-      if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-      }
-    });
-
-    // Fix Modal behavior for Tailwind (since popup-jenjang.js overrides display)
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.target.id === 'modalJenjangDetail' && mutation.attributeName === 'style') {
-          const modal = mutation.target;
-          const card = document.getElementById('mjCard');
-          if (modal.style.display !== 'none') {
-            // It's opening
-            if (modal.style.display !== 'flex') modal.style.display = 'flex'; // keep flex centering
-            setTimeout(() => {
-              modal.classList.remove('opacity-0', 'pointer-events-none');
-              if (card) card.classList.remove('scale-95');
-            }, 10);
-          } else {
-            // It's closing
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            if (card) card.classList.add('scale-95');
-          }
+          localStorage.theme = 'light';
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.theme = 'dark';
         }
       });
-    });
-    const mjModal = document.getElementById('modalJenjangDetail');
-    if (mjModal) observer.observe(mjModal, { attributes: true });
-
+    }
   </script>
 
-  <script type="module" src="src/popup-jenjang.js"></script>
-  <script type="module" src="src/app.js"></script>
+  <script type="module" src="src/popup-jenjang.js?v=4.6"></script>
+  <script type="module" src="src/app.js?v=4.6"></script>
 </body>
 
 </html>
