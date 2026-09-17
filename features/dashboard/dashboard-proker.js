@@ -22,7 +22,7 @@ import {
 } from './dashboard-common.js';
 
 let appHooks = {
-  renderUserProfile: () => {}
+  renderUserProfile: () => { }
 };
 
 export function setProkerHooks(hooks) {
@@ -261,7 +261,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     bannerNoticeHtml = `
       <div class="proker-banner-gold">
         <div class="proker-banner-gold-content">
-          <div class="proker-banner-gold-title">🌟 Wewenang Superadmin Daerah</div>
+          <div class="proker-banner-gold-title">Wewenang Superadmin Daerah</div>
           <div class="proker-banner-gold-sub">Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️ .</div>
         </div>
         <button type="button" id="btnTambahProkerBaru" class="btn-proker-banner-gold">
@@ -272,7 +272,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   } else {
     bannerNoticeHtml = `
       <div class="proker-banner-wilayah">
-        <strong>👁️ Mode Koordinasi Wilayah (${currentUser.tingkatan === 'desa' ? 'Tingkat Desa ' + (currentUser.desaNama || '') : 'Pamong Kelompok ' + (currentUser.kelompokNama || '')}):</strong><br/>
+        <strong>Mode Koordinasi Wilayah (${currentUser.tingkatan === 'desa' ? 'Tingkat Desa ' + (currentUser.desaNama || '') : 'Pamong Kelompok ' + (currentUser.kelompokNama || '')}):</strong><br/>
         Berikut adalah agenda resmi Program Kerja PPG Solo Selatan beserta rincian sasaran, tujuan, waktu, dan tempat pelaksanaan kegiatan.
       </div>
     `;
@@ -290,17 +290,17 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon text-emerald-400">arrow_forward</span>
+          <span class="material-symbols-outlined proker-stat-icon">hourglass_top</span>
           <div class="proker-stat-info">
             <span class="stat-label">SEDANG BERJALAN</span>
-            <span class="stat-num stat-emerald">${stats.ongoing} PROGRAM</span>
+            <span class="stat-num">${stats.ongoing} PROGRAM</span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon">done</span>
+          <span class="material-symbols-outlined proker-stat-icon text-emerald-400">done_all</span>
           <div class="proker-stat-info">
             <span class="stat-label">SELESAI / TERLAKSANA</span>
-            <span class="stat-num">${stats.done} PROGRAM</span>
+            <span class="stat-num stat-emerald">${stats.done} PROGRAM</span>
           </div>
         </div>
       </div>
@@ -553,13 +553,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           ${paginatedItems.map(p => {
-            let statusClass = p.status || 'planned';
-            let statusLabel = 'Direncanakan';
-            if (statusClass === 'done') statusLabel = 'Selesai';
-            else if (statusClass === 'ongoing') statusLabel = 'Berlangsung';
-            else if (statusClass === 'upcoming') statusLabel = 'Akan Datang';
+      let statusClass = p.status || 'planned';
+      let statusLabel = 'Direncanakan';
+      if (statusClass === 'done') statusLabel = 'Selesai';
+      else if (statusClass === 'ongoing') statusLabel = 'Berlangsung';
+      else if (statusClass === 'upcoming') statusLabel = 'Akan Datang';
 
-            let superButtons = isSuper ? `
+      let superButtons = isSuper ? `
               <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program">
                 <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
               </button>
@@ -568,7 +568,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
               </button>
             ` : '';
 
-            return `
+      return `
               <div class="proker-card-item">
                 <div class="proker-card-header">
                   <strong class="proker-card-title">${p.no}. ${p.kegiatan}</strong>
@@ -609,7 +609,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 </div>
               </div>
             `;
-          }).join('')}
+    }).join('')}
         </div>
         ${paginationHtml}
       </div>

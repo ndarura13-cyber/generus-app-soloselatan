@@ -249,10 +249,13 @@
     <div class="h-full px-4 md:px-6 max-w-7xl mx-auto flex items-center justify-between">
       
       <div class="flex items-center gap-3">
-        <button id="dashHamburger" class="p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg md:hidden transition-colors">
+        <button id="dashHamburger" class="hidden p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" style="display: none !important;">
           <span class="material-symbols-outlined">menu</span>
         </button>
-        <div class="md:hidden font-bold text-brandBlue dark:text-blue-400 leading-tight ml-2">PPG Solo Selatan</div>
+        <div class="md:hidden flex items-center gap-2 font-bold text-brandBlue dark:text-blue-400 leading-tight">
+          <img src="../../src/image/icon-192.png" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 shadow-sm" />
+          <span class="text-base tracking-tight">PPG Solo Selatan</span>
+        </div>
       </div>
 
       <!-- Desktop Nav Actions -->
@@ -682,6 +685,6 @@
   <!-- Backdrop for Drop-Up -->
   <div id="mobDropUpBackdrop" class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
-  <script type="module" src="dashboard.js?v=5.0"></script>
+  <script type="module" src="dashboard.js?v=5.1"></script>
 </body>
 </html>
