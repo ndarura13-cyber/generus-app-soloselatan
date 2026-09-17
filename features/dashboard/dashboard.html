@@ -32,7 +32,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=4.9" />
+  <link rel="stylesheet" href="dashboard.css?v=5.0" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -220,11 +220,12 @@
         <button id="sideBtnSiswa" class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Database Generus</button>
         <button id="sideBtnPembiasaan" class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Lembar Pembiasaan</button>
         <button id="sideBtnAbsensi" class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Absensi KBM</button>
+        <button id="sideBtnKelolaPengurus" class="w-full text-left py-2 text-sm text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-semibold transition-colors whitespace-nowrap hidden">Kelola Hak Akses</button>
       </div>
 
       <div class="text-xs font-bold text-slate-400 uppercase tracking-widest px-3 mt-4 mb-2 menu-label">Sistem</div>
       
-      <button id="sideBtnPengurus" title="Pengurus Daerah" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium relative group">
+      <button id="sideBtnPengurus" title="Pengurus Daerah" style="display:none;" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium relative group">
         <span class="material-symbols-outlined shrink-0">admin_panel_settings</span>
         <span class="whitespace-nowrap menu-text">Pengurus Daerah</span>
       </button>
@@ -333,12 +334,13 @@
           <button id="drawerBtnSiswa" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Database Generus</button>
           <button id="drawerBtnPembiasaan" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Lembar Pembiasaan</button>
           <button id="drawerBtnAbsensi" class="w-full text-left py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors">Absensi KBM</button>
+          <button id="drawerBtnKelolaPengurus" class="w-full text-left py-2.5 text-sm text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-semibold transition-colors hidden">Kelola Hak Akses</button>
         </div>
       </div>
 
       <div class="mt-4 mb-2 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Sistem</div>
       
-      <button id="drawerBtnPengurusDaerah" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
+      <button id="drawerBtnPengurusDaerah" style="display:none;" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium">
         <span class="material-symbols-outlined">group</span>
         Pengurus PPG Daerah
       </button>
@@ -627,8 +629,8 @@
     </button>
     
     <!-- Pengurus Daerah -->
-    <button id="mobNavPengurus" class="flex flex-col items-center justify-center p-2 w-16 text-slate-500 hover:text-brandBlue dark:hover:text-blue-400 transition-colors relative">
-      <span class="material-symbols-outlined text-[24px]">admin_panel_settings</span>
+    <button id="mobNavPengurus" class="flex flex-col items-center justify-center p-2 w-16 text-slate-500 hover:text-brandBlue dark:hover:text-blue-400 transition-colors relative" title="Struktur Pengurus PPG">
+      <span class="material-symbols-outlined text-[24px]">diversity_2</span>
       <span class="text-[10px] font-bold mt-1">Pengurus</span>
     </button>
     
@@ -657,6 +659,9 @@
           <button id="mobBtnAbsensi" class="flex items-center gap-3 w-full text-left p-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <span class="material-symbols-outlined text-blue-500 text-[20px]">how_to_reg</span> Absensi KBM
           </button>
+          <button id="mobBtnKelolaPengurus" class="flex items-center gap-3 w-full text-left p-2 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors hidden">
+            <span class="material-symbols-outlined text-rose-500 text-[20px]">admin_panel_settings</span> Kelola Hak Akses
+          </button>
         </div>
       </div>
     </div>
@@ -677,6 +682,6 @@
   <!-- Backdrop for Drop-Up -->
   <div id="mobDropUpBackdrop" class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
-  <script type="module" src="dashboard.js?v=4.9"></script>
+  <script type="module" src="dashboard.js?v=5.0"></script>
 </body>
 </html>

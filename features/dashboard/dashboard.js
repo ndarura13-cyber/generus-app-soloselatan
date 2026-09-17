@@ -112,6 +112,9 @@ export function renderUserProfile() {
     scopeTextEl.innerHTML = `<strong>Tingkat:</strong> Pengurus PPG Daerah Solo Selatan${asalInfo}`;
 
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'flex';
+    document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'block');
+    document.getElementById('drawerBtnKelolaPengurus')?.style.setProperty('display', 'block');
+    document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'flex');
     checkPendingApprovals();
 
     const pStats = getProkerStats();
@@ -141,6 +144,9 @@ export function renderUserProfile() {
 
     scopeTextEl.innerHTML = `<strong>Wilayah Koordinasi:</strong> Desa ${currentUser.desaNama || 'Barat'} &bull; Asal Kel. ${currentUser.kelompokNama || '-'}`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
+    document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
+    document.getElementById('drawerBtnKelolaPengurus')?.style.setProperty('display', 'none');
+    document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
     const pStats = getProkerStats();
@@ -160,6 +166,9 @@ export function renderUserProfile() {
 
     scopeTextEl.innerHTML = `<strong>Kelompok Binaan:</strong> Kelompok ${currentUser.kelompokNama || 'Gentan'} (Desa ${currentUser.desaNama || 'Barat'})`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
+    document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
+    document.getElementById('drawerBtnKelolaPengurus')?.style.setProperty('display', 'none');
+    document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
     const pStats = getProkerStats();
@@ -512,9 +521,13 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
       drawerUserBadge.textContent = currentUser.isSuperadmin ? '🌟 Superadmin Daerah' : (currentUser.tingkatan === 'desa' ? '🏛️ Koordinator Desa' : '👥 Pamong Kelompok');
     }
 
-    const drawerPengurusItem = document.getElementById('drawerBtnStruktur');
-    if (drawerPengurusItem) {
-      drawerPengurusItem.style.display = (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') ? 'flex' : 'none';
+    const drawerKelolaItem = document.getElementById('drawerBtnKelolaPengurus');
+    if (drawerKelolaItem) {
+      drawerKelolaItem.style.display = (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') ? 'block' : 'none';
+    }
+    const drawerStrukturItem = document.getElementById('drawerBtnStruktur');
+    if (drawerStrukturItem) {
+      drawerStrukturItem.style.display = 'block';
     }
   }
 
@@ -561,8 +574,25 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   const mobNavProfil = document.getElementById('mobNavProfil');
   const mobNavLogout = document.getElementById('mobNavLogout');
 
+  // Kelola Hak Akses Pengurus Handler (Superadmin Only)
+  const handleOpenKelolaPengurus = async () => {
+    showToast("Mengambil data pengurus terbaru dari server...");
+    if (isSupabaseConfigured()) await syncPengurusFromSupabase();
+    renderManagePengurusModal('all');
+  };
+
+  document.getElementById('sideBtnKelolaPengurus')?.addEventListener('click', handleOpenKelolaPengurus);
+  document.getElementById('drawerBtnKelolaPengurus')?.addEventListener('click', () => {
+    closeDrawer();
+    handleOpenKelolaPengurus();
+  });
+  document.getElementById('mobBtnKelolaPengurus')?.addEventListener('click', () => {
+    toggleDropUp();
+    handleOpenKelolaPengurus();
+  });
+
   mobNavHome?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  mobNavPengurus?.addEventListener('click', () => { renderManagePengurusModal(); });
+  mobNavPengurus?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   mobNavProfil?.addEventListener('click', () => { renderSelfProfileModal(); });
   mobNavLogout?.addEventListener('click', doLogout);
 
