@@ -42,6 +42,39 @@
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME SYSTEM VARIABLES (UNIVERSAL)
+   ═══════════════════════════════════════════════════════════════ */
+html.dark, body.dark, .dark {
+  --blue: #38bdf8;
+  --blue-dark: #60a5fa;
+  --blue-light: #172554;
+  
+  --gold: #f59e0b;
+  --gold-light: #451a03;
+  --gold-dark: #fbbf24;
+  
+  --green: #10b981;
+  --green-pastel: #064e3b;
+  --green-dark: #34d399;
+  
+  --purple: #a855f7;
+  --purple-light: #3b0764;
+  
+  --red: #ef4444;
+  --red-light: #450a0a;
+  
+  --bg: #090e1a;
+  --surface: #0b1329;
+  --surface-2: #111d38;
+  --surface-nested: #080e1e;
+  
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #223554;
+  --border-light: #1e293b;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -1453,11 +1486,11 @@ body {
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  margin-bottom: 16px;
-  background: var(--surface-2);
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  margin: 6px 0 16px 0;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .proker-table-wrap {
@@ -1846,7 +1879,9 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    padding: 10px;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
     margin-bottom: 12px;
   }
   .proker-filter-bar > div:first-child {
@@ -2816,4 +2851,15 @@ body {
 .dark .btn-confirm-no:hover {
   background: #1e293b !important;
   color: #ffffff !important;
+}
+
+
+/* Ensure filter bar has NO bright background in dark mode */
+.dark .proker-filter-bar,
+.dark .modal-body .proker-filter-bar,
+.modal-body .dark .proker-filter-bar {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
