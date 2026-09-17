@@ -249,78 +249,93 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   let bannerNoticeHtml = '';
   if (isSuper) {
     bannerNoticeHtml = `
-      <div style="background:linear-gradient(135deg, #fef8e7 0%, #fff3cd 100%);padding:14px 18px;border-radius:12px;border:1.5px solid #fde68a;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:13px;font-weight:800;color:var(--gold-dark);">🌟 Wewenang Superadmin Daerah</div>
-          <div style="font-size:12px;color:var(--gold-dark);margin-top:2px;">Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️.</div>
+      <div class="proker-banner-gold">
+        <div class="proker-banner-gold-content">
+          <div class="proker-banner-gold-title">🌟 Wewenang Superadmin Daerah</div>
+          <div class="proker-banner-gold-sub">Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️ .</div>
         </div>
-        <button type="button" id="btnTambahProkerBaru" style="padding:9px 16px;background:linear-gradient(135deg, var(--gold), #d49b10);color:#1a1d2e;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(212,160,23,.25);">
+        <button type="button" id="btnTambahProkerBaru" class="btn-proker-banner-gold">
           <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span> Tambah Program Kerja
         </button>
       </div>
     `;
   } else {
     bannerNoticeHtml = `
-      <div style="background:var(--green-pastel);padding:12px 16px;border-radius:12px;border:1px solid var(--border);font-size:12.5px;color:var(--green-dark);line-height:1.5;">
+      <div class="proker-banner-wilayah">
         <strong>👁️ Mode Koordinasi Wilayah (${currentUser.tingkatan === 'desa' ? 'Tingkat Desa ' + (currentUser.desaNama || '') : 'Pamong Kelompok ' + (currentUser.kelompokNama || '')}):</strong><br/>
         Berikut adalah agenda resmi Program Kerja PPG Solo Selatan beserta rincian sasaran, tujuan, waktu, dan tempat pelaksanaan kegiatan.
       </div>
     `;
   }
 
-  // Summary Stat Strip (2 Baris Rapi)
-  const growthBadge = stats.percentGrowth > 0
-    ? `<span class="proker-growth-pill up">▲ +${stats.percentGrowth}% Naik</span>`
-    : (stats.percentGrowth < 0
-      ? `<span class="proker-growth-pill down">▼ ${stats.percentGrowth}% Turun</span>`
-      : `<span class="proker-growth-pill equal">▬ 0% Tetap</span>`);
-
+  // Summary Stat Strip (Screenshot Layout 3 x 2 Grid with Icons)
   const statsHtml = `
     <div class="proker-stats-container">
       <div class="proker-stats-row-1">
         <div class="proker-stat-box">
-          <span class="stat-label">Total Agenda</span>
-          <span class="stat-num">${stats.total} Program</span>
+          <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
+          <div class="proker-stat-info">
+            <span class="stat-label">TOTAL AGENDA</span>
+            <span class="stat-num">${stats.total} PROGRAM</span>
+          </div>
         </div>
         <div class="proker-stat-box">
-          <span class="stat-label">Sedang Berjalan</span>
-          <span class="stat-num" style="color:var(--green);">${stats.ongoing} Program</span>
+          <span class="material-symbols-outlined proker-stat-icon text-emerald-400">arrow_forward</span>
+          <div class="proker-stat-info">
+            <span class="stat-label">SEDANG BERJALAN</span>
+            <span class="stat-num stat-emerald">${stats.ongoing} PROGRAM</span>
+          </div>
         </div>
         <div class="proker-stat-box">
-          <span class="stat-label">Selesai / Terlaksana</span>
-          <span class="stat-num" style="color:var(--text-muted);">${stats.done} Program</span>
+          <span class="material-symbols-outlined proker-stat-icon">done</span>
+          <div class="proker-stat-info">
+            <span class="stat-label">SELESAI / TERLAKSANA</span>
+            <span class="stat-num">${stats.done} PROGRAM</span>
+          </div>
         </div>
       </div>
       <div class="proker-stats-row-2">
         <div class="proker-stat-box">
-          <span class="stat-label">Total Est. Anggaran Tahun Ini</span>
-          <span class="stat-num" style="color:var(--blue);">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
+          <span class="material-symbols-outlined proker-stat-icon">payments</span>
+          <div class="proker-stat-info">
+            <span class="stat-label">EST. ANGGARAN TAHUN INI</span>
+            <span class="stat-num">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
+            <span class="stat-sub">EST. ANGGARAN (TAHUN INI)</span>
+          </div>
         </div>
         <div class="proker-stat-box">
-          <span class="stat-label">Est. Anggaran Tahun Sebelumnya</span>
-          <span class="stat-num" style="color:var(--text-muted);">Rp ${stats.anggaranTahunLalu.toLocaleString('id-ID')}</span>
+          <span class="material-symbols-outlined proker-stat-icon">savings</span>
+          <div class="proker-stat-info">
+            <span class="stat-label">EST. ANGGARAN TAHUN SEBELUMNYA</span>
+            <span class="stat-num">Rp ${stats.anggaranTahunLalu.toLocaleString('id-ID')}</span>
+            <span class="stat-sub">EST. ANGGARAN (LALU)</span>
+          </div>
         </div>
         <div class="proker-stat-box">
-          <span class="stat-label">Pertumbuhan Anggaran</span>
-          <div class="stat-num">${growthBadge}</div>
+          <span class="material-symbols-outlined proker-stat-icon text-emerald-400">trending_up</span>
+          <div class="proker-stat-info">
+            <span class="stat-label">PERTUMBUHAN ANGGARAN</span>
+            <span class="stat-num stat-emerald">${stats.percentGrowth > 0 ? '+' : ''}${stats.percentGrowth}%</span>
+            <span class="stat-sub">${stats.percentGrowth >= 0 ? 'NAIK (VS LALU)' : 'TURUN (VS LALU)'}</span>
+          </div>
         </div>
       </div>
     </div>
   `;
 
-  // Filter Bar (Hanya Status & Bidang Penanggung Jawab PIC)
+  // Filter Bar
   const bidangOptions = DAFTAR_BIDANG_PPG.map(b =>
     `<option value="${b}" ${filterBidang === b ? 'selected' : ''}>Bidang ${b}</option>`
   ).join('');
 
   const filterHtml = `
     <div class="proker-filter-bar">
-      <div style="flex:1;min-width:180px;position:relative;">
-        <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan..." style="width:100%;padding:8px 12px 8px 32px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;" />
-        <span class="material-symbols-outlined" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);">search</span>
+      <div style="flex:1;min-width:200px;position:relative;">
+        <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan..." class="proker-input" style="width:100%;" />
+        <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:#64748b;pointer-events:none;">search</span>
       </div>
 
-      <select id="selectFilterStatus" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);outline:none;cursor:pointer;">
+      <select id="selectFilterStatus" class="proker-select">
         <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
         <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>🟢 Sedang Berlangsung</option>
         <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
@@ -328,32 +343,32 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>⚪ Selesai</option>
       </select>
 
-      <select id="selectFilterBidang" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);outline:none;cursor:pointer;">
+      <select id="selectFilterBidang" class="proker-select">
         <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>Semua Bidang (14 Bidang)</option>
         ${bidangOptions}
       </select>
 
-      <div style="display:inline-flex;gap:6px;">
-        <button type="button" id="btnExportCsv" title="Download data dalam format Excel CSV" style="padding:7px 12px;background:var(--surface)fff;border:1px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:16px;color:var(--green);">file_download</span> CSV
+      <div style="display:inline-flex;gap:8px;">
+        <button type="button" id="btnExportCsv" class="proker-btn-csv" title="Download data dalam format Excel CSV">
+          <span class="material-symbols-outlined" style="font-size:16px;">file_download</span> CSV
         </button>
-        <button type="button" id="btnPrintTable" title="Cetak dokumen resmi" style="padding:7px 12px;background:var(--surface)fff;border:1px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">print</span> Cetak
+        <button type="button" id="btnPrintTable" class="proker-btn-print" title="Cetak dokumen resmi">
+          <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak
         </button>
       </div>
 
-      <div style="display:inline-flex;background:#e2e8f0;padding:2px;border-radius:8px;">
-        <button type="button" id="tabViewTimeline" style="padding:6px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:${activeTab === 'timeline' ? '#ffffff' : 'transparent'};color:${activeTab === 'timeline' ? 'var(--blue)' : 'var(--text-muted)'};box-shadow:${activeTab === 'timeline' ? '0 2px 4px rgba(0,0,0,0.08)' : 'none'};display:flex;align-items:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:14px;">view_timeline</span> Timeline Kegiatan
+      <div class="proker-tabs-wrap">
+        <button type="button" id="tabViewTimeline" class="proker-tab-pill ${activeTab === 'timeline' ? 'active' : ''}">
+          <span class="material-symbols-outlined" style="font-size:15px;">view_timeline</span> Timeline Kegiatan
         </button>
-        <button type="button" id="tabViewTable" style="padding:6px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:${activeTab === 'table' ? '#ffffff' : 'transparent'};color:${activeTab === 'table' ? 'var(--blue)' : 'var(--text-muted)'};box-shadow:${activeTab === 'table' ? '0 2px 4px rgba(0,0,0,0.08)' : 'none'};display:flex;align-items:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:14px;">table_chart</span> Tabel Resmi
+        <button type="button" id="tabViewTable" class="proker-tab-pill ${activeTab === 'table' ? 'active' : ''}">
+          <span class="material-symbols-outlined" style="font-size:15px;">table_chart</span> Tabel Resmi
         </button>
       </div>
     </div>
   `;
 
-  // Content rendering based on activeTab
+    // Content rendering based on activeTab
   let contentHtml = '';
 
   if (activeTab === 'table') {
@@ -477,80 +492,70 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     contentHtml = `
       <div style="display:flex;flex-direction:column;gap:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
-            <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">view_timeline</span>
+          <div style="font-size:12.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">view_timeline</span>
             Timeline kronologis ${filtered.length} agenda kegiatan program kerja tahunan 2026.
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
           ${filtered.map(p => {
-      let statusClass = p.status || 'planned';
+            let statusClass = p.status || 'planned';
+            let statusLabel = 'Direncanakan';
+            if (statusClass === 'done') statusLabel = 'Selesai';
+            else if (statusClass === 'ongoing') statusLabel = 'Berlangsung';
+            else if (statusClass === 'upcoming') statusLabel = 'Akan Datang';
 
-      let quickStatusTimeline = isSuper ? `
-              <select class="proker-quick-select proker-quick-status-change" data-id="${p.id}">
-                <option value="planned" ${statusClass === 'planned' ? 'selected' : ''}>🟡 Direncanakan</option>
-                <option value="upcoming" ${statusClass === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
-                <option value="ongoing" ${statusClass === 'ongoing' ? 'selected' : ''}>🟢 Berlangsung</option>
-                <option value="done" ${statusClass === 'done' ? 'selected' : ''}>⚪ Selesai</option>
-              </select>
-            ` : `
-              <span class="proker-badge-status ${statusClass}">
-                <span class="dot ${statusClass}"></span>
-                <span>${statusClass === 'done' ? 'Selesai' : (statusClass === 'ongoing' ? 'Sedang Berlangsung' : (statusClass === 'upcoming' ? 'Akan Datang' : 'Direncanakan'))}</span>
-              </span>
-            `;
-
-      let superButtons = isSuper ? `
-              <div style="display:inline-flex;gap:6px;align-items:center;">
-                <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program" style="padding:5px 10px;border:1px solid var(--border);background:var(--surface);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
-                  <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
-                </button>
-                <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 10px;border:1px solid var(--border);background:var(--surface);color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
-                  <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
-                </button>
-              </div>
+            let superButtons = isSuper ? `
+              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program">
+                <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
+              </button>
+              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program">
+                <span class="material-symbols-outlined" style="font-size:14px;">delete</span> Hapus
+              </button>
             ` : '';
 
-      return `
-              <div style="border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--surface)fff;box-shadow:0 2px 6px rgba(0,0,0,0.02);display:flex;gap:14px;align-items:flex-start;">
-                <div style="flex:1;">
-                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-                    <div>
-                      <strong style="font-size:14px;color:var(--text);">${p.no}</strong>
-                      <strong style="font-size:14px;color:var(--text);"> . </strong>
-                      <strong style="font-size:14px;color:var(--text);">${p.kegiatan}</strong>
-                      </br>
-                      <span style="font-size:11px;color:var(--blue);font-weight:700;background:var(--blue-light);padding:2px 6px;border-radius:4px;margin-left:6px;">PIC: ${p.penanggungJawab || 'Pengurus PPG'}</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                      ${quickStatusTimeline}
-                      ${superButtons}
-                    </div>
-                  </div>
-                  <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);margin:6px 0;">
-                    <span style="display:flex;align-items:center;gap:4px;">
-                      <span class="material-symbols-outlined ms-proker-ic">calendar_today</span> ${p.waktu}
+            return `
+              <div class="proker-card-item">
+                <div class="proker-card-header">
+                  <strong class="proker-card-title">${p.no}. ${p.kegiatan}</strong>
+                  <div class="proker-card-actions">
+                    <span class="proker-status-pill ${statusClass}">
+                      <span class="proker-status-dot"></span>
+                      ${statusLabel}
                     </span>
-                    <span>&bull;</span>
-                    <span style="display:flex;align-items:center;gap:4px;color:var(--blue-dark);font-weight:600;">
-                      <span class="material-symbols-outlined ms-proker-ic">location_on</span> ${p.tempat}
-                    </span>
-                    <span>&bull;</span>
-                    <span style="display:flex;align-items:center;gap:4px;color:var(--blue-dark);font-weight:600;">
-                      <span class="material-symbols-outlined ms-proker-ic">group</span> ${p.sasaran}
-                    </span>
+                    ${superButtons}
                   </div>
-                  <div style="background:var(--surface-2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);margin-bottom:6px;border-left:3px solid var(--blue);">
-                    <strong>Tujuan:</strong> ${p.tujuan}
-                  </div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--text-muted);border-top:1px dashed var(--border);padding-top:6px;flex-wrap:wrap;gap:6px;">
-                    <div>Rincian Biaya: <em>${p.rincianBiaya || '-'}</em></div>
-                    <strong style="color:var(--green-dark);font-size:12.5px;">Est. Biaya: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</strong>
-                  </div>
+                </div>
+
+                <div class="proker-card-meta">
+                  <span class="proker-pic-pill">PIC: ${p.penanggungJawab || 'Pengurus PPG'}</span>
+                  <span class="proker-meta-item">
+                    <span class="material-symbols-outlined" style="font-size:15px;color:#94a3b8;">calendar_today</span>
+                    ${p.waktu}
+                  </span>
+                  <span class="proker-meta-bullet">&bull;</span>
+                  <span class="proker-meta-item">
+                    <span class="material-symbols-outlined loc-icon" style="font-size:15px;">location_on</span>
+                    ${p.tempat}
+                  </span>
+                  <span class="proker-meta-bullet">&bull;</span>
+                  <span class="proker-meta-item">
+                    <span class="material-symbols-outlined group-icon" style="font-size:15px;">group</span>
+                    ${p.sasaran}
+                  </span>
+                </div>
+
+                <div class="proker-tujuan-box">
+                  <strong>Tujuan:</strong> ${p.tujuan}
+                </div>
+
+                <div class="proker-card-footer">
+                  <div class="proker-rincian">Rincian Biaya: <em>${p.rincianBiaya || '-'}</em></div>
+                  <div class="proker-est-biaya">Est. Biaya: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</div>
                 </div>
               </div>
             `;
-    }).join('')}
+          }).join('')}
         </div>
       </div>
     `;
@@ -659,7 +664,7 @@ export async function renderAddEditProkerForm(p = null) {
     ${!isEdit ? `
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;background:var(--bg);padding:10px;border-radius:8px;border:1px dashed var(--border);">
       <span style="font-size:11px;color:var(--text-muted);margin-right:auto;display:flex;align-items:center;">Punya banyak data? Gunakan format Excel (CSV).</span>
-      <button type="button" id="btnDownloadFormatExcel" style="padding:6px 12px;background:var(--surface)fff;border:1px solid var(--border);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+      <button type="button" id="btnDownloadFormatExcel" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">download</span> Unduh Format
       </button>
       <input type="file" id="inputImportCsv" accept=".csv" style="display:none;" />
@@ -677,7 +682,7 @@ export async function renderAddEditProkerForm(p = null) {
           <span class="material-symbols-outlined" style="font-size:16px;">badge</span>
           BIDANG PENANGGUNG JAWAB (PIC) *
         </label>
-        <select id="prokerInputPic" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;background:var(--surface)fff;color:var(--text);outline:none;">
+        <select id="prokerInputPic" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;background:var(--surface);color:var(--text);outline:none;">
           <option value="">-- Pilih Salah Satu dari 14 Bidang Pengurus PPG --</option>
           ${picOptions}
         </select>

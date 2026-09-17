@@ -32,7 +32,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=4.6" />
+  <link rel="stylesheet" href="dashboard.css?v=4.7" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -64,43 +64,52 @@
       }
       
       .modal-box {
-        @apply bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-full flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-300;
+        @apply bg-white dark:bg-[#0b1329] rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 transform scale-95 transition-transform duration-300;
+      }
+      .modal-box.modal-wide {
+        max-width: 1100px !important;
+      }
+      .modal-box.modal-large {
+        max-width: 950px !important;
+      }
+      .modal-box.modal-medium {
+        max-width: 800px !important;
       }
       .modal-backdrop.show .modal-box {
         @apply scale-100;
       }
       .modal-header {
-        @apply p-6 pb-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start shrink-0;
+        @apply px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 flex justify-between items-center shrink-0 bg-white dark:bg-[#0b1329];
       }
       .modal-title-wrap {
-        @apply flex items-start gap-4;
+        @apply flex items-center gap-3.5;
       }
       .modal-icon-top {
-        @apply w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0 text-2xl;
+        @apply w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/80 text-brandBlue dark:text-sky-400 border border-transparent dark:border-blue-800/60 flex items-center justify-center shrink-0 text-xl;
       }
       .modal-title-wrap h3 {
-        @apply text-xl font-bold text-slate-900 dark:text-white mt-1;
+        @apply text-lg md:text-xl font-extrabold text-slate-900 dark:text-white;
       }
       .btn-close-modal {
-        @apply text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 text-2xl leading-none;
+        @apply text-slate-400 hover:text-slate-600 dark:hover:text-white dark:hover:bg-slate-800/80 rounded-lg transition-colors p-1.5 text-2xl leading-none;
       }
       .modal-body {
-        @apply flex-1 overflow-y-auto p-6 space-y-4;
+        @apply flex-1 overflow-y-auto p-5 md:p-6 bg-white dark:bg-[#0b1329] text-slate-900 dark:text-slate-100;
       }
 
       .confirm-card {
-        @apply bg-white dark:bg-slate-800 rounded-3xl w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-300;
+        @apply bg-white dark:bg-[#0b1329] rounded-2xl w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl border border-slate-200 dark:border-slate-800 transform scale-95 transition-transform duration-300;
       }
       .confirm-backdrop.show .confirm-card { @apply scale-100; }
       .confirm-icon-box {
-        @apply w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center mb-4;
+        @apply w-14 h-14 rounded-full bg-red-50 dark:bg-red-950/50 text-red-500 flex items-center justify-center mb-4 border border-transparent dark:border-red-800/40;
       }
-      .confirm-icon-box .material-symbols-outlined { @apply text-3xl; }
+      .confirm-icon-box .material-symbols-outlined { @apply text-2xl; }
       .confirm-title { @apply text-lg font-bold text-slate-900 dark:text-white mb-2; }
       .confirm-message { @apply text-sm text-slate-600 dark:text-slate-400 mb-6; }
       .confirm-actions { @apply flex w-full gap-3; }
-      .btn-confirm-no { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors; }
-      .btn-confirm-yes { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors; }
+      .btn-confirm-no { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 transition-colors; }
+      .btn-confirm-yes { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors; }
 
       
       /* Desktop Sidebar Collapse */
@@ -668,6 +677,6 @@
   <!-- Backdrop for Drop-Up -->
   <div id="mobDropUpBackdrop" class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
-  <script type="module" src="dashboard.js?v=4.6"></script>
+  <script type="module" src="dashboard.js?v=4.7"></script>
 </body>
 </html>
