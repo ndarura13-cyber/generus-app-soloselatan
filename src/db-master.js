@@ -1598,7 +1598,8 @@ export async function deleteKbmEvent(id) {
 export async function syncProkerFromSupabase() {
   if (!isSupabaseConfigured()) return getProkerList();
   try {
-    const remoteList = await fetchProkerFromSupabase();
+    const res = await fetchProkerFromSupabase();
+    const remoteList = Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : null);
     if (remoteList && remoteList.length > 0) {
       saveProkerList(remoteList);
       return remoteList;

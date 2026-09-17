@@ -9,7 +9,8 @@ import {
   addProker,
   updateProker,
   deleteProker,
-  getProkerStats
+  getProkerStats,
+  syncProkerFromSupabase
 } from '../../src/db-master.js';
 
 import {
@@ -218,7 +219,16 @@ export function formatDateRange(startDateStr, endDateStr) {
   return `${s.getDate()} ${monthNames[s.getMonth()]} ${s.getFullYear()} – ${e.getDate()} ${monthNames[e.getMonth()]} ${e.getFullYear()}`;
 }
 
-export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline') {
+export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true) {
+  // Synchronize with Supabase if requested (e.g. on initial modal open)
+  if (shouldSync) {
+    try {
+      await syncProkerFromSupabase();
+    } catch (err) {
+      console.warn('Sync Supabase Proker warning:', err);
+    }
+  }
+
   const isSuper = currentUser.isSuperadmin || currentUser.tingkatan === 'daerah';
   const prokerList = getProkerList();
   const stats = getProkerStats();
@@ -368,11 +378,50 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     </div>
   `;
 
-    // Content rendering based on activeTab
+  // Pagination Calculation
+  const itemsPerPage = 5;
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+  // Pagination HTML Builder
+  let paginationHtml = '';
+  if (totalItems > 0) {
+    let pageButtonsHtml = '';
+    for (let pNum = 1; pNum <= totalPages; pNum++) {
+      pageButtonsHtml += `
+        <button type="button" class="proker-page-btn ${pNum === currentPage ? 'active' : ''}" data-page="${pNum}">
+          ${pNum}
+        </button>
+      `;
+    }
+
+    paginationHtml = `
+      <div class="proker-pagination">
+        <div class="proker-pagination-info">
+          Menampilkan <strong>${startIndex + 1} – ${Math.min(startIndex + itemsPerPage, totalItems)}</strong> dari <strong>${totalItems}</strong> program
+        </div>
+        <div class="proker-pagination-btns">
+          <button type="button" class="proker-page-btn btn-prev" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">
+            <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span> Sebelumnya
+          </button>
+          ${pageButtonsHtml}
+          <button type="button" class="proker-page-btn btn-next" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">
+            Selanjutnya <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Content rendering based on activeTab
   let contentHtml = '';
 
   if (activeTab === 'table') {
-    let rowsHtml = filtered.map((p, idx) => {
+    let rowsHtml = paginatedItems.map((p, idx) => {
       let statusClass = p.status || 'planned';
 
       let quickStatusSelect = isSuper ? `
@@ -407,8 +456,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       return `
         <tr>
-          <td style="font-weight:800;text-align:center;color:var(--blue);">${p.no || (idx + 1)}
-          </td>
+          <td style="font-weight:800;text-align:center;color:var(--blue);">${p.no || (startIndex + idx + 1)}</td>
           <td>
             <div style="font-weight:800;font-size:13px;color:var(--text);">${p.kegiatan}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">PIC: <strong style="color:var(--blue-dark);">${p.penanggungJawab || 'Pengurus PPG'}</strong></div>
@@ -461,30 +509,33 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     }
 
     contentHtml = `
-      <div style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <span>👈 Geser tabel ke kanan dan ke kiri untuk melihat seluruh 8 kolom program kerja 👉</span>
-        <span>Menampilkan <strong>${filtered.length}</strong> program</span>
-      </div>
-      <div class="proker-table-wrap">
-        <table class="proker-table">
-          <thead>
-            <tr>
-              <th style="width:36px;text-align:center;">NO</th>
-              <th>KEGIATAN</th>
-              <th>WAKTU</th>
-              <th>SASARAN/ PESERTA</th>
-              <th>TUJUAN KEGIATAN</th>
-              <th>RINCIAN BIAYA</th>
-              <th>EST. BIAYA</th>
-              <th>TEMPAT PELAKSANAAN</th>
-              <th>STATUS</th>
-              ${isSuper ? '<th style="text-align:right;">AKSI</th>' : ''}
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-        </table>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-muted);">
+          <span>👉 Geser tabel ke kanan dan ke kiri untuk melihat seluruh 8 kolom program kerja 👈</span>
+          <span style="font-weight:700;">Halaman ${currentPage} dari ${totalPages} (${totalItems} Total Program)</span>
+        </div>
+        <div class="proker-table-wrap">
+          <table class="proker-table">
+            <thead>
+              <tr>
+                <th style="width:40px;text-align:center;">NO</th>
+                <th style="min-width:200px;">KEGIATAN</th>
+                <th style="min-width:130px;">WAKTU</th>
+                <th style="min-width:150px;">SASARAN/ PESERTA</th>
+                <th style="min-width:200px;">TUJUAN KEGIATAN</th>
+                <th style="min-width:180px;">RINCIAN BIAYA</th>
+                <th style="min-width:120px;">EST. BIAYA</th>
+                <th style="min-width:140px;">TEMPAT</th>
+                <th style="min-width:130px;">STATUS</th>
+                ${isSuper ? '<th style="width:90px;text-align:right;">AKSI</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+        ${paginationHtml}
       </div>
     `;
   } else {
@@ -494,11 +545,14 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
           <div style="font-size:12.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
             <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">view_timeline</span>
-            Timeline kronologis ${filtered.length} agenda kegiatan program kerja tahunan 2026.
+            Timeline kronologis agenda kegiatan program kerja tahunan 2026.
           </div>
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);">
+            Halaman ${currentPage} dari ${totalPages} (${totalItems} Total)
+          </span>
         </div>
         <div style="display:flex;flex-direction:column;gap:14px;">
-          ${filtered.map(p => {
+          ${paginatedItems.map(p => {
             let statusClass = p.status || 'planned';
             let statusLabel = 'Direncanakan';
             if (statusClass === 'done') statusLabel = 'Selesai';
@@ -557,13 +611,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
             `;
           }).join('')}
         </div>
+        ${paginationHtml}
       </div>
     `;
   }
 
-  // Open Modal with Proker UI
   openModal('Program Kerja Tahunan PPG Solo Selatan', 'event_note', `
-    <div style="display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;flex-direction:column;gap:16px;">
       ${bannerNoticeHtml}
       ${statsHtml}
       ${filterHtml}
@@ -571,17 +625,24 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     </div>
   `, 'wide');
 
-  // Event Listeners inside Modal
-  document.getElementById('inputProkerSearch')?.addEventListener('input', (e) => {
-    renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab);
-  });
+  // Event Listeners
+  const searchInput = document.getElementById('inputProkerSearch');
+  if (searchInput) {
+    searchInput.focus();
+    const val = searchInput.value;
+    searchInput.value = '';
+    searchInput.value = val;
+    searchInput.addEventListener('input', (e) => {
+      renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false);
+    });
+  }
 
   document.getElementById('selectFilterStatus')?.addEventListener('change', (e) => {
-    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab);
+    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab, 1, false);
   });
 
   document.getElementById('selectFilterBidang')?.addEventListener('change', (e) => {
-    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab);
+    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false);
   });
 
   document.getElementById('btnExportCsv')?.addEventListener('click', () => {
@@ -593,11 +654,21 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   document.getElementById('tabViewTable')?.addEventListener('click', () => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, 'table');
+    renderProkerModal(filterBidang, filterStatus, searchQuery, 'table', currentPage, false);
   });
 
   document.getElementById('tabViewTimeline')?.addEventListener('click', () => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline');
+    renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline', currentPage, false);
+  });
+
+  // Pagination click listeners
+  modalBody.querySelectorAll('.proker-page-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pNum = parseInt(btn.dataset.page);
+      if (pNum && pNum >= 1 && pNum <= totalPages && pNum !== currentPage) {
+        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, pNum, false);
+      }
+    });
   });
 
   document.getElementById('btnTambahProkerBaru')?.addEventListener('click', () => {
@@ -611,7 +682,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       const newStatus = select.value;
       await updateProker(pId, { status: newStatus });
       showToast(`Status program berhasil diubah menjadi: "${newStatus}"`, 'info');
-      renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab);
+      renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
       appHooks.renderUserProfile();
     });
   });
@@ -640,7 +711,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         onConfirm: async () => {
           await deleteProker(pId);
           showToast(`Program kerja "${pTitle}" berhasil dihapus`, 'success');
-          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab);
+          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
           appHooks.renderUserProfile();
         }
       });

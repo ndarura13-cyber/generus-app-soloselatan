@@ -906,18 +906,30 @@ export async function fetchProkerFromSupabase() {
       'direncanakan': 'planned'
     };
 
+    const defaultPicByNo = {
+      1: 'Sekretaris & Ketua',
+      2: 'Bidang Kurikulum & Database',
+      3: 'Bidang Tenaga Pendidik',
+      4: 'Bidang Kegiatan Muda Mudi & Kemandirian',
+      5: 'Bidang Bimbingan Konseling & Keputrian',
+      6: 'Bidang Tahfidz & Seni Olahraga',
+      7: 'Ketua, Sekretaris & Bendahara'
+    };
+
     const mapped = (data || []).map(row => ({
       id: row.id,
-      no: row.nomor_urut,
-      kegiatan: row.judul_program,
-      waktu: row.waktu_pelaksanaan,
-      sasaran: row.sasaran_peserta,
-      tujuan: row.tujuan_kegiatan,
-      rincianBiaya: row.rincian_biaya,
+      no: row.nomor_urut || 1,
+      kegiatan: row.judul_program || 'Program Kerja',
+      waktu: row.waktu_pelaksanaan || '-',
+      sasaran: row.sasaran_peserta || '-',
+      tujuan: row.tujuan_kegiatan || '-',
+      rincianBiaya: row.rincian_biaya || '-',
       estBiaya: Number(row.estimasi_biaya) || 0,
-      tempat: row.tempat_pelaksanaan,
+      tempat: row.tempat_pelaksanaan || '-',
       status: statusMapFromDb[row.status] || row.status || 'planned',
-      tingkatWilayah: row.tingkat_wilayah || 'daerah',
+      tingkatWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
+      targetWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
+      penanggungJawab: row.penanggung_jawab_id || defaultPicByNo[row.nomor_urut] || 'Pengurus PPG',
       semester: row.semester || 1,
       desaId: row.desa_id,
       kelompokId: row.kelompok_id
