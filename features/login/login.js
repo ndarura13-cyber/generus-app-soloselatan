@@ -4,7 +4,10 @@
 
 'use strict';
 
-import { MASTER_WILAYAH, MASTER_STRUKTUR_PERAN, getRolesByTingkatan, getPengurusList, registerNewPengurus } from '../../src/db-master.js';
+import { MASTER_WILAYAH, MASTER_STRUKTUR_PERAN, getRolesByTingkatan, getPengurusList, registerNewPengurus, syncPengurusFromSupabase } from '../../src/db-master.js';
+
+// Sync real-time pengurus from Supabase on login page load
+syncPengurusFromSupabase().catch(e => console.warn('Login sync pengurus error:', e));
 
 // --- AUTO DIRECT IF LOGGED IN ---
 (function checkExistingSession() {
@@ -205,11 +208,11 @@ loginForm?.addEventListener('submit', (e) => {
     // Demo fallback khusus default admin jika belum ada
     if (email === 'admin.daerah@ppgsolo.org' || email === 'admin@ppgsolo.org') {
       proceedLogin({
-        nama: 'H. Ahmad Sulaiman (Superadmin)',
+        nama: 'Suhardi (Superadmin)',
         email: email,
         noWa: '081234567890',
         tingkatan: 'daerah',
-        peran: 'superadmin',
+        peran: 'Ketua',
         wilayahLabel: 'Daerah Solo Selatan (Seluruh Wilayah)',
         isSuperadmin: true,
         canPostProker: true,

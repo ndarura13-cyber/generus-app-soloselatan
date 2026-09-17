@@ -26,16 +26,11 @@ import { getProkerList, syncProkerFromSupabase } from './db-master.js';
     splash.classList.add('hidden');
     setTimeout(() => {
       if (splash.parentNode) splash.parentNode.removeChild(splash);
-    }, 400);
+    }, 600);
   };
 
-  // Tutup splash dengan cepat agar interaksi pengguna instan
-  setTimeout(hideSplash, 600);
-  if (document.readyState === 'complete') {
-    setTimeout(hideSplash, 200);
-  } else {
-    window.addEventListener('load', hideSplash, { once: true });
-  }
+  // Tampilkan splash screen secara elegan selama 1.5 detik agar animasi logo dan progress bar selesai dengan sempurna
+  setTimeout(hideSplash, 1500);
 })();
 
 /* ── 1. NAVBAR SCROLL EFFECT ──────────────────────────────── */

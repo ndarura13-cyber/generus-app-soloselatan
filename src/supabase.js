@@ -85,6 +85,44 @@ function mapUuidToId(uuid) {
   return UUID_MAP[uuid] || uuid;
 }
 
+export const DESA_NAMES = {
+  "desa-barat": "Barat",
+  "desa-selatan": "Selatan",
+  "desa-tengah": "Tengah",
+  "desa-timur-1": "Timur 1",
+  "desa-timur-2": "Timur 2"
+};
+
+export const KELOMPOK_NAMES = {
+  "kel-gentan": "Gentan",
+  "kel-pajang": "Pajang",
+  "kel-sondakan": "Sondakan",
+  "kel-songgalan": "Songgalan",
+  "kel-teposanan": "Teposanan",
+  "kel-joyotakan-1": "Joyotakan 1",
+  "kel-joyotakan-2": "Joyotakan 2",
+  "kel-kaliwingko": "Kaliwingko",
+  "kel-solo-baru": "Solo Baru",
+  "kel-baluwarti": "Baluwarti",
+  "kel-mojo-1": "Mojo 1",
+  "kel-mojo-2": "Mojo 2",
+  "kel-sampangan": "Sampangan",
+  "kel-semanggi": "Semanggi",
+  "kel-gunung-sari": "Gunung Sari",
+  "kel-gunung-wijil-1": "Gunung Wijil 1",
+  "kel-gunung-wijil-2": "Gunung Wijil 2",
+  "kel-kapohan": "Kapohan",
+  "kel-randurejo": "Randurejo",
+  "kel-winong": "Winong",
+  "kel-ngasinan": "Ngasinan",
+  "kel-ngoresan": "Ngoresan",
+  "kel-petoran": "Petoran",
+  "kel-pucangsawit-1": "Pucangsawit 1",
+  "kel-pucangsawit-2": "Pucangsawit 2",
+  "kel-pucangsawit-indah": "Pucangsawit Indah",
+  "kel-sekarpace": "Sekarpace"
+};
+
 const STORAGE_KEY_CONFIG = "ppg_supabase_config_v1";
 
 // Default / Cached Config
@@ -573,24 +611,31 @@ export async function fetchPengurusFromSupabase() {
 
     if (error) throw error;
     
-    const formattedData = data.map(p => ({
-      id: p.id,
-      nama: p.nama,
-      no_wa: p.no_wa,
-      noWa: p.no_wa,
-      tingkatan: p.tingkatan,
-      peran: p.peran,
-      daerahId: mapUuidToId(p.daerah_id),
-      desaId: mapUuidToId(p.desa_id),
-      kelompokId: mapUuidToId(p.kelompok_id),
-      isSuperadmin: p.is_superadmin,
-      statusApproval: p.status_approval,
-      isActive: p.is_active !== false,
-      email: p.email,
-      password: p.password_hash,
-      created_at: p.created_at,
-      updated_at: p.updated_at
-    }));
+    const formattedData = data.map(p => {
+      const dId = mapUuidToId(p.desa_id);
+      const kId = mapUuidToId(p.kelompok_id);
+      return {
+        id: p.id,
+        nama: p.nama,
+        no_wa: p.no_wa,
+        noWa: p.no_wa,
+        tingkatan: p.tingkatan,
+        peran: p.peran,
+        jabatan: p.peran,
+        daerahId: mapUuidToId(p.daerah_id) || "daerah-solo-selatan",
+        desaId: dId,
+        desaNama: DESA_NAMES[dId] || (dId ? dId.replace('desa-', '').toUpperCase() : '-'),
+        kelompokId: kId,
+        kelompokNama: KELOMPOK_NAMES[kId] || (kId ? kId.replace('kel-', '').toUpperCase() : '-'),
+        isSuperadmin: Boolean(p.is_superadmin),
+        statusApproval: p.status_approval || 'approved',
+        isActive: p.is_active !== false,
+        email: p.email,
+        password: p.password_hash,
+        created_at: p.created_at,
+        updated_at: p.updated_at
+      };
+    });
 
     return { success: true, data: formattedData };
   } catch (err) {
