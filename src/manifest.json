@@ -1,6 +1,6 @@
 {
   "name": "PPG Solo Selatan",
-  "short_name": "Generus SS",
+  "short_name": "PPG Solo Selatan",
   "description": "Platform digital Penggerak Pembina Generus Solo Selatan – Mewujudkan Generasi Penerus yang Faham Agama dan memiliki 29 Karakter Luhur.",
   "start_url": "../index.html",
   "display": "standalone",
@@ -10,16 +10,28 @@
   "lang": "id",
   "icons": [
     {
+      "src": "image/appicon.png",
+      "sizes": "192x192 512x512 2048x2048",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/appicon.png",
+      "sizes": "192x192 512x512 2048x2048",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "image/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "image/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
   "categories": [
@@ -43,7 +55,7 @@
       "url": "../index.html#program-kerja",
       "icons": [
         {
-          "src": "image/icon-192.png",
+          "src": "image/appicon.png",
           "sizes": "192x192"
         }
       ]
@@ -55,7 +67,7 @@
       "url": "../features/login/login.html",
       "icons": [
         {
-          "src": "image/icon-192.png",
+          "src": "image/appicon.png",
           "sizes": "192x192"
         }
       ]

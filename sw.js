@@ -4,7 +4,7 @@
              Cache-First for static assets (images, icons, styles, fonts)
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'ppg-generus-v4.6';
+const CACHE_NAME = 'ppg-generus-v5.0';
 
 const STATIC_ASSETS = [
   '/',
@@ -30,6 +30,7 @@ const STATIC_ASSETS = [
   '/src/app.js',
   '/src/db-master.js',
   '/src/manifest.json',
+  '/src/image/appicon.png',
   '/src/image/hero.jpg',
   '/src/image/icon-192.png',
   '/src/image/icon-512.png'

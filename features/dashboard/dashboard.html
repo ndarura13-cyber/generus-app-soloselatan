@@ -6,6 +6,17 @@
   <title>Dashboard Pengurus – PPG Solo Selatan</title>
   <meta name="description" content="Dashboard Pengurus & Admin PPG Solo Selatan." />
 
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="../../src/manifest.json" />
+  <meta name="theme-color" content="#1a56c4" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PPG Solo Selatan" />
+  <link rel="icon" type="image/png" href="../../src/image/appicon.png" />
+  <link rel="shortcut icon" href="../../src/image/appicon.png" />
+  <link rel="apple-touch-icon" href="../../src/image/appicon.png" />
+
   <!-- Security & Authentication Gatekeeper -->
   <script>
     (function() {
@@ -188,7 +199,7 @@
   <aside id="desktopSidebar" class="hidden md:flex flex-col fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
     <div class="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
       <div class="flex items-center gap-3 overflow-hidden">
-        <img src="../../src/image/icon-192.png" alt="Logo" class="w-8 h-8 rounded-lg shrink-0 logo-img" />
+        <img src="../../src/image/appicon.png" alt="Logo" class="w-8 h-8 rounded-lg shrink-0 logo-img object-cover shadow-sm" />
         <span class="font-bold text-brandBlue dark:text-blue-400 whitespace-nowrap logo-text">PPG Solo Selatan</span>
       </div>
       <button id="btnToggleSidebar" class="p-1 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -253,7 +264,7 @@
           <span class="material-symbols-outlined">menu</span>
         </button>
         <div class="md:hidden flex items-center gap-2 font-bold text-brandBlue dark:text-blue-400 leading-tight">
-          <img src="../../src/image/icon-192.png" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 shadow-sm" />
+          <img src="../../src/image/appicon.png" alt="Logo" class="w-7 h-7 rounded-lg shrink-0 shadow-sm object-cover" />
           <span class="text-base tracking-tight">PPG Solo Selatan</span>
         </div>
       </div>
