@@ -729,14 +729,30 @@ body {
 /* ── DESA TABS & KELOMPOK GRID ─────────────────────────── */
 .desa-tabs {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 6px;
   margin-bottom: 18px;
+  flex-wrap: nowrap;
+}
+
+.desa-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.desa-tabs::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark .desa-tabs::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 
 .desa-tab-btn {
-  padding: 9px 18px;
+  padding: 8px 16px;
   border-radius: 50px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -749,6 +765,25 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .desa-tabs {
+    gap: 6px;
+    padding-bottom: 6px;
+  }
+
+  .desa-tab-btn {
+    padding: 7px 12px;
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .desa-count-badge {
+    padding: 1px 5px;
+    font-size: 10px;
+  }
 }
 
 .desa-tab-btn:hover {

@@ -384,9 +384,9 @@ export function renderDesaTabs() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `desa-tab-btn ${desa.id === activeDesaId ? 'active' : ''}`;
-    btn.dataset.desa = desa.id;
+    const namaBagian = (desa.nama || '').replace(/^Desa\s+/i, '');
     btn.innerHTML = `
-      <span>Desa ${desa.nama}</span>
+      <span>${namaBagian}</span>
       <span class="desa-count-badge">${desa.kelompok.length} Kel.</span>
     `;
 
