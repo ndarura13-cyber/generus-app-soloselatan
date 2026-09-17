@@ -4,7 +4,7 @@
 
 'use strict';
 
-import { getProkerList } from './db-master.js';
+import { getProkerList, syncProkerFromSupabase } from './db-master.js';
 
 /* ── 0. SPLASH LOADING SCREEN ─────────────────────────────── */
 (function setupLoadingScreen() {
@@ -281,6 +281,11 @@ function renderProker() {
 }
 
 renderProker();
+
+// Sinkronisasi data Program Kerja live dari Supabase di background
+syncProkerFromSupabase().then(() => {
+  renderProker();
+}).catch(e => console.warn('[app.js] Background sync proker error:', e));
 
 
 

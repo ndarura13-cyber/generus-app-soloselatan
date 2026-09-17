@@ -374,25 +374,8 @@ export async function deleteSiswaFromSupabase(id) {
   }
 }
 
-/**
- * Mengambil program kerja dari Supabase
- */
-export async function fetchProkerFromSupabase() {
-  const client = getSupabase();
-  if (!client) return { success: false, message: "Supabase client belum aktif." };
-
-  try {
-    const { data, error } = await client
-      .from("program_kerja")
-      .select("*")
-      .order("nomor_urut", { ascending: true });
-
-    if (error) throw error;
-    return { success: true, data: data || [] };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-}
+// Proker CRUD functions (fetchProkerFromSupabase, upsertProkerToSupabase, deleteProkerFromSupabase)
+// are fully defined with schema mapping in the Program Kerja section at the bottom of this file.
 
 // Inisialisasi awal saat modul dimuat
 initSupabaseClient();
@@ -594,6 +577,7 @@ export async function fetchPengurusFromSupabase() {
       id: p.id,
       nama: p.nama,
       no_wa: p.no_wa,
+      noWa: p.no_wa,
       tingkatan: p.tingkatan,
       peran: p.peran,
       daerahId: mapUuidToId(p.daerah_id),
@@ -601,6 +585,7 @@ export async function fetchPengurusFromSupabase() {
       kelompokId: mapUuidToId(p.kelompok_id),
       isSuperadmin: p.is_superadmin,
       statusApproval: p.status_approval,
+      isActive: p.is_active !== false,
       email: p.email,
       password: p.password_hash,
       created_at: p.created_at,
@@ -809,16 +794,44 @@ export async function deleteKbmEventFromSupabase(id) {
 // --- MASTER WILAYAH ---
 export async function fetchWilayahFromSupabase() {
   if (!isSupabaseConfigured()) return null;
-  const client = getSupabaseClient();
+  const client = getSupabase();
+  if (!client) return null;
   try {
-    const { data, error } = await client
-      .from('master_config')
-      .select('data')
-      .eq('id', 'master_wilayah')
-      .single();
-    if (error) throw error;
-    if (data && data.data) return data.data;
-    return null;
+    const [daerahRes, desaRes, kelRes] = await Promise.all([
+      client.from('daerah').select('*').order('created_at', { ascending: true }),
+      client.from('desa').select('*').order('urutan', { ascending: true }),
+      client.from('kelompok').select('*').order('urutan', { ascending: true })
+    ]);
+
+    if (!daerahRes.data || !desaRes.data || !kelRes.data) return null;
+
+    const d = daerahRes.data[0] || {};
+    const daerahId = mapUuidToId(d.id) || "daerah-solo-selatan";
+
+    const desaMapped = desaRes.data.map(desa => {
+      const desaId = mapUuidToId(desa.id) || desa.id;
+      const kelompokMapped = kelRes.data
+        .filter(k => k.desa_id === desa.id)
+        .map(k => ({
+          id: mapUuidToId(k.id) || k.id,
+          nama: k.nama_kelompok || k.nama
+        }));
+
+      return {
+        id: desaId,
+        nama: desa.nama_desa || desa.nama,
+        kelompok: kelompokMapped
+      };
+    });
+
+    return {
+      daerah: {
+        id: daerahId,
+        nama: d.nama_daerah || "Solo Selatan",
+        kode: d.kode_daerah || "SLO-SEL"
+      },
+      desa: desaMapped
+    };
   } catch (err) {
     console.error("Supabase Error fetching Wilayah:", err.message);
     return null;
@@ -831,22 +844,83 @@ export async function fetchWilayahFromSupabase() {
 
 export async function fetchProkerFromSupabase() {
   const client = getSupabase();
-  if (!client) return [];
+  if (!client) return { success: false, data: [] };
+
   try {
-    const { data, error } = await client.from('proker').select('*').order('no', { ascending: true });
+    const { data, error } = await client
+      .from("program_kerja")
+      .select("*")
+      .order("nomor_urut", { ascending: true });
+
     if (error) throw error;
-    return data || [];
+
+    const statusMapFromDb = {
+      'selesai': 'done',
+      'sedang_berlangsung': 'ongoing',
+      'akan_datang': 'upcoming',
+      'direncanakan': 'planned'
+    };
+
+    const mapped = (data || []).map(row => ({
+      id: row.id,
+      no: row.nomor_urut,
+      kegiatan: row.judul_program,
+      waktu: row.waktu_pelaksanaan,
+      sasaran: row.sasaran_peserta,
+      tujuan: row.tujuan_kegiatan,
+      rincianBiaya: row.rincian_biaya,
+      estBiaya: Number(row.estimasi_biaya) || 0,
+      tempat: row.tempat_pelaksanaan,
+      status: statusMapFromDb[row.status] || row.status || 'planned',
+      tingkatWilayah: row.tingkat_wilayah || 'daerah',
+      semester: row.semester || 1,
+      desaId: row.desa_id,
+      kelompokId: row.kelompok_id
+    }));
+
+    return { success: true, data: mapped };
   } catch (err) {
-    console.error("Supabase Error fetching Proker:", err.message);
-    return [];
+    console.error("Supabase Error fetching Proker:", err);
+    return { success: false, data: [], error: err.message };
   }
 }
 
 export async function upsertProkerToSupabase(proker) {
   const client = getSupabase();
   if (!client) return null;
+
   try {
-    const { data, error } = await client.from('proker').upsert(proker).select().single();
+    const statusMapToDb = {
+      'done': 'selesai',
+      'ongoing': 'sedang_berlangsung',
+      'upcoming': 'akan_datang',
+      'planned': 'direncanakan'
+    };
+
+    const isUuid = typeof proker.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(proker.id);
+
+    const record = {
+      nomor_urut: parseInt(proker.no) || 1,
+      judul_program: proker.kegiatan,
+      waktu_pelaksanaan: proker.waktu || null,
+      sasaran_peserta: proker.sasaran || null,
+      tujuan_kegiatan: proker.tujuan || null,
+      rincian_biaya: proker.rincianBiaya || null,
+      estimasi_biaya: Number(proker.estBiaya) || 0,
+      tempat_pelaksanaan: proker.tempat || null,
+      status: statusMapToDb[proker.status] || proker.status || 'direncanakan',
+      tingkat_wilayah: proker.tingkatWilayah || 'daerah',
+      semester: parseInt(proker.semester) || 1
+    };
+
+    if (isUuid) record.id = proker.id;
+
+    const { data, error } = await client
+      .from("program_kerja")
+      .upsert(record)
+      .select()
+      .single();
+
     if (error) throw error;
     return data;
   } catch (err) {
@@ -859,7 +933,10 @@ export async function deleteProkerFromSupabase(prokerId) {
   const client = getSupabase();
   if (!client) return false;
   try {
-    const { error } = await client.from('proker').delete().eq('id', prokerId);
+    const isUuid = typeof prokerId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(prokerId);
+    if (!isUuid) return true; // Local item only
+
+    const { error } = await client.from('program_kerja').delete().eq('id', prokerId);
     if (error) throw error;
     return true;
   } catch (err) {

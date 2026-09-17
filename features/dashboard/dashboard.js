@@ -625,9 +625,12 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     
     if (liveAccount) {
       setCurrentUser({ ...currentUser, ...liveAccount });
-      renderUserProfile(); // Re-render with live data
     }
     
+    // Re-render UI with freshly synced live data from Supabase
+    renderUserProfile();
+    renderDesaTabs();
+    renderKelompokGrid();
     checkPendingApprovals();
     console.log('PPG Dashboard initialized successfully with live data.');
   } catch (err) {

@@ -5,7 +5,7 @@
  */
 "use strict";
 
-import { getSiswaList, MASTER_WILAYAH, getAllKelompok, isSiswaAktif } from "./db-master.js";
+import { getSiswaList, MASTER_WILAYAH, getAllKelompok, isSiswaAktif, syncSiswaFromSupabase } from "./db-master.js";
 
 /* ───────────── Konfigurasi Kategori & Jenjang ───────────── */
 const KATEGORI_CONFIG = {
@@ -366,8 +366,13 @@ export function tutupModal() {
 
 /* ───────────── Inisialisasi Listener ───────────── */
 function initPopupListeners() {
-  // Update data awal
+  // Update data awal dari local cache
   updateAngka();
+
+  // Sinkronisasi data real-time dari Supabase di background
+  syncSiswaFromSupabase().then(() => {
+    updateAngka();
+  }).catch(e => console.warn("[popup-jenjang] Background sync siswa:", e));
 
   // 1. Klik pada Hero Image Badge
   const heroBadge = document.getElementById("heroImgBadge");
