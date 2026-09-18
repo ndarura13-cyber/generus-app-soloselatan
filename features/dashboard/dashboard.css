@@ -3477,16 +3477,22 @@ body {
   color: #f8fafc !important;
 }
 
+/* Filter Jenjang Grid */
+.filter-jenjang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 /* Wilayah Filter Box */
 .filter-wilayah-box {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   background: #ffffff;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  align-items: center;
 }
 .dark .filter-wilayah-box {
   background: #0f172a !important;
@@ -3494,16 +3500,35 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
+/* Row 1: Search Bar */
+.filter-wilayah-row-1 {
+  position: relative;
+  width: 100%;
+}
+.filter-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
 .filter-wilayah-input {
   width: 100%;
-  padding: 9px 12px 9px 32px;
+  padding: 9px 12px 9px 34px;
   border: 1.5px solid var(--border);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 12.5px;
   background: #ffffff;
   color: var(--text);
   outline: none;
   box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+.filter-wilayah-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 .dark .filter-wilayah-input {
   background: #111d38 !important;
@@ -3514,18 +3539,35 @@ body {
   color: #64748b !important;
 }
 
+/* Row 2: 3 Dropdowns in 1 row (Desa, Kelompok, Status) */
+.filter-wilayah-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+.filter-wilayah-col {
+  min-width: 0;
+}
 .filter-wilayah-select {
   width: 100%;
-  padding: 9px 12px;
+  padding: 8px 10px;
   border: 1.5px solid var(--border);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 11.5px;
   background: #ffffff;
   color: #1e293b;
   outline: none;
   box-sizing: border-box;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.filter-wilayah-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 .dark .filter-wilayah-select {
   background: #111d38 !important;
@@ -3537,9 +3579,18 @@ body {
   color: #f8fafc !important;
 }
 
+/* Row 3: Action buttons */
+.filter-wilayah-row-3 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
 /* Export & Import CSV buttons in Generus */
 .btn-export-csv {
-  padding: 9px 13px;
+  padding: 8px 12px;
   background: #ffffff;
   border: 1.5px solid var(--border);
   border-radius: 8px;
@@ -3551,6 +3602,7 @@ body {
   align-items: center;
   gap: 6px;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 .dark .btn-export-csv {
   background: #111d38 !important;
@@ -3564,10 +3616,10 @@ body {
 }
 
 .btn-import-csv {
-  padding: 9px 13px;
-  background: var(--green-pastel);
-  border: 1px solid var(--green);
-  color: var(--green-dark);
+  padding: 8px 12px;
+  background: var(--green-pastel, #ecfdf5);
+  border: 1.5px solid var(--green, #10b981);
+  color: var(--green-dark, #047857);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
@@ -3576,6 +3628,7 @@ body {
   align-items: center;
   gap: 6px;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 .dark .btn-import-csv {
   background: rgba(16, 185, 129, 0.15) !important;
@@ -3585,6 +3638,113 @@ body {
 .dark .btn-import-csv:hover {
   background: rgba(16, 185, 129, 0.25) !important;
   color: #a7f3d0 !important;
+}
+
+.btn-auto-promote {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.btn-auto-promote:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.dark .btn-auto-promote {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+}
+
+.btn-tambah-siswa {
+  padding: 8px 14px;
+  background: var(--blue, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.btn-tambah-siswa:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.dark .btn-tambah-siswa {
+  background: #3b82f6 !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Modal Action Buttons */
+.btn-cancel-siswa {
+  flex: 1;
+  padding: 12px;
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.dark .btn-cancel-siswa {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+.dark .btn-cancel-siswa:hover {
+  background: #334155 !important;
+}
+
+.btn-submit-siswa {
+  flex: 2;
+  padding: 12px;
+  background: var(--blue, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.dark .btn-submit-siswa {
+  background: #3b82f6 !important;
+}
+.dark .btn-submit-siswa:hover {
+  background: #2563eb !important;
+}
+
+.btn-delete-siswa {
+  padding: 10px;
+  background: #fef2f2;
+  color: var(--red, #ef4444);
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+.dark .btn-delete-siswa {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
 }
 
 /* Bulk Action Bar */
@@ -3824,6 +3984,37 @@ body {
     justify-content: center;
     gap: 5px;
     cursor: pointer;
+  }
+
+  /* Mobile adjustments for Generus Filter Box */
+  .filter-wilayah-row-2 {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .filter-wilayah-select {
+    font-size: 11px;
+    padding: 7px 6px;
+  }
+  .filter-wilayah-row-3 {
+    justify-content: space-between;
+  }
+  .btn-export-csv .btn-label-text,
+  .btn-import-csv .btn-label-text,
+  .btn-auto-promote .btn-label-text {
+    display: none !important;
+  }
+  .btn-export-csv,
+  .btn-import-csv,
+  .btn-auto-promote {
+    padding: 8px 10px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    justify-content: center !important;
+  }
+  .btn-tambah-siswa {
+    flex: 1 !important;
+    height: 38px !important;
+    justify-content: center !important;
   }
 }
 

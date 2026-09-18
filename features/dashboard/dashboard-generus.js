@@ -418,7 +418,7 @@ export function renderSiswaModal() {
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;">
+        <div class="filter-jenjang-grid">
           <div>
             <label class="filter-jenjang-label">
               1. Kategori Jenjang Usia:
@@ -461,44 +461,55 @@ export function renderSiswaModal() {
 
       <!-- FILTER PENCARIAN & WILAYAH (DESA / KELOMPOK / STATUS SAMBUNG) -->
       <div class="filter-wilayah-box">
-        <div style="position:relative;flex:1 1 180px;min-width:180px;">
+        <!-- BARIS 1: SEARCH BAR -->
+        <div class="filter-wilayah-row-1">
           <input type="text" id="inputSiswaSearch" class="filter-wilayah-input" value="${currentSiswaFilter.search}" placeholder="🔍 Cari nama / NIS..." />
-          <span class="material-symbols-outlined" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none;">search</span>
+          <span class="material-symbols-outlined filter-search-icon">search</span>
         </div>
-        <div style="flex:1 1 140px;min-width:140px;">
-          <select id="filterSiswaDesa" class="filter-wilayah-select">
-            <option value="all">Semua Desa (5 Desa)</option>
-            ${desaOptions}
-          </select>
+
+        <!-- BARIS 2: 3 FILTER (DESA, KELOMPOK, STATUS) -->
+        <div class="filter-wilayah-row-2">
+          <div class="filter-wilayah-col">
+            <select id="filterSiswaDesa" class="filter-wilayah-select">
+              <option value="all">Semua Desa (5 Desa)</option>
+              ${desaOptions}
+            </select>
+          </div>
+          <div class="filter-wilayah-col">
+            <select id="filterSiswaKelompok" class="filter-wilayah-select">
+              <option value="all">Semua Kelompok (27 Kel.)</option>
+              ${kelOptions}
+            </select>
+          </div>
+          <div class="filter-wilayah-col">
+            <select id="filterSiswaStatus" class="filter-wilayah-select">
+              <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>📋 Semua Status (${totalCount})</option>
+              <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>🟢 Sambung (${activeCount})</option>
+              <option value="Pindah Sambung" ${currentSiswaFilter.status === 'Pindah Sambung' ? 'selected' : ''}>🚚 Pindah (${pindahCount})</option>
+              <option value="Menikah" ${currentSiswaFilter.status === 'Menikah' ? 'selected' : ''}>💍 Menikah (${nikahCount})</option>
+            </select>
+          </div>
         </div>
-        <div style="flex:1 1 140px;min-width:140px;">
-          <select id="filterSiswaKelompok" class="filter-wilayah-select">
-            <option value="all">Semua Kelompok (27 Kelompok)</option>
-            ${kelOptions}
-          </select>
-        </div>
-        <div style="flex:1 1 150px;min-width:150px;">
-          <select id="filterSiswaStatus" class="filter-wilayah-select">
-            <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>📋 Semua Status Sambung (${totalCount})</option>
-            <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>🟢 Aktif: Sambung (${activeCount})</option>
-            <option value="Pindah Sambung" ${currentSiswaFilter.status === 'Pindah Sambung' ? 'selected' : ''}>🚚 Pindah Sambung (${pindahCount})</option>
-            <option value="Menikah" ${currentSiswaFilter.status === 'Menikah' ? 'selected' : ''}>💍 Menikah (${nikahCount})</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;flex:1 1 auto;">
+
+        <!-- BARIS 3: ICON TOMBOL SESUAI PERUBAHAN MOBILE -->
+        <div class="filter-wilayah-row-3">
           <button type="button" id="btnExportCsvGenerus" class="btn-export-csv" title="Download data dalam format Excel CSV">
-            <span class="material-symbols-outlined" style="font-size:16px;color:var(--green);">file_download</span> Export CSV
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--green, #10b981);">file_download</span>
+            <span class="btn-label-text">Export CSV</span>
           </button>
           <input type="file" id="inputImportCsvGenerus" accept=".csv" style="display:none;" />
           <button type="button" id="btnImportCsvGenerus" class="btn-import-csv" title="Import data dari format Excel CSV">
-            <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import CSV
+            <span class="material-symbols-outlined" style="font-size:18px;">upload</span>
+            <span class="btn-label-text">Import CSV</span>
           </button>
 
-          <button type="button" id="btnAutoPromoteJenjang" style="padding:9px 15px;background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(79,70,229,0.3);white-space:nowrap;" title="Kenaikan Jenjang Otomatis Sesuai Usia atau Pergantian Tahun Ajaran">
-            <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span> Kenaikan Jenjang Otomatis
+          <button type="button" id="btnAutoPromoteJenjang" class="btn-auto-promote" title="Kenaikan Jenjang Otomatis Sesuai Usia atau Pergantian Tahun Ajaran">
+            <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span>
+            <span class="btn-label-text">Kenaikan Jenjang</span>
           </button>
-          <button type="button" id="btnTambahSiswaBaru" style="padding:9px 15px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 6px rgba(26,86,196,0.25);white-space:nowrap;">
-            <span class="material-symbols-outlined" style="font-size:18px;">person_add</span> Tambah Generus
+          <button type="button" id="btnTambahSiswaBaru" class="btn-tambah-siswa" title="Tambah Data Generus Baru">
+            <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
+            <span>Tambah Generus</span>
           </button>
         </div>
       </div>
@@ -1415,7 +1426,7 @@ export function renderSiswaFormModal(existingData = null) {
           <span class="material-symbols-outlined" style="font-size:18px;color:#2563eb;">school</span>
           <span class="filter-jenjang-title" style="font-size:12px;text-transform:uppercase;letter-spacing:0.3px;">Jenjang Generus</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;">
+        <div class="filter-jenjang-grid">
           <div>
             <label class="filter-jenjang-label">Kategori Jenjang <span style="color:red">*</span></label>
             <select id="sKategoriJenjang" required class="filter-jenjang-select">
@@ -1470,11 +1481,11 @@ export function renderSiswaFormModal(existingData = null) {
 
       <!-- Sticky Actions Footer -->
       <div class="modal-sticky-footer">
-        <button type="button" class="btn-cancel-siswa" style="flex:1;padding:12px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;">← Kembali</button>
-        <button type="submit" style="flex:2;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">💾 Simpan Data</button>
+        <button type="button" class="btn-cancel-siswa">← Kembali</button>
+        <button type="submit" class="btn-submit-siswa">💾 Simpan Data</button>
       </div>
       ${isEdit ? `
-        <button type="button" id="btnDeleteSiswa" style="padding:10px;background:#fef2f2;color:var(--red);border:1px solid #fca5a5;border-radius:8px;font-weight:700;cursor:pointer;margin-top:4px;">🗑 Hapus Data Generus Ini</button>
+        <button type="button" id="btnDeleteSiswa" class="btn-delete-siswa">🗑 Hapus Data Generus Ini</button>
       ` : ''}
     </form>
   `;
