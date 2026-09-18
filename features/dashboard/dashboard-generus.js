@@ -407,9 +407,9 @@ export function renderSiswaModal() {
     <div style="display:flex;flex-direction:column;gap:14px;">
 
       <!-- HIGHLIGHT KHUSUS: FILTER MULTI-LEVEL JENJANG GENERUS -->
-      <div class="filter-jenjang-card-highlight" style="background:linear-gradient(135deg, #f0f7ff 0%, #e0edfe 100%);border:2px solid #3b82f6;border-radius:12px;padding: 10px 12px;box-shadow:0 4px 14px rgba(37,99,235,0.08);">
+      <div class="filter-jenjang-card-highlight">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
-          <div style="font-size:12px;font-weight:800;color:#1e40af;display:inline-flex;align-items:center;gap:6px;">
+          <div class="filter-jenjang-title">
             <span class="material-symbols-outlined" style="font-size:16px;">filter_alt</span>
             Filter Kategori Jenjang &amp; Kelas
           </div>
@@ -418,12 +418,12 @@ export function renderSiswaModal() {
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;">
           <div>
-            <label style="font-size:11px;font-weight:800;color:#1e40af;margin-bottom:4px;display:block;">
+            <label class="filter-jenjang-label">
               1. Kategori Jenjang Usia:
             </label>
-            <select id="filterSiswaJenjang" style="width:100%;padding:9px 12px;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;background:#fff;font-weight:700;color:#1e3a8a;outline:none;box-shadow:0 1px 2px rgba(0,0,0,0.04);cursor:pointer;">
+            <select id="filterSiswaJenjang" class="filter-jenjang-select">
               <option value="all">🌟 Semua Jenjang Usia</option>
               <option value="caberawit" ${currentSiswaFilter.jenjang === 'caberawit' ? 'selected' : ''}>🌱 Caberawit</option>
               <option value="gp_reguler" ${currentSiswaFilter.jenjang === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler</option>
@@ -432,10 +432,10 @@ export function renderSiswaModal() {
           </div>
 
           <div>
-            <label style="font-size:11px;font-weight:800;color:#1e40af;margin-bottom:4px;display:block;">
+            <label class="filter-jenjang-label">
               2. Tingkat / Kelas Terpilih:
             </label>
-            <select id="filterSiswaKelas" style="width:100%;padding:9px 12px;border:1.5px solid #93c5fd;border-radius:8px;font-size:12px;background:#fff;font-weight:600;color:#1e293b;outline:none;box-shadow:0 1px 2px rgba(0,0,0,0.04);cursor:pointer;">
+            <select id="filterSiswaKelas" class="filter-jenjang-select">
               ${getKelasFilterOptions(currentSiswaFilter.jenjang, currentSiswaFilter.kelas)}
             </select>
           </div>
@@ -443,13 +443,13 @@ export function renderSiswaModal() {
       </div>
 
       <!-- BAR AKSI HAPUS CEPAT CHECKLIST -->
-      <div id="bulkActionSiswaBar" style="display:none;background:#fef2f2;border:1.5px solid #fecaca;padding:10px 16px;border-radius:10px;margin-bottom:12px;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(220,38,38,0.1);">
-        <div style="display:flex;align-items:center;gap:8px;color:#991b1b;font-weight:700;font-size:12.5px;">
+      <div id="bulkActionSiswaBar" class="bulk-action-bar" style="display:none;">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:12.5px;">
           <span class="material-symbols-outlined" style="font-size:20px;color:#dc2626;">checklist</span>
           <span id="selectedSiswaCountText">0 generus terpilih</span>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <button type="button" id="btnBatalPilihSiswa" style="background:#fff;border:1px solid #cbd5e1;padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:700;color:#475569;cursor:pointer;">
+          <button type="button" id="btnBatalPilihSiswa" class="btn-batal-pilih" style="padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;">
             Batal Pilih
           </button>
           <button type="button" id="btnBulkHapusSiswa" style="background:#dc2626;color:#fff;border:none;padding:6px 16px;border-radius:6px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(220,38,38,0.3);">
@@ -460,25 +460,25 @@ export function renderSiswaModal() {
       </div>
 
       <!-- FILTER PENCARIAN & WILAYAH (DESA / KELOMPOK / STATUS SAMBUNG) -->
-      <div style="display:flex;flex-wrap:wrap;gap:8px;background:#fff;padding:12px 14px;border-radius:10px;border:1px solid var(--border);align-items:center;">
-        <div style="position:relative;flex:1 1 160px;min-width:160px;">
-          <input type="text" id="inputSiswaSearch" value="${currentSiswaFilter.search}" placeholder="🔍 Cari nama / NIS..." style="width:100%;padding:9px 12px 9px 32px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;" />
-          <span class="material-symbols-outlined" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);">search</span>
+      <div class="filter-wilayah-box">
+        <div style="position:relative;flex:1 1 180px;min-width:180px;">
+          <input type="text" id="inputSiswaSearch" class="filter-wilayah-input" value="${currentSiswaFilter.search}" placeholder="🔍 Cari nama / NIS..." />
+          <span class="material-symbols-outlined" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none;">search</span>
         </div>
         <div style="flex:1 1 140px;min-width:140px;">
-          <select id="filterSiswaDesa" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;box-sizing:border-box;font-weight:600;">
+          <select id="filterSiswaDesa" class="filter-wilayah-select">
             <option value="all">Semua Desa (5 Desa)</option>
             ${desaOptions}
           </select>
         </div>
         <div style="flex:1 1 140px;min-width:140px;">
-          <select id="filterSiswaKelompok" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;box-sizing:border-box;font-weight:600;">
+          <select id="filterSiswaKelompok" class="filter-wilayah-select">
             <option value="all">Semua Kelompok (27 Kelompok)</option>
             ${kelOptions}
           </select>
         </div>
-        <div style="flex:1 1 140px;min-width:140px;">
-          <select id="filterSiswaStatus" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;box-sizing:border-box;font-weight:700;color:#1e293b;">
+        <div style="flex:1 1 150px;min-width:150px;">
+          <select id="filterSiswaStatus" class="filter-wilayah-select">
             <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>📋 Semua Status Sambung (${totalCount})</option>
             <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>🟢 Aktif: Sambung (${activeCount})</option>
             <option value="Pindah Sambung" ${currentSiswaFilter.status === 'Pindah Sambung' ? 'selected' : ''}>🚚 Pindah Sambung (${pindahCount})</option>
@@ -486,11 +486,11 @@ export function renderSiswaModal() {
           </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;flex:1 1 auto;">
-          <button type="button" id="btnExportCsvGenerus" title="Download data dalam format Excel CSV" style="padding:9px 12px;background:var(--surface)fff;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:800;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <button type="button" id="btnExportCsvGenerus" class="btn-export-csv" title="Download data dalam format Excel CSV">
             <span class="material-symbols-outlined" style="font-size:16px;color:var(--green);">file_download</span> Export CSV
           </button>
           <input type="file" id="inputImportCsvGenerus" accept=".csv" style="display:none;" />
-          <button type="button" id="btnImportCsvGenerus" title="Import data dari format Excel CSV" style="padding:9px 12px;background:var(--green-pastel);border:1px solid var(--green);color:var(--green-dark);border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <button type="button" id="btnImportCsvGenerus" class="btn-import-csv" title="Import data dari format Excel CSV">
             <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import CSV
           </button>
 
@@ -503,33 +503,47 @@ export function renderSiswaModal() {
         </div>
       </div>
 
-      <!-- TABLE -->
-      <div class="proker-table-wrap">
+      <!-- DESKTOP TABLE VIEW (MD UP) -->
+      <div class="siswa-desktop-table proker-table-wrap">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead style="background:#f8fafc;position:sticky;top:0;z-index:10;">
+          <thead class="siswa-table-head" style="position:sticky;top:0;z-index:10;">
             <tr>
-              <th style="padding:10px 8px;text-align:center;border-bottom:2px solid #cbd5e1;width:38px;">
-                <input type="checkbox" id="checkAllSiswa" title="Pilih Semua di Halaman Ini" style="cursor:pointer;width:15px;height:15px;" />
+              <th style="padding:10px 8px;text-align:center;width:38px;">
+                <input type="checkbox" id="checkAllSiswa" title="Pilih Semua di Halaman Ini" style="cursor:pointer;width:15px;height:15px;accent-color:#2563eb;" />
               </th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Aksi</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">No</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('nama_lengkap')">Nama Lengkap ↕️</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('tempat_lahir')">Tempat Lahir ↕️</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('tanggal_lahir')">Tgl Lahir ↕️</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('desa_id')">Desa ↕️</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('kelompok_id')">Kelompok ↕️</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('usia')">Usia ↕️</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('jenis_kelamin')">L/P ↕️</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('kategori_usia')">Jenjang &amp; Kelas ↕️</th>
-              <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #cbd5e1;white-space:nowrap;">No. HP</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;">Domisili</th>
-              <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #cbd5e1;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('status_sambung')">Status ↕️</th>
+              <th style="padding:10px 12px;text-align:center;white-space:nowrap;">Aksi</th>
+              <th style="padding:10px 12px;text-align:center;white-space:nowrap;">No</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('nama_lengkap')">Nama Lengkap ↕️</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('tempat_lahir')">Tempat Lahir ↕️</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('tanggal_lahir')">Tgl Lahir ↕️</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('desa_id')">Desa ↕️</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('kelompok_id')">Kelompok ↕️</th>
+              <th style="padding:10px 12px;text-align:center;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('usia')">Usia ↕️</th>
+              <th style="padding:10px 12px;text-align:center;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('jenis_kelamin')">L/P ↕️</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('kategori_usia')">Jenjang &amp; Kelas ↕️</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap;">No. HP</th>
+              <th style="padding:10px 12px;text-align:center;white-space:nowrap;">Domisili</th>
+              <th style="padding:10px 12px;text-align:center;white-space:nowrap;cursor:pointer;" onclick="sortSiswa('status_sambung')">Status ↕️</th>
             </tr>
           </thead>
           <tbody id="siswaTableBody">
             <!-- Rendered via JS -->
           </tbody>
         </table>
+      </div>
+
+      <!-- MOBILE ACCORDION CARD VIEW (SMARTPHONES) -->
+      <div class="siswa-mobile-container">
+        <div class="siswa-mobile-select-all-bar">
+          <label style="display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;cursor:pointer;">
+            <input type="checkbox" id="checkAllSiswaMobile" style="width:17px;height:17px;cursor:pointer;accent-color:#2563eb;" />
+            <span>Pilih Semua di Halaman Ini</span>
+          </label>
+          <span id="mobilePagingIndicator" style="font-size:11px;font-weight:700;color:var(--text-muted);"></span>
+        </div>
+        <div id="siswaMobileList">
+          <!-- Rendered via JS -->
+        </div>
       </div>
 
       <!-- PAGINATION BAR -->
@@ -860,11 +874,14 @@ let siswaPageSize = 50;
 
 export function renderSiswaTableRows() {
   const tbody = document.getElementById('siswaTableBody');
+  const mobileListEl = document.getElementById('siswaMobileList');
   const paginWrap = document.getElementById('siswaPaginationWrap');
   const bulkBar = document.getElementById('bulkActionSiswaBar');
   const countText = document.getElementById('selectedSiswaCountText');
   const checkAllEl = document.getElementById('checkAllSiswa');
-  if (!tbody) return;
+  const checkAllMobileEl = document.getElementById('checkAllSiswaMobile');
+  const mobilePagingInd = document.getElementById('mobilePagingIndicator');
+  if (!tbody && !mobileListEl) return;
 
   const rawList = getSiswaList();
 
@@ -897,10 +914,20 @@ export function renderSiswaTableRows() {
   const totalPages = Math.max(1, Math.ceil(totalFiltered / siswaPageSize));
   if (siswaCurrentPage > totalPages) siswaCurrentPage = 1;
 
+  if (mobilePagingInd) {
+    mobilePagingInd.textContent = `Hal. ${siswaCurrentPage} / ${totalPages} (${totalFiltered} total)`;
+  }
+
   if (totalFiltered === 0) {
-    tbody.innerHTML = `<tr><td colspan="14" style="padding:28px;text-align:center;color:var(--text-muted);font-size:13px;">Tidak ada data generus yang sesuai filter pencarian / jenjang / status.</td></tr>`;
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="14" style="padding:28px;text-align:center;color:var(--text-muted);font-size:13px;">Tidak ada data generus yang sesuai filter pencarian / jenjang / status.</td></tr>`;
+    }
+    if (mobileListEl) {
+      mobileListEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--text-muted);font-size:13px;">Tidak ada data generus yang sesuai filter pencarian / jenjang / status.</div>`;
+    }
     if (paginWrap) paginWrap.innerHTML = '';
     if (checkAllEl) checkAllEl.checked = false;
+    if (checkAllMobileEl) checkAllMobileEl.checked = false;
     return;
   }
 
@@ -911,54 +938,152 @@ export function renderSiswaTableRows() {
   // Update check all state for current page
   const allPagedChecked = pagedItems.length > 0 && pagedItems.every(s => selectedSiswaIds.has(s.id));
   if (checkAllEl) checkAllEl.checked = allPagedChecked;
+  if (checkAllMobileEl) checkAllMobileEl.checked = allPagedChecked;
 
-  tbody.innerHTML = pagedItems.map((s, idx) => {
-    const isChecked = selectedSiswaIds.has(s.id);
-    const cfg = JENJANG_CONFIG[s.kategori_usia] || { badge: 'Remaja', bg: '#f3e8ff', color: '#7c3aed' };
-    
-    let statusBadge = `<span style="background:var(--green-pastel);color:var(--green-dark);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;"></span> Sambung</span>`;
-    if (s.status_sambung === 'Menikah') {
-      statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">💍 Menikah</span>`;
-    } else if (s.status_sambung === 'Pindah Sambung') {
-      statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">🚚 Pindah</span>`;
-    }
+  // 1. Render Desktop Table View
+  if (tbody) {
+    tbody.innerHTML = pagedItems.map((s, idx) => {
+      const isChecked = selectedSiswaIds.has(s.id);
+      const cfg = JENJANG_CONFIG[s.kategori_usia] || { badge: 'Remaja', bg: '#f3e8ff', color: '#7c3aed' };
+      
+      let statusBadge = `<span style="background:var(--green-pastel);color:var(--green-dark);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;"></span> Sambung</span>`;
+      if (s.status_sambung === 'Menikah') {
+        statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">💍 Menikah</span>`;
+      } else if (s.status_sambung === 'Pindah Sambung') {
+        statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">🚚 Pindah</span>`;
+      }
 
-    const tglFormatted = s.tanggal_lahir ? new Date(s.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
-    return `
-      <tr class="${isChecked ? 'row-selected' : ''}" style="border-bottom:1px solid var(--border);transition:background 0.15s;">
-        <td style="padding:8px 8px;text-align:center;">
-          <input type="checkbox" class="check-siswa-row" data-id="${s.id}" style="cursor:pointer;width:15px;height:15px;" ${isChecked ? 'checked' : ''} />
-        </td>
-        <td style="padding:8px 12px;text-align:center;white-space:nowrap;">
-          <div style="display:inline-flex;gap:4px;align-items:center;">
-            <button type="button" class="btn-edit-siswa" data-id="${s.id}" title="Edit Data" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:4px 7px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;">
-              <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
-            </button>
-            <button type="button" class="btn-delete-siswa-table" data-id="${s.id}" data-nama="${s.nama_lengkap}" title="Hapus Data Generus" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:4px 7px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;">
-              <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+      const tglFormatted = s.tanggal_lahir ? new Date(s.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+      return `
+        <tr class="${isChecked ? 'row-selected' : ''}" style="border-bottom:1px solid var(--border);transition:background 0.15s;">
+          <td style="padding:8px 8px;text-align:center;">
+            <input type="checkbox" class="check-siswa-row" data-id="${s.id}" style="cursor:pointer;width:15px;height:15px;accent-color:#2563eb;" ${isChecked ? 'checked' : ''} />
+          </td>
+          <td style="padding:8px 12px;text-align:center;white-space:nowrap;">
+            <div style="display:inline-flex;gap:4px;align-items:center;">
+              <button type="button" class="btn-edit-siswa btn-edit-siswa-action" data-id="${s.id}" title="Edit Data" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:4px 7px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;">
+                <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+              </button>
+              <button type="button" class="btn-delete-siswa-table btn-delete-siswa-action" data-id="${s.id}" data-nama="${s.nama_lengkap}" title="Hapus Data Generus" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:4px 7px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;">
+                <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+              </button>
+            </div>
+          </td>
+          <td style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text-muted);font-weight:700;">${startIndex + idx + 1}</td>
+          <td style="padding:8px 12px;font-weight:700;min-width:160px;color:var(--text);">${s.nama_lengkap}</td>
+          <td style="padding:8px 12px;">${s.tempat_lahir || '-'}</td>
+          <td style="padding:8px 12px;white-space:nowrap;font-size:11px;">${tglFormatted}</td>
+          <td style="padding:8px 12px;">Desa ${s.desa_nama || '-'}</td>
+          <td style="padding:8px 12px;">Kel. ${s.kelompok_nama || '-'}</td>
+          <td style="padding:8px 12px;text-align:center;font-weight:700;">${calculateUmur(s.tanggal_lahir)}</td>
+          <td style="padding:8px 12px;text-align:center;font-weight:700;color:${s.jenis_kelamin === 'L' ? '#1d4ed8' : '#be185d'};">${s.jenis_kelamin}</td>
+          <td style="padding:8px 12px;">
+            <span style="background:${cfg.bg};color:${cfg.color};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;display:inline-block;">${cfg.badge}</span>
+            <span style="display:block;font-size:11px;font-weight:600;margin-top:2px;color:var(--text-muted);">${s.jenjang_kelas}</span>
+          </td>
+          <td style="padding:8px 12px;font-size:11px;">${s.no_hp || '-'}</td>
+          <td style="padding:8px 12px;text-align:center;font-size:11px;">${s.domisili || '-'}</td>
+          <td style="padding:8px 12px;text-align:center;">
+            ${statusBadge}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 2. Render Mobile Accordion Cards View
+  if (mobileListEl) {
+    mobileListEl.innerHTML = pagedItems.map((s) => {
+      const isChecked = selectedSiswaIds.has(s.id);
+      const cfg = JENJANG_CONFIG[s.kategori_usia] || { badge: 'Remaja', bg: '#f3e8ff', color: '#7c3aed' };
+
+      let statusBadge = `<span style="background:var(--green-pastel);color:var(--green-dark);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;"></span> Sambung</span>`;
+      if (s.status_sambung === 'Menikah') {
+        statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">💍 Menikah</span>`;
+      } else if (s.status_sambung === 'Pindah Sambung') {
+        statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">🚚 Pindah</span>`;
+      }
+
+      const tglFormatted = s.tanggal_lahir ? new Date(s.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+
+      return `
+        <div class="siswa-mobile-card ${isChecked ? 'card-selected' : ''}" data-id="${s.id}">
+          <!-- Header Bar: Checklist, Nama Generus, Kelompok & Desa, Tombol Dropdown -->
+          <div class="siswa-mobile-header">
+            <div class="siswa-mobile-info-wrap">
+              <input type="checkbox" class="check-siswa-row" data-id="${s.id}" style="cursor:pointer;width:18px;height:18px;accent-color:#2563eb;flex-shrink:0;" ${isChecked ? 'checked' : ''} />
+              
+              <div class="siswa-mobile-names">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                  <span class="siswa-mobile-name-text">${s.nama_lengkap}</span>
+                  <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:4px;${s.jenis_kelamin === 'L' ? 'background:#dbeafe;color:#1e40af;' : 'background:#fce7f3;color:#be185d;'}">${s.jenis_kelamin}</span>
+                </div>
+                <div class="siswa-mobile-sub-text">
+                  <span class="material-symbols-outlined" style="font-size:13px;color:var(--blue);">location_on</span>
+                  <span>Kel. ${s.kelompok_nama || '-'}</span>
+                  <span>•</span>
+                  <span>Desa ${s.desa_nama || '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol dropdown pada samping nama -->
+            <button type="button" class="btn-toggle-siswa-detail" title="Lihat Rincian & Aksi" data-id="${s.id}">
+              <span class="material-symbols-outlined" style="font-size:20px;transition:transform 0.2s ease;">expand_more</span>
             </button>
           </div>
-        </td>
-        <td style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text-muted);font-weight:700;">${startIndex + idx + 1}</td>
-        <td style="padding:8px 12px;font-weight:700;min-width:160px;color:var(--text);">${s.nama_lengkap}</td>
-        <td style="padding:8px 12px;">${s.tempat_lahir || '-'}</td>
-        <td style="padding:8px 12px;white-space:nowrap;font-size:11px;">${tglFormatted}</td>
-        <td style="padding:8px 12px;">Desa ${s.desa_nama || '-'}</td>
-        <td style="padding:8px 12px;">Kel. ${s.kelompok_nama || '-'}</td>
-        <td style="padding:8px 12px;text-align:center;font-weight:700;">${calculateUmur(s.tanggal_lahir)}</td>
-        <td style="padding:8px 12px;text-align:center;font-weight:700;color:${s.jenis_kelamin === 'L' ? '#1d4ed8' : '#be185d'};">${s.jenis_kelamin}</td>
-        <td style="padding:8px 12px;">
-          <span style="background:${cfg.bg};color:${cfg.color};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;display:inline-block;">${cfg.badge}</span>
-          <span style="display:block;font-size:11px;font-weight:600;margin-top:2px;color:#334155;">${s.jenjang_kelas}</span>
-        </td>
-        <td style="padding:8px 12px;font-size:11px;">${s.no_hp || '-'}</td>
-        <td style="padding:8px 12px;text-align:center;font-size:11px;">${s.domisili || '-'}</td>
-        <td style="padding:8px 12px;text-align:center;">
-          ${statusBadge}
-        </td>
-      </tr>
-    `;
-  }).join('');
+
+          <!-- Rincian Lainnya & Tombol Aksi (Muncul saat dropdown diklik) -->
+          <div class="siswa-mobile-detail-panel">
+            <div class="siswa-mobile-grid-details">
+              <div class="siswa-mobile-detail-item">
+                <span class="label">Jenjang &amp; Kelas</span>
+                <div class="val" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px;">
+                  <span style="background:${cfg.bg};color:${cfg.color};padding:1px 6px;border-radius:4px;font-size:9.5px;font-weight:800;">${cfg.badge}</span>
+                  <span style="font-size:11px;">${s.jenjang_kelas}</span>
+                </div>
+              </div>
+              <div class="siswa-mobile-detail-item">
+                <span class="label">Usia</span>
+                <div class="val">${calculateUmur(s.tanggal_lahir)} Tahun</div>
+              </div>
+              <div class="siswa-mobile-detail-item">
+                <span class="label">Tempat &amp; Tgl Lahir</span>
+                <div class="val">${s.tempat_lahir || '-'}, ${tglFormatted}</div>
+              </div>
+              <div class="siswa-mobile-detail-item">
+                <span class="label">Status Sambung</span>
+                <div class="val">${statusBadge}</div>
+              </div>
+              <div class="siswa-mobile-detail-item">
+                <span class="label">No. HP / WhatsApp</span>
+                <div class="val">${s.no_hp ? `<a href="tel:${s.no_hp}" style="color:var(--blue);text-decoration:none;">${s.no_hp}</a>` : '-'}</div>
+              </div>
+              <div class="siswa-mobile-detail-item">
+                <span class="label">Domisili</span>
+                <div class="val">${s.domisili || '-'}</div>
+              </div>
+              ${(s.nama_ayah || s.nama_ibu) ? `
+              <div class="siswa-mobile-detail-item" style="grid-column: span 2;">
+                <span class="label">Orang Tua</span>
+                <div class="val">${[s.nama_ayah ? 'Bpk. ' + s.nama_ayah : '', s.nama_ibu ? 'Ibu ' + s.nama_ibu : ''].filter(Boolean).join(' / ')}</div>
+              </div>` : ''}
+            </div>
+
+            <!-- Tombol Aksi Mobile -->
+            <div class="siswa-mobile-actions-bar">
+              <button type="button" class="btn-edit-siswa btn-edit-siswa-action" data-id="${s.id}" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:8px 12px;">
+                <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Edit Data
+              </button>
+              <button type="button" class="btn-delete-siswa-table btn-delete-siswa-action" data-id="${s.id}" data-nama="${s.nama_lengkap}" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:8px 12px;">
+                <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 
   // Render Pagination HTML
   if (paginWrap) {
@@ -977,11 +1102,11 @@ export function renderSiswaTableRows() {
     }
 
     paginWrap.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;color:var(--text-muted);">
+      <div style="display:flex;align-items:center;gap:12px;color:var(--text-muted);flex-wrap:wrap;">
         <span>Menampilkan <strong>${startIndex + 1} - ${endIndex}</strong> dari <strong>${totalFiltered}</strong> generus</span>
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;">
           Per halaman:
-          <select id="selSiswaPageSize" style="padding:3px 8px;border:1px solid var(--border);border-radius:6px;background:#fff;font-size:11.5px;font-weight:700;">
+          <select id="selSiswaPageSize" style="padding:3px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:11.5px;font-weight:700;">
             <option value="25" ${siswaPageSize === 25 ? 'selected' : ''}>25</option>
             <option value="50" ${siswaPageSize === 50 ? 'selected' : ''}>50</option>
             <option value="100" ${siswaPageSize === 100 ? 'selected' : ''}>100</option>
@@ -1043,8 +1168,8 @@ export function renderSiswaTableRows() {
   }
   updateBulkBar();
 
-  // Checkbox row listeners
-  tbody.querySelectorAll('.check-siswa-row').forEach(chk => {
+  // Checkbox row listeners (Both Desktop & Mobile)
+  document.querySelectorAll('.check-siswa-row').forEach(chk => {
     chk.addEventListener('change', (e) => {
       const id = e.target.dataset.id;
       if (e.target.checked) {
@@ -1055,12 +1180,21 @@ export function renderSiswaTableRows() {
       updateBulkBar();
       const allChecked = pagedItems.every(s => selectedSiswaIds.has(s.id));
       if (checkAllEl) checkAllEl.checked = allChecked;
+      if (checkAllMobileEl) checkAllMobileEl.checked = allChecked;
+
+      // Sync all checkboxes for this id
+      document.querySelectorAll(`.check-siswa-row[data-id="${id}"]`).forEach(c => {
+        c.checked = e.target.checked;
+      });
+
       const tr = e.target.closest('tr');
       if (tr) tr.classList.toggle('row-selected', e.target.checked);
+      const card = e.target.closest('.siswa-mobile-card');
+      if (card) card.classList.toggle('card-selected', e.target.checked);
     });
   });
 
-  // Check all in current page listener
+  // Check all in current page listener (Desktop)
   if (checkAllEl) {
     checkAllEl.onchange = (e) => {
       const checked = e.target.checked;
@@ -1071,6 +1205,44 @@ export function renderSiswaTableRows() {
       renderSiswaTableRows();
     };
   }
+
+  // Check all in current page listener (Mobile)
+  if (checkAllMobileEl) {
+    checkAllMobileEl.onchange = (e) => {
+      const checked = e.target.checked;
+      pagedItems.forEach(s => {
+        if (checked) selectedSiswaIds.add(s.id);
+        else selectedSiswaIds.delete(s.id);
+      });
+      renderSiswaTableRows();
+    };
+  }
+
+  // Mobile Dropdown Accordion Toggle
+  document.querySelectorAll('.btn-toggle-siswa-detail').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.siswa-mobile-card');
+      const panel = card?.querySelector('.siswa-mobile-detail-panel');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (panel) {
+        const isShown = panel.classList.contains('show');
+        panel.classList.toggle('show', !isShown);
+        if (icon) {
+          icon.style.transform = isShown ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+      }
+    });
+  });
+
+  // Tap mobile header row (outside checkbox & toggle button) to toggle dropdown
+  document.querySelectorAll('.siswa-mobile-header').forEach(hdr => {
+    hdr.addEventListener('click', (e) => {
+      if (e.target.closest('.check-siswa-row') || e.target.closest('.btn-toggle-siswa-detail')) return;
+      const toggleBtn = hdr.querySelector('.btn-toggle-siswa-detail');
+      toggleBtn?.click();
+    });
+  });
 
   // Batal pilih listener
   document.getElementById('btnBatalPilihSiswa')?.addEventListener('click', () => {
@@ -1099,18 +1271,20 @@ export function renderSiswaTableRows() {
     });
   });
 
-  // Single Edit Listener
-  tbody.querySelectorAll('.btn-edit-siswa').forEach(btn => {
+  // Single Edit Listener (Desktop & Mobile)
+  document.querySelectorAll('.btn-edit-siswa').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const id = e.currentTarget.dataset.id;
       const data = getSiswaList().find(x => x.id === id);
       if (data) renderSiswaFormModal(data);
     });
   });
 
-  // Single Delete Listener (di tabel aksi)
-  tbody.querySelectorAll('.btn-delete-siswa-table').forEach(btn => {
+  // Single Delete Listener (Desktop & Mobile)
+  document.querySelectorAll('.btn-delete-siswa-table').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const id = e.currentTarget.dataset.id;
       const nama = e.currentTarget.dataset.nama || 'generus';
       showConfirmModal({
@@ -1206,7 +1380,7 @@ export function renderSiswaFormModal(existingData = null) {
       </div>
 
       <!-- Usia (auto/manual) -->
-      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:10px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
           <label style="font-weight:700;font-size:12px;">Usia</label>
           <label style="font-size:11px;color:var(--text-muted);cursor:pointer;">
@@ -1214,37 +1388,37 @@ export function renderSiswaFormModal(existingData = null) {
             Isi manual
           </label>
         </div>
-        <div id="usiaAutoDisplay" style="padding:8px 12px;background:#e2e8f0;border-radius:6px;font-size:13px;color:var(--text-muted);">Otomatis dari tanggal lahir</div>
-        <input type="number" id="sUsiaManual" value="${existingData && existingData.usia_manual ? existingData.usia_manual : ''}" placeholder="Isi usia (tahun)" style="display:none;width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;" />
+        <div id="usiaAutoDisplay" style="padding:8px 12px;background:var(--surface-hover);border-radius:6px;font-size:13px;color:var(--text-muted);">Otomatis dari tanggal lahir</div>
+        <input type="number" id="sUsiaManual" value="${existingData && existingData.usia_manual ? existingData.usia_manual : ''}" placeholder="Isi usia (tahun)" style="display:none;width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;background:var(--surface);color:var(--text);" />
       </div>
 
       <!-- Wilayah: Multi-Level Dropdown (Desa -> Kelompok) -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;">Desa <span style="color:red">*</span></label>
-          <select id="sDesa" required style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;background:#fff;font-weight:600;">
+          <select id="sDesa" required style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;background:var(--surface);color:var(--text);font-weight:600;">
             <option value="">-- Pilih Desa --</option>
             ${desaOptions}
           </select>
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;">Kelompok <span style="color:red">*</span></label>
-          <select id="sKelompok" required style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;background:#fff;font-weight:600;">
+          <select id="sKelompok" required style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;background:var(--surface);color:var(--text);font-weight:600;">
             ${initialKelOptions}
           </select>
         </div>
       </div>
 
       <!-- Jenjang Generus: Multi-Level Dropdown (Kategori Jenjang -> Kelas/Tingkat) -->
-      <div style="background:linear-gradient(135deg, #f0f7ff 0%, #e0edfe 100%);border:1.5px solid #93c5fd;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;">
+      <div class="filter-jenjang-card-highlight" style="display:flex;flex-direction:column;gap:10px;">
         <div style="display:flex;align-items:center;gap:6px;">
           <span class="material-symbols-outlined" style="font-size:18px;color:#2563eb;">school</span>
-          <span style="font-size:12px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:0.3px;">Jenjang Generus</span>
+          <span class="filter-jenjang-title" style="font-size:12px;text-transform:uppercase;letter-spacing:0.3px;">Jenjang Generus</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;">
           <div>
-            <label style="font-weight:700;display:block;margin-bottom:4px;color:#1e3a8a;">Kategori Jenjang <span style="color:red">*</span></label>
-            <select id="sKategoriJenjang" required style="width:100%;padding:10px;border:1.5px solid #93c5fd;border-radius:8px;outline:none;box-sizing:border-box;background:#fff;font-weight:700;color:#1e3a8a;">
+            <label class="filter-jenjang-label">Kategori Jenjang <span style="color:red">*</span></label>
+            <select id="sKategoriJenjang" required class="filter-jenjang-select">
               <option value="">-- Pilih Kategori Jenjang --</option>
               <option value="caberawit" ${currentKat === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
               <option value="gp_reguler" ${currentKat === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
@@ -1252,8 +1426,8 @@ export function renderSiswaFormModal(existingData = null) {
             </select>
           </div>
           <div>
-            <label style="font-weight:700;display:block;margin-bottom:4px;color:#1e3a8a;">Kelas / Tingkat <span style="color:red">*</span></label>
-            <select id="sKelas" required style="width:100%;padding:10px;border:1.5px solid #93c5fd;border-radius:8px;outline:none;box-sizing:border-box;background:#fff;font-weight:600;color:#334155;">
+            <label class="filter-jenjang-label">Kelas / Tingkat <span style="color:red">*</span></label>
+            <select id="sKelas" required class="filter-jenjang-select">
               ${initialKelasOptions}
             </select>
           </div>
