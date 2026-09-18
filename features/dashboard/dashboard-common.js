@@ -186,6 +186,20 @@ export function closeModal() {
 
 btnCloseModal?.addEventListener('click', closeModal);
 
+// Backdrop tap-outside dismissal (intuitive on mobile sheet & desktop)
+modalBackdrop?.addEventListener('click', (e) => {
+  if (e.target === modalBackdrop) {
+    closeModal();
+  }
+});
+
+// Escape key dismissal
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modalBackdrop?.classList.contains('show')) {
+    closeModal();
+  }
+});
+
 /* ── 4. Reusable Confirmation Modal (Yes / No Question) ────── */
 export const confirmModalBackdrop = document.getElementById('confirmModalBackdrop');
 export const confirmIconBox = document.getElementById('confirmIconBox');
