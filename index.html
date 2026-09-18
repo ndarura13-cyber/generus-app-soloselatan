@@ -124,6 +124,10 @@
     .dark .proker-date { color: #cbd5e1 !important; }
     .dark .page-btn { background-color: #334155 !important; color: #fff !important; border-color: #475569 !important; }
     .dark .page-btn.active { background-color: #1a56c4 !important; border-color: #1a56c4 !important; }
+    .dark .proker-status-badge.done { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; border-color: rgba(148, 163, 184, 0.3) !important; }
+    .dark .proker-status-badge.ongoing { background-color: rgba(16, 185, 129, 0.15) !important; color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.35) !important; }
+    .dark .proker-status-badge.upcoming,
+    .dark .proker-status-badge.planned { background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.35) !important; }
     
     /* Force hamburger color to Tailwind brand colors, ignoring style.css */
     .hamburger span { @apply bg-brandBlue dark:bg-brandGold !important; }
@@ -596,22 +600,27 @@
           <div class="flex items-center gap-4">
             <div
               class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 flex flex-col items-center justify-center text-brandBlue dark:text-blue-400 shadow-inner">
-              <span class="font-bold text-lg leading-tight" id="currentMonth">AGT</span>
+              <span class="font-bold text-lg leading-tight" id="currentMonth">SEP</span>
               <span class="text-xs font-semibold opacity-80" id="currentYear">2026</span>
             </div>
             <div class="text-white">
-              <div class="font-bold text-xl">Agenda Bulan Ini</div>
-              <div class="text-sm opacity-80">Periode Aktif Generus</div>
+              <div class="font-bold text-xl md:text-2xl tracking-tight" id="prokerHeaderTitle">September 2026</div>
             </div>
           </div>
 
-          <div class="flex flex-wrap gap-3 text-xs font-medium text-white/90">
-            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span
-                class="w-2.5 h-2.5 rounded-full bg-green-400"></span> Selesai</div>
-            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span
-                class="w-2.5 h-2.5 rounded-full bg-brandGold"></span> Berlangsung</div>
-            <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md"><span
-                class="w-2.5 h-2.5 rounded-full bg-blue-300"></span> Akan Datang</div>
+          <div class="flex flex-wrap items-center gap-2 text-xs font-semibold" id="prokerStatusFilterBar">
+            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="all" title="Tampilkan Semua Program Kerja">
+              <span class="w-2.5 h-2.5 rounded-full bg-white/80"></span> Semua
+            </button>
+            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="ongoing" title="Filter Program Kerja Berjalan">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Berjalan
+            </button>
+            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="berlangsung" title="Filter Program Kerja Berlangsung">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Berlangsung
+            </button>
+            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="done" title="Filter Program Kerja Selesai">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Selesai
+            </button>
           </div>
         </div>
 

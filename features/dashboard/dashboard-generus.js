@@ -205,9 +205,9 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
     detailContentHtml = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:12px;">
         ${categories.filter(c => c.key !== 'all').map(c => {
-          const s = getStatsForList(c.list);
-          const pct = activeSiswa.length > 0 ? ((c.list.length / activeSiswa.length) * 100).toFixed(1) : 0;
-          return `
+      const s = getStatsForList(c.list);
+      const pct = activeSiswa.length > 0 ? ((c.list.length / activeSiswa.length) * 100).toFixed(1) : 0;
+      return `
             <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;">
               <div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -220,9 +220,9 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">👦 ${s.l} Putra &bull; 👧 ${s.p} Putri</div>
                 <div style="margin-top:8px;font-size:11px;color:var(--text);display:flex;flex-wrap:wrap;gap:4px;">
                   ${c.classes.map(cls => {
-                    const cnt = c.list.filter(item => item.jenjang_kelas === cls).length;
-                    return `<span style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:600;">${cls}: <strong>${cnt}</strong></span>`;
-                  }).join('')}
+        const cnt = c.list.filter(item => item.jenjang_kelas === cls).length;
+        return `<span style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:600;">${cls}: <strong>${cnt}</strong></span>`;
+      }).join('')}
                 </div>
               </div>
               <button type="button" class="btn-drildown-kat" data-cat="${c.key}" style="padding:6px 12px;background:${c.bg};color:${c.color};border:1px solid ${c.color};border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;">
@@ -231,7 +231,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
               </button>
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     `;
   } else {
@@ -245,17 +245,17 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
           ${classes.map(cls => {
-            const inClass = currentCat.list.filter(s => s.jenjang_kelas === cls);
-            const inL = inClass.filter(s => s.jenis_kelamin === 'L').length;
-            const inP = inClass.filter(s => s.jenis_kelamin === 'P').length;
+      const inClass = currentCat.list.filter(s => s.jenjang_kelas === cls);
+      const inL = inClass.filter(s => s.jenis_kelamin === 'L').length;
+      const inP = inClass.filter(s => s.jenis_kelamin === 'P').length;
 
-            // Sebaran Desa
-            const desaCounts = MASTER_WILAYAH.desa.map(d => ({
-              nama: d.nama,
-              count: inClass.filter(s => s.desa_id === d.id).length
-            })).filter(x => x.count > 0);
+      // Sebaran Desa
+      const desaCounts = MASTER_WILAYAH.desa.map(d => ({
+        nama: d.nama,
+        count: inClass.filter(s => s.desa_id === d.id).length
+      })).filter(x => x.count > 0);
 
-            return `
+      return `
               <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;">
                 <div>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -276,7 +276,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
                 </button>
               </div>
             `;
-          }).join('')}
+    }).join('')}
         </div>
       </div>
     `;
@@ -290,15 +290,15 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
       </h4>
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
         ${MASTER_WILAYAH.desa.map(d => {
-          const inDesa = currentCat.list.filter(s => s.desa_id === d.id || (s.desa_nama && d.nama && s.desa_nama.toLowerCase() === d.nama.toLowerCase()));
-          return `
+    const inDesa = currentCat.list.filter(s => s.desa_id === d.id || (s.desa_nama && d.nama && s.desa_nama.toLowerCase() === d.nama.toLowerCase()));
+    return `
             <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
               <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Desa ${d.nama}</div>
               <div style="font-size:15px;font-weight:900;color:var(--text);margin:2px 0;">${inDesa.length} <span style="font-size:10px;font-weight:600;color:var(--text-muted);">Generus</span></div>
               <div style="font-size:10px;color:var(--text-muted);">${d.kelompok.length} Kelompok</div>
             </div>
           `;
-        }).join('')}
+  }).join('')}
       </div>
     </div>
   `;
@@ -424,7 +424,7 @@ export function renderSiswaModal() {
               1. Kategori Jenjang Usia:
             </label>
             <select id="filterSiswaJenjang" class="filter-jenjang-select">
-              <option value="all">🌟 Semua Jenjang Usia</option>
+              <option value="all">🌟 Jenjang Usia</option>
               <option value="caberawit" ${currentSiswaFilter.jenjang === 'caberawit' ? 'selected' : ''}>🌱 Caberawit</option>
               <option value="gp_reguler" ${currentSiswaFilter.jenjang === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler</option>
               <option value="remaja" ${currentSiswaFilter.jenjang === 'remaja' ? 'selected' : ''}>🎓 Remaja &amp; Dewasa</option>
@@ -454,7 +454,7 @@ export function renderSiswaModal() {
           </button>
           <button type="button" id="btnBulkHapusSiswa" style="background:#dc2626;color:#fff;border:none;padding:6px 16px;border-radius:6px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(220,38,38,0.3);">
             <span class="material-symbols-outlined" style="font-size:16px;">delete_sweep</span>
-            Hapus Cepat Data Terpilih
+            Hapus Terpilih
           </button>
         </div>
       </div>
@@ -471,19 +471,19 @@ export function renderSiswaModal() {
         <div class="filter-wilayah-row-2">
           <div class="filter-wilayah-col">
             <select id="filterSiswaDesa" class="filter-wilayah-select">
-              <option value="all">Semua Desa (5 Desa)</option>
+              <option value="all">Desa</option>
               ${desaOptions}
             </select>
           </div>
           <div class="filter-wilayah-col">
             <select id="filterSiswaKelompok" class="filter-wilayah-select">
-              <option value="all">Semua Kelompok (27 Kel.)</option>
+              <option value="all">Kelompok</option>
               ${kelOptions}
             </select>
           </div>
           <div class="filter-wilayah-col">
             <select id="filterSiswaStatus" class="filter-wilayah-select">
-              <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>📋 Semua Status (${totalCount})</option>
+              <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>Status (${totalCount})</option>
               <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>🟢 Sambung (${activeCount})</option>
               <option value="Pindah Sambung" ${currentSiswaFilter.status === 'Pindah Sambung' ? 'selected' : ''}>🚚 Pindah (${pindahCount})</option>
               <option value="Menikah" ${currentSiswaFilter.status === 'Menikah' ? 'selected' : ''}>💍 Menikah (${nikahCount})</option>
@@ -956,7 +956,7 @@ export function renderSiswaTableRows() {
     tbody.innerHTML = pagedItems.map((s, idx) => {
       const isChecked = selectedSiswaIds.has(s.id);
       const cfg = JENJANG_CONFIG[s.kategori_usia] || { badge: 'Remaja', bg: '#f3e8ff', color: '#7c3aed' };
-      
+
       let statusBadge = `<span style="background:var(--green-pastel);color:var(--green-dark);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;"></span> Sambung</span>`;
       if (s.status_sambung === 'Menikah') {
         statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">💍 Menikah</span>`;

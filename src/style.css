@@ -1015,32 +1015,29 @@ img {
 }
 
 .proker-dot.done {
-  background: #6b7280;
+  background: #94a3b8;
 }
 
 .proker-dot.ongoing {
-  background: var(--green);
-  box-shadow: 0 0 0 4px rgba(93, 168, 122, .25);
+  background: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, .25);
   animation: pulse-dot 2s infinite;
 }
 
-.proker-dot.upcoming {
-  background: var(--blue);
-}
-
+.proker-dot.upcoming,
 .proker-dot.planned {
-  background: var(--gold);
+  background: #f59e0b;
 }
 
 @keyframes pulse-dot {
 
   0%,
   100% {
-    box-shadow: 0 0 0 4px rgba(93, 168, 122, .25);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, .25);
   }
 
   50% {
-    box-shadow: 0 0 0 8px rgba(93, 168, 122, .1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, .1);
   }
 }
 
@@ -1074,28 +1071,44 @@ img {
   white-space: nowrap;
 }
 
+.proker-status-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 .proker-status-badge.done {
-  background: #f3f4f6;
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.proker-status-badge.done .dot {
+  background: #94a3b8;
 }
 
 .proker-status-badge.ongoing {
-  background: var(--green-pastel);
-  color: var(--green-dark);
-  border: 1px solid rgba(46, 139, 87, 0.3);
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.4);
 }
 
-.proker-status-badge.upcoming {
-  background: var(--blue-light);
-  color: var(--blue);
-  border: 1px solid rgba(26, 86, 196, 0.3);
+.proker-status-badge.ongoing .dot {
+  background: #10b981;
 }
 
+.proker-status-badge.upcoming,
 .proker-status-badge.planned {
-  background: var(--gold-light);
-  color: #8a6a00;
-  border: 1px solid rgba(212, 160, 23, 0.3);
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.proker-status-badge.upcoming .dot,
+.proker-status-badge.planned .dot {
+  background: #f59e0b;
 }
 
 .proker-meta {

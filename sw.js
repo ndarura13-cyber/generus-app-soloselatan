@@ -4,7 +4,7 @@
              Cache-First for static assets (images, icons, styles, fonts)
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'ppg-generus-v5.0';
+const CACHE_NAME = 'ppg-generus-v5.1';
 
 const STATIC_ASSETS = [
   '/',
@@ -25,7 +25,6 @@ const STATIC_ASSETS = [
   '/features/laporan/laporan-pembiasaan.html',
   '/features/laporan/cetak-absensi.html',
   '/features/laporan/laporan-kehadiran.html',
-  '/features/laporan/template-laporan.html',
   '/src/style.css',
   '/src/app.js',
   '/src/db-master.js',

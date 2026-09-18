@@ -143,48 +143,101 @@ const heroCounter = document.getElementById('heroGenerusCount');
 if (heroCounter) countObserver.observe(heroCounter);
 
 /* ── 7. PROGRAM KERJA DATA & RENDER (TERINTEGRASI DATABASE) ── */
-const months = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
+const shortMonthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
+const fullMonthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const now = new Date();
+const currentMonthIdx = now.getMonth();
+const currentYearVal = now.getFullYear();
 
 const currentMonthEl = document.getElementById('currentMonth');
 const currentYearEl = document.getElementById('currentYear');
+const prokerHeaderTitleEl = document.getElementById('prokerHeaderTitle');
 
-if (currentMonthEl) currentMonthEl.textContent = months[now.getMonth()];
-if (currentYearEl) currentYearEl.textContent = now.getFullYear();
-
-function getStatusLabel(status) {
-  switch (status) {
-    case 'done': return 'Selesai';
-    case 'ongoing': return 'Sedang Berlangsung';
-    case 'upcoming': return 'Akan Datang';
-    case 'planned':
-    default: return 'Direncanakan';
-  }
+if (currentMonthEl) currentMonthEl.textContent = shortMonthNames[currentMonthIdx];
+if (currentYearEl) currentYearEl.textContent = currentYearVal;
+if (prokerHeaderTitleEl) {
+  prokerHeaderTitleEl.textContent = `${fullMonthNames[currentMonthIdx]} ${currentYearVal}`;
 }
 
+function getStatusLabel(status) {
+  if (status === 'done' || status === 'selesai') return 'Selesai';
+  if (status === 'ongoing' || status === 'berjalan' || status === 'sedang_berlangsung') return 'Berjalan';
+  return 'Berlangsung';
+}
+
+function getStatusClass(status) {
+  if (status === 'done' || status === 'selesai') return 'done';
+  if (status === 'ongoing' || status === 'berjalan' || status === 'sedang_berlangsung') return 'ongoing';
+  return 'upcoming';
+}
+
+let currentProkerFilter = 'ongoing'; // Default filter: Berjalan (yang sedang berjalan di bulan tersebut)
 let currentProkerPage = 1;
 const prokerItemsPerPage = 5;
+
+function updateFilterButtonsUI() {
+  const filterBtns = document.querySelectorAll('.proker-filter-btn');
+  filterBtns.forEach(btn => {
+    const f = btn.dataset.filter;
+    if (f === currentProkerFilter) {
+      if (f === 'ongoing') {
+        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-emerald-300 bg-emerald-500 text-white font-bold shadow-md ring-2 ring-emerald-300/40 cursor-pointer transition-all duration-200';
+      } else if (f === 'berlangsung') {
+        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-amber-300 bg-amber-500 text-white font-bold shadow-md ring-2 ring-amber-300/40 cursor-pointer transition-all duration-200';
+      } else if (f === 'done') {
+        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-slate-300 bg-slate-500 text-white font-bold shadow-md ring-2 ring-slate-300/40 cursor-pointer transition-all duration-200';
+      } else {
+        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-white bg-white text-brandBlue font-bold shadow-md ring-2 ring-white/40 cursor-pointer transition-all duration-200';
+      }
+    } else {
+      btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white/90 font-medium cursor-pointer transition-all duration-200';
+    }
+  });
+}
 
 function renderProker() {
   const list = document.getElementById('prokerList');
   const paginationContainer = document.getElementById('prokerPagination');
   if (!list) return;
 
-  const prokerData = getProkerList();
-  const totalPages = Math.ceil(prokerData.length / prokerItemsPerPage);
-  
-  // Ensure current page is valid
+  updateFilterButtonsUI();
+
+  const allProker = getProkerList();
+
+  // Filter program kerja sesuai status
+  let filteredData = allProker;
+  if (currentProkerFilter === 'ongoing') {
+    filteredData = allProker.filter(p => p.status === 'ongoing' || p.status === 'berjalan' || p.status === 'sedang_berlangsung');
+  } else if (currentProkerFilter === 'berlangsung') {
+    filteredData = allProker.filter(p => p.status === 'upcoming' || p.status === 'planned' || p.status === 'akan_datang' || p.status === 'direncanakan' || p.status === 'berlangsung');
+  } else if (currentProkerFilter === 'done') {
+    filteredData = allProker.filter(p => p.status === 'done' || p.status === 'selesai');
+  }
+
+  if (filteredData.length === 0) {
+    list.innerHTML = `
+      <div class="text-center py-12 text-slate-500 dark:text-slate-400">
+        <span class="material-symbols-outlined text-4xl mb-2 text-slate-400">event_busy</span>
+        <p class="font-medium text-sm">Tidak ada program kerja dengan status ini.</p>
+      </div>
+    `;
+    if (paginationContainer) paginationContainer.innerHTML = '';
+    return;
+  }
+
+  const totalPages = Math.ceil(filteredData.length / prokerItemsPerPage);
   if (currentProkerPage > totalPages) currentProkerPage = totalPages;
   if (currentProkerPage < 1) currentProkerPage = 1;
 
   const startIndex = (currentProkerPage - 1) * prokerItemsPerPage;
   const endIndex = startIndex + prokerItemsPerPage;
-  const currentData = prokerData.slice(startIndex, endIndex);
+  const currentData = filteredData.slice(startIndex, endIndex);
 
   list.innerHTML = currentData.map((item, index) => {
     const globalIndex = startIndex + index + 1;
-    const statusClass = item.status || 'planned';
-    const statusLabel = getStatusLabel(statusClass);
+    const rawStatus = item.status || 'planned';
+    const statusClass = getStatusClass(rawStatus);
+    const statusLabel = getStatusLabel(rawStatus);
     const tempatHtml = item.tempat ? `
       <span class="proker-meta-sep">&bull;</span>
       <span class="proker-meta-item">
@@ -242,12 +295,12 @@ function renderProker() {
     if (totalPages > 1) {
       let dotsHtml = '';
       for (let i = 1; i <= totalPages; i++) {
-        dotsHtml += `<button class="page-dot ${i === currentProkerPage ? 'active' : ''}" data-page="${i}" aria-label="Page ${i}"></button>`;
+        dotsHtml += `<button class="px-3 py-1 text-xs font-bold rounded-lg transition-all page-dot ${i === currentProkerPage ? 'bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}" data-page="${i}" aria-label="Page ${i}">${i}</button>`;
       }
       paginationContainer.innerHTML = `
-        <button class="page-nav prev" ${currentProkerPage === 1 ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_left</span></button>
-        <div class="page-dots">${dotsHtml}</div>
-        <button class="page-nav next" ${currentProkerPage === totalPages ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_right</span></button>
+        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav prev" ${currentProkerPage === 1 ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_left</span></button>
+        <div class="page-dots flex items-center gap-1.5">${dotsHtml}</div>
+        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav next" ${currentProkerPage === totalPages ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_right</span></button>
       `;
 
       // Bind events
@@ -257,22 +310,41 @@ function renderProker() {
           renderProker();
         });
       });
-      paginationContainer.querySelector('.prev').addEventListener('click', () => {
-        if (currentProkerPage > 1) {
-          currentProkerPage--;
-          renderProker();
-        }
-      });
-      paginationContainer.querySelector('.next').addEventListener('click', () => {
-        if (currentProkerPage < totalPages) {
-          currentProkerPage++;
-          renderProker();
-        }
-      });
+      const prevBtn = paginationContainer.querySelector('.prev');
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          if (currentProkerPage > 1) {
+            currentProkerPage--;
+            renderProker();
+          }
+        });
+      }
+      const nextBtn = paginationContainer.querySelector('.next');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          if (currentProkerPage < totalPages) {
+            currentProkerPage++;
+            renderProker();
+          }
+        });
+      }
     } else {
       paginationContainer.innerHTML = '';
     }
   }
+}
+
+// Bind event listener filter status proker
+const filterBarContainer = document.getElementById('prokerStatusFilterBar');
+if (filterBarContainer) {
+  filterBarContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('.proker-filter-btn');
+    if (!btn) return;
+    const filterVal = btn.dataset.filter;
+    currentProkerFilter = (currentProkerFilter === filterVal) ? 'all' : filterVal;
+    currentProkerPage = 1;
+    renderProker();
+  });
 }
 
 renderProker();
@@ -383,8 +455,7 @@ if ('serviceWorker' in navigator) {
         });
       })
       .catch(err => {
-        console.warn('[App] Root SW registration failed, trying fallback:', err);
-        navigator.serviceWorker.register('./src/sw.js').catch(e => console.warn('[App] Fallback SW failed:', e));
+        console.warn('[App] Root SW registration failed:', err);
       });
   });
 }
