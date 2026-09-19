@@ -167,9 +167,9 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 
   // Nav tabs inside modal
   const navTabsHtml = `
-    <div style="display:flex;gap:6px;overflow-x:auto;border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:14px;">
+    <div class="ringkasan-tabs-scroll">
       ${categories.map(c => `
-        <button type="button" class="btn-tab-ringkasan" data-cat="${c.key}" style="padding:8px 14px;border-radius:8px;border:1.5px solid ${c.key === activeKat ? c.color : 'transparent'};background:${c.key === activeKat ? c.bg : '#f8fafc'};color:${c.key === activeKat ? c.color : 'var(--text-muted)'};font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;">
+        <button type="button" class="btn-tab-ringkasan ringkasan-tab-btn ${c.key === activeKat ? `active-${c.key}` : ''}" data-cat="${c.key}">
           <span class="material-symbols-outlined" style="font-size:16px;">${c.icon}</span>
           ${c.title.split('(')[0].trim()} (${c.list.length})
         </button>
@@ -179,17 +179,19 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 
   // Overview banner
   const overviewBannerHtml = `
-    <div style="background:linear-gradient(135deg, ${currentCat.bg} 0%, #ffffff 100%);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+    <div class="ringkasan-banner-box banner-${currentCat.key}">
       <div>
-        <div style="font-size:11px;font-weight:800;color:${currentCat.color};text-transform:uppercase;letter-spacing:0.5px;">Ringkasan Data Generus Aktif (Sambung)</div>
-        <h3 style="margin:2px 0 4px;font-size:16px;font-weight:800;color:var(--text);">${currentCat.title}</h3>
-        <p style="margin:0;font-size:11.5px;color:var(--text-muted);">${currentCat.desc}</p>
+        <div class="ringkasan-banner-tag ringkasan-color-${currentCat.key}">Ringkasan Data Generus Aktif (Sambung)</div>
+        <h3 class="ringkasan-banner-title">${currentCat.title}</h3>
+        <p class="ringkasan-banner-desc">${currentCat.desc}</p>
       </div>
       <div style="display:flex;gap:12px;align-items:center;">
         <div style="text-align:right;">
-          <div style="font-size:22px;font-weight:900;color:${currentCat.color};">${catStats.total} <span style="font-size:13px;font-weight:600;color:var(--text-muted);">Generus Aktif</span></div>
-          <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);">
-            <span style="color:#1d4ed8;">👦 ${catStats.l} Putra</span> &bull; <span style="color:#be185d;">👧 ${catStats.p} Putri</span>
+          <div class="ringkasan-banner-total ringkasan-color-${currentCat.key}">
+            ${catStats.total} <span class="ringkasan-banner-unit">Generus Aktif</span>
+          </div>
+          <div class="ringkasan-banner-gender">
+            <span class="text-putra">👦 ${catStats.l} Putra</span> &bull; <span class="text-putri">👧 ${catStats.p} Putri</span>
           </div>
           ${nonAktifCount > 0 && activeKat === 'all' ? `<div style="font-size:10px;color:#94a3b8;margin-top:2px;">(Tersimpan ${nonAktifCount} non-aktif: Pindah/Menikah)</div>` : ''}
         </div>
@@ -208,24 +210,26 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
       const s = getStatsForList(c.list);
       const pct = activeSiswa.length > 0 ? ((c.list.length / activeSiswa.length) * 100).toFixed(1) : 0;
       return `
-            <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;">
+            <div class="ringkasan-card-item">
               <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                  <span style="background:${c.bg};color:${c.color};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:4px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span class="ringkasan-tag-${c.key}">
                     <span class="material-symbols-outlined" style="font-size:14px;">${c.icon}</span> ${c.title.split('(')[0]}
                   </span>
-                  <span style="font-size:12px;font-weight:800;color:${c.color};">${pct}%</span>
+                  <span class="ringkasan-pct-${c.key}">${pct}%</span>
                 </div>
-                <div style="font-size:20px;font-weight:900;color:var(--text);">${s.total} Generus</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">👦 ${s.l} Putra &bull; 👧 ${s.p} Putri</div>
-                <div style="margin-top:8px;font-size:11px;color:var(--text);display:flex;flex-wrap:wrap;gap:4px;">
+                <div class="ringkasan-card-total">${s.total} Generus</div>
+                <div class="ringkasan-card-gender">
+                  <span class="text-putra">👦 ${s.l} Putra</span> &bull; <span class="text-putri">👧 ${s.p} Putri</span>
+                </div>
+                <div class="ringkasan-classes-wrap">
                   ${c.classes.map(cls => {
         const cnt = c.list.filter(item => item.jenjang_kelas === cls).length;
-        return `<span style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:600;">${cls}: <strong>${cnt}</strong></span>`;
+        return `<span class="ringkasan-class-badge">${cls}: <strong>${cnt}</strong></span>`;
       }).join('')}
                 </div>
               </div>
-              <button type="button" class="btn-drildown-kat" data-cat="${c.key}" style="padding:6px 12px;background:${c.bg};color:${c.color};border:1px solid ${c.color};border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;">
+              <button type="button" class="btn-drildown-kat ringkasan-btn-drilldown-${c.key}" data-cat="${c.key}">
                 Lihat Rincian Lengkap Kelas
                 <span class="material-symbols-outlined" style="font-size:15px;">arrow_forward</span>
               </button>
@@ -239,8 +243,8 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
     const classes = currentCat.classes || [];
     detailContentHtml = `
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--text);">Rincian Data Berdasarkan Jenjang / Kelas (${classes.length} Tingkat)</h4>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+          <h4 class="ringkasan-section-subtitle">Rincian Data Berdasarkan Jenjang / Kelas (${classes.length} Tingkat)</h4>
           <span style="font-size:11px;color:var(--text-muted);">Klik tombol pada tiap kelas untuk melihat data di database</span>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
@@ -256,21 +260,21 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
       })).filter(x => x.count > 0);
 
       return `
-              <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;">
+              <div class="ringkasan-card-item">
                 <div>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-weight:800;font-size:13px;color:var(--text);">${cls}</span>
-                    <span style="font-size:13px;font-weight:900;color:${currentCat.color};">${inClass.length} Generus</span>
+                    <span class="ringkasan-card-title">${cls}</span>
+                    <span class="ringkasan-count-${currentCat.key}">${inClass.length} Generus</span>
                   </div>
-                  <div style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">
-                    <span style="color:#1d4ed8;">👦 ${inL} L</span> &bull; <span style="color:#be185d;">👧 ${inP} P</span>
+                  <div class="ringkasan-card-gender" style="margin:2px 0 6px;">
+                    <span class="text-putra">👦 ${inL} L</span> &bull; <span class="text-putri">👧 ${inP} P</span>
                   </div>
-                  <div style="font-size:10.5px;color:var(--text-muted);background:#f8fafc;padding:6px 8px;border-radius:6px;border:1px solid #f1f5f9;">
-                    <span style="font-weight:700;display:block;margin-bottom:2px;">Sebaran Desa:</span>
+                  <div class="ringkasan-subbox-desa">
+                    <span class="subbox-label">Sebaran Desa:</span>
                     ${desaCounts.length > 0 ? desaCounts.map(dc => `${dc.nama}: <strong>${dc.count}</strong>`).join(', ') : 'Belum ada data'}
                   </div>
                 </div>
-                <button type="button" class="btn-filter-ke-database" data-jenjang="${currentCat.key}" data-kelas="${cls}" style="padding:6px 10px;background:#f8fafc;color:var(--blue);border:1px solid #cbd5e1;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;">
+                <button type="button" class="btn-filter-ke-database ringkasan-btn-db" data-jenjang="${currentCat.key}" data-kelas="${cls}">
                   <span class="material-symbols-outlined" style="font-size:14px;">filter_alt</span>
                   Buka Data di Database
                 </button>
@@ -284,18 +288,18 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 
   // Distribution across 5 Desas
   const desaDistHtml = `
-    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;">
-      <h4 style="margin:0 0 8px;font-size:12.5px;font-weight:800;color:var(--text);">
+    <div class="ringkasan-desa-dist-wrapper">
+      <h4 class="ringkasan-desa-dist-title">
         Sebaran Generus di 5 Desa Solo Selatan (${currentCat.title.split('(')[0].trim()})
       </h4>
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
         ${MASTER_WILAYAH.desa.map(d => {
     const inDesa = currentCat.list.filter(s => s.desa_id === d.id || (s.desa_nama && d.nama && s.desa_nama.toLowerCase() === d.nama.toLowerCase()));
     return `
-            <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Desa ${d.nama}</div>
-              <div style="font-size:15px;font-weight:900;color:var(--text);margin:2px 0;">${inDesa.length} <span style="font-size:10px;font-weight:600;color:var(--text-muted);">Generus</span></div>
-              <div style="font-size:10px;color:var(--text-muted);">${d.kelompok.length} Kelompok</div>
+            <div class="ringkasan-desa-pill">
+              <div class="desa-label">Desa ${d.nama}</div>
+              <div class="desa-count">${inDesa.length} <span class="desa-unit">Generus</span></div>
+              <div class="desa-sub">${d.kelompok.length} Kelompok</div>
             </div>
           `;
   }).join('')}
@@ -304,12 +308,12 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
   `;
 
   const modalHtml = `
-    <div style="display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:12px;">
       ${navTabsHtml}
       ${overviewBannerHtml}
       ${detailContentHtml}
       ${desaDistHtml}
-      <div class="modal-sticky-footer" style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
+      <div class="modal-sticky-footer" style="margin-top:8px;padding-top:14px;display:flex;justify-content:space-between;align-items:center;">
         <button type="button" class="btn-cancel-modal px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
           Tutup
         </button>
@@ -320,6 +324,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
       </div>
     </div>
   `;
+
 
   openModal(`Rincian Ringkasan: ${currentCat.title.split('(')[0]}`, currentCat.icon, modalHtml, 'large');
 
@@ -350,6 +355,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
       currentSiswaFilter.kelompok = 'all';
       currentSiswaFilter.search = '';
       siswaCurrentPage = 1;
+      applyUserRegionFilter(true);
       renderSiswaModal();
     });
   });
@@ -362,6 +368,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
     currentSiswaFilter.kelompok = 'all';
     currentSiswaFilter.search = '';
     siswaCurrentPage = 1;
+    applyUserRegionFilter(true);
     renderSiswaModal();
   });
 
@@ -369,6 +376,32 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 }
 
 let currentSiswaFilter = { search: '', desa: 'all', kelompok: 'all', jenjang: 'all', kelas: 'all', status: 'all' };
+
+/**
+ * Otomatis sesuaikan filter wilayah jika pamong kelompok atau koordinator desa (seperti pada fitur pembiasaan)
+ */
+export function applyUserRegionFilter(force = false) {
+  const isSuperadminOrDaerah = currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah');
+
+  if (!isSuperadminOrDaerah && currentUser) {
+    if (currentUser.tingkatan === 'desa' && currentUser.desaId) {
+      if (force || currentSiswaFilter.desa === 'all') {
+        currentSiswaFilter.desa = currentUser.desaId;
+      }
+    } else if (currentUser.tingkatan === 'kelompok') {
+      if (force || currentSiswaFilter.desa === 'all') {
+        if (currentUser.desaId) currentSiswaFilter.desa = currentUser.desaId;
+      }
+      if (force || currentSiswaFilter.kelompok === 'all') {
+        if (currentUser.kelompokId) currentSiswaFilter.kelompok = currentUser.kelompokId;
+      }
+    }
+  }
+}
+
+// Inisialisasi awal wilayah pengguna saat modul dimuat
+applyUserRegionFilter(true);
+
 let currentSiswaSort = { key: 'nama_lengkap', dir: 'asc' };
 if (typeof window !== 'undefined') window.sortSiswa = (key) => {
   if (currentSiswaSort.key === key) {
@@ -382,6 +415,7 @@ if (typeof window !== 'undefined') window.sortSiswa = (key) => {
 
 export function renderSiswaModal() {
   updateDashboardStats();
+  applyUserRegionFilter();
   const allList = getSiswaList();
   const activeCount = allList.filter(isSiswaAktif).length;
   const nonAktifCount = allList.length - activeCount;
@@ -492,16 +526,25 @@ export function renderSiswaModal() {
         </div>
 
         <!-- BARIS 3: ICON TOMBOL SESUAI PERUBAHAN MOBILE -->
+        <!-- BARIS 3: TOMBOL AKSI TERPADU (EXPORT PDF, EXCEL, IMPORT WIZARD) -->
         <div class="filter-wilayah-row-3">
-          <button type="button" id="btnExportCsvGenerus" class="btn-export-csv" title="Download data dalam format Excel CSV">
-            <span class="material-symbols-outlined" style="font-size:18px;color:var(--green, #10b981);">file_download</span>
-            <span class="btn-label-text">Export CSV</span>
+          <button type="button" id="btnExportPdfGenerus" class="btn-export-pdf" title="Cetak atau Simpan Laporan PDF Resmi Data Generus (A4 Landscape)">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#d97706;">picture_as_pdf</span>
+            <span class="btn-label-text">Export PDF</span>
           </button>
-          <input type="file" id="inputImportCsvGenerus" accept=".csv" style="display:none;" />
-          <button type="button" id="btnImportCsvGenerus" class="btn-import-csv" title="Import data dari format Excel CSV">
-            <span class="material-symbols-outlined" style="font-size:18px;">upload</span>
-            <span class="btn-label-text">Import CSV</span>
+          <button type="button" id="btnExportExcelGenerus" class="btn-export-excel" title="Download data lengkap dalam format Excel (.xlsx)">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#10b981;">table_view</span>
+            <span class="btn-label-text">Export Excel</span>
           </button>
+          <button type="button" id="btnImportWizardGenerus" class="btn-import-wizard" title="Import data cerdas dari file Excel (.xlsx / .xls) atau CSV">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#2563eb;">upload_file</span>
+            <span class="btn-label-text">Import Data</span>
+          </button>
+
+          <!-- Hidden legacy buttons for backward compatibility -->
+          <button type="button" id="btnExportCsvGenerus" style="display:none;" aria-hidden="true"></button>
+          <input type="file" id="inputImportCsvGenerus" accept=".csv,.xlsx,.xls" style="display:none;" />
+          <button type="button" id="btnImportCsvGenerus" style="display:none;" aria-hidden="true"></button>
 
           <button type="button" id="btnAutoPromoteJenjang" class="btn-auto-promote" title="Kenaikan Jenjang Otomatis Sesuai Usia atau Pergantian Tahun Ajaran">
             <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span>
@@ -638,15 +681,158 @@ export function renderSiswaModal() {
     renderSiswaFormModal(null);
   });
 
-  // CSV Export & Import Logic
-  document.getElementById('btnExportCsvGenerus')?.addEventListener('click', () => {
-    const allSiswa = getSiswaList();
-    let csvContent = "\uFEFF"; // UTF-8 BOM
-    csvContent += "NAMA_LENGKAP;TEMPAT_LAHIR;TANGGAL_LAHIR;JENIS_KELAMIN;KATEGORI_USIA;JENJANG_KELAS;NAMA_AYAH;NAMA_IBU;NO_HP;DOMISILI;STATUS_SAMBUNG\n";
+  // ── EXPORT & IMPORT EVENT LISTENERS ──
+  document.getElementById('btnExportPdfGenerus')?.addEventListener('click', () => {
+    exportGenerusToPdf();
+  });
 
-    allSiswa.forEach(s => {
+  document.getElementById('btnExportExcelGenerus')?.addEventListener('click', () => {
+    exportGenerusToExcel(false);
+  });
+
+  document.getElementById('btnExportCsvGenerus')?.addEventListener('click', () => {
+    exportGenerusToExcel(false);
+  });
+
+  document.getElementById('btnImportWizardGenerus')?.addEventListener('click', () => {
+    openImportWizardModal();
+  });
+
+  const fileInput = document.getElementById('inputImportCsvGenerus');
+  document.getElementById('btnImportCsvGenerus')?.addEventListener('click', () => {
+    openImportWizardModal();
+  });
+
+  fileInput?.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+      openImportWizardModal();
+      handleWizardFileSelected(e.target.files[0]);
+    }
+  });
+
+  // Initial render of rows
+  renderSiswaTableRows();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXPORT & SMART IMPORT WIZARD FUNCTIONS (EXCEL & CSV)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let _parsedImportData = [];
+
+/**
+ * Ekspor Data Generus ke Laporan PDF Resmi (A4 Landscape)
+ */
+export function exportGenerusToPdf() {
+  applyUserRegionFilter();
+  try {
+    sessionStorage.setItem('ppg_export_filter', JSON.stringify(currentSiswaFilter));
+  } catch (e) {
+    console.warn('Gagal menyimpan filter ekspor:', e);
+  }
+  showToast('Membuka pratinjau cetak PDF Data Generus...', 'info');
+  window.open('../laporan/laporan-generus.html', '_blank');
+}
+
+/**
+ * Ekspor Data Generus Lengkap ke Format Excel (.xlsx) atau CSV
+ */
+export function exportGenerusToExcel(filteredOnly = false) {
+  const isSuperadminOrDaerah = currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah');
+  applyUserRegionFilter();
+  const allSiswa = getSiswaList();
+  const shouldFilter = filteredOnly || !isSuperadminOrDaerah;
+  const targetList = shouldFilter
+    ? allSiswa.filter(s => {
+        if (currentSiswaFilter.desa !== 'all' && s.desa_id !== currentSiswaFilter.desa) return false;
+        if (currentSiswaFilter.kelompok !== 'all' && s.kelompok_id !== currentSiswaFilter.kelompok) return false;
+        if (currentSiswaFilter.jenjang !== 'all' && s.kategori_usia !== currentSiswaFilter.jenjang) return false;
+        if (currentSiswaFilter.status !== 'all' && s.status_sambung !== currentSiswaFilter.status) return false;
+        return true;
+      })
+    : allSiswa;
+
+  if (targetList.length === 0) {
+    showToast('Tidak ada data generus untuk diekspor!', 'warning');
+    return;
+  }
+
+  // Jika SheetJS (XLSX) tersedia, ekspor native .xlsx
+  if (typeof XLSX !== 'undefined') {
+    const rows = [
+      [
+        'NO',
+        'NAMA LENGKAP',
+        'JENIS KELAMIN (L/P)',
+        'TEMPAT LAHIR',
+        'TANGGAL LAHIR (YYYY-MM-DD)',
+        'USIA',
+        'KATEGORI USIA',
+        'JENJANG / KELAS',
+        'DESA',
+        'KELOMPOK',
+        'NAMA AYAH',
+        'NAMA IBU',
+        'NO HP / WHATSAPP',
+        'DOMISILI',
+        'STATUS SAMBUNG'
+      ]
+    ];
+
+    targetList.forEach((s, idx) => {
+      const usia = s.tanggal_lahir ? calculateUmur(s.tanggal_lahir) : '';
+      rows.push([
+        idx + 1,
+        s.nama_lengkap || '',
+        s.jenis_kelamin || 'L',
+        s.tempat_lahir || '',
+        s.tanggal_lahir || '',
+        usia,
+        s.kategori_usia || '',
+        s.jenjang_kelas || '',
+        s.desa_nama || '',
+        s.kelompok_nama || '',
+        s.nama_ayah || '',
+        s.nama_ibu || '',
+        s.no_hp || '',
+        s.domisili || 'Pribumi',
+        s.status_sambung || 'Sambung'
+      ]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    ws['!cols'] = [
+      { wch: 5 },  // No
+      { wch: 28 }, // Nama
+      { wch: 10 }, // Gender
+      { wch: 18 }, // Tempat
+      { wch: 16 }, // Tgl Lahir
+      { wch: 6 },  // Usia
+      { wch: 16 }, // Kategori
+      { wch: 16 }, // Kelas
+      { wch: 14 }, // Desa
+      { wch: 18 }, // Kelompok
+      { wch: 18 }, // Ayah
+      { wch: 18 }, // Ibu
+      { wch: 16 }, // HP
+      { wch: 12 }, // Domisili
+      { wch: 14 }  // Status
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Data Generus');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `Data_Generus_PPG_Solo_Selatan_${dateStr}.xlsx`);
+    showToast(`Berhasil mengekspor ${targetList.length} data ke Excel (.xlsx)!`, 'success');
+  } else {
+    // Fallback CSV (UTF-8 BOM)
+    let csvContent = "\uFEFF";
+    csvContent += "NO;NAMA_LENGKAP;JENIS_KELAMIN;TEMPAT_LAHIR;TANGGAL_LAHIR;USIA;KATEGORI_USIA;JENJANG_KELAS;DESA;KELOMPOK;NAMA_AYAH;NAMA_IBU;NO_HP;DOMISILI;STATUS_SAMBUNG\n";
+    targetList.forEach((s, idx) => {
       const clean = (str) => '"' + (str || '').toString().replace(/"/g, '""') + '"';
-      csvContent += `${clean(s.nama_lengkap)};${clean(s.tempat_lahir)};${clean(s.tanggal_lahir)};${clean(s.jenis_kelamin)};${clean(s.kategori_usia)};${clean(s.jenjang_kelas)};${clean(s.nama_ayah)};${clean(s.nama_ibu)};${clean(s.no_hp)};${clean(s.domisili)};${clean(s.status_sambung)}\n`;
+      const usia = s.tanggal_lahir ? calculateUmur(s.tanggal_lahir) : '';
+      csvContent += `${idx + 1};${clean(s.nama_lengkap)};${clean(s.jenis_kelamin)};${clean(s.tempat_lahir)};${clean(s.tanggal_lahir)};${usia};${clean(s.kategori_usia)};${clean(s.jenjang_kelas)};${clean(s.desa_nama)};${clean(s.kelompok_nama)};${clean(s.nama_ayah)};${clean(s.nama_ibu)};${clean(s.no_hp)};${clean(s.domisili)};${clean(s.status_sambung)}\n`;
     });
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -658,57 +844,715 @@ export function renderSiswaModal() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    showToast(`Berhasil mengekspor ${targetList.length} data ke CSV!`, 'success');
+  }
+}
+
+/**
+ * Unduh Template Resmi Excel (.xlsx) untuk Import Generus
+ */
+export function downloadTemplateImportGenerus() {
+  if (typeof XLSX === 'undefined') {
+    alert('Pustaka Excel sedang dimuat, silakan coba sesaat lagi.');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: DATA SANTRI (Template Utama)
+  const header = [
+    'NAMA LENGKAP *',
+    'JENIS KELAMIN (L/P) *',
+    'TEMPAT LAHIR',
+    'TANGGAL LAHIR (YYYY-MM-DD)',
+    'KATEGORI USIA',
+    'JENJANG / KELAS',
+    'DESA *',
+    'KELOMPOK *',
+    'NAMA AYAH',
+    'NAMA IBU',
+    'NO HP / WA',
+    'DOMISILI',
+    'STATUS SAMBUNG'
+  ];
+
+  const sampleRows = [
+    [
+      'Muhammad Faiz Pratama',
+      'L',
+      'Surakarta',
+      '2017-04-12',
+      'caberawit',
+      '2 SD',
+      'Barat',
+      'Gentan',
+      'Bpk. Joko Susilo',
+      'Ibu Siti Aminah',
+      '081234567890',
+      'Pribumi',
+      'Sambung'
+    ],
+    [
+      'Aisyah Nur Azizah',
+      'P',
+      'Sukoharjo',
+      '2012-08-25',
+      'gp_reguler',
+      '1 SMP',
+      'Selatan',
+      'Solo Baru',
+      'Bpk. Ahmad Fauzi',
+      'Ibu Fatimah',
+      '089876543210',
+      'Pribumi',
+      'Sambung'
+    ],
+    [
+      'Rizky Pratama Yudha',
+      'L',
+      'Surakarta',
+      '2004-11-15',
+      'remaja',
+      'Mahasiswa',
+      'Tengah',
+      'Baluwarti',
+      'Bpk. Hendro',
+      'Ibu Lestari',
+      '085678901234',
+      'Pribumi',
+      'Sambung'
+    ]
+  ];
+
+  const wsData = XLSX.utils.aoa_to_sheet([header, ...sampleRows]);
+  wsData['!cols'] = [
+    { wch: 28 }, // Nama
+    { wch: 14 }, // Gender
+    { wch: 18 }, // Tempat
+    { wch: 20 }, // Tgl Lahir
+    { wch: 16 }, // Kategori
+    { wch: 16 }, // Kelas
+    { wch: 14 }, // Desa
+    { wch: 18 }, // Kelompok
+    { wch: 20 }, // Ayah
+    { wch: 20 }, // Ibu
+    { wch: 16 }, // HP
+    { wch: 14 }, // Domisili
+    { wch: 16 }  // Status
+  ];
+
+  XLSX.utils.book_append_sheet(wb, wsData, 'DATA_SANTRI');
+
+  // Sheet 2: PANDUAN & DAFTAR WILAYAH
+  const allK = getAllKelompok();
+  const guideRows = [
+    ['PANDUAN PENGISIAN TEMPLATE EXCEL DATA GENERUS PPG SOLO SELATAN'],
+    ['1. Kolom bertanda (*) WAJIB diisi (Nama Lengkap, Gender, Desa, Kelompok).'],
+    ['2. Format Tanggal Lahir: YYYY-MM-DD (Contoh: 2015-05-20) atau DD/MM/YYYY.'],
+    ['3. Jenis Kelamin: L (Laki-laki) atau P (Perempuan).'],
+    ['4. Kategori Usia: caberawit, gp_reguler, atau remaja.'],
+    ['5. Status Sambung: Sambung, Pindah Sambung, atau Menikah (Default: Sambung).'],
+    [''],
+    ['DAFTAR 5 DESA RESMI:', 'DAFTAR 27 KELOMPOK RESMI:']
+  ];
+
+  MASTER_WILAYAH.desa.forEach((d, idx) => {
+    guideRows.push([`Desa ${d.nama}`, '']);
   });
 
-  const fileInput = document.getElementById('inputImportCsvGenerus');
-  document.getElementById('btnImportCsvGenerus')?.addEventListener('click', () => {
+  allK.forEach(k => {
+    guideRows.push(['', `${k.nama} (Desa ${k.desaNama})`]);
+  });
+
+  const wsGuide = XLSX.utils.aoa_to_sheet(guideRows);
+  wsGuide['!cols'] = [{ wch: 25 }, { wch: 32 }];
+  XLSX.utils.book_append_sheet(wb, wsGuide, 'PANDUAN_WILAYAH');
+
+  XLSX.writeFile(wb, 'Template_Import_Generus_PPGSoloSelatan.xlsx');
+  showToast('Template Excel berhasil diunduh!', 'success');
+}
+
+/**
+ * Modal Wizard Import Cerdas (Excel & CSV)
+ */
+export function openImportWizardModal() {
+  _parsedImportData = [];
+
+  const modalHtml = `
+    <div class="import-wizard-wrapper" style="padding:4px 0;">
+      <!-- TOP BANNER -->
+      <div class="import-wizard-banner">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <span class="material-symbols-outlined" style="font-size:28px;color:#2563eb;flex-shrink:0;">lightbulb</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:800;color:var(--text);">Import Cerdas &amp; Fleksibel</div>
+            <p style="font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.4;">
+              Unggah berkas <strong>.xlsx</strong>, <strong>.xls</strong>, atau <strong>.csv</strong> yang Anda miliki. Sistem cerdas otomatis mengenali nama kolom dan menormalkan nama Desa serta Kelompok.
+            </p>
+          </div>
+          <button type="button" id="btnDownloadTemplateInWizard" class="btn-download-template" title="Download Template Excel Resmi">
+            <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+            <span>Unduh Template (.xlsx)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- DROPZONE AREA -->
+      <div id="importDropZone" class="import-dropzone">
+        <input type="file" id="inputWizardFile" accept=".xlsx,.xls,.csv" style="display:none;" />
+        <span class="material-symbols-outlined" style="font-size:44px;color:#3b82f6;margin-bottom:6px;">cloud_upload</span>
+        <div style="font-size:14px;font-weight:800;color:var(--text);">Pilih atau Tarik Berkas Excel / CSV ke Sini</div>
+        <p style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">Mendukung berkas Microsoft Excel (.xlsx, .xls) dan CSV terdelimitasi</p>
+        <button type="button" id="btnBrowseFile" class="btn-browse-file">
+          <span class="material-symbols-outlined" style="font-size:16px;">folder_open</span>
+          <span>Pilih Berkas Komputer</span>
+        </button>
+      </div>
+
+      <!-- CONTAINER HASIL BACA & PRATINJAU -->
+      <div id="importPreviewContainer" style="display:none;margin-top:16px;">
+        <!-- STATS CARDS -->
+        <div class="import-stat-grid">
+          <div class="import-stat-card">
+            <span class="lbl">Total Terbaca</span>
+            <span id="statTotalRead" class="val" style="color:#0284c7;">0</span>
+          </div>
+          <div class="import-stat-card">
+            <span class="lbl">Data Baru (Siap Tambah)</span>
+            <span id="statTotalNew" class="val" style="color:#10b981;">0</span>
+          </div>
+          <div class="import-stat-card">
+            <span class="lbl">Duplikat Terdeteksi</span>
+            <span id="statTotalDup" class="val" style="color:#f59e0b;">0</span>
+          </div>
+          <div class="import-stat-card">
+            <span class="lbl">Perlu Diperbaiki</span>
+            <span id="statTotalInvalid" class="val" style="color:#ef4444;">0</span>
+          </div>
+        </div>
+
+        <!-- TOGGLE SETTINGS -->
+        <div class="import-options-box">
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);">
+            <input type="checkbox" id="checkUpdateDuplicates" checked style="width:16px;height:16px;accent-color:#2563eb;" />
+            <span>Perbarui data jika ditemukan nama &amp; tgl lahir/kelompok yang sama (Update/Overwrite)</span>
+          </label>
+          <span style="font-size:11px;color:var(--text-muted);display:block;margin-left:24px;margin-top:2px;">
+            Jika dimatikan, data yang sudah ada di database akan dilewati (Skip) dan hanya data santri baru yang ditambahkan.
+          </span>
+        </div>
+
+        <!-- PREVIEW TABLE WRAPPER -->
+        <div class="import-table-wrap">
+          <table class="import-preview-table">
+            <thead>
+              <tr>
+                <th style="width:38px;text-align:center;">No</th>
+                <th style="width:85px;text-align:center;">Status</th>
+                <th style="width:160px;">Nama Lengkap</th>
+                <th style="width:40px;text-align:center;">L/P</th>
+                <th style="width:120px;">Tgl Lahir / Usia</th>
+                <th style="width:110px;">Jenjang / Kelas</th>
+                <th style="width:90px;">Desa</th>
+                <th style="width:100px;">Kelompok</th>
+                <th style="width:100px;">No. HP</th>
+              </tr>
+            </thead>
+            <tbody id="importPreviewTbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ACTIONS FOOTER -->
+        <div class="import-modal-footer">
+          <button type="button" id="btnCancelImport" class="btn-cancel-import">
+            <span>Batal</span>
+          </button>
+          <button type="button" id="btnSubmitBatchImport" class="btn-submit-import">
+            <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+            <span id="txtBtnSubmitImport">Simpan ke Database</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  openModal('Import Data Generus (Excel / CSV)', 'upload_file', modalHtml, 'wide');
+
+  // Attach handlers in wizard
+  document.getElementById('btnDownloadTemplateInWizard')?.addEventListener('click', () => {
+    downloadTemplateImportGenerus();
+  });
+
+  const fileInput = document.getElementById('inputWizardFile');
+  const dropZone = document.getElementById('importDropZone');
+
+  document.getElementById('btnBrowseFile')?.addEventListener('click', () => {
     fileInput?.click();
   });
 
+  dropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-active');
+  });
+
+  dropZone?.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-active');
+  });
+
+  dropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-active');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleWizardFileSelected(e.dataTransfer.files[0]);
+    }
+  });
+
   fileInput?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const text = evt.target.result;
-      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length > 1) {
-        let count = 0;
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(';');
-          if (cols.length >= 11) {
-            const clean = (str) => str ? str.replace(/(^"|"$)/g, '').trim() : '';
-            if (clean(cols[0])) {
-              addSiswa({
-                nama_lengkap: clean(cols[0]),
-                tempat_lahir: clean(cols[1]),
-                tanggal_lahir: clean(cols[2]),
-                jenis_kelamin: clean(cols[3]) || 'L',
-                kategori_usia: clean(cols[4]),
-                jenjang_kelas: clean(cols[5]),
-                nama_ayah: clean(cols[6]),
-                nama_ibu: clean(cols[7]),
-                no_hp: clean(cols[8]),
-                domisili: clean(cols[9]),
-                status_sambung: clean(cols[10]) || 'Sambung',
-                desa_id: currentSiswaFilter.desa !== 'all' ? currentSiswaFilter.desa : null,
-                kelompok_id: currentSiswaFilter.kelompok !== 'all' ? currentSiswaFilter.kelompok : null
-              });
-              count++;
-            }
-          }
+    if (e.target.files && e.target.files[0]) {
+      handleWizardFileSelected(e.target.files[0]);
+    }
+  });
+
+  document.getElementById('btnCancelImport')?.addEventListener('click', () => {
+    closeModal();
+  });
+
+  document.getElementById('btnSubmitBatchImport')?.addEventListener('click', () => {
+    confirmAndExecuteBatchImport();
+  });
+}
+
+function handleWizardFileSelected(file) {
+  if (!file) return;
+
+  const fileName = file.name || 'Berkas';
+  showToast(`Membaca berkas: ${fileName}...`, 'info');
+
+  const reader = new FileReader();
+  const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+
+  if (isExcel) {
+    if (typeof XLSX === 'undefined') {
+      alert('Pustaka pembaca Excel sedang dimuat. Silakan tunggu beberapa detik dan coba lagi.');
+      return;
+    }
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+        let sheetName = workbook.SheetNames[0];
+        const match = workbook.SheetNames.find(n =>
+          n.toUpperCase().includes('DATA') || n.toUpperCase().includes('SANTRI') || n.toUpperCase().includes('SISWA')
+        );
+        if (match) sheetName = match;
+
+        const worksheet = workbook.Sheets[sheetName];
+        const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, dateNF: 'yyyy-mm-dd' });
+        processRawSheetRows(rawJson, fileName);
+      } catch (err) {
+        console.error('Error parsing Excel:', err);
+        alert('Gagal membaca berkas Excel. Pastikan berkas tidak rusak atau terproteksi password.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    // CSV Text
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length < 2) {
+          alert('Berkas CSV kosong atau tidak memiliki baris data.');
+          return;
         }
-        alert('Berhasil mengimpor ' + count + ' data generus!');
-        renderSiswaModal();
-      } else {
-        alert('Format CSV kosong atau tidak valid.');
+        const firstLine = lines[0];
+        const delimiter = (firstLine.split(';').length > firstLine.split(',').length) ? ';' : ',';
+        const rawJson = lines.map(line => {
+          const regex = new RegExp(`(?:^|${delimiter})(?:"([^"]*(?:""[^"]*)*)"|([^"${delimiter}]*))`, 'g');
+          const row = [];
+          let match;
+          while ((match = regex.exec(line)) !== null) {
+            let val = match[1] !== undefined ? match[1].replace(/""/g, '"') : match[2];
+            row.push((val || '').trim());
+          }
+          return row;
+        });
+        processRawSheetRows(rawJson, fileName);
+      } catch (err) {
+        console.error('Error parsing CSV:', err);
+        alert('Gagal membaca berkas CSV.');
       }
     };
     reader.readAsText(file);
+  }
+}
+
+function processRawSheetRows(rawRows, fileName) {
+  if (!rawRows || rawRows.length < 2) {
+    alert('Berkas tidak memiliki cukup baris data (minimal 1 baris header dan 1 baris data).');
+    return;
+  }
+
+  // Cari baris header dalam 5 baris pertama
+  let headerIndex = 0;
+  for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+    const rowStr = (rawRows[r] || []).join(' ').toLowerCase();
+    if (rowStr.includes('nama') || rowStr.includes('name') || rowStr.includes('santri')) {
+      headerIndex = r;
+      break;
+    }
+  }
+
+  const rawHeaders = (rawRows[headerIndex] || []).map(h => (h || '').toString().trim());
+  const colMap = smartMapHeaders(rawHeaders);
+
+  if (colMap.nama_lengkap === undefined) {
+    alert('Kolom "Nama Lengkap" tidak terdeteksi pada berkas. Pastikan ada kolom yang memuat nama santri.');
+    return;
+  }
+
+  const allExistingSiswa = getSiswaList();
+  const allKelompok = getAllKelompok();
+  const parsedItems = [];
+
+  for (let r = headerIndex + 1; r < rawRows.length; r++) {
+    const row = rawRows[r];
+    if (!row || row.length === 0) continue;
+
+    const getVal = (field) => {
+      const idx = colMap[field];
+      if (idx === undefined || idx >= row.length) return '';
+      return (row[idx] || '').toString().trim();
+    };
+
+    const namaLengkap = getVal('nama_lengkap');
+    if (!namaLengkap) continue; // Lewati baris kosong tanpa nama
+
+    const tempatLahir = getVal('tempat_lahir');
+    let tanggalLahir = getVal('tanggal_lahir');
+    tanggalLahir = normalizeDateString(tanggalLahir);
+
+    let jk = getVal('jenis_kelamin').toUpperCase();
+    if (jk.includes('P') || jk.includes('WANITA') || jk.includes('PEREMPUAN')) jk = 'P';
+    else jk = 'L';
+
+    // Normalisasi Desa & Kelompok
+    const rawDesa = getVal('desa');
+    const rawKelompok = getVal('kelompok');
+    const resolvedWilayah = resolveDesaKelompok(rawDesa, rawKelompok, allKelompok);
+
+    let usia = tanggalLahir ? calculateUmur(tanggalLahir) : null;
+
+    // Normalisasi Kategori & Jenjang
+    let rawKategori = getVal('kategori_usia').toLowerCase();
+    let rawKelas = getVal('jenjang_kelas');
+
+    let kategoriUsia = 'caberawit';
+    if (rawKategori.includes('gp') || rawKategori.includes('reguler') || rawKategori.includes('smp')) {
+      kategoriUsia = 'gp_reguler';
+    } else if (rawKategori.includes('remaja') || rawKategori.includes('mandiri') || rawKategori.includes('nikah')) {
+      kategoriUsia = 'remaja';
+    } else if (rawKategori.includes('caberawit') || rawKategori.includes('paud') || rawKategori.includes('sd')) {
+      kategoriUsia = 'caberawit';
+    } else if (usia !== null) {
+      kategoriUsia = determineJenjangByAge(usia);
+    }
+
+    let jenjangKelas = rawKelas;
+    if (!jenjangKelas && usia !== null) {
+      if (usia < 5) jenjangKelas = 'PAUD';
+      else if (usia === 5) jenjangKelas = 'TK A';
+      else if (usia === 6) jenjangKelas = 'TK B';
+      else if (usia >= 7 && usia <= 12) jenjangKelas = `${usia - 6} SD`;
+      else if (usia >= 13 && usia <= 15) jenjangKelas = `${usia - 12} SMP`;
+      else if (usia >= 16 && usia <= 18) jenjangKelas = `${usia - 15} SMA`;
+      else if (usia > 18 && usia <= 22) jenjangKelas = 'Pra-Nikah';
+      else jenjangKelas = 'Kelas Remaja';
+    }
+
+    const namaAyah = getVal('nama_ayah');
+    const namaIbu = getVal('nama_ibu');
+    const noHp = getVal('no_hp');
+    let domisili = getVal('domisili') || 'Pribumi';
+    let statusSambung = getVal('status_sambung') || 'Sambung';
+
+    // Cek Duplikasi
+    const existing = allExistingSiswa.find(s => {
+      const matchName = (s.nama_lengkap || '').trim().toLowerCase() === namaLengkap.toLowerCase();
+      if (!matchName) return false;
+      if (tanggalLahir && s.tanggal_lahir) {
+        return tanggalLahir === s.tanggal_lahir;
+      }
+      if (resolvedWilayah.kelompokId && s.kelompok_id) {
+        return resolvedWilayah.kelompokId === s.kelompok_id;
+      }
+      return true;
+    });
+
+    const isDuplicate = !!existing;
+    const existingId = existing ? existing.id : null;
+
+    parsedItems.push({
+      status: isDuplicate ? 'DUPLICATE' : 'NEW',
+      existingId: existingId,
+      data: {
+        nama_lengkap: namaLengkap,
+        tempat_lahir: tempatLahir || '-',
+        tanggal_lahir: tanggalLahir || '',
+        jenis_kelamin: jk,
+        kategori_usia: kategoriUsia,
+        jenjang_kelas: jenjangKelas || '-',
+        desa_id: resolvedWilayah.desaId,
+        desa_nama: resolvedWilayah.desaNama,
+        kelompok_id: resolvedWilayah.kelompokId,
+        kelompok_nama: resolvedWilayah.kelompokNama,
+        nama_ayah: namaAyah || '-',
+        nama_ibu: namaIbu || '-',
+        no_hp: noHp || '-',
+        domisili: domisili,
+        status_sambung: statusSambung
+      }
+    });
+  }
+
+  _parsedImportData = parsedItems;
+  renderImportPreviewResults(parsedItems, fileName);
+}
+
+function smartMapHeaders(headers) {
+  const map = {};
+  headers.forEach((h, idx) => {
+    const clean = h.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!clean) return;
+
+    if (clean.includes('namalengkap') || clean.includes('namasiswa') || clean.includes('namasantri') || clean === 'nama' || clean === 'fullname') {
+      if (map.nama_lengkap === undefined) map.nama_lengkap = idx;
+    } else if (clean.includes('tempatlahir') || clean.includes('tmplahir') || clean.includes('kotalahir') || clean === 'tempat') {
+      if (map.tempat_lahir === undefined) map.tempat_lahir = idx;
+    } else if (clean.includes('tanggallahir') || clean.includes('tgllahir') || clean === 'tgl' || clean === 'ttl' || clean === 'dob' || clean.includes('birth')) {
+      if (map.tanggal_lahir === undefined) map.tanggal_lahir = idx;
+    } else if (clean.includes('jeniskelamin') || clean.includes('kelamin') || clean === 'gender' || clean === 'lp' || clean === 'jk' || clean === 'sex') {
+      if (map.jenis_kelamin === undefined) map.jenis_kelamin = idx;
+    } else if (clean.includes('kategori') || clean.includes('jenjangusia')) {
+      if (map.kategori_usia === undefined) map.kategori_usia = idx;
+    } else if (clean.includes('kelas') || clean.includes('tingkat') || clean.includes('jenjangkelas') || clean === 'jenjang') {
+      if (map.jenjang_kelas === undefined) map.jenjang_kelas = idx;
+    } else if (clean.includes('desa') || clean.includes('wilayahdesa')) {
+      if (map.desa === undefined) map.desa = idx;
+    } else if (clean.includes('kelompok') || clean.includes('daerahsambung')) {
+      if (map.kelompok === undefined) map.kelompok = idx;
+    } else if (clean.includes('ayah') || clean.includes('bapak') || clean.includes('namaayah')) {
+      if (map.nama_ayah === undefined) map.nama_ayah = idx;
+    } else if (clean.includes('ibu') || clean.includes('namaibu')) {
+      if (map.nama_ibu === undefined) map.nama_ibu = idx;
+    } else if (clean.includes('hp') || clean.includes('wa') || clean.includes('telepon') || clean.includes('kontak') || clean.includes('whatsapp')) {
+      if (map.no_hp === undefined) map.no_hp = idx;
+    } else if (clean.includes('domisili') || clean.includes('asal')) {
+      if (map.domisili === undefined) map.domisili = idx;
+    } else if (clean.includes('statussambung') || clean === 'status' || clean.includes('sambung')) {
+      if (map.status_sambung === undefined) map.status_sambung = idx;
+    }
+  });
+  return map;
+}
+
+function resolveDesaKelompok(rawDesa, rawKelompok, allKelompok) {
+  let matchedKel = null;
+  let cleanK = (rawKelompok || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  if (cleanK) {
+    matchedKel = allKelompok.find(k => {
+      const kClean = k.nama.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return kClean === cleanK || cleanK.includes(kClean) || kClean.includes(cleanK);
+    });
+  }
+
+  if (matchedKel) {
+    return {
+      desaId: matchedKel.desaId,
+      desaNama: matchedKel.desaNama,
+      kelompokId: matchedKel.id,
+      kelompokNama: matchedKel.nama
+    };
+  }
+
+  // Jika kelompok belum cocok, coba cocokkan nama desa
+  let cleanD = (rawDesa || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  let matchedDesa = null;
+  if (cleanD) {
+    matchedDesa = MASTER_WILAYAH.desa.find(d => {
+      const dClean = d.nama.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return dClean === cleanD || cleanD.includes(dClean) || dClean.includes(cleanD);
+    });
+  }
+
+  if (matchedDesa) {
+    return {
+      desaId: matchedDesa.id,
+      desaNama: matchedDesa.nama,
+      kelompokId: null,
+      kelompokNama: '-'
+    };
+  }
+
+  // Fallback ke filter dashboard yang sedang aktif
+  let fbDesaId = currentSiswaFilter.desa !== 'all' ? currentSiswaFilter.desa : null;
+  let fbDesaNama = null;
+  let fbKelId = currentSiswaFilter.kelompok !== 'all' ? currentSiswaFilter.kelompok : null;
+  let fbKelNama = null;
+
+  if (fbDesaId) {
+    const d = MASTER_WILAYAH.desa.find(x => x.id === fbDesaId);
+    if (d) fbDesaNama = d.nama;
+  }
+  if (fbKelId) {
+    const k = allKelompok.find(x => x.id === fbKelId);
+    if (k) {
+      fbKelNama = k.nama;
+      fbDesaId = k.desaId;
+      fbDesaNama = k.desaNama;
+    }
+  }
+
+  return {
+    desaId: fbDesaId,
+    desaNama: fbDesaNama,
+    kelompokId: fbKelId,
+    kelompokNama: fbKelNama
+  };
+}
+
+function normalizeDateString(val) {
+  if (!val) return '';
+  if (val instanceof Date && !isNaN(val)) {
+    return val.toISOString().slice(0, 10);
+  }
+  const str = val.toString().trim();
+  if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(str)) {
+    const parts = str.split('-');
+    return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+  }
+  if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(str)) {
+    const parts = str.split(/[\/\-]/);
+    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+  }
+  if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(str)) {
+    const parts = str.split('/');
+    return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+  }
+  const num = Number(str);
+  if (!isNaN(num) && num > 20000 && num < 60000) {
+    const dateObj = new Date(Math.round((num - 25569) * 86400 * 1000));
+    if (!isNaN(dateObj)) {
+      return dateObj.toISOString().slice(0, 10);
+    }
+  }
+  return str;
+}
+
+function renderImportPreviewResults(parsedItems, fileName) {
+  const container = document.getElementById('importPreviewContainer');
+  if (!container) return;
+
+  const total = parsedItems.length;
+  const newItems = parsedItems.filter(i => i.status === 'NEW').length;
+  const dupItems = parsedItems.filter(i => i.status === 'DUPLICATE').length;
+  const invalidItems = parsedItems.filter(i => !i.data.nama_lengkap).length;
+
+  document.getElementById('statTotalRead').textContent = total;
+  document.getElementById('statTotalNew').textContent = newItems;
+  document.getElementById('statTotalDup').textContent = dupItems;
+  document.getElementById('statTotalInvalid').textContent = invalidItems;
+
+  const tbody = document.getElementById('importPreviewTbody');
+  if (tbody) {
+    let rowsHtml = '';
+    parsedItems.slice(0, 100).forEach((item, idx) => {
+      const s = item.data;
+      const statusBadge = item.status === 'DUPLICATE'
+        ? '<span class="import-badge badge-dup">Duplikat</span>'
+        : '<span class="import-badge badge-new">Baru</span>';
+
+      const ttl = [s.tempat_lahir !== '-' ? s.tempat_lahir : '', s.tanggal_lahir].filter(Boolean).join(', ') || '-';
+      const usiaStr = s.tanggal_lahir ? ` (${calculateUmur(s.tanggal_lahir)} th)` : '';
+
+      rowsHtml += `
+        <tr>
+          <td style="text-align:center;font-weight:700;">${idx + 1}</td>
+          <td style="text-align:center;">${statusBadge}</td>
+          <td style="font-weight:700;color:var(--text);">${s.nama_lengkap}</td>
+          <td style="text-align:center;font-weight:700;color:${s.jenis_kelamin === 'P' ? '#ec4899' : '#3b82f6'};">${s.jenis_kelamin}</td>
+          <td>${ttl}${usiaStr}</td>
+          <td><span class="badge-tag" style="background:#e0f2fe;color:#0369a1;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;">${s.jenjang_kelas || s.kategori_usia}</span></td>
+          <td>${s.desa_nama || '-'}</td>
+          <td style="font-weight:600;">${s.kelompok_nama || '-'}</td>
+          <td>${s.no_hp || '-'}</td>
+        </tr>
+      `;
+    });
+
+    if (parsedItems.length > 100) {
+      rowsHtml += `
+        <tr>
+          <td colspan="9" style="text-align:center;padding:8px;font-weight:700;color:var(--text-muted);background:var(--bg);">
+            ... Dan ${parsedItems.length - 100} data lainnya ...
+          </td>
+        </tr>
+      `;
+    }
+
+    tbody.innerHTML = rowsHtml;
+  }
+
+  const btnSubmit = document.getElementById('txtBtnSubmitImport');
+  if (btnSubmit) {
+    btnSubmit.textContent = `Simpan (${total}) Data ke Database`;
+  }
+
+  container.style.display = 'block';
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function confirmAndExecuteBatchImport() {
+  if (!_parsedImportData || _parsedImportData.length === 0) {
+    alert('Tidak ada data yang siap diimpor.');
+    return;
+  }
+
+  const checkUpdate = document.getElementById('checkUpdateDuplicates');
+  const updateDuplicates = checkUpdate ? checkUpdate.checked : true;
+
+  let addedCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+
+  _parsedImportData.forEach(item => {
+    if (!item.data.nama_lengkap) return;
+
+    if (item.status === 'DUPLICATE') {
+      if (updateDuplicates && item.existingId) {
+        updateSiswa(item.existingId, item.data);
+        updatedCount++;
+      } else {
+        skippedCount++;
+      }
+    } else {
+      addSiswa(item.data);
+      addedCount++;
+    }
   });
 
-  // Initial render of rows
-  renderSiswaTableRows();
+  closeModal();
+
+  let msg = `Berhasil mengimpor data generus: ${addedCount} data baru ditambahkan`;
+  if (updatedCount > 0) msg += `, ${updatedCount} data lama diperbarui`;
+  if (skippedCount > 0) msg += `, ${skippedCount} data duplikat dilewati`;
+  msg += '!';
+
+  showToast(msg, 'success');
+  renderSiswaModal();
 }
 
 /**
@@ -1322,8 +2166,13 @@ export function renderSiswaFormModal(existingData = null) {
   const title = isEdit ? `Edit Generus: ${existingData.nama_lengkap}` : "Tambah Generus Baru";
 
   // Multi-level 1: Desa & Kelompok
-  const currentDesaId = existingData ? (existingData.desa_id || '') : '';
-  const currentKelId = existingData ? (existingData.kelompok_id || '') : '';
+  const isSuper = currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah');
+  const currentDesaId = existingData
+    ? (existingData.desa_id || '')
+    : (!isSuper && currentUser?.desaId ? currentUser.desaId : '');
+  const currentKelId = existingData
+    ? (existingData.kelompok_id || '')
+    : (!isSuper && currentUser?.tingkatan === 'kelompok' && currentUser?.kelompokId ? currentUser.kelompokId : '');
 
   const desaOptions = MASTER_WILAYAH.desa.map(d =>
     `<option value="${d.id}" data-name="${d.nama}" ${currentDesaId === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`

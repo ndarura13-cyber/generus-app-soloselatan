@@ -20,23 +20,21 @@ export function updateSupabaseStatusUI() {
   const dot = document.getElementById('supabaseStatusDot');
   const txt = document.getElementById('supabaseStatusText');
   const btn = document.getElementById('btnSupabaseStatus');
-  if (!dot || !txt) return;
+  if (!txt) return;
 
   if (isSupabaseConfigured()) {
-    dot.style.background = '#16a34a';
     txt.textContent = 'Supabase Aktif';
     if (btn) {
-      btn.style.background = '#f0fdf4';
-      btn.style.borderColor = '#86efac';
-      btn.style.color = '#166534';
+      btn.classList.remove('status-disconnected');
+      btn.classList.add('status-connected');
+      btn.removeAttribute('style');
     }
   } else {
-    dot.style.background = '#f59e0b';
     txt.textContent = 'Supabase Off';
     if (btn) {
-      btn.style.background = '#fffbeb';
-      btn.style.borderColor = '#fde68a';
-      btn.style.color = '#92400e';
+      btn.classList.remove('status-connected');
+      btn.classList.add('status-disconnected');
+      btn.removeAttribute('style');
     }
   }
 }
@@ -48,41 +46,41 @@ export function renderSupabaseModal(onDataSynced = null) {
   openModal('Integrasi Supabase Cloud Database', 'cloud_sync', 'default');
 
   modalBody.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;">
-      <div style="background:${isConfigured ? '#f0fdf4' : '#fffbeb'};border:1.5px solid ${isConfigured ? '#86efac' : '#fcd34d'};border-radius:10px;padding:12px 14px;">
-        <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:${isConfigured ? '#166534' : '#92400e'};font-size:13px;">
+    <div class="sb-modal-body">
+      <div class="sb-status-banner ${isConfigured ? 'configured' : 'not-configured'}">
+        <div style="display:flex;align-items:center;gap:8px;">
           <span class="material-symbols-outlined" style="font-size:20px;">${isConfigured ? 'cloud_done' : 'cloud_off'}</span>
-          <span>Status: ${isConfigured ? 'Kredensial Supabase Terpasang' : 'Belum Terhubung ke Supabase Cloud (Menggunakan Database Lokal)'}</span>
+          <span class="sb-banner-title">Status: ${isConfigured ? 'Kredensial Supabase Terpasang' : 'Belum Terhubung ke Supabase Cloud (Menggunakan Database Lokal)'}</span>
         </div>
-        <p style="margin:4px 0 0;font-size:11.5px;color:${isConfigured ? '#15803d' : '#b45309'};line-height:1.4;">
-          ${isConfigured 
-            ? 'Aplikasi telah memiliki konfigurasi Supabase. Anda dapat menguji koneksi dan melakukan sinkronisasi data generus kapan saja.'
-            : 'Untuk menghubungkan skema database ke Supabase, buat project di <a href="https://supabase.com" target="_blank" style="font-weight:800;text-decoration:underline;color:#b45309;">supabase.com</a>, jalankan script database_schema.sql di SQL Editor, lalu masukkan Project URL dan Anon Key di bawah ini.'}
+        <p class="sb-banner-desc">
+          ${isConfigured
+      ? 'Aplikasi telah memiliki konfigurasi Supabase. Anda dapat menguji koneksi dan melakukan sinkronisasi data generus kapan saja.'
+      : 'Untuk menghubungkan skema database ke Supabase, buat project di <a href="https://supabase.com" target="_blank" style="font-weight:800;text-decoration:underline;">supabase.com</a>, jalankan script database_schema.sql di SQL Editor, lalu masukkan Project URL dan Anon Key di bawah ini.'}
         </p>
       </div>
 
       <form id="formSupabaseConfig" style="display:flex;flex-direction:column;gap:12px;">
         <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;">Project URL Supabase <span style="color:red">*</span></label>
-          <input type="url" id="sbProjectUrl" value="${cfg.url || ''}" placeholder="https://xyzcompany.supabase.co" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box;" />
-          <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">Ditemukan di dashboard Supabase: Project Settings ➔ API ➔ Project URL</div>
+          <label class="sb-field-label">Project URL Supabase <span style="color:red">*</span></label>
+          <input type="url" id="sbProjectUrl" class="sb-field-input" value="${cfg.url || ''}" placeholder="https://xyzcompany.supabase.co" required />
+          <div class="sb-field-hint">Ditemukan di dashboard Supabase: Project Settings ➔ API ➔ Project URL</div>
         </div>
 
         <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;">Project API Anon Key (Public Key) <span style="color:red">*</span></label>
-          <textarea id="sbAnonKey" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:11.5px;font-family:monospace;outline:none;box-sizing:border-box;">${cfg.anonKey || ''}</textarea>
-          <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">Ditemukan di dashboard Supabase: Project Settings ➔ API ➔ Project API Keys (anon public)</div>
+          <label class="sb-field-label">Project API Anon Key (Public Key) <span style="color:red">*</span></label>
+          <textarea id="sbAnonKey" class="sb-field-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required style="font-family:monospace;font-size:11.5px;">${cfg.anonKey || ''}</textarea>
+          <div class="sb-field-hint">Ditemukan di dashboard Supabase: Project Settings ➔ API ➔ Project API Keys (anon public)</div>
         </div>
 
-        <div id="sbTestResult" style="display:none;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:700;"></div>
+        <div id="sbTestResult" class="sb-test-alert" style="display:none;"></div>
 
         <!-- Tombol Aksi -->
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-          <button type="button" id="btnTestSupabaseConn" style="flex:1;min-width:140px;padding:10px 14px;background:#f1f5f9;border:1.5px solid #cbd5e1;color:var(--text);border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+          <button type="button" id="btnTestSupabaseConn" class="sb-btn-test">
             <span class="material-symbols-outlined" style="font-size:18px;">network_check</span>
             Uji Koneksi
           </button>
-          <button type="submit" style="flex:1;min-width:140px;padding:10px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 6px rgba(26,86,196,0.25);">
+          <button type="submit" class="sb-btn-save">
             <span class="material-symbols-outlined" style="font-size:18px;">save</span>
             Simpan Kredensial
           </button>
@@ -90,17 +88,17 @@ export function renderSupabaseModal(onDataSynced = null) {
       </form>
 
       ${isConfigured ? `
-        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:6px;">
-          <div style="font-weight:800;font-size:12.5px;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-            <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">sync</span>
+        <div class="sb-sync-section">
+          <div class="sb-sync-title">
+            <span class="material-symbols-outlined" style="font-size:18px;">sync</span>
             Sinkronisasi Data Generus
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <button type="button" id="btnUploadSiswaToCloud" style="padding:10px;background:var(--blue-light);border:1.5px solid #bfdbfe;color:#1d4ed8;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+            <button type="button" id="btnUploadSiswaToCloud" class="sb-btn-upload">
               <span class="material-symbols-outlined" style="font-size:16px;">cloud_upload</span>
               Unggah Lokal ke Cloud
             </button>
-            <button type="button" id="btnDownloadSiswaFromCloud" style="padding:10px;background:var(--bg);border:1.5px solid #cbd5e1;color:#334155;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+            <button type="button" id="btnDownloadSiswaFromCloud" class="sb-btn-download">
               <span class="material-symbols-outlined" style="font-size:16px;">cloud_download</span>
               Tarik Data Cloud ke Lokal
             </button>
@@ -108,8 +106,8 @@ export function renderSupabaseModal(onDataSynced = null) {
         </div>
       ` : ''}
 
-      <div style="background:var(--bg);border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text-muted);line-height:1.5;">
-        💡 <strong>Tips Skema:</strong> File script SQL lengkap siap pakai tersimpan di <code style="background:#e2e8f0;padding:1px 4px;border-radius:4px;color:var(--text);">src/database_schema.sql</code>. Anda hanya perlu menyalin dan menempelkannya di menu <strong>SQL Editor</strong> Supabase lalu klik tombol <strong>Run</strong>.
+      <div class="sb-tips-box">
+        💡 <strong>Tips Skema:</strong> File script SQL lengkap siap pakai tersimpan di <code class="sb-tips-code">src/database_schema.sql</code>. Anda hanya perlu menyalin dan menempelkannya di menu <strong>SQL Editor</strong> Supabase lalu klik tombol <strong>Run</strong>.
       </div>
     </div>
   `;
@@ -124,36 +122,29 @@ export function renderSupabaseModal(onDataSynced = null) {
     const anonKey = document.getElementById('sbAnonKey').value.trim();
     if (!url || !anonKey) {
       testRes.style.display = 'block';
-      testRes.style.background = '#fef2f2';
-      testRes.style.color = '#dc2626';
-      testRes.style.border = '1px solid #fecaca';
+      testRes.className = 'sb-test-alert alert-error';
       testRes.textContent = 'Silakan isi Project URL dan Anon Key terlebih dahulu!';
       return;
     }
 
     saveSupabaseConfig({ url, anonKey });
     testRes.style.display = 'block';
-    testRes.style.background = '#f0f9ff';
-    testRes.style.color = '#0369a1';
-    testRes.style.border = '1px solid #bae6fd';
+    testRes.className = 'sb-test-alert alert-info';
     testRes.textContent = 'Sedang menguji koneksi ke Supabase...';
 
     const res = await testSupabaseConnection();
     if (res.success) {
-      testRes.style.background = '#f0fdf4';
-      testRes.style.color = '#15803d';
-      testRes.style.border = '1px solid #86efac';
+      testRes.className = 'sb-test-alert alert-success';
       testRes.textContent = `✅ ${res.message}`;
       showToast('Koneksi Supabase Berhasil!', 'success');
       updateSupabaseStatusUI();
     } else {
-      testRes.style.background = '#fef2f2';
-      testRes.style.color = '#dc2626';
-      testRes.style.border = '1px solid #fecaca';
+      testRes.className = 'sb-test-alert alert-error';
       testRes.textContent = `❌ ${res.message}`;
       showToast('Gagal menghubungi Supabase.', 'danger');
     }
   });
+
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();

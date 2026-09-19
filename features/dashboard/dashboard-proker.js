@@ -281,30 +281,33 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   // Summary Stat Strip (Screenshot Layout 3 x 2 Grid with Icons)
   const statsHtml = `
     <div class="proker-stats-container">
+      <!-- BARIS 1: INFORMASI CEPAT (1 BARIS 3 KOLOM) -->
       <div class="proker-stats-row-1">
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
           <div class="proker-stat-info">
-            <span class="stat-label">TOTAL AGENDA</span>
-            <span class="stat-num">${stats.total} PROGRAM</span>
+            <span class="stat-label">TOTAL KERJA</span>
+            <span class="stat-num">${stats.total} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon">hourglass_top</span>
+          <span class="material-symbols-outlined proker-stat-icon text-emerald-500">hourglass_top</span>
           <div class="proker-stat-info">
-            <span class="stat-label">SEDANG BERJALAN</span>
-            <span class="stat-num">${stats.ongoing} PROGRAM</span>
+            <span class="stat-label">BERJALAN</span>
+            <span class="stat-num stat-emerald">${stats.ongoing} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon text-emerald-400">done_all</span>
+          <span class="material-symbols-outlined proker-stat-icon text-blue-500">done_all</span>
           <div class="proker-stat-info">
-            <span class="stat-label">SELESAI / TERLAKSANA</span>
-            <span class="stat-num stat-emerald">${stats.done} PROGRAM</span>
+            <span class="stat-label">SELESAI</span>
+            <span class="stat-num stat-blue">${stats.done} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
       </div>
-      <div class="proker-stats-row-2">
+
+      <!-- BARIS 2 ANGGARAN DESKTOP (3 KOLOM) -->
+      <div class="proker-stats-row-2 proker-stats-row-2-desktop">
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon">payments</span>
           <div class="proker-stat-info">
@@ -330,6 +333,27 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
       </div>
+
+      <!-- BARIS 2 ANGGARAN MOBILE (2 BARIS SESUAI PERMINTAAN USER) -->
+      <div class="proker-stats-anggaran-mobile">
+        <div class="proker-anggaran-line-1">
+          <div class="anggaran-line-label">
+            <span class="material-symbols-outlined" style="font-size:15px;color:#2563eb;">payments</span>
+            <span>Est. Anggaran Tahun Ini</span>
+          </div>
+          <strong class="anggaran-line-val-now">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</strong>
+        </div>
+        <div class="proker-anggaran-line-2">
+          <div class="anggaran-line-prev">
+            <span>Tahun Sebelumnya:</span>
+            <strong>Rp ${stats.anggaranTahunLalu.toLocaleString('id-ID')}</strong>
+          </div>
+          <div class="proker-growth-pill ${stats.percentGrowth >= 0 ? 'up' : 'down'}">
+            <span>${stats.percentGrowth > 0 ? '+' : ''}${stats.percentGrowth}%</span>
+            <span class="material-symbols-outlined" style="font-size:13px;">${stats.percentGrowth >= 0 ? 'trending_up' : 'trending_down'}</span>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -340,40 +364,53 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
   const filterHtml = `
     <div class="proker-filter-bar">
-      <div style="flex:1;min-width:200px;position:relative;">
-        <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan..." class="proker-input" style="width:100%;" />
-        <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:#64748b;pointer-events:none;">search</span>
+      <!-- BARIS 1: PENCARIAN (FULL WIDTH) -->
+      <div class="proker-filter-row-1">
+        <div class="proker-search-wrap">
+          <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan..." class="proker-input" />
+          <span class="material-symbols-outlined proker-search-icon">search</span>
+        </div>
       </div>
 
-      <select id="selectFilterStatus" class="proker-select">
-        <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
-        <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>🟢 Sedang Berlangsung</option>
-        <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
-        <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>🟡 Direncanakan</option>
-        <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>⚪ Selesai</option>
-      </select>
+      <!-- BARIS 2: FILTER STATUS DAN BIDANG (BERDAMPINGAN) -->
+      <div class="proker-filter-row-2">
+        <div class="proker-filter-col">
+          <select id="selectFilterStatus" class="proker-select">
+            <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
+            <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>🟢 Berlangsung</option>
+            <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>🟡 Akan Datang</option>
+            <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>🔵 Direncanakan</option>
+            <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>⚪ Selesai</option>
+          </select>
+        </div>
 
-      <select id="selectFilterBidang" class="proker-select">
-        <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>Semua Bidang (14 Bidang)</option>
-        ${bidangOptions}
-      </select>
-
-      <div style="display:inline-flex;gap:8px;">
-        <button type="button" id="btnExportCsv" class="proker-btn-csv" title="Download data dalam format Excel CSV">
-          <span class="material-symbols-outlined" style="font-size:16px;">file_download</span> CSV
-        </button>
-        <button type="button" id="btnPrintTable" class="proker-btn-print" title="Cetak dokumen resmi">
-          <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak
-        </button>
+        <div class="proker-filter-col">
+          <select id="selectFilterBidang" class="proker-select">
+            <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>Semua Bidang</option>
+            ${bidangOptions}
+          </select>
+        </div>
       </div>
 
-      <div class="proker-tabs-wrap">
-        <button type="button" id="tabViewTimeline" class="proker-tab-pill ${activeTab === 'timeline' ? 'active' : ''}">
-          <span class="material-symbols-outlined" style="font-size:15px;">view_timeline</span> Timeline Kegiatan
-        </button>
-        <button type="button" id="tabViewTable" class="proker-tab-pill ${activeTab === 'table' ? 'active' : ''}">
-          <span class="material-symbols-outlined" style="font-size:15px;">table_chart</span> Tabel Resmi
-        </button>
+      <!-- BARIS 3: AKSI EKSPOR & TABS TAMPILAN -->
+      <div class="proker-filter-row-3">
+        <div class="proker-export-btns">
+          <button type="button" id="btnExportCsv" class="proker-btn-csv" title="Download data dalam format Excel CSV">
+            <span class="material-symbols-outlined" style="font-size:16px;">file_download</span> CSV
+          </button>
+          <button type="button" id="btnPrintTable" class="proker-btn-print" title="Cetak dokumen resmi">
+            <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak
+          </button>
+        </div>
+
+        <div class="proker-tabs-wrap">
+          <button type="button" id="tabViewTimeline" class="proker-tab-pill ${activeTab === 'timeline' ? 'active' : ''}">
+            <span class="material-symbols-outlined" style="font-size:15px;">view_timeline</span> Timeline
+          </button>
+          <button type="button" id="tabViewTable" class="proker-tab-pill ${activeTab === 'table' ? 'active' : ''}">
+            <span class="material-symbols-outlined" style="font-size:15px;">table_chart</span> Tabel
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -426,8 +463,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       let quickStatusSelect = isSuper ? `
         <select class="proker-quick-select proker-quick-status-change" data-id="${p.id}" style="font-size:11px;padding:4px 6px;">
-          <option value="planned" ${statusClass === 'planned' ? 'selected' : ''}>🟡 Direncanakan</option>
-          <option value="upcoming" ${statusClass === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
+          <option value="planned" ${statusClass === 'planned' ? 'selected' : ''}>🔵 Direncanakan</option>
+          <option value="upcoming" ${statusClass === 'upcoming' ? 'selected' : ''}>🟡 Akan Datang</option>
           <option value="ongoing" ${statusClass === 'ongoing' ? 'selected' : ''}>🟢 Berlangsung</option>
           <option value="done" ${statusClass === 'done' ? 'selected' : ''}>⚪ Selesai</option>
         </select>
@@ -551,8 +588,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
             Halaman ${currentPage} dari ${totalPages} (${totalItems} Total)
           </span>
         </div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          ${paginatedItems.map(p => {
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          ${paginatedItems.map((p, idx) => {
       let statusClass = p.status || 'planned';
       let statusLabel = 'Direncanakan';
       if (statusClass === 'done') statusLabel = 'Selesai';
@@ -569,43 +606,55 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
             ` : '';
 
       return `
-              <div class="proker-card-item">
-                <div class="proker-card-header">
-                  <strong class="proker-card-title">${p.no}. ${p.kegiatan}</strong>
+              <div class="proker-card-item" data-id="${p.id}">
+                <!-- HEADER: HANYA NOMOR, PROGRAM, STATUS, DAN CHEVRON TOGGLE SESUAI REQUEST MOBILE -->
+                <div class="proker-card-header" role="button" tabindex="0" aria-expanded="false" title="Klik untuk menampilkan / menyembunyikan detail program">
+                  <div class="proker-card-title-wrap">
+                    <span class="proker-card-num">${p.no || (startIndex + idx + 1)}.</span>
+                    <strong class="proker-card-title">${p.kegiatan}</strong>
+                  </div>
                   <div class="proker-card-actions">
                     <span class="proker-status-pill ${statusClass}">
                       <span class="proker-status-dot"></span>
-                      ${statusLabel}
+                      <span class="proker-status-text">${statusLabel}</span>
                     </span>
-                    ${superButtons}
+                    <button type="button" class="btn-toggle-proker-detail" aria-label="Toggle Detail Program" title="Tampilkan/Sembunyikan Detail">
+                      <span class="material-symbols-outlined proker-chevron-icon">expand_more</span>
+                    </button>
                   </div>
                 </div>
 
-                <div class="proker-card-meta">
-                  <span class="proker-pic-pill">PIC: ${p.penanggungJawab || 'Pengurus PPG'}</span>
-                  <span class="proker-meta-item">
-                    <span class="material-symbols-outlined" style="font-size:15px;color:#94a3b8;">calendar_today</span>
-                    ${p.waktu}
-                  </span>
-                  <span class="proker-meta-bullet">&bull;</span>
-                  <span class="proker-meta-item">
-                    <span class="material-symbols-outlined loc-icon" style="font-size:15px;">location_on</span>
-                    ${p.tempat}
-                  </span>
-                  <span class="proker-meta-bullet">&bull;</span>
-                  <span class="proker-meta-item">
-                    <span class="material-symbols-outlined group-icon" style="font-size:15px;">group</span>
-                    ${p.sasaran}
-                  </span>
-                </div>
+                <!-- DETAIL PANEL: TERSEMBUNYI SECARA DEFAULT DI MOBILE VIEW -->
+                <div class="proker-card-detail-panel">
+                  <div class="proker-card-meta">
+                    <span class="proker-pic-pill">PIC: ${p.penanggungJawab || 'Pengurus PPG'}</span>
+                    <span class="proker-meta-item">
+                      <span class="material-symbols-outlined" style="font-size:15px;color:#94a3b8;">calendar_today</span>
+                      ${p.waktu}
+                    </span>
+                    <span class="proker-meta-bullet">&bull;</span>
+                    <span class="proker-meta-item">
+                      <span class="material-symbols-outlined loc-icon" style="font-size:15px;">location_on</span>
+                      ${p.tempat}
+                    </span>
+                    <span class="proker-meta-bullet">&bull;</span>
+                    <span class="proker-meta-item">
+                      <span class="material-symbols-outlined group-icon" style="font-size:15px;">group</span>
+                      ${p.sasaran}
+                    </span>
+                  </div>
 
-                <div class="proker-tujuan-box">
-                  <strong>Tujuan:</strong> ${p.tujuan}
-                </div>
+                  <div class="proker-tujuan-box">
+                    <strong>Tujuan:</strong> ${p.tujuan}
+                  </div>
 
-                <div class="proker-card-footer">
-                  <div class="proker-rincian">Rincian Biaya: <em>${p.rincianBiaya || '-'}</em></div>
-                  <div class="proker-est-biaya">Est. Biaya: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</div>
+                  <div class="proker-card-footer">
+                    <div class="proker-rincian">Rincian Biaya: <em>${p.rincianBiaya || '-'}</em></div>
+                    <div class="proker-footer-right">
+                      <div class="proker-est-biaya">Est. Biaya: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</div>
+                      ${superButtons ? `<div class="proker-admin-actions">${superButtons}</div>` : ''}
+                    </div>
+                  </div>
                 </div>
               </div>
             `;
@@ -683,12 +732,43 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       await updateProker(pId, { status: newStatus });
       showToast(`Status program berhasil diubah menjadi: "${newStatus}"`, 'info');
       renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
+      renderInlineProkerWidget();
       appHooks.renderUserProfile();
     });
   });
 
+  // Accordion Dropdown: Tampilkan / Sembunyikan Detil Program Kerja
+  modalBody.querySelectorAll('.proker-card-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      // Abaikan jika user mengklik tombol edit atau hapus
+      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del')) {
+        return;
+      }
+      const card = header.closest('.proker-card-item');
+      if (!card) return;
+
+      if (window.innerWidth <= 768) {
+        card.classList.toggle('is-expanded');
+        const isExp = card.classList.contains('is-expanded');
+        header.setAttribute('aria-expanded', isExp ? 'true' : 'false');
+      } else {
+        card.classList.toggle('is-collapsed');
+        const isCol = card.classList.contains('is-collapsed');
+        header.setAttribute('aria-expanded', isCol ? 'false' : 'true');
+      }
+    });
+
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        header.click();
+      }
+    });
+  });
+
   modalBody.querySelectorAll('.btn-proker-edit').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const pId = btn.dataset.id;
       const prokerItem = prokerList.find(p => p.id === pId);
       if (prokerItem) renderAddEditProkerForm(prokerItem);
@@ -696,7 +776,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   modalBody.querySelectorAll('.btn-proker-del').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const pId = btn.dataset.id;
       const pTitle = btn.dataset.title;
 
@@ -712,6 +793,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           await deleteProker(pId);
           showToast(`Program kerja "${pTitle}" berhasil dihapus`, 'success');
           renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
+          renderInlineProkerWidget();
           appHooks.renderUserProfile();
         }
       });
@@ -804,8 +886,8 @@ export async function renderAddEditProkerForm(p = null) {
         <div class="form-group">
           <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">STATUS KEGIATAN</label>
           <select id="prokerInputStatus" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);">
-            <option value="planned" ${isEdit && p.status === 'planned' ? 'selected' : ''}>🟡 Direncanakan</option>
-            <option value="upcoming" ${isEdit && p.status === 'upcoming' ? 'selected' : ''}>🔵 Akan Datang</option>
+            <option value="planned" ${isEdit && p.status === 'planned' ? 'selected' : ''}>🔵 Direncanakan</option>
+            <option value="upcoming" ${isEdit && p.status === 'upcoming' ? 'selected' : ''}>🟡 Akan Datang</option>
             <option value="ongoing" ${isEdit && p.status === 'ongoing' ? 'selected' : ''}>🟢 Sedang Berlangsung</option>
             <option value="done" ${isEdit && p.status === 'done' ? 'selected' : ''}>⚪ Selesai</option>
           </select>
@@ -957,6 +1039,227 @@ export async function renderAddEditProkerForm(p = null) {
     }
 
     renderProkerModal();
+    renderInlineProkerWidget();
     appHooks.renderUserProfile();
   });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INLINE PROGRAM KERJA WIDGET (DASHBOARD)
+   Komponen agenda bulanan di dashboard admin serupa landing page
+   ═══════════════════════════════════════════════════════════════ */
+
+let currentDashProkerFilter = 'ongoing'; // Default: Program Kerja Berjalan
+let currentDashProkerPage = 1;
+const dashProkerItemsPerPage = 5;
+
+const dashShortMonthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
+const dashFullMonthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+function getProkerStatusLabel(status) {
+  if (status === 'done' || status === 'selesai') return 'Selesai';
+  if (status === 'ongoing' || status === 'berjalan' || status === 'sedang_berlangsung') return 'Berjalan';
+  if (status === 'upcoming' || status === 'akan_datang') return 'Akan Datang';
+  if (status === 'planned' || status === 'direncanakan') return 'Direncanakan';
+  return 'Direncanakan';
+}
+
+function getProkerStatusClass(status) {
+  if (status === 'done' || status === 'selesai') return 'done';
+  if (status === 'ongoing' || status === 'berjalan' || status === 'sedang_berlangsung') return 'ongoing';
+  if (status === 'upcoming' || status === 'akan_datang') return 'upcoming';
+  if (status === 'planned' || status === 'direncanakan') return 'planned';
+  return 'planned';
+}
+
+export function renderInlineProkerWidget() {
+  const listEl = document.getElementById('dashProkerList');
+  if (!listEl) return;
+
+  const now = new Date();
+  const currentMonthIdx = now.getMonth();
+  const currentYearVal = now.getFullYear();
+
+  const monthEl = document.getElementById('dashProkerMonth');
+  const yearEl = document.getElementById('dashProkerYear');
+  const headerTitleEl = document.getElementById('dashProkerHeaderTitle');
+  const paginationContainer = document.getElementById('dashProkerPagination');
+
+  if (monthEl) monthEl.textContent = dashShortMonthNames[currentMonthIdx];
+  if (yearEl) yearEl.textContent = currentYearVal;
+  if (headerTitleEl) headerTitleEl.textContent = `${dashFullMonthNames[currentMonthIdx]} ${currentYearVal}`;
+
+  // Update visual state tombol filter
+  const filterBtns = document.querySelectorAll('.dash-proker-filter-btn');
+  filterBtns.forEach(btn => {
+    const f = btn.dataset.filter;
+    if (f === currentDashProkerFilter) {
+      if (f === 'ongoing') {
+        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-emerald-300 bg-emerald-500 text-white font-bold shadow-md ring-2 ring-emerald-300/40 cursor-pointer transition-all duration-200';
+      } else if (f === 'upcoming') {
+        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-amber-300 bg-amber-500 text-white font-bold shadow-md ring-2 ring-amber-300/40 cursor-pointer transition-all duration-200';
+      } else if (f === 'planned') {
+        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-blue-300 bg-blue-500 text-white font-bold shadow-md ring-2 ring-blue-300/40 cursor-pointer transition-all duration-200';
+      } else if (f === 'done') {
+        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-slate-300 bg-slate-500 text-white font-bold shadow-md ring-2 ring-slate-300/40 cursor-pointer transition-all duration-200';
+      } else {
+        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-white bg-white text-brandBlue font-bold shadow-md ring-2 ring-white/40 cursor-pointer transition-all duration-200';
+      }
+    } else {
+      btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white/90 font-medium cursor-pointer transition-all duration-200';
+    }
+  });
+
+  const allProker = getProkerList();
+  let filteredData = allProker;
+  if (currentDashProkerFilter === 'ongoing') {
+    filteredData = allProker.filter(p => p.status === 'ongoing' || p.status === 'berjalan' || p.status === 'sedang_berlangsung');
+  } else if (currentDashProkerFilter === 'upcoming') {
+    filteredData = allProker.filter(p => p.status === 'upcoming' || p.status === 'akan_datang');
+  } else if (currentDashProkerFilter === 'planned') {
+    filteredData = allProker.filter(p => p.status === 'planned' || p.status === 'direncanakan');
+  } else if (currentDashProkerFilter === 'done') {
+    filteredData = allProker.filter(p => p.status === 'done' || p.status === 'selesai');
+  }
+
+  if (filteredData.length === 0) {
+    listEl.innerHTML = `
+      <div class="text-center py-12 text-slate-500 dark:text-slate-400">
+        <span class="material-symbols-outlined text-4xl mb-2 text-slate-400">event_busy</span>
+        <p class="font-medium text-sm">Tidak ada program kerja dengan status ini.</p>
+      </div>
+    `;
+    if (paginationContainer) paginationContainer.innerHTML = '';
+    return;
+  }
+
+  const totalPages = Math.ceil(filteredData.length / dashProkerItemsPerPage);
+  if (currentDashProkerPage > totalPages) currentDashProkerPage = totalPages;
+  if (currentDashProkerPage < 1) currentDashProkerPage = 1;
+
+  const startIndex = (currentDashProkerPage - 1) * dashProkerItemsPerPage;
+  const endIndex = startIndex + dashProkerItemsPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  listEl.innerHTML = currentData.map((item, index) => {
+    const globalIndex = startIndex + index + 1;
+    const rawStatus = item.status || 'planned';
+    const statusClass = getProkerStatusClass(rawStatus);
+    const statusLabel = getProkerStatusLabel(rawStatus);
+    const tempatHtml = item.tempat ? `
+      <span class="proker-meta-sep">&bull;</span>
+      <span class="proker-meta-item">
+        <span class="material-symbols-outlined ms-proker-ic">location_on</span>
+        <span>${item.tempat}</span>
+      </span>
+    ` : '';
+    const tujuanHtml = item.tujuan ? `
+      <div class="proker-tujuan-box">
+        <strong>Tujuan:</strong> ${item.tujuan}
+      </div>
+    ` : '';
+
+    return `
+      <div class="proker-item group/proker" data-expanded="false">
+        <div class="proker-dot ${statusClass}"></div>
+        <div class="proker-content">
+          <div class="proker-row-header cursor-pointer md:cursor-default flex items-center justify-between" onclick="if(window.innerWidth < 768) { this.closest('.proker-item').dataset.expanded = this.closest('.proker-item').dataset.expanded === 'true' ? 'false' : 'true'; }">
+            <div class="proker-title flex-1 pr-2">
+              <span class="proker-num">${item.no || globalIndex}.</span> ${item.kegiatan}
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="proker-status-badge ${statusClass}">
+                <span class="dot ${statusClass}"></span>
+                <span>${statusLabel}</span>
+              </span>
+              <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 20px;">
+                chevron_right
+              </span>
+            </div>
+          </div>
+          <div class="proker-details hidden md:block mt-2.5">
+            <div class="proker-meta">
+              <span class="proker-meta-item">
+                <span class="material-symbols-outlined ms-proker-ic">calendar_today</span>
+                <span>${item.waktu}</span>
+              </span>
+              ${tempatHtml}
+              <span class="proker-meta-sep">&bull;</span>
+              <span class="proker-meta-item">
+                <span class="material-symbols-outlined ms-proker-ic">group</span>
+                <span>${item.sasaran}</span>
+              </span>
+            </div>
+            ${tujuanHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (paginationContainer) {
+    if (totalPages > 1) {
+      let dotsHtml = '';
+      for (let i = 1; i <= totalPages; i++) {
+        dotsHtml += `<button type="button" class="px-3 py-1 text-xs font-bold rounded-lg transition-all dash-page-dot ${i === currentDashProkerPage ? 'bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}" data-page="${i}" aria-label="Halaman ${i}">${i}</button>`;
+      }
+      paginationContainer.innerHTML = `
+        <button type="button" class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center dash-page-nav prev" ${currentDashProkerPage === 1 ? 'disabled' : ''} aria-label="Sebelumnya"><span class="material-symbols-outlined">chevron_left</span></button>
+        <div class="page-dots flex items-center gap-1.5">${dotsHtml}</div>
+        <button type="button" class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center dash-page-nav next" ${currentDashProkerPage === totalPages ? 'disabled' : ''} aria-label="Berikutnya"><span class="material-symbols-outlined">chevron_right</span></button>
+      `;
+
+      paginationContainer.querySelectorAll('.dash-page-dot').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentDashProkerPage = parseInt(e.target.dataset.page);
+          renderInlineProkerWidget();
+        });
+      });
+      const prevBtn = paginationContainer.querySelector('.prev');
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          if (currentDashProkerPage > 1) {
+            currentDashProkerPage--;
+            renderInlineProkerWidget();
+          }
+        });
+      }
+      const nextBtn = paginationContainer.querySelector('.next');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          if (currentDashProkerPage < totalPages) {
+            currentDashProkerPage++;
+            renderInlineProkerWidget();
+          }
+        });
+      }
+    } else {
+      paginationContainer.innerHTML = '';
+    }
+  }
+}
+
+export function initInlineProkerWidget() {
+  const filterBar = document.getElementById('dashProkerFilterBar');
+  if (filterBar && !filterBar.dataset.bound) {
+    filterBar.dataset.bound = 'true';
+    filterBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.dash-proker-filter-btn');
+      if (!btn) return;
+      const filterVal = btn.dataset.filter;
+      currentDashProkerFilter = (currentDashProkerFilter === filterVal) ? 'all' : filterVal;
+      currentDashProkerPage = 1;
+      renderInlineProkerWidget();
+    });
+  }
+
+  const btnKelola = document.getElementById('btnKelolaProkerDashboard');
+  if (btnKelola && !btnKelola.dataset.bound) {
+    btnKelola.dataset.bound = 'true';
+    btnKelola.addEventListener('click', () => {
+      renderProkerModal();
+    });
+  }
+
+  renderInlineProkerWidget();
 }

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Data Generus – PPG Solo Selatan</title>
+  <meta name="description" content="Laporan Data Lengkap Generasi Penerus PPG Solo Selatan – Siap Cetak dan Ekspor PDF." />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary: #1a56c4;
+      --primary-dark: #0f3a8b;
+      --gold: #d4a017;
+      --green: #10b981;
+      --slate-dark: #0f172a;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #cbd5e1;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.4;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── SCREEN ONLY TOOLBAR ── */
+    .screen-toolbar {
+      background: linear-gradient(135deg, #0a1f52 0%, #1a56c4 100%);
+      color: #fff;
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .toolbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .toolbar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .toolbar-title .badge-count {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-print {
+      background: #10b981;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .btn-print:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ── FILTER SUBBAR (SCREEN ONLY) ── */
+    .filter-subbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .filter-subbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .filter-select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #f8fafc;
+      outline: none;
+      cursor: pointer;
+    }
+    .filter-select:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    /* ── REPORT DOCUMENT CONTAINER (A4 LANDSCAPE) ── */
+    .report-container {
+      max-width: 297mm;
+      margin: 20px auto 40px;
+      padding: 10mm 12mm;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+
+    /* ── KOP SURAT FORMAL ── */
+    .kop-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 8px;
+    }
+
+    .kop-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .kop-text {
+      flex: 1;
+      text-align: center;
+    }
+
+    .kop-text h1 {
+      font-size: 14pt;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin: 0 0 2px 0;
+    }
+
+    .kop-text h2 {
+      font-size: 12pt;
+      font-weight: 800;
+      color: #1a56c4;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      margin: 0 0 2px 0;
+    }
+
+    .kop-text p {
+      font-size: 9pt;
+      font-weight: 500;
+      color: #475569;
+      margin: 0;
+    }
+
+    .kop-divider {
+      border-top: 2.5px solid #0f172a;
+      border-bottom: 1px solid #0f172a;
+      height: 3px;
+      margin: 4px 0 14px 0;
+    }
+
+    /* ── SUMMARY METRICS BANNER ── */
+    .summary-banner {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+    }
+
+    .metric-box {
+      border-right: 1px solid #e2e8f0;
+      padding-right: 8px;
+    }
+    .metric-box:last-child {
+      border-right: none;
+    }
+
+    .metric-label {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .metric-value {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+    .metric-value.val-blue { color: #1a56c4; }
+    .metric-value.val-green { color: #10b981; }
+    .metric-value.val-amber { color: #d97706; }
+    .metric-value.val-pink { color: #db2777; }
+
+    /* ── SECTION HEADER WILAYAH ── */
+    .group-header-row {
+      background: #0a1f52 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      text-align: left !important;
+      padding: 6px 10px !important;
+      font-size: 9.5pt !important;
+      letter-spacing: 0.3px !important;
+    }
+
+    .group-subtotal-badge {
+      display: inline-block;
+      float: right;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 1px 8px;
+      border-radius: 12px;
+      font-size: 8pt;
+      font-weight: 700;
+    }
+
+    /* ── DATA TABLE ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-bottom: 16px;
+    }
+
+    .data-table thead th {
+      background: #1e293b;
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 6px 5px;
+      text-align: left;
+      border: 1px solid #334155;
+      white-space: nowrap;
+    }
+
+    .data-table thead th.th-center {
+      text-align: center;
+    }
+
+    .data-table tbody td {
+      padding: 5px 6px;
+      border: 1px solid #cbd5e1;
+      vertical-align: middle;
+      color: #1e293b;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .td-center {
+      text-align: center;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-caberawit { background: #fef3c7; color: #b45309; }
+    .badge-gp { background: #dbeafe; color: #1d4ed8; }
+    .badge-remaja { background: #f3e8ff; color: #7e22ce; }
+    .badge-l { color: #2563eb; font-weight: 800; }
+    .badge-p { color: #db2777; font-weight: 800; }
+
+    /* ── SIGNATURE BLOCK ── */
+    .sig-block {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      page-break-inside: avoid;
+    }
+
+    .sig-box {
+      width: 30%;
+      text-align: center;
+      font-size: 9pt;
+    }
+
+    .sig-space {
+      height: 55px;
+    }
+
+    .sig-name {
+      font-weight: 800;
+      text-decoration: underline;
+      color: #0f172a;
+    }
+
+    .sig-title {
+      font-size: 8pt;
+      color: #64748b;
+    }
+
+    /* ── PRINT MEDIA RULES (A4 LANDSCAPE) ── */
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 8mm 8mm 8mm 8mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        font-size: 8pt;
+      }
+
+      .screen-toolbar,
+      .filter-subbar {
+        display: none !important;
+      }
+
+      .report-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+      }
+
+      .group-header-row {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+      }
+
+      .data-table thead th {
+        background: #1e293b !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+      }
+
+      .data-table tbody td {
+        border: 1px solid #94a3b8 !important;
+      }
+
+      tr {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Screen Only Toolbar -->
+  <div class="screen-toolbar">
+    <div class="toolbar-inner">
+      <div class="toolbar-title">
+        <span class="material-symbols-outlined" style="font-size:22px;">description</span>
+        <span>Laporan Data Generus Resmi</span>
+        <span id="txtHeaderCount" class="badge-count">0 Santri</span>
+      </div>
+      <div class="toolbar-actions">
+        <button type="button" class="btn-action btn-print" onclick="window.print()">
+          <span class="material-symbols-outlined" style="font-size:16px;">print</span>
+          <span>Cetak / Simpan PDF</span>
+        </button>
+        <button type="button" id="btnExportExcelLaporan" class="btn-action" style="background:#0284c7;color:#fff;">
+          <span class="material-symbols-outlined" style="font-size:16px;">table_view</span>
+          <span>Unduh Excel (.xlsx)</span>
+        </button>
+        <button type="button" class="btn-action btn-back" onclick="handleKembaliDashboard()">
+          <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+          <span>Kembali</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen Only Filter Subbar -->
+  <div class="filter-subbar">
+    <div class="filter-subbar-inner">
+      <div class="filter-item">
+        <label for="filterDesa">Desa:</label>
+        <select id="filterDesa" class="filter-select">
+          <option value="all">Semua Desa (5 Desa)</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="filterKelompok">Kelompok:</label>
+        <select id="filterKelompok" class="filter-select">
+          <option value="all">Semua Kelompok (27 Kelompok)</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="filterJenjang">Jenjang:</label>
+        <select id="filterJenjang" class="filter-select">
+          <option value="all">Semua Jenjang</option>
+          <option value="caberawit">Caberawit (PAUD - SD)</option>
+          <option value="gp_reguler">GP Reguler (SMP - SMA)</option>
+          <option value="remaja">Remaja &amp; Mandiri</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="filterStatus">Status:</label>
+        <select id="filterStatus" class="filter-select">
+          <option value="all">Semua Status</option>
+          <option value="Sambung">Sambung</option>
+          <option value="Pindah Sambung">Pindah Sambung</option>
+          <option value="Menikah">Menikah</option>
+        </select>
+      </div>
+      <div class="filter-item" style="margin-left:auto;">
+        <span id="txtFilterStatusInfo" style="font-size:11px;font-weight:700;color:var(--primary);">Menampilkan semua data</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Report Document -->
+  <div class="report-container">
+
+    <!-- Formal Letterhead (Kop Surat) -->
+    <div class="kop-wrapper">
+      <img src="../../src/image/Logo-PPG.png" alt="Logo PPG Solo Selatan" class="kop-logo" onerror="this.style.display='none'" />
+      <div class="kop-text">
+        <h1>PENGURUS PEMBINA PENGGERAK GENERASI PENERUS (PPG)</h1>
+        <h2>DAERAH SOLO SELATAN</h2>
+        <p>Sekretariat: Solo Selatan, Jawa Tengah &bull; Database Induk Pembinaan Generus</p>
+      </div>
+      <img src="../../src/image/logoKMMda.png" alt="Logo KMMda Remaja" class="kop-logo" onerror="this.style.display='none'" />
+    </div>
+    <div class="kop-divider"></div>
+
+    <div style="text-align:center;margin-bottom:12px;">
+      <h3 style="font-size:12pt;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:0.4px;">
+        DATA INDUK GENERASI PENERUS (SANTRI)
+      </h3>
+      <p id="txtScopeWilayah" style="font-size:9pt;font-weight:600;color:#475569;margin-top:2px;">
+        Cakupan: Seluruh Wilayah Solo Selatan (5 Desa / 27 Kelompok)
+      </p>
+    </div>
+
+    <!-- Summary Metrics Banner -->
+    <div class="summary-banner">
+      <div class="metric-box">
+        <div class="metric-label">Total Generus</div>
+        <div id="mTotalSiswa" class="metric-value val-blue">0</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">Laki-Laki (L)</div>
+        <div id="mTotalPutra" class="metric-value">0</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">Perempuan (P)</div>
+        <div id="mTotalPutri" class="metric-value val-pink">0</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">Caberawit</div>
+        <div id="mTotalCaberawit" class="metric-value val-amber">0</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">GP Reguler</div>
+        <div id="mTotalGp" class="metric-value val-blue">0</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">Remaja/Mandiri</div>
+        <div id="mTotalRemaja" class="metric-value val-green">0</div>
+      </div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div id="tableContentContainer">
+      <!-- Generated via JS -->
+    </div>
+
+    <!-- Formal Signatures -->
+    <div class="sig-block">
+      <div class="sig-box">
+        <p>Mengetahui,</p>
+        <p class="sig-title">Ketua PPG Solo Selatan</p>
+        <div class="sig-space"></div>
+        <p class="sig-name">( Dewan Pembina )</p>
+      </div>
+      <div class="sig-box">
+        <p>&nbsp;</p>
+        <p class="sig-title">Koordinator Kurikulum &amp; KBM</p>
+        <div class="sig-space"></div>
+        <p class="sig-name">( Sie Kurikulum )</p>
+      </div>
+      <div class="sig-box">
+        <p id="txtTanggalCetak">Surakarta, -</p>
+        <p class="sig-title">Sekretaris / Pengelola Data</p>
+        <div class="sig-space"></div>
+        <p class="sig-name">( Pengurus Wilayah )</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SheetJS for Export Excel from Report Page -->
+  <script src="../../src/vendor/xlsx.full.min.js"></script>
+
+  <!-- Report Data Logic -->
+  <script type="module">
+    import {
+      MASTER_WILAYAH,
+      getAllKelompok,
+      getSiswaList,
+      calculateUmur
+    } from '../../src/db-master.js';
+
+    let allSiswa = [];
+    let currentFilter = {
+      desa: 'all',
+      kelompok: 'all',
+      jenjang: 'all',
+      status: 'all'
+    };
+
+    // Baca filter yang ditransfer dari Dashboard (jika ada)
+    try {
+      const savedFilter = sessionStorage.getItem('ppg_export_filter');
+      if (savedFilter) {
+        const parsed = JSON.parse(savedFilter);
+        currentFilter = { ...currentFilter, ...parsed };
+      }
+    } catch (e) {
+      console.warn('Gagal membaca filter tersimpan:', e);
+    }
+
+    window.handleKembaliDashboard = function () {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '../dashboard/dashboard.html';
+      }
+    };
+
+    function initReport() {
+      allSiswa = getSiswaList();
+      populateFilterDropdowns();
+      renderTanggalCetak();
+      applyAndRender();
+      attachListeners();
+    }
+
+    function renderTanggalCetak() {
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const now = new Date();
+      const str = `Surakarta, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      const el = document.getElementById('txtTanggalCetak');
+      if (el) el.textContent = str;
+    }
+
+    function populateFilterDropdowns() {
+      const selDesa = document.getElementById('filterDesa');
+      const selKelompok = document.getElementById('filterKelompok');
+
+      if (!selDesa || !selKelompok) return;
+
+      // Populate Desa
+      selDesa.innerHTML = '<option value="all">Semua Desa (5 Desa)</option>';
+      MASTER_WILAYAH.desa.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `Desa ${d.nama}`;
+        selDesa.appendChild(opt);
+      });
+      selDesa.value = currentFilter.desa || 'all';
+
+      // Populate Kelompok based on Desa
+      populateKelompokDropdown();
+
+      // Jenjang & Status
+      const selJenjang = document.getElementById('filterJenjang');
+      const selStatus = document.getElementById('filterStatus');
+      if (selJenjang && currentFilter.jenjang) selJenjang.value = currentFilter.jenjang;
+      if (selStatus && currentFilter.status) selStatus.value = currentFilter.status;
+    }
+
+    function populateKelompokDropdown() {
+      const selDesa = document.getElementById('filterDesa');
+      const selKelompok = document.getElementById('filterKelompok');
+      if (!selDesa || !selKelompok) return;
+
+      const selectedDesaId = selDesa.value;
+      selKelompok.innerHTML = '<option value="all">Semua Kelompok</option>';
+
+      let kelompokList = [];
+      if (selectedDesaId === 'all') {
+        kelompokList = getAllKelompok();
+      } else {
+        const desaObj = MASTER_WILAYAH.desa.find(d => d.id === selectedDesaId);
+        if (desaObj && desaObj.kelompok) {
+          kelompokList = desaObj.kelompok.map(k => ({ ...k, desaId: desaObj.id, desaNama: desaObj.nama }));
+        }
+      }
+
+      kelompokList.forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k.id;
+        opt.textContent = selectedDesaId === 'all' ? `${k.nama} (${k.desaNama})` : k.nama;
+        selKelompok.appendChild(opt);
+      });
+
+      selKelompok.value = currentFilter.kelompok || 'all';
+    }
+
+    function attachListeners() {
+      document.getElementById('filterDesa')?.addEventListener('change', (e) => {
+        currentFilter.desa = e.target.value;
+        currentFilter.kelompok = 'all';
+        populateKelompokDropdown();
+        applyAndRender();
+      });
+
+      document.getElementById('filterKelompok')?.addEventListener('change', (e) => {
+        currentFilter.kelompok = e.target.value;
+        applyAndRender();
+      });
+
+      document.getElementById('filterJenjang')?.addEventListener('change', (e) => {
+        currentFilter.jenjang = e.target.value;
+        applyAndRender();
+      });
+
+      document.getElementById('filterStatus')?.addEventListener('change', (e) => {
+        currentFilter.status = e.target.value;
+        applyAndRender();
+      });
+
+      document.getElementById('btnExportExcelLaporan')?.addEventListener('click', () => {
+        exportFilteredToExcel();
+      });
+    }
+
+    function applyAndRender() {
+      let filtered = allSiswa.filter(s => {
+        if (currentFilter.desa !== 'all' && s.desa_id !== currentFilter.desa) return false;
+        if (currentFilter.kelompok !== 'all' && s.kelompok_id !== currentFilter.kelompok) return false;
+        if (currentFilter.jenjang !== 'all' && s.kategori_usia !== currentFilter.jenjang) return false;
+        if (currentFilter.status !== 'all' && s.status_sambung !== currentFilter.status) return false;
+        return true;
+      });
+
+      // Update scope label
+      const txtScope = document.getElementById('txtScopeWilayah');
+      if (txtScope) {
+        let label = 'Cakupan: ';
+        if (currentFilter.desa !== 'all') {
+          const dObj = MASTER_WILAYAH.desa.find(d => d.id === currentFilter.desa);
+          label += `Desa ${dObj ? dObj.nama : currentFilter.desa}`;
+        } else {
+          label += 'Seluruh Desa (5 Desa)';
+        }
+
+        if (currentFilter.kelompok !== 'all') {
+          const allK = getAllKelompok();
+          const kObj = allK.find(k => k.id === currentFilter.kelompok);
+          label += ` &bull; Kelompok ${kObj ? kObj.nama : currentFilter.kelompok}`;
+        } else {
+          label += ' &bull; 27 Kelompok';
+        }
+
+        if (currentFilter.jenjang !== 'all') {
+          let jLabel = currentFilter.jenjang;
+          if (jLabel === 'caberawit') jLabel = 'Caberawit (PAUD - SD)';
+          else if (jLabel === 'gp_reguler') jLabel = 'GP Reguler (SMP - SMA)';
+          else if (jLabel === 'remaja') jLabel = 'Remaja & Mandiri';
+          label += ` &bull; Jenjang: ${jLabel}`;
+        }
+        txtScope.innerHTML = label;
+      }
+
+      // Update metrics
+      const total = filtered.length;
+      const putra = filtered.filter(s => s.jenis_kelamin === 'L').length;
+      const putri = filtered.filter(s => s.jenis_kelamin === 'P').length;
+      const caberawit = filtered.filter(s => s.kategori_usia === 'caberawit').length;
+      const gp = filtered.filter(s => s.kategori_usia === 'gp_reguler').length;
+      const remaja = filtered.filter(s => s.kategori_usia === 'remaja').length;
+
+      document.getElementById('mTotalSiswa').textContent = total;
+      document.getElementById('mTotalPutra').textContent = putra;
+      document.getElementById('mTotalPutri').textContent = putri;
+      document.getElementById('mTotalCaberawit').textContent = caberawit;
+      document.getElementById('mTotalGp').textContent = gp;
+      document.getElementById('mTotalRemaja').textContent = remaja;
+
+      const txtHeaderCount = document.getElementById('txtHeaderCount');
+      if (txtHeaderCount) txtHeaderCount.textContent = `${total} Santri`;
+
+      const txtFilterInfo = document.getElementById('txtFilterStatusInfo');
+      if (txtFilterInfo) {
+        txtFilterInfo.textContent = `Menampilkan ${total} dari ${allSiswa.length} total generus`;
+      }
+
+      // Render Tables (Grouped by Desa & Kelompok)
+      renderGroupedTables(filtered);
+    }
+
+    function renderGroupedTables(list) {
+      const container = document.getElementById('tableContentContainer');
+      if (!container) return;
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:40px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;margin:16px 0;">
+            <span class="material-symbols-outlined" style="font-size:36px;color:#94a3b8;">folder_off</span>
+            <p style="font-size:11pt;font-weight:700;color:#475569;margin-top:6px;">Tidak ada data generus yang sesuai dengan kriteria filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Grouping data by Desa -> Kelompok
+      const grouped = {};
+      list.forEach(s => {
+        const dNama = s.desa_nama || 'Tanpa Desa';
+        const kNama = s.kelompok_nama || 'Tanpa Kelompok';
+        if (!grouped[dNama]) grouped[dNama] = {};
+        if (!grouped[dNama][kNama]) grouped[dNama][kNama] = [];
+        grouped[dNama][kNama].push(s);
+      });
+
+      let html = '';
+      let globalCounter = 1;
+
+      Object.keys(grouped).sort().forEach(desaNama => {
+        Object.keys(grouped[desaNama]).sort().forEach(kelompokNama => {
+          const items = grouped[desaNama][kelompokNama];
+          items.sort((a, b) => (a.nama_lengkap || '').localeCompare(b.nama_lengkap || ''));
+
+          html += `
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th colspan="11" class="group-header-row">
+                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">location_on</span>
+                    DESA: ${desaNama.toUpperCase()} &bull; KELOMPOK: ${kelompokNama.toUpperCase()}
+                    <span class="group-subtotal-badge">${items.length} Santri</span>
+                  </th>
+                </tr>
+                <tr>
+                  <th class="th-center" style="width:30px;">NO</th>
+                  <th style="width:160px;">NAMA LENGKAP</th>
+                  <th class="th-center" style="width:36px;">L/P</th>
+                  <th style="width:140px;">TEMPAT, TGL LAHIR</th>
+                  <th class="th-center" style="width:40px;">USIA</th>
+                  <th style="width:110px;">JENJANG / KELAS</th>
+                  <th style="width:90px;">DESA</th>
+                  <th style="width:95px;">KELOMPOK</th>
+                  <th style="width:120px;">NAMA ORANG TUA</th>
+                  <th class="th-center" style="width:85px;">NO. HP/WA</th>
+                  <th class="th-center" style="width:75px;">STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          items.forEach(s => {
+            const ttl = [s.tempat_lahir || '', s.tanggal_lahir || ''].filter(Boolean).join(', ') || '-';
+            const usia = s.tanggal_lahir ? `${calculateUmur(s.tanggal_lahir)} th` : '-';
+            const genderBadge = s.jenis_kelamin === 'P'
+              ? '<span class="badge-p">P</span>'
+              : '<span class="badge-l">L</span>';
+
+            let jenjangClass = 'badge-caberawit';
+            if (s.kategori_usia === 'gp_reguler') jenjangClass = 'badge-gp';
+            else if (s.kategori_usia === 'remaja') jenjangClass = 'badge-remaja';
+
+            const ortu = [s.nama_ayah ? `A: ${s.nama_ayah}` : '', s.nama_ibu ? `I: ${s.nama_ibu}` : ''].filter(Boolean).join('<br>') || '-';
+
+            html += `
+              <tr>
+                <td class="td-center" style="font-weight:700;">${globalCounter++}</td>
+                <td style="font-weight:700;color:#0f172a;">${s.nama_lengkap || '-'}</td>
+                <td class="td-center">${genderBadge}</td>
+                <td>${ttl}</td>
+                <td class="td-center" style="font-weight:600;">${usia}</td>
+                <td>
+                  <span class="badge-tag ${jenjangClass}">${s.jenjang_kelas || s.kategori_usia || '-'}</span>
+                </td>
+                <td style="font-size:8pt;">${s.desa_nama || '-'}</td>
+                <td style="font-size:8pt;font-weight:600;">${s.kelompok_nama || '-'}</td>
+                <td style="font-size:7.5pt;line-height:1.2;">${ortu}</td>
+                <td class="td-center" style="font-size:7.5pt;">${s.no_hp || '-'}</td>
+                <td class="td-center">
+                  <span style="font-size:7.5pt;font-weight:700;color:${s.status_sambung === 'Sambung' ? '#15803d' : '#b45309'};">
+                    ${s.status_sambung || 'Sambung'}
+                  </span>
+                </td>
+              </tr>
+            `;
+          });
+
+          html += `
+              </tbody>
+            </table>
+          `;
+        });
+      });
+
+      container.innerHTML = html;
+    }
+
+    function exportFilteredToExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert('Modul Excel sedang dimuat, silakan coba beberapa detik lagi.');
+        return;
+      }
+
+      let filtered = allSiswa.filter(s => {
+        if (currentFilter.desa !== 'all' && s.desa_id !== currentFilter.desa) return false;
+        if (currentFilter.kelompok !== 'all' && s.kelompok_id !== currentFilter.kelompok) return false;
+        if (currentFilter.jenjang !== 'all' && s.kategori_usia !== currentFilter.jenjang) return false;
+        if (currentFilter.status !== 'all' && s.status_sambung !== currentFilter.status) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        alert('Tidak ada data untuk diekspor!');
+        return;
+      }
+
+      const rows = [
+        [
+          'NO',
+          'NAMA LENGKAP',
+          'JENIS KELAMIN (L/P)',
+          'TEMPAT LAHIR',
+          'TANGGAL LAHIR (YYYY-MM-DD)',
+          'USIA',
+          'KATEGORI USIA',
+          'JENJANG / KELAS',
+          'DESA',
+          'KELOMPOK',
+          'NAMA AYAH',
+          'NAMA IBU',
+          'NO HP / WHATSAPP',
+          'DOMISILI',
+          'STATUS SAMBUNG'
+        ]
+      ];
+
+      filtered.forEach((s, idx) => {
+        const usia = s.tanggal_lahir ? calculateUmur(s.tanggal_lahir) : '';
+        rows.push([
+          idx + 1,
+          s.nama_lengkap || '',
+          s.jenis_kelamin || 'L',
+          s.tempat_lahir || '',
+          s.tanggal_lahir || '',
+          usia,
+          s.kategori_usia || '',
+          s.jenjang_kelas || '',
+          s.desa_nama || '',
+          s.kelompok_nama || '',
+          s.nama_ayah || '',
+          s.nama_ibu || '',
+          s.no_hp || '',
+          s.domisili || 'Pribumi',
+          s.status_sambung || 'Sambung'
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+
+      // Auto fit column widths
+      ws['!cols'] = [
+        { wch: 5 },  // No
+        { wch: 26 }, // Nama
+        { wch: 10 }, // Gender
+        { wch: 18 }, // Tempat
+        { wch: 16 }, // Tgl Lahir
+        { wch: 6 },  // Usia
+        { wch: 16 }, // Kategori
+        { wch: 16 }, // Kelas
+        { wch: 14 }, // Desa
+        { wch: 18 }, // Kelompok
+        { wch: 18 }, // Ayah
+        { wch: 18 }, // Ibu
+        { wch: 16 }, // HP
+        { wch: 12 }, // Domisili
+        { wch: 14 }  // Status
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Data Generus');
+      const nowStr = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `Laporan_Generus_PPGSoloSelatan_${nowStr}.xlsx`);
+    }
+
+    // Auto-init on page load
+    document.addEventListener('DOMContentLoaded', initReport);
+  </script>
+</body>
+
+</html>

@@ -162,13 +162,17 @@ if (prokerHeaderTitleEl) {
 function getStatusLabel(status) {
   if (status === 'done' || status === 'selesai') return 'Selesai';
   if (status === 'ongoing' || status === 'berjalan' || status === 'sedang_berlangsung') return 'Berjalan';
-  return 'Berlangsung';
+  if (status === 'upcoming' || status === 'akan_datang') return 'Akan Datang';
+  if (status === 'planned' || status === 'direncanakan') return 'Direncanakan';
+  return 'Direncanakan';
 }
 
 function getStatusClass(status) {
   if (status === 'done' || status === 'selesai') return 'done';
   if (status === 'ongoing' || status === 'berjalan' || status === 'sedang_berlangsung') return 'ongoing';
-  return 'upcoming';
+  if (status === 'upcoming' || status === 'akan_datang') return 'upcoming';
+  if (status === 'planned' || status === 'direncanakan') return 'planned';
+  return 'planned';
 }
 
 let currentProkerFilter = 'ongoing'; // Default filter: Berjalan (yang sedang berjalan di bulan tersebut)
@@ -182,8 +186,10 @@ function updateFilterButtonsUI() {
     if (f === currentProkerFilter) {
       if (f === 'ongoing') {
         btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-emerald-300 bg-emerald-500 text-white font-bold shadow-md ring-2 ring-emerald-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'berlangsung') {
+      } else if (f === 'upcoming') {
         btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-amber-300 bg-amber-500 text-white font-bold shadow-md ring-2 ring-amber-300/40 cursor-pointer transition-all duration-200';
+      } else if (f === 'planned') {
+        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-blue-300 bg-blue-500 text-white font-bold shadow-md ring-2 ring-blue-300/40 cursor-pointer transition-all duration-200';
       } else if (f === 'done') {
         btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-slate-300 bg-slate-500 text-white font-bold shadow-md ring-2 ring-slate-300/40 cursor-pointer transition-all duration-200';
       } else {
@@ -208,8 +214,10 @@ function renderProker() {
   let filteredData = allProker;
   if (currentProkerFilter === 'ongoing') {
     filteredData = allProker.filter(p => p.status === 'ongoing' || p.status === 'berjalan' || p.status === 'sedang_berlangsung');
-  } else if (currentProkerFilter === 'berlangsung') {
-    filteredData = allProker.filter(p => p.status === 'upcoming' || p.status === 'planned' || p.status === 'akan_datang' || p.status === 'direncanakan' || p.status === 'berlangsung');
+  } else if (currentProkerFilter === 'upcoming') {
+    filteredData = allProker.filter(p => p.status === 'upcoming' || p.status === 'akan_datang');
+  } else if (currentProkerFilter === 'planned') {
+    filteredData = allProker.filter(p => p.status === 'planned' || p.status === 'direncanakan');
   } else if (currentProkerFilter === 'done') {
     filteredData = allProker.filter(p => p.status === 'done' || p.status === 'selesai');
   }

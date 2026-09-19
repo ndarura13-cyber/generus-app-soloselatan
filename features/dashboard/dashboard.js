@@ -45,7 +45,9 @@ import {
 
 import {
   renderProkerModal,
-  setProkerHooks
+  setProkerHooks,
+  initInlineProkerWidget,
+  renderInlineProkerWidget
 } from './dashboard-proker.js';
 
 import {
@@ -90,6 +92,7 @@ export function renderUserProfile() {
   if (userNameEl) userNameEl.textContent = currentUser.nama;
   if (headingUserNameEl) headingUserNameEl.textContent = currentUser.nama;
   updateDashboardStats();
+  renderInlineProkerWidget();
 
   const prokerCardDesc = document.getElementById('prokerCardDesc');
   const prokerActionText = document.getElementById('prokerActionText');
@@ -638,6 +641,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     renderDesaTabs();
     renderKelompokGrid();
     updateSupabaseStatusUI();
+    initInlineProkerWidget();
 
     // Fetch live data from Supabase (minimizing reliance on localStorage)
     console.log('Fetching live data from Supabase...');
@@ -662,6 +666,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     renderDesaTabs();
     renderKelompokGrid();
     checkPendingApprovals();
+    renderInlineProkerWidget();
     console.log('PPG Dashboard initialized successfully with live data.');
   } catch (err) {
     console.error('Fatal error initializing PPG Dashboard:', err);

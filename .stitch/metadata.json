@@ -1,0 +1,30 @@
+{
+  "projectId": "17286285228241563161",
+  "title": "PPG Solo Selatan - Generus App",
+  "assetId": "b8d2e7980f0f4dc88e1c17489be9d8ab",
+  "updatedAt": "2026-09-19T12:10:20Z",
+  "designSystem": {
+    "displayName": "PPG Solo Selatan - Generus App Design System",
+    "colorMode": "LIGHT",
+    "dualTheme": true,
+    "darkModeTokens": {
+      "dark-bg": "#090e1a",
+      "dark-surface": "#0b1329",
+      "dark-surface-elevated": "#111d38",
+      "dark-border": "#223554"
+    },
+    "statusTokens": {
+      "status-ongoing": "#10b981",
+      "status-upcoming": "#f59e0b",
+      "status-planned": "#3b82f6",
+      "status-done": "#94a3b8"
+    }
+  },
+  "screens": [
+    {
+      "name": "projects/17286285228241563161/screens/c77fbaed01524e4dbc93ecdaabd9e1ad",
+      "title": "DESIGN.md",
+      "generatedBy": "polish_edit_theme_agent"
+    }
+  ]
+}

@@ -126,8 +126,8 @@
     .dark .page-btn.active { background-color: #1a56c4 !important; border-color: #1a56c4 !important; }
     .dark .proker-status-badge.done { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; border-color: rgba(148, 163, 184, 0.3) !important; }
     .dark .proker-status-badge.ongoing { background-color: rgba(16, 185, 129, 0.15) !important; color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.35) !important; }
-    .dark .proker-status-badge.upcoming,
-    .dark .proker-status-badge.planned { background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.35) !important; }
+    .dark .proker-status-badge.upcoming { background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.35) !important; }
+    .dark .proker-status-badge.planned { background-color: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; border-color: rgba(96, 165, 250, 0.35) !important; }
     
     /* Force hamburger color to Tailwind brand colors, ignoring style.css */
     .hamburger span { @apply bg-brandBlue dark:bg-brandGold !important; }
@@ -615,8 +615,11 @@
             <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="ongoing" title="Filter Program Kerja Berjalan">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Berjalan
             </button>
-            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="berlangsung" title="Filter Program Kerja Berlangsung">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Berlangsung
+            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="upcoming" title="Filter Program Kerja Akan Datang">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Akan Datang
+            </button>
+            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="planned" title="Filter Program Kerja Direncanakan">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> Direncanakan
             </button>
             <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="done" title="Filter Program Kerja Selesai">
               <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Selesai

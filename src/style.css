@@ -1024,9 +1024,12 @@ img {
   animation: pulse-dot 2s infinite;
 }
 
-.proker-dot.upcoming,
-.proker-dot.planned {
+.proker-dot.upcoming {
   background: #f59e0b;
+}
+
+.proker-dot.planned {
+  background: #3b82f6;
 }
 
 @keyframes pulse-dot {
@@ -1099,16 +1102,24 @@ img {
   background: #10b981;
 }
 
-.proker-status-badge.upcoming,
-.proker-status-badge.planned {
+.proker-status-badge.upcoming {
   background: #fef3c7;
   color: #b45309;
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-.proker-status-badge.upcoming .dot,
-.proker-status-badge.planned .dot {
+.proker-status-badge.upcoming .dot {
   background: #f59e0b;
+}
+
+.proker-status-badge.planned {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.proker-status-badge.planned .dot {
+  background: #3b82f6;
 }
 
 .proker-meta {
