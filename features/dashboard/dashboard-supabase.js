@@ -13,7 +13,7 @@ import {
   upsertSiswaToSupabase
 } from '../../src/supabase.js';
 
-import { getSiswaList } from '../../src/db-master.js';
+import { getSiswaList, syncPembiasaanFromSupabase, clearPembiasaanLocalStorage } from '../../src/db-master.js';
 import { openModal, closeModal, showToast, modalBody } from './dashboard-common.js';
 
 export function updateSupabaseStatusUI() {
@@ -91,16 +91,26 @@ export function renderSupabaseModal(onDataSynced = null) {
         <div class="sb-sync-section">
           <div class="sb-sync-title">
             <span class="material-symbols-outlined" style="font-size:18px;">sync</span>
-            Sinkronisasi Data Generus
+            Sinkronisasi Data Generus &amp; Pembiasaan
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <button type="button" id="btnUploadSiswaToCloud" class="sb-btn-upload">
               <span class="material-symbols-outlined" style="font-size:16px;">cloud_upload</span>
-              Unggah Lokal ke Cloud
+              Unggah Generus ke Cloud
             </button>
             <button type="button" id="btnDownloadSiswaFromCloud" class="sb-btn-download">
               <span class="material-symbols-outlined" style="font-size:16px;">cloud_download</span>
-              Tarik Data Cloud ke Lokal
+              Tarik Generus ke Lokal
+            </button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+            <button type="button" id="btnSyncPembiasaanCloud" class="sb-btn-upload" style="background:#0f766e;border-color:#14b8a6;">
+              <span class="material-symbols-outlined" style="font-size:16px;">checklist</span>
+              Tarik Pembiasaan Cloud
+            </button>
+            <button type="button" id="btnClearPembiasaanCache" class="sb-btn-download" style="background:#7f1d1d;border-color:#ef4444;color:#fecaca;">
+              <span class="material-symbols-outlined" style="font-size:16px;">delete_sweep</span>
+              Bersihkan Cache Lokal
             </button>
           </div>
         </div>
@@ -188,5 +198,26 @@ export function renderSupabaseModal(onDataSynced = null) {
     } else {
       showToast(`Gagal mengambil data dari Supabase: ${res.error}`, 'danger');
     }
+  });
+
+  document.getElementById('btnSyncPembiasaanCloud')?.addEventListener('click', async () => {
+    showToast('Menyinkronkan data pembiasaan dari Supabase...', 'info');
+    const res = await syncPembiasaanFromSupabase();
+    if (res.success) {
+      showToast('Data Pembiasaan berhasil disinkronkan langsung dari Supabase Cloud!', 'success');
+      if (typeof onDataSynced === 'function') onDataSynced();
+    } else {
+      showToast(`Gagal menyinkronkan pembiasaan: ${res.message || 'Error'}`, 'danger');
+    }
+  });
+
+  document.getElementById('btnClearPembiasaanCache')?.addEventListener('click', async () => {
+    clearPembiasaanLocalStorage();
+    showToast('Membersihkan cache lokal... Menarik data murni dari Supabase...', 'info');
+    if (isSupabaseConfigured()) {
+      await syncPembiasaanFromSupabase();
+    }
+    showToast('Cache dibersihkan! Target Pembiasaan kini 100% bergantung murni pada Supabase.', 'success');
+    if (typeof onDataSynced === 'function') onDataSynced();
   });
 }

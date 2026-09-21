@@ -28,12 +28,12 @@ import {
   showConfirmModal,
   renderKontakModal,
   modalBody
-} from './dashboard-common.js';
+} from './dashboard-common.js?v=6.1';
 
 import {
   updateSupabaseStatusUI,
   renderSupabaseModal
-} from './dashboard-supabase.js';
+} from './dashboard-supabase.js?v=6.1';
 
 import {
   checkPendingApprovals,
@@ -41,29 +41,29 @@ import {
   renderStrukturDaerahModal,
   renderManagePengurusModal,
   setPengurusHooks
-} from './dashboard-pengurus.js';
+} from './dashboard-pengurus.js?v=6.2';
 
 import {
   renderProkerModal,
   setProkerHooks,
   initInlineProkerWidget,
   renderInlineProkerWidget
-} from './dashboard-proker.js';
+} from './dashboard-proker.js?v=6.1';
 
 import {
   renderEventPembiasaanModal
-} from './dashboard-pembiasaan.js';
+} from './dashboard-pembiasaan.js?v=6.1';
 
 import {
   updateDashboardStats,
   renderSiswaModal,
   renderDetailRingkasanModal
-} from './dashboard-generus.js';
+} from './dashboard-generus.js?v=6.1';
 
 import {
   renderCetakAbsensiModal,
   renderFormRekapKehadiranModal
-} from './dashboard-kbm.js';
+} from './dashboard-kbm.js?v=6.1';
 
 // DOM Elements
 const userNameEl = document.getElementById('userName');
@@ -198,151 +198,213 @@ setProkerHooks({
 
 /* ── 2. Edit Profil Pengurus Sedang Bertugas ───────────────── */
 export function renderSelfProfileModal() {
-  const currentDesaId = currentUser.desaId || 'desa-barat';
-  const currentKelId = currentUser.kelompokId || 'kel-gentan';
+  // Label & styling lencana tingkatan hak akses (Read-Only)
+  let levelBadgeLabel = '👥 Pamong Kelompok';
+  let levelBadgeBg = '#dbeafe';
+  let levelBadgeColor = '#1e40af';
 
-  let desaOptions = MASTER_WILAYAH.desa.map(d => `
-    <option value="${d.id}" data-name="${d.nama}" ${currentDesaId === d.id ? 'selected' : ''}>Desa ${d.nama}</option>
-  `).join('');
+  if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
+    levelBadgeLabel = '🌟 Superadmin Daerah';
+    levelBadgeBg = 'linear-gradient(135deg, #fef3c7, #fde68a)';
+    levelBadgeColor = '#92400e';
+  } else if (currentUser.tingkatan === 'desa') {
+    levelBadgeLabel = `🏛️ Koordinator Desa ${currentUser.desaNama || ''}`;
+    levelBadgeBg = '#dcfce7';
+    levelBadgeColor = '#166534';
+  }
 
-  const currentDesa = MASTER_WILAYAH.desa.find(d => d.id === currentDesaId) || MASTER_WILAYAH.desa[0];
-  const sortedKelompok = [...currentDesa.kelompok].sort((a, b) => a.nama.localeCompare(b.nama));
-  let kelOptions = sortedKelompok.map(k => `
-    <option value="${k.id}" data-name="${k.nama}" ${currentKelId === k.id ? 'selected' : ''}>Kelompok ${k.nama}</option>
-  `).join('');
+  const roleName = currentUser.peran || currentUser.jabatan || 'Pengurus';
+  const wilayahTxt = `Desa ${currentUser.desaNama || '-'} &bull; Kel. ${currentUser.kelompokNama || '-'}`;
 
   const formHtml = `
-    <form id="formSelfProfile" class="flex flex-col gap-3.5">
-      <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl border-l-4 border-brandBlue text-xs text-blue-900 dark:text-blue-200">
-        <strong>Perbarui Profil &amp; Asal Wilayah Anda:</strong><br/>
-        Data peran dan asal kelompok Anda akan langsung disesuaikan ke seluruh sistem pembinaan.
+    <form id="formSelfProfile" class="flex flex-col gap-3">
+      <!-- KARTU INFORMASI HAK AKSES & WILAYAH (RINGKAS 1 BARIS) -->
+      <div class="bg-slate-50 dark:bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
+          <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-xs inline-flex items-center gap-1 shrink-0" style="background:${levelBadgeBg};color:${levelBadgeColor};">
+            ${levelBadgeLabel}
+          </span>
+          <span class="font-bold text-slate-800 dark:text-slate-200 truncate">${roleName}</span>
+          <span class="text-slate-300 dark:text-slate-600 hidden sm:inline">&bull;</span>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-0.5 truncate">
+            <span class="material-symbols-outlined text-[13px] text-brandBlue shrink-0">location_on</span>
+            ${wilayahTxt}
+          </span>
+        </div>
+        <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center gap-0.5 shrink-0" title="Hak akses & wilayah dikelola Superadmin">
+          <span class="material-symbols-outlined text-[11px]">lock</span> Terkunci
+        </span>
       </div>
 
+      <!-- FORM DATA PRIBADI MANDIRI -->
       <div>
-        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Nama Lengkap <span class="text-red-500">*</span></label>
-        <input type="text" id="profNama" value="${currentUser.nama}" required class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Email Akun <span class="text-red-500">*</span></label>
-          <input type="email" id="profEmail" value="${currentUser.email}" required class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Nomor WhatsApp <span class="text-red-500">*</span></label>
-          <input type="text" id="profNoWa" value="${currentUser.noWa || ''}" required placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
+        <label class="block text-[11.5px] font-bold mb-1 text-slate-700 dark:text-slate-300">Nama Lengkap <span class="text-red-500">*</span></label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">person</span>
+          <input type="text" id="profNama" value="${currentUser.nama}" required class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Tingkatan Akses <span class="text-red-500">*</span></label>
-          <select id="profTingkatan" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue font-bold">
-            <option value="kelompok" ${currentUser.tingkatan === 'kelompok' ? 'selected' : ''}>Pamong Kelompok</option>
-            <option value="desa" ${currentUser.tingkatan === 'desa' ? 'selected' : ''}>Koordinator Desa</option>
-            <option value="daerah" ${currentUser.tingkatan === 'daerah' ? 'selected' : ''}>🌟 Superadmin Daerah (Pengurus PPG)</option>
-          </select>
+          <label class="block text-[11.5px] font-bold mb-1 text-slate-700 dark:text-slate-300">Email Akun <span class="text-red-500">*</span></label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">mail</span>
+            <input type="email" id="profEmail" value="${currentUser.email}" required class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
+          </div>
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Jabatan / Peran <span class="text-red-500">*</span></label>
-          <input type="text" id="profPeran" value="${currentUser.peran || currentUser.jabatan || 'Pamong'}" required class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wrapWilayahProf">
-        <div>
-          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Asal Desa <span class="text-red-500">*</span></label>
-          <select id="profDesa" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue">
-            ${desaOptions}
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Asal Kelompok <span class="text-red-500">*</span></label>
-          <select id="profKelompok" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue">
-            ${kelOptions}
-          </select>
+          <label class="block text-[11.5px] font-bold mb-1 text-slate-700 dark:text-slate-300">Nomor WhatsApp <span class="text-red-500">*</span></label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">chat</span>
+            <input type="tel" id="profNoWa" value="${currentUser.noWa || ''}" required placeholder="08xxxxxxxxxx" class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
+          </div>
         </div>
       </div>
 
-      <div>
-        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">Ubah Kata Sandi (Opsional)</label>
-        <input type="password" id="profPassword" placeholder="Kosongkan jika tidak ingin mengubah password" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
+      <!-- GANTI KATA SANDI (DENGAN TOMBOL IKON LIHAT PASSWORD) -->
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-2.5 flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1 font-bold text-xs text-slate-700 dark:text-slate-300">
+            <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">key</span>
+            <span>Ganti Kata Sandi</span>
+            <span class="text-[10.5px] text-slate-400 font-normal">(Opsional)</span>
+          </div>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500">Kosongkan jika tak diubah</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold mb-1 text-slate-600 dark:text-slate-400">Kata Sandi Baru</label>
+            <div class="relative flex items-center">
+              <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">lock</span>
+              <input type="password" id="profPassword" placeholder="Min. 6 karakter" autocomplete="new-password" style="padding-left:34px !important;padding-right:38px !important;" class="w-full py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+              <button type="button" id="btnToggleProfPass" class="btn-toggle-password" aria-label="Lihat / Sembunyikan Password" title="Lihat / Sembunyikan Kata Sandi">
+                <span class="material-symbols-outlined text-[18px] block select-none pointer-events-none">visibility</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold mb-1 text-slate-600 dark:text-slate-400">Ulangi Kata Sandi</label>
+            <div class="relative flex items-center">
+              <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">lock_clock</span>
+              <input type="password" id="profPasswordConfirm" placeholder="Konfirmasi kata sandi" autocomplete="new-password" style="padding-left:34px !important;padding-right:38px !important;" class="w-full py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+              <button type="button" id="btnToggleProfPassConfirm" class="btn-toggle-password" aria-label="Lihat / Sembunyikan Konfirmasi Password" title="Lihat / Sembunyikan Konfirmasi Kata Sandi">
+                <span class="material-symbols-outlined text-[18px] block select-none pointer-events-none">visibility</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="flex gap-2.5 mt-2">
-        <button type="button" class="btn-cancel-prof flex-1 py-3 px-4 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[13px] hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Batal</button>
-        <button type="submit" class="flex-[2] py-3 px-4 bg-brandBlue hover:bg-brandDarkBlue text-white rounded-xl font-extrabold text-[13px] flex items-center justify-center gap-2 transition-colors">
-          <span class="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan
+      <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
+      <div class="modal-sticky-footer">
+        <button type="button" class="btn-sticky-back btn-cancel-prof" title="Tutup / Batal">
+          <span class="material-symbols-outlined">close</span>
+          <span class="btn-text">Batal</span>
+        </button>
+        <button type="submit" id="btnSaveSelfProfile" class="btn-sticky-save" title="Simpan Perubahan">
+          <span class="material-symbols-outlined">save</span>
+          <span class="btn-text">Simpan Perubahan</span>
         </button>
       </div>
     </form>
   `;
 
-  openModal('Pengaturan Profil & Asal Wilayah', 'account_circle', 'default');
+  openModal('Pengaturan Profil & Keamanan Akun', 'account_circle', 'default');
   modalBody.innerHTML = formHtml;
-
-  const profDesa = document.getElementById('profDesa');
-  const profKelompok = document.getElementById('profKelompok');
-  const profTingkatan = document.getElementById('profTingkatan');
-  const profPeran = document.getElementById('profPeran');
 
   document.querySelector('.btn-cancel-prof')?.addEventListener('click', closeModal);
 
-  profDesa?.addEventListener('change', () => {
-    const selectedDesaId = profDesa.value;
-    const foundDesa = MASTER_WILAYAH.desa.find(d => d.id === selectedDesaId);
-    if (foundDesa) {
-      const sortedKels = [...foundDesa.kelompok].sort((a, b) => a.nama.localeCompare(b.nama));
-      profKelompok.innerHTML = sortedKels.map(k => `<option value="${k.id}" data-name="${k.nama}">Kelompok ${k.nama}</option>`).join('');
-    }
-  });
+  // Helper fungsi tombol toggle lihat password (eye icon)
+  const setupToggle = (btnId, inputId) => {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    if (!btn || !input) return;
 
+    btn.addEventListener('click', () => {
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.textContent = isPass ? 'visibility_off' : 'visibility';
+      }
+      btn.setAttribute('title', isPass ? 'Sembunyikan kata sandi' : 'Lihat kata sandi');
+    });
+  };
+
+  setupToggle('btnToggleProfPass', 'profPassword');
+  setupToggle('btnToggleProfPassConfirm', 'profPasswordConfirm');
+
+  // Event handler submit pembaruan profil mandiri
   document.getElementById('formSelfProfile')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const newNama = document.getElementById('profNama').value.trim();
     const newEmail = document.getElementById('profEmail').value.trim();
     const newNoWa = document.getElementById('profNoWa').value.trim();
-    const newTingkatan = profTingkatan.value;
-    const newPeran = profPeran.value;
-    const selectedDesaOption = profDesa.options[profDesa.selectedIndex];
-    const selectedKelOption = profKelompok.options[profKelompok.selectedIndex];
     const newPassword = document.getElementById('profPassword').value;
+    const confirmPassword = document.getElementById('profPasswordConfirm').value;
 
+    if (!newNama || !newEmail || !newNoWa) {
+      showToast('Nama lengkap, email, dan nomor WhatsApp wajib diisi.', 'error');
+      return;
+    }
+
+    // Validasi kata sandi baru jika diisi
+    if (newPassword) {
+      if (newPassword.length < 6) {
+        showToast('Kata sandi baru minimal terdiri dari 6 karakter.', 'error');
+        document.getElementById('profPassword').focus();
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        showToast('Konfirmasi kata sandi baru tidak cocok dengan kata sandi baru.', 'error');
+        document.getElementById('profPasswordConfirm').focus();
+        return;
+      }
+    }
+
+    const saveBtn = document.getElementById('btnSaveSelfProfile');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> <span class="btn-text">Menyimpan...</span>`;
+    }
+
+    // Keamanan RBAC: Hanya mengirimkan Nama, Email, No WA, dan Password baru jika ada.
+    // Tingkatan, peran, dan wilayah asal tetap terkunci aman dan tidak dapat dinaikkan sendiri oleh user.
     const res = await updateCurrentProfile(currentUser.id, {
-      email: newEmail,
       nama: newNama,
+      email: newEmail,
       noWa: newNoWa,
-      tingkatan: newTingkatan,
-      peran: newPeran,
-      jabatan: newPeran,
-      desaId: profDesa.value,
-      desaNama: selectedDesaOption?.dataset.name || 'Barat',
-      kelompokId: profKelompok.value,
-      kelompokNama: selectedKelOption?.dataset.name || 'Gentan',
       password: newPassword || undefined
     });
 
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `<span class="material-symbols-outlined">save</span> <span class="btn-text">Simpan Perubahan</span>`;
+    }
+
     if (res.success) {
+      // Perbarui sesi aktif di memori dengan tetap mempertahankan wewenang asli
       const updated = {
         ...currentUser,
         nama: newNama,
         email: newEmail,
-        noWa: newNoWa,
-        tingkatan: newTingkatan,
-        peran: newPeran,
-        jabatan: newPeran,
-        desaId: profDesa.value,
-        desaNama: selectedDesaOption?.dataset.name || 'Barat',
-        kelompokId: profKelompok.value,
-        kelompokNama: selectedKelOption?.dataset.name || 'Gentan',
-        isSuperadmin: newTingkatan === 'daerah' ? true : currentUser.isSuperadmin
+        noWa: newNoWa
       };
+      if (newPassword) {
+        updated.password = newPassword;
+      }
       setCurrentUser(updated);
 
       renderUserProfile();
-      renderKelompokGrid();
       closeModal();
-      showToast(`Profil "${newNama}" berhasil disimpan & diperbarui!`, 'success');
+      showToast(newPassword
+        ? `Profil & kata sandi "${newNama}" berhasil diperbarui!`
+        : `Profil "${newNama}" berhasil diperbarui!`, 'success');
+    } else {
+      showToast(res.message || 'Gagal menyimpan perubahan profil.', 'error');
     }
   });
 }
@@ -444,13 +506,13 @@ export function renderKelompokGrid() {
       </div>
       <div>
         ${hasPengurus
-          ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak">
+        ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak">
               <span class="material-symbols-outlined text-[16px]">visibility</span>
              </button>`
-          : `<button type="button" class="btn-view-kontak-empty flex items-center justify-center p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
+        : `<button type="button" class="btn-view-kontak-empty flex items-center justify-center p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
               <span class="material-symbols-outlined text-[16px]">visibility_off</span>
              </button>`
-        }
+      }
       </div>
     `;
 
@@ -558,7 +620,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
 
   // Desktop Sidebar Listeners
   document.getElementById('sideBtnLogout')?.addEventListener('click', doLogout);
-  
+
   document.getElementById('sideBtnProker')?.addEventListener('click', () => { renderProkerModal(); });
   document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   document.getElementById('sideBtnSiswa')?.addEventListener('click', () => { renderSiswaModal(); });
@@ -656,11 +718,11 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     // Cross-check session against live data and update UI
     const livePengurus = getPengurusList();
     const liveAccount = livePengurus.find(p => p.id === currentUser.id || p.email === currentUser.email);
-    
+
     if (liveAccount) {
       setCurrentUser({ ...currentUser, ...liveAccount });
     }
-    
+
     // Re-render UI with freshly synced live data from Supabase
     renderUserProfile();
     renderDesaTabs();

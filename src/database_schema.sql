@@ -345,6 +345,13 @@ CREATE TABLE IF NOT EXISTS event_pembiasaan (
     habit_3 VARCHAR(150),
     habit_4 VARCHAR(150),
     
+    -- Bobot Poin Maksimal per Butir Pembiasaan
+    -- Default: Pembiasaan Penting = 30 poin, Additional = 10 poin
+    habit_max_1 INT DEFAULT 30,
+    habit_max_2 INT DEFAULT 30,
+    habit_max_3 INT DEFAULT 10,
+    habit_max_4 INT DEFAULT 10,
+    
     dibuat_oleh_id UUID REFERENCES pengurus(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -537,3 +544,13 @@ EXCEPTION
     WHEN OTHERS THEN
         NULL; -- Lewati jika tabel sudah ada di publikasi
 END $$;
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 12. SKRIP MIGRASI PEMBAHARUAN FORMAT PENILAIAN PEMBIASAAN CABERAWIT
+-- Jalankan skrip ini pada Supabase SQL Editor jika tabel event_pembiasaan sudah ada sebelumnya:
+-- ═══════════════════════════════════════════════════════════════════════════
+ALTER TABLE event_pembiasaan 
+ADD COLUMN IF NOT EXISTS habit_max_1 INT DEFAULT 30,
+ADD COLUMN IF NOT EXISTS habit_max_2 INT DEFAULT 30,
+ADD COLUMN IF NOT EXISTS habit_max_3 INT DEFAULT 10,
+ADD COLUMN IF NOT EXISTS habit_max_4 INT DEFAULT 10;

@@ -46,7 +46,7 @@
     rel="stylesheet" />
 
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=5.5" />
+  <link rel="stylesheet" href="dashboard.css?v=6.2" />
 
   <!-- SheetJS Pustaka Excel (.xlsx / .xls) Asli (Client-side) -->
   <script src="../../src/vendor/xlsx.full.min.js"></script>
@@ -656,8 +656,8 @@
           <h3
             class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
             Database &amp; Input Generus</h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Kelola profil lengkap, NIK, alamat, mutasi
-            cabang, dan riwayat semester Generus.</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1">Kelola profil lengkap, Desa, Kelompok, Usia,
+            dan Status Sambung.</p>
           <div class="flex items-center justify-between text-sm font-bold text-purple-600 dark:text-purple-400">
             <span>Buka Database</span>
             <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -889,10 +889,6 @@
             class="flex items-center gap-3 w-full text-left p-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <span class="material-symbols-outlined text-blue-500 text-[20px]">assignment</span> Program Kerja
           </button>
-          <button id="mobBtnStruktur"
-            class="flex items-center gap-3 w-full text-left p-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-            <span class="material-symbols-outlined text-blue-500 text-[20px]">account_tree</span> Struktur Pengurus
-          </button>
           <button id="mobBtnSiswa"
             class="flex items-center gap-3 w-full text-left p-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <span class="material-symbols-outlined text-blue-500 text-[20px]">group</span> Database Generus
@@ -934,7 +930,7 @@
     class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
-  <script type="module" src="dashboard.js?v=5.1"></script>
+  <script type="module" src="dashboard.js?v=6.2"></script>
 </body>
 
 </html>

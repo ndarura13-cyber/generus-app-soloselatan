@@ -437,14 +437,29 @@ export async function fetchEventPembiasaanFromSupabase() {
     const formattedData = data.map(evt => {
       const habits = [];
       if (evt.habit_1) habits.push(evt.habit_1);
-      if (evt.habit_2) habits.push(evt.habit_2);
-      if (evt.habit_3) habits.push(evt.habit_3);
-      if (evt.habit_4) habits.push(evt.habit_4);
+      const habitMax = [];
+      if (evt.habit_1) {
+        habits.push(evt.habit_1);
+        habitMax.push(Number(evt.habit_max_1) || 30);
+      }
+      if (evt.habit_2) {
+        habits.push(evt.habit_2);
+        habitMax.push(Number(evt.habit_max_2) || 30);
+      }
+      if (evt.habit_3) {
+        habits.push(evt.habit_3);
+        habitMax.push(Number(evt.habit_max_3) || 10);
+      }
+      if (evt.habit_4) {
+        habits.push(evt.habit_4);
+        habitMax.push(Number(evt.habit_max_4) || 10);
+      }
       return {
         id: evt.id,
         judul_periode: evt.judul_periode,
         status: evt.status,
         habits: habits,
+        habit_max: habitMax,
         created_at: evt.created_at,
         updated_at: evt.updated_at
       };
@@ -468,6 +483,10 @@ export async function upsertEventPembiasaanToSupabase(evtData) {
       habit_2: evtData.habits?.[1] || null,
       habit_3: evtData.habits?.[2] || null,
       habit_4: evtData.habits?.[3] || null,
+      habit_max_1: evtData.habit_max?.[0] ?? (evtData.habits?.[0] ? 30 : null),
+      habit_max_2: evtData.habit_max?.[1] ?? (evtData.habits?.[1] ? 30 : null),
+      habit_max_3: evtData.habit_max?.[2] ?? (evtData.habits?.[2] ? 10 : null),
+      habit_max_4: evtData.habit_max?.[3] ?? (evtData.habits?.[3] ? 10 : null),
     };
     
     const isUuid = typeof evtData.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evtData.id);
@@ -475,27 +494,55 @@ export async function upsertEventPembiasaanToSupabase(evtData) {
       payload.id = evtData.id;
     }
 
-    const { data, error } = await client
+    let { data, error } = await client
       .from("event_pembiasaan")
       .upsert([payload], { onConflict: "id" })
       .select();
 
+    if (error && error.message && error.message.includes('habit_max')) {
+      console.warn("Kolom habit_max belum ada di Supabase, fallback simpan tanpa habit_max...");
+      delete payload.habit_max_1;
+      delete payload.habit_max_2;
+      delete payload.habit_max_3;
+      delete payload.habit_max_4;
+      const retry = await client
+        .from("event_pembiasaan")
+        .upsert([payload], { onConflict: "id" })
+        .select();
+      data = retry.data;
+      error = retry.error;
+    }
+
     if (error) throw error;
     
-    const returnedRow = data[0];
+    const returnedRow = data[0] || {};
     const habits = [];
-    if (returnedRow.habit_1) habits.push(returnedRow.habit_1);
-    if (returnedRow.habit_2) habits.push(returnedRow.habit_2);
-    if (returnedRow.habit_3) habits.push(returnedRow.habit_3);
-    if (returnedRow.habit_4) habits.push(returnedRow.habit_4);
+    const habitMax = [];
+    if (returnedRow.habit_1 || evtData.habits?.[0]) {
+      habits.push(returnedRow.habit_1 || evtData.habits?.[0]);
+      habitMax.push(Number(returnedRow.habit_max_1) || evtData.habit_max?.[0] || 30);
+    }
+    if (returnedRow.habit_2 || evtData.habits?.[1]) {
+      habits.push(returnedRow.habit_2 || evtData.habits?.[1]);
+      habitMax.push(Number(returnedRow.habit_max_2) || evtData.habit_max?.[1] || 30);
+    }
+    if (returnedRow.habit_3 || evtData.habits?.[2]) {
+      habits.push(returnedRow.habit_3 || evtData.habits?.[2]);
+      habitMax.push(Number(returnedRow.habit_max_3) || evtData.habit_max?.[2] || 10);
+    }
+    if (returnedRow.habit_4 || evtData.habits?.[3]) {
+      habits.push(returnedRow.habit_4 || evtData.habits?.[3]);
+      habitMax.push(Number(returnedRow.habit_max_4) || evtData.habit_max?.[3] || 10);
+    }
       
     const formatted = {
-      id: returnedRow.id,
-      judul_periode: returnedRow.judul_periode,
-      status: returnedRow.status,
+      id: returnedRow.id || evtData.id,
+      judul_periode: returnedRow.judul_periode || evtData.judul_periode,
+      status: returnedRow.status || evtData.status,
       habits: habits,
-      created_at: returnedRow.created_at,
-      updated_at: returnedRow.updated_at
+      habit_max: habitMax,
+      created_at: returnedRow.created_at || evtData.created_at,
+      updated_at: returnedRow.updated_at || new Date().toISOString()
     };
 
     return { success: true, data: formatted };

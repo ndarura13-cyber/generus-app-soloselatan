@@ -308,19 +308,19 @@ export function renderCetakAbsensiModal(activeTab = 'event_list') {
       <!-- Urutan Data Hidden/Default -->
       <input type="hidden" id="modalSelUrutan" value="official" />
 
-      <!-- ACTIONS -->
-      <div class="modal-sticky-footer" style="margin-top:8px;display:flex;gap:8px;">
-        <button type="button" id="btnBatalKeEventList" style="flex:1;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
-          Kembali
+      <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
+      <div class="modal-sticky-footer">
+        <button type="button" id="btnBatalKeEventList" class="btn-sticky-back" title="Kembali ke Tabel">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali ke Tabel</span>
         </button>
-        <button type="button" id="btnCetakLangsungTanpaSimpan" style="flex:1.5;padding:11px;background:var(--bg);color:#334155;border:1.5px solid #cbd5e1;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
-          <span class="material-symbols-outlined" style="font-size:17px;">print</span>
-          Cetak Saja
+        <button type="button" id="btnCetakLangsungTanpaSimpan" class="btn-sticky-print" title="Cetak Saja">
+          <span class="material-symbols-outlined">print</span>
+          <span class="btn-text">Cetak Saja</span>
         </button>
-        <button type="submit" id="btnSubmitEventKbm" style="flex:2;padding:11px;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-weight:800;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 8px rgba(34,197,94,0.35);">
-          <span class="material-symbols-outlined" style="font-size:18px;">save</span>
-          Simpan Event &amp; Buka Cetak
+        <button type="submit" id="btnSubmitEventKbm" class="btn-sticky-save" title="Simpan Event KBM">
+          <span class="material-symbols-outlined">save</span>
+          <span class="btn-text">Simpan Event KBM</span>
         </button>
       </div>
     </form>
@@ -703,21 +703,21 @@ export function renderFormRekapKehadiranModal(eventId) {
         </div>
       </div>
 
-      <!-- ACTIONS -->
-      <div class="modal-sticky-footer" style="margin-top:6px;display:flex;gap:8px;">
-        <button type="button" id="btnBackToEventList" style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;">
-          ← Kembali ke Event
+      <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
+      <div class="modal-sticky-footer">
+        <button type="button" id="btnBackToEventList" class="btn-sticky-back" title="Kembali ke Tabel">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali ke Tabel</span>
         </button>
-        <button type="button" id="btnSimpanDanCetakLaporan" style="flex:1.5;padding:12px;background:#fdf2f8;color:#db2777;border:1.5px solid #fbcfe8;border-radius:8px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;">
-          <span class="material-symbols-outlined" style="font-size:17px;">print</span>
-          Simpan &amp; Cetak PDF
+        <button type="button" id="btnSimpanDanCetakLaporan" class="btn-sticky-print" title="Simpan &amp; Cetak PDF">
+          <span class="material-symbols-outlined">print</span>
+          <span class="btn-text">Simpan &amp; Cetak PDF</span>
         </button>
-        <button type="button" id="btnSimpanRekap" style="flex:2;padding:12px;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;box-shadow:0 3px 8px rgba(34,197,94,0.35);">
-          <span class="material-symbols-outlined" style="font-size:18px;">save</span>
-          Simpan Laporan Kehadiran
+        <button type="button" id="btnSimpanRekap" class="btn-sticky-save" title="Simpan Laporan Kehadiran">
+          <span class="material-symbols-outlined">save</span>
+          <span class="btn-text">Simpan Laporan</span>
         </button>
       </div>
-
     </div>
   `;
 

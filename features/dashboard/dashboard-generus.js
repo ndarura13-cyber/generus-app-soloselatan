@@ -744,12 +744,12 @@ export function exportGenerusToExcel(filteredOnly = false) {
   const shouldFilter = filteredOnly || !isSuperadminOrDaerah;
   const targetList = shouldFilter
     ? allSiswa.filter(s => {
-        if (currentSiswaFilter.desa !== 'all' && s.desa_id !== currentSiswaFilter.desa) return false;
-        if (currentSiswaFilter.kelompok !== 'all' && s.kelompok_id !== currentSiswaFilter.kelompok) return false;
-        if (currentSiswaFilter.jenjang !== 'all' && s.kategori_usia !== currentSiswaFilter.jenjang) return false;
-        if (currentSiswaFilter.status !== 'all' && s.status_sambung !== currentSiswaFilter.status) return false;
-        return true;
-      })
+      if (currentSiswaFilter.desa !== 'all' && s.desa_id !== currentSiswaFilter.desa) return false;
+      if (currentSiswaFilter.kelompok !== 'all' && s.kelompok_id !== currentSiswaFilter.kelompok) return false;
+      if (currentSiswaFilter.jenjang !== 'all' && s.kategori_usia !== currentSiswaFilter.jenjang) return false;
+      if (currentSiswaFilter.status !== 'all' && s.status_sambung !== currentSiswaFilter.status) return false;
+      return true;
+    })
     : allSiswa;
 
   if (targetList.length === 0) {
@@ -2309,7 +2309,7 @@ export function renderSiswaFormModal(existingData = null) {
         </div>
       </div>
 
-      <!-- Domisili & Status Mutasi -->
+      <!-- Domisili & Status Sambung -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;">Domisili</label>
@@ -2319,7 +2319,7 @@ export function renderSiswaFormModal(existingData = null) {
           </select>
         </div>
         <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;">Status Mutasi</label>
+          <label style="font-weight:700;display:block;margin-bottom:4px;">Status Sambung</label>
           <select id="sMutasi" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;">
             <option value="Sambung" ${existingData && existingData.status_sambung === 'Sambung' ? 'selected' : ''}>Sambung (Aktif)</option>
             <option value="Pindah Sambung" ${existingData && existingData.status_sambung === 'Pindah Sambung' ? 'selected' : ''}>Pindah Sambung</option>
@@ -2328,14 +2328,23 @@ export function renderSiswaFormModal(existingData = null) {
         </div>
       </div>
 
-      <!-- Sticky Actions Footer -->
+      <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
       <div class="modal-sticky-footer">
-        <button type="button" class="btn-cancel-siswa">← Kembali</button>
-        <button type="submit" class="btn-submit-siswa">💾 Simpan Data</button>
+        ${isEdit ? `
+          <button type="button" id="btnDeleteSiswa" class="btn-sticky-delete btn-delete-siswa" title="Hapus Data Generus">
+            <span class="material-symbols-outlined">delete</span>
+            <span class="btn-text">Hapus Data</span>
+          </button>
+        ` : ''}
+        <button type="button" class="btn-sticky-back btn-cancel-siswa" title="Kembali ke Tabel">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali ke Tabel</span>
+        </button>
+        <button type="submit" class="btn-sticky-save btn-submit-siswa" title="${isEdit ? 'Simpan Perubahan' : 'Simpan Data'}">
+          <span class="material-symbols-outlined">save</span>
+          <span class="btn-text">${isEdit ? 'Simpan Perubahan' : 'Simpan Data'}</span>
+        </button>
       </div>
-      ${isEdit ? `
-        <button type="button" id="btnDeleteSiswa" class="btn-delete-siswa">🗑 Hapus Data Generus Ini</button>
-      ` : ''}
     </form>
   `;
 

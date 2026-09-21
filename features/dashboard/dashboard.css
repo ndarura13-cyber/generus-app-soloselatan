@@ -1421,22 +1421,138 @@ body {
   }
 }
 
-/* Modal Sticky Bottom Actions */
+/* ═══════════════════════════════════════════════════════════════
+   MODAL STICKY BOTTOM ACTIONS (STANDARDIZED NAVIGATION)
+   ═══════════════════════════════════════════════════════════════ */
 .modal-sticky-footer {
   position: sticky;
   bottom: -20px;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: -20px;
+  margin-top: 20px;
+  padding: 14px 24px;
   background: #ffffff;
-  padding: 12px 0;
-  margin-top: 14px;
   border-top: 1px solid var(--border);
-  z-index: 20;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+  z-index: 30;
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 10px;
 }
 
 .dark .modal-sticky-footer {
   background: #0b1329 !important;
   border-top: 1px solid #1e293b !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Reusable buttons in sticky footer */
+.btn-sticky-back {
+  padding: 10px 18px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-sticky-back:hover {
+  background: var(--surface-2);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.btn-sticky-save {
+  padding: 10px 22px;
+  border: none;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  box-shadow: 0 4px 14px rgba(26, 86, 196, 0.28);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-sticky-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(26, 86, 196, 0.38);
+}
+
+.btn-sticky-save:active {
+  transform: translateY(0);
+}
+
+.btn-sticky-delete {
+  padding: 10px 16px;
+  background: #fef2f2;
+  color: var(--red);
+  border: 1.5px solid #fecaca;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  margin-right: auto;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-sticky-delete:hover {
+  background: #fee2e2;
+  border-color: var(--red);
+}
+
+.dark .btn-sticky-delete {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.btn-sticky-print {
+  padding: 10px 16px;
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1.5px solid #fbcfe8;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dark .btn-sticky-print {
+  background: rgba(219, 39, 119, 0.15);
+  border-color: rgba(219, 39, 119, 0.35);
+  color: #f472b6;
 }
 
 /* Habit Preset Chips */
@@ -1571,7 +1687,7 @@ body {
     border-radius: 10px !important;
   }
 
-  /* Modal Sticky Bottom Actions */
+  /* Modal Sticky Bottom Actions (Mobile View: Icon Only tanpa kata) */
   .modal-sticky-footer {
     position: sticky !important;
     bottom: -14px !important;
@@ -1583,17 +1699,22 @@ body {
     background: #ffffff !important;
     border-top: 1px solid var(--border) !important;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06) !important;
-    z-index: 25 !important;
+    z-index: 30 !important;
     display: flex !important;
-    gap: 10px !important;
+    justify-content: stretch !important;
+    gap: 8px !important;
   }
 
   .dark .modal-sticky-footer {
     background: #0b1329 !important;
     border-top: 1px solid #1e293b !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35) !important;
   }
 
-  .modal-sticky-footer button {
+  .modal-sticky-footer button,
+  .modal-sticky-footer .btn-sticky-back,
+  .modal-sticky-footer .btn-sticky-save,
+  .modal-sticky-footer .btn-sticky-print {
     flex: 1 !important;
     min-height: 44px !important;
     border-radius: 12px !important;
@@ -1602,6 +1723,29 @@ body {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    padding: 10px !important;
+  }
+
+  .modal-sticky-footer .btn-sticky-delete {
+    margin-right: 0 !important;
+    flex: 0 0 46px !important;
+    max-width: 48px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Sembunyikan teks label tombol di mobile view - CUKUP ICON SAJA TANPA KATA */
+  .modal-sticky-footer .btn-text,
+  .modal-sticky-footer button > span:not(.material-symbols-outlined) {
+    display: none !important;
+  }
+
+  .modal-sticky-footer .material-symbols-outlined {
+    font-size: 22px !important;
+    margin: 0 !important;
   }
 
   /* Table horizontal scrolling safety */
@@ -5003,7 +5147,10 @@ body {
   .btn-import-wizard .btn-label-text,
   .btn-export-csv .btn-label-text,
   .btn-import-csv .btn-label-text,
-  .btn-auto-promote .btn-label-text {
+  .btn-auto-promote .btn-label-text,
+  .btn-edit-pengurus .btn-label-text,
+  .btn-toggle-active .btn-label-text,
+  .btn-hapus-pengurus .btn-label-text {
     display: none !important;
   }
 
@@ -5018,6 +5165,17 @@ body {
     height: 38px !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
+  }
+
+  .btn-edit-pengurus,
+  .btn-toggle-active,
+  .btn-hapus-pengurus {
+    padding: 6px 8px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    gap: 0 !important;
   }
 
   .btn-tambah-siswa {
@@ -6465,3 +6623,1003 @@ body {
   color: #f87171 !important;
   border-color: rgba(239, 68, 68, 0.35) !important;
 }
+
+/* ── Password Visibility Toggle Icons ── */
+.btn-toggle-password {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  z-index: 5;
+}
+
+.btn-toggle-password:hover {
+  color: var(--blue);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .btn-toggle-password {
+  color: #64748b;
+}
+
+.dark .btn-toggle-password:hover {
+  color: #38bdf8;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PEMBIASAAN CABERAWIT: RESPONSIVE MOBILE CARDS & SCORING
+   ═══════════════════════════════════════════════════════════════ */
+.pembiasaan-desktop-view {
+  display: block;
+}
+
+.pembiasaan-mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pembiasaan-desktop-view {
+    display: none !important;
+  }
+  .pembiasaan-mobile-view {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.pembiasaan-student-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pembiasaan-student-card:focus-within {
+  border-color: var(--blue);
+  box-shadow: 0 4px 14px rgba(26, 86, 196, 0.12);
+}
+
+.pembiasaan-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 8px;
+}
+
+.pembiasaan-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.pembiasaan-card-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.pembiasaan-card-score-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.pembiasaan-card-total-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--blue);
+  line-height: 1.1;
+}
+
+.pembiasaan-card-pct-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  margin-top: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.badge-pct-good {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-pct-fair {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-pct-poor {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.pembiasaan-card-habits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .pembiasaan-card-habits-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pembiasaan-habit-input-cell {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pembiasaan-habit-label-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.pembiasaan-habit-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.habit-badge-pill {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.habit-badge-penting {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.habit-badge-additional {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.pembiasaan-mobile-num-input {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  padding: 6px;
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.pembiasaan-mobile-num-input:focus {
+  border-color: var(--blue);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(26, 86, 196, 0.15);
+}
+
+.dark .pembiasaan-mobile-num-input {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Footer Rata-Rata */
+.pembiasaan-avg-row {
+  background: #f8fafc;
+  font-weight: 800;
+  border-top: 2px solid var(--border);
+}
+
+.dark .pembiasaan-avg-row {
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.pembiasaan-mobile-summary-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PEMBIASAAN ACCORDION & MOBILE OPTIMIZATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Dual-view switcher for Event List Modal */
+.event-desktop-view {
+  display: block;
+}
+
+.event-mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .event-desktop-view {
+    display: none !important;
+  }
+  .event-mobile-view {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Event Mobile Card (Accordion) */
+.event-mobile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease;
+}
+
+.event-mobile-card.open {
+  border-color: var(--blue);
+  box-shadow: 0 2px 8px rgba(26, 86, 196, 0.12);
+}
+
+.event-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.event-mobile-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.event-mobile-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-mobile-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Icon-only action button in mobile */
+.btn-event-icon-only {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+
+.btn-event-icon-only:active {
+  transform: scale(0.95);
+}
+
+.btn-event-icon-edit {
+  background: #f0f9ff;
+  color: var(--blue);
+  border-color: #bae6fd;
+}
+
+.btn-event-icon-open {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.btn-event-icon-delete {
+  background: #fef2f2;
+  color: var(--red);
+  border-color: #fca5a5;
+}
+
+.dark .btn-event-icon-edit {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.3);
+  color: #38bdf8;
+}
+
+.dark .btn-event-icon-delete {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.event-mobile-toggle-btn {
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.event-mobile-chevron,
+.pembiasaan-card-chevron {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  font-size: 20px;
+}
+
+.event-mobile-card.open .event-mobile-chevron,
+.pembiasaan-student-card.open .pembiasaan-card-chevron {
+  transform: rotate(180deg);
+}
+
+.event-mobile-detail {
+  display: none;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  flex-direction: column;
+  gap: 8px;
+  animation: modalBodyFadeIn 0.2s ease both;
+}
+
+.event-mobile-card.open .event-mobile-detail {
+  display: flex;
+}
+
+/* Student Card Dropdown / Accordion on Mobile */
+.pembiasaan-student-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pembiasaan-student-card.open {
+  border-color: var(--blue);
+  box-shadow: 0 2px 10px rgba(26, 86, 196, 0.12);
+}
+
+.pembiasaan-student-card .pembiasaan-card-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.pembiasaan-student-card .pembiasaan-card-habits-grid {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  animation: modalBodyFadeIn 0.2s ease both;
+}
+
+.pembiasaan-student-card.open .pembiasaan-card-habits-grid {
+  display: grid;
+}
+
+/* Reusable Pembiasaan Pagination Component */
+.pembiasaan-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.pembiasaan-page-info {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.pembiasaan-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pembiasaan-page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pembiasaan-page-btn:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.pembiasaan-page-btn.active {
+  background: var(--blue);
+  color: #ffffff;
+  border-color: var(--blue);
+  box-shadow: 0 2px 6px rgba(26, 86, 196, 0.25);
+}
+
+.pembiasaan-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dark .pembiasaan-page-btn {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.dark .pembiasaan-page-btn.active {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STRUKTUR PENGURUS DAERAH MODAL (CLEAN WEB & COMPACT MOBILE)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tabs Bar */
+.struktur-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+}
+
+.struktur-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.struktur-tab-btn {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.struktur-tab-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: #94a3b8;
+}
+
+.struktur-tab-btn.active {
+  background: var(--blue);
+  color: #ffffff;
+  border-color: var(--blue);
+  box-shadow: 0 2px 8px rgba(26, 86, 196, 0.25);
+}
+
+.struktur-tab-count {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.struktur-tab-btn.active .struktur-tab-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Search & Filter Bar */
+.struktur-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.struktur-search-input-box {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.struktur-search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.struktur-search-input {
+  width: 100%;
+  padding: 9px 12px 9px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 12.5px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.struktur-search-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26, 86, 196, 0.1);
+}
+
+.btn-toggle-filter-wilayah {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-filter-wilayah:hover,
+.btn-toggle-filter-wilayah.active {
+  background: var(--blue-light);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* Expandable Filter Strip */
+.struktur-wilayah-strip {
+  display: none;
+  background: var(--surface-2);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  animation: modalBodyFadeIn 0.2s ease both;
+}
+
+.struktur-wilayah-strip.open {
+  display: flex;
+}
+
+/* ── 1. Desktop View (2-Column Grid) ── */
+.struktur-desktop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.struktur-card-desktop {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.struktur-card-desktop:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border-color: rgba(26, 86, 196, 0.35);
+}
+
+.struktur-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.struktur-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.struktur-avatar-bph {
+  background: linear-gradient(135deg, #4338ca, #6366f1);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.struktur-info-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.struktur-nama {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.struktur-badge-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-top: 3px;
+}
+
+.badge-role-bph {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-role-bidang {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.struktur-asal-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.struktur-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+.btn-kontak-wa {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  font-weight: 700;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-kontak-wa:hover {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+.btn-kontak-email {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-kontak-email:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* ── 2. Mobile View (Compact Accordion Cards) ── */
+.struktur-mobile-list {
+  display: none;
+}
+
+.struktur-mobile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: all 0.2s ease;
+}
+
+.struktur-mobile-card.open {
+  border-color: var(--blue);
+  box-shadow: 0 2px 10px rgba(26, 86, 196, 0.12);
+}
+
+.struktur-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.struktur-mobile-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.struktur-avatar-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.struktur-avatar-mini-bph {
+  background: linear-gradient(135deg, #4338ca, #6366f1);
+}
+
+.struktur-mobile-name-wrap {
+  min-width: 0;
+  flex: 1;
+}
+
+.struktur-mobile-name {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.struktur-mobile-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.struktur-card-chevron {
+  font-size: 20px;
+  color: var(--text-muted);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+}
+
+.struktur-mobile-card.open .struktur-card-chevron {
+  transform: rotate(180deg);
+  color: var(--blue);
+}
+
+.struktur-mobile-detail {
+  display: none;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  flex-direction: column;
+  gap: 8px;
+  animation: modalBodyFadeIn 0.2s ease both;
+}
+
+.struktur-mobile-card.open .struktur-mobile-detail {
+  display: flex;
+}
+
+.struktur-mobile-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.struktur-mobile-actions a {
+  flex: 1;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .struktur-desktop-grid {
+    display: none !important;
+  }
+  .struktur-mobile-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Dark Mode Overrides */
+.dark .struktur-tab-btn {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.dark .struktur-tab-btn:hover {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.dark .struktur-tab-btn.active {
+  background: var(--blue);
+  color: #ffffff;
+  border-color: var(--blue);
+}
+
+.dark .struktur-tab-count {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.dark .btn-toggle-filter-wilayah {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .struktur-wilayah-strip {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+.dark .struktur-card-desktop,
+.dark .struktur-mobile-card {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+.dark .badge-role-bph {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.dark .badge-role-bidang {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.dark .btn-kontak-wa {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.dark .btn-kontak-wa:hover {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.dark .btn-kontak-email {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+

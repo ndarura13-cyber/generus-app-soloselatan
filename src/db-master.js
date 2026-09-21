@@ -23,8 +23,9 @@ import {
   upsertProkerToSupabase,
   deleteProkerFromSupabase,
   getSupabase,
-  fetchWilayahFromSupabase
 } from "./supabase.js";
+
+export { isSupabaseConfigured };
 
 export let MASTER_WILAYAH = {
   daerah: {
@@ -490,18 +491,14 @@ export async function deletePengurus(pengurusId) {
 export async function updateCurrentProfile(userId, profileData) {
   const list = getPengurusList();
   const idx = list.findIndex(p => p.id === userId || p.email === profileData.email);
-  const roleName = profileData.peran || profileData.jabatan || (idx !== -1 ? list[idx].peran : undefined) || "Pengurus";
 
   if (idx !== -1) {
-    list[idx].nama = profileData.nama || list[idx].nama;
-    list[idx].email = profileData.email || list[idx].email;
-    list[idx].noWa = profileData.noWa || list[idx].noWa;
-    list[idx].peran = roleName;
-    list[idx].jabatan = roleName;
-    if (profileData.desaId) list[idx].desaId = profileData.desaId;
-    if (profileData.desaNama) list[idx].desaNama = profileData.desaNama;
-    if (profileData.kelompokId) list[idx].kelompokId = profileData.kelompokId;
-    if (profileData.kelompokNama) list[idx].kelompokNama = profileData.kelompokNama;
+    // Keamanan RBAC: Hanya boleh mengubah data pribadi mandiri (Nama, Email, No WA, Password)
+    // Tingkatan, peran, jabatan, desa, dan kelompok TETAP TERKUNCI dan hanya dapat diubah oleh Superadmin di Kelola Hak Akses
+    list[idx].nama = profileData.nama ? profileData.nama.trim() : list[idx].nama;
+    list[idx].email = profileData.email ? profileData.email.trim() : list[idx].email;
+    list[idx].noWa = profileData.noWa ? profileData.noWa.trim() : list[idx].noWa;
+
     if (profileData.password) {
       list[idx].password = profileData.password;
     }
@@ -515,16 +512,18 @@ export async function updateCurrentProfile(userId, profileData) {
           nama: list[idx].nama,
           email: list[idx].email,
           no_wa: list[idx].noWa,
+          tingkatan: list[idx].tingkatan,
           peran: list[idx].peran,
           jabatan: list[idx].jabatan,
           desa_id: list[idx].desaId,
           desa_nama: list[idx].desaNama,
           kelompok_id: list[idx].kelompokId,
           kelompok_nama: list[idx].kelompokNama,
+          is_active: list[idx].isActive,
           updated_at: list[idx].updatedAt
         };
         if (list[idx].password) {
-           dbPayload.password = list[idx].password; 
+          dbPayload.password = list[idx].password; 
         }
         
         await upsertPengurusToSupabase(list[idx]);
@@ -534,22 +533,16 @@ export async function updateCurrentProfile(userId, profileData) {
     }
   }
 
-  // Update session
+  // Update session aktif di browser
   try {
     const rawSession = localStorage.getItem("ppg_user_session");
     if (rawSession) {
       const session = JSON.parse(rawSession);
       const updatedSession = {
         ...session,
-        nama: profileData.nama || session.nama,
-        email: profileData.email || session.email,
-        noWa: profileData.noWa || session.noWa,
-        peran: roleName,
-        jabatan: roleName,
-        desaId: profileData.desaId || session.desaId,
-        desaNama: profileData.desaNama || session.desaNama,
-        kelompokId: profileData.kelompokId || session.kelompokId,
-        kelompokNama: profileData.kelompokNama || session.kelompokNama,
+        nama: profileData.nama ? profileData.nama.trim() : session.nama,
+        email: profileData.email ? profileData.email.trim() : session.email,
+        noWa: profileData.noWa ? profileData.noWa.trim() : session.noWa,
       };
       if (profileData.password) {
         updatedSession.password = profileData.password;
@@ -898,6 +891,7 @@ export const MOCK_EVENT_PEMBIASAAN = [
       "Mencuci Piring",
       "Menjaga Adab Dalam Kamar Mandi"
     ],
+    habit_max: [30, 30, 10, 10],
     created_at: "2026-05-01T00:00:00Z"
   },
   {
@@ -910,21 +904,22 @@ export const MOCK_EVENT_PEMBIASAAN = [
       "Mencuci Piring",
       "Menjaga Adab Dalam Kamar Mandi"
     ],
+    habit_max: [30, 30, 10, 10],
     created_at: "2026-06-01T00:00:00Z"
   }
 ];
 
 export const MOCK_NILAI_PEMBIASAAN = [
-  // Data Event 001 (Mei) - Solo Baru
-  { event_id: "evt-001", siswa_id: "s-001", nilai: [85, 90, 100, 80] },
-  { event_id: "evt-001", siswa_id: "s-002", nilai: [90, 85, 95, 90] },
-  { event_id: "evt-001", siswa_id: "s-003", nilai: [80, 80, 80, 80] },
-  { event_id: "evt-001", siswa_id: "s-004", nilai: [100, 100, 100, 100] },
+  // Data Event 001 (Mei) - Solo Baru (Skala: Penting max 30, Additional max 10)
+  { event_id: "evt-001", siswa_id: "s-001", nilai: [26, 28, 9, 8] },
+  { event_id: "evt-001", siswa_id: "s-002", nilai: [27, 25, 10, 9] },
+  { event_id: "evt-001", siswa_id: "s-003", nilai: [24, 24, 8, 8] },
+  { event_id: "evt-001", siswa_id: "s-004", nilai: [30, 30, 10, 10] },
   
   // Data Event 002 (Juni) - Sondakan (sebagian sudah dinilai)
-  { event_id: "evt-002", siswa_id: "s-005", nilai: [95, 90, 85, 90] }, // Fidela
-  { event_id: "evt-002", siswa_id: "s-006", nilai: [16, 8, 14, 14] }, // Ken
-  { event_id: "evt-002", siswa_id: "s-007", nilai: [2, 0, 2, 21] },   // Faid
+  { event_id: "evt-002", siswa_id: "s-005", nilai: [28, 27, 9, 9] }, // Fidela
+  { event_id: "evt-002", siswa_id: "s-006", nilai: [16, 8, 6, 7] },  // Ken
+  { event_id: "evt-002", siswa_id: "s-007", nilai: [2, 0, 2, 8] },   // Faid
 ];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1280,46 +1275,84 @@ export function autoPromoteAllSiswa(options = { mode: "age" }) {
 const EVENT_PEMBIASAAN_STORAGE_KEY = "ppg_event_pembiasaan_v1";
 const NILAI_PEMBIASAAN_STORAGE_KEY = "ppg_nilai_pembiasaan_v1";
 
+export function clearPembiasaanLocalStorage() {
+  localStorage.removeItem(EVENT_PEMBIASAAN_STORAGE_KEY);
+  localStorage.removeItem(NILAI_PEMBIASAAN_STORAGE_KEY);
+}
+
 export function getEventPembiasaanList() {
   try {
     const raw = localStorage.getItem(EVENT_PEMBIASAAN_STORAGE_KEY);
     if (!raw) {
+      if (isSupabaseConfigured()) return [];
       localStorage.setItem(EVENT_PEMBIASAAN_STORAGE_KEY, JSON.stringify(MOCK_EVENT_PEMBIASAAN));
       return [...MOCK_EVENT_PEMBIASAAN];
     }
     const parsed = JSON.parse(raw);
-    if (parsed.length === 0) {
+    if (!Array.isArray(parsed)) {
+      if (isSupabaseConfigured()) return [];
       localStorage.setItem(EVENT_PEMBIASAAN_STORAGE_KEY, JSON.stringify(MOCK_EVENT_PEMBIASAAN));
       return [...MOCK_EVENT_PEMBIASAAN];
     }
-    return parsed;
+    if (parsed.length === 0) {
+      return [];
+    }
+    // Jika Supabase aktif, jangan gunakan data mock bawaan (evt-001 / evt-002)
+    let activeEvents = parsed;
+    if (isSupabaseConfigured()) {
+      const realEvents = parsed.filter(e => e.id !== 'evt-001' && e.id !== 'evt-002');
+      if (realEvents.length !== parsed.length) {
+        saveEventPembiasaanList(realEvents);
+        activeEvents = realEvents;
+      }
+    }
+    // Pastikan seluruh event memiliki array habit_max
+    return activeEvents.map(evt => {
+      const habits = Array.isArray(evt.habits) ? evt.habits : [];
+      let habitMax = Array.isArray(evt.habit_max) ? evt.habit_max : [];
+      if (habitMax.length !== habits.length) {
+        habitMax = habits.map((_, i) => (i < 2 ? 30 : 10));
+      }
+      return {
+        ...evt,
+        habits,
+        habit_max: habitMax
+      };
+    });
   } catch (e) {
-    return [...MOCK_EVENT_PEMBIASAAN];
+    return isSupabaseConfigured() ? [] : [...MOCK_EVENT_PEMBIASAAN];
   }
 }
 
 export function saveEventPembiasaanList(list) {
-  localStorage.setItem(EVENT_PEMBIASAAN_STORAGE_KEY, JSON.stringify(list));
+  localStorage.setItem(EVENT_PEMBIASAAN_STORAGE_KEY, JSON.stringify(list || []));
 }
 
 // Initial Sync helper
 export async function syncPembiasaanFromSupabase() {
-  if (!isSupabaseConfigured()) return;
+  if (!isSupabaseConfigured()) return { success: false, message: "Supabase belum terkonfigurasi" };
   const evRes = await fetchEventPembiasaanFromSupabase();
-  if (evRes.success && evRes.data) {
+  if (evRes.success && Array.isArray(evRes.data)) {
     saveEventPembiasaanList(evRes.data);
   }
   const nilRes = await fetchNilaiPembiasaanFromSupabase();
-  if (nilRes.success && nilRes.data) {
+  if (nilRes.success && Array.isArray(nilRes.data)) {
     saveNilaiPembiasaanList(nilRes.data);
   }
+  return { success: true, events: evRes.data, nilai: nilRes.data };
 }
 
 export async function addEventPembiasaan(data) {
+  const habits = data.habits || [];
+  let habitMax = Array.isArray(data.habit_max) && data.habit_max.length === habits.length
+    ? data.habit_max
+    : habits.map((_, i) => (i < 2 ? 30 : 10));
+
   let newEvent = {
     judul_periode: data.judul_periode || "Periode Baru",
     status: data.status || "berjalan",
-    habits: data.habits || [],
+    habits: habits,
+    habit_max: habitMax,
     created_at: new Date().toISOString()
   };
 
@@ -1412,22 +1445,34 @@ export function getNilaiPembiasaanList() {
   try {
     const raw = localStorage.getItem(NILAI_PEMBIASAAN_STORAGE_KEY);
     if (!raw) {
+      if (isSupabaseConfigured()) return [];
       localStorage.setItem(NILAI_PEMBIASAAN_STORAGE_KEY, JSON.stringify(MOCK_NILAI_PEMBIASAAN));
       return [...MOCK_NILAI_PEMBIASAAN];
     }
     const parsed = JSON.parse(raw);
-    if (parsed.length === 0) {
+    if (!Array.isArray(parsed)) {
+      if (isSupabaseConfigured()) return [];
       localStorage.setItem(NILAI_PEMBIASAAN_STORAGE_KEY, JSON.stringify(MOCK_NILAI_PEMBIASAAN));
       return [...MOCK_NILAI_PEMBIASAAN];
     }
+    if (parsed.length === 0) {
+      return [];
+    }
+    if (isSupabaseConfigured()) {
+      const realNilai = parsed.filter(n => n.event_id !== 'evt-001' && n.event_id !== 'evt-002');
+      if (realNilai.length !== parsed.length) {
+        saveNilaiPembiasaanList(realNilai);
+        return realNilai;
+      }
+    }
     return parsed;
   } catch (e) {
-    return [...MOCK_NILAI_PEMBIASAAN];
+    return isSupabaseConfigured() ? [] : [...MOCK_NILAI_PEMBIASAAN];
   }
 }
 
 export function saveNilaiPembiasaanList(list) {
-  localStorage.setItem(NILAI_PEMBIASAAN_STORAGE_KEY, JSON.stringify(list));
+  localStorage.setItem(NILAI_PEMBIASAAN_STORAGE_KEY, JSON.stringify(list || []));
 }
 
 export async function saveNilaiPembiasaan(event_id, siswa_id, nilaiArray) {

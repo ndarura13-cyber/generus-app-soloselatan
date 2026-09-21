@@ -342,12 +342,37 @@
     }
 
     .habit-pill {
-      background: var(--primary);
-      color: #fff;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .habit-badge-pill {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .habit-badge-penting {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .habit-badge-additional {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
     }
 
     /* ── TABLE ── */
@@ -617,10 +642,21 @@
       getEventPembiasaanList,
       getNilaiPembiasaanList,
       getSiswaList,
+      isSupabaseConfigured,
+      syncPembiasaanFromSupabase,
       MASTER_WILAYAH,
       getAllKelompok,
       calculateUmur
     } from '../../src/db-master.js';
+
+    // Auto-sync live data from Supabase if configured
+    if (isSupabaseConfigured()) {
+      try {
+        await syncPembiasaanFromSupabase();
+      } catch (e) {
+        console.warn('Laporan pembiasaan live sync failed:', e);
+      }
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('event');
@@ -723,8 +759,22 @@
       const closedDate = targetEvent.closed_at ? new Date(targetEvent.closed_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
       const printDate = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
-      // Habit legend
-      const habitLegend = targetEvent.habits.map((h, i) => `<span class="habit-pill">H${i + 1}: ${h}</span>`).join('');
+      const habitMax = Array.isArray(targetEvent.habit_max) && targetEvent.habit_max.length === targetEvent.habits.length
+        ? targetEvent.habit_max.map(v => parseInt(v) || 10)
+        : targetEvent.habits.map((_, i) => (i < 2 ? 30 : 10));
+      const totalMaxScore = habitMax.reduce((a, b) => a + b, 0);
+
+      // Habit legend with badges
+      const habitLegend = targetEvent.habits.map((h, i) => {
+        const hMax = habitMax[i] || (i < 2 ? 30 : 10);
+        const isPenting = hMax >= 30;
+        return `
+          <span class="habit-pill">
+            <span class="habit-badge-pill ${isPenting ? 'habit-badge-penting' : 'habit-badge-additional'}">${isPenting ? 'Penting' : 'Add.'} (${hMax}p)</span>
+            <span>H${i + 1}: ${h}</span>
+          </span>
+        `;
+      }).join('');
 
       // Build filter options
       const desaOptions = MASTER_WILAYAH.desa.map(d => `<option value="${d.id}">Desa ${d.nama}</option>`).join('');
@@ -753,6 +803,10 @@
             <div class="laporan-meta-item">
               <label>Status Event</label>
               <strong><span class="${targetEvent.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${targetEvent.status === 'berjalan' ? '🟢 Berjalan' : '🔒 Selesai'}</span></strong>
+            </div>
+            <div class="laporan-meta-item">
+              <label>Total Bobot Poin</label>
+              <strong>${totalMaxScore} Poin (${targetEvent.habits.length} Pembiasaan)</strong>
             </div>
             <div class="laporan-meta-item">
               <label>Tanggal Dibuat</label>
@@ -792,8 +846,11 @@
                 <th style="text-align:left;min-width:180px;">Nama Generus</th>
                 <th>Usia</th>
                 <th>Kel.</th>
-                ${targetEvent.habits.map((h, i) => `<th title="${h}">H${i + 1}</th>`).join('')}
-                <th>Total</th>
+                ${targetEvent.habits.map((h, i) => {
+                  const hMax = habitMax[i] || (i < 2 ? 30 : 10);
+                  return `<th title="${h}">H${i + 1}<br/><span style="font-size:9.5px;font-weight:400;opacity:0.85;">(Maks ${hMax})</span></th>`;
+                }).join('')}
+                <th>Total Capaian</th>
                 <th>Ket.</th>
               </tr>
             </thead>
@@ -860,30 +917,48 @@
           const nilaiObj = allNilai.find(n => n.siswa_id === s.id);
           const nilais = nilaiObj ? nilaiObj.nilai : new Array(targetEvent.habits.length).fill(0);
           const total = nilais.reduce((a, b) => a + parseInt(b || 0), 0);
-          const max = targetEvent.habits.length * 100;
-          const pct = max > 0 ? Math.round((total / max) * 100) : 0;
-          const ket = pct >= 80 ? '✅ Baik' : pct >= 50 ? '⚠️ Cukup' : '❌ Kurang';
+          const pct = totalMaxScore > 0 ? Math.round((total / totalMaxScore) * 1000) / 10 : 0;
+          const ket = pct >= 75 ? '✅ Baik' : (pct >= 50 ? '⚠️ Cukup' : '❌ Kurang');
 
           nilais.forEach((v, i) => habitTotals[i] += parseInt(v || 0));
           grandTotal += total;
 
           return `<tr>
-            <td>${idx + 1}</td>
-            <td style="text-align:left;">${s.nama_lengkap}</td>
-            <td>${calculateUmur(s.tanggal_lahir)}</td>
-            <td>${s.kelompok_nama || '-'}</td>
-            ${nilais.map(v => `<td>${parseInt(v) || 0}</td>`).join('')}
-            <td><strong>${total}</strong></td>
-            <td style="white-space:nowrap;">${ket}</td>
+            <td style="text-align:center;">${idx + 1}</td>
+            <td style="text-align:left;font-weight:600;">${s.nama_lengkap}</td>
+            <td style="text-align:center;">${calculateUmur(s.tanggal_lahir)}</td>
+            <td style="text-align:center;">${s.kelompok_nama || '-'}</td>
+            ${nilais.map(v => `<td style="text-align:center;font-weight:600;">${parseInt(v) || 0}</td>`).join('')}
+            <td style="text-align:center;">
+              <strong>${total}</strong> <span style="font-size:10px;color:var(--text-muted);">/ ${totalMaxScore}</span>
+              <div style="font-size:10px;font-weight:800;color:${pct >= 75 ? '#166534' : (pct >= 50 ? '#b45309' : '#dc2626')};">${pct}%</div>
+            </td>
+            <td style="text-align:center;white-space:nowrap;font-weight:700;">${ket}</td>
           </tr>`;
         }).join('');
 
-        tfoot.innerHTML = `<tr>
-          <td colspan="4" style="text-align:left;">Total Keseluruhan (${filtered.length} siswa)</td>
-          ${habitTotals.map(v => `<td>${v}</td>`).join('')}
-          <td><strong>${grandTotal}</strong></td>
-          <td>–</td>
-        </tr>`;
+        const avgPerHabit = habitTotals.map(sum => (sum / filtered.length).toFixed(1));
+        const avgTotal = (grandTotal / filtered.length).toFixed(1);
+        const avgPct = totalMaxScore > 0 ? ((grandTotal / (filtered.length * totalMaxScore)) * 100).toFixed(1) : 0;
+        const avgKet = avgPct >= 75 ? '✅ Baik' : (avgPct >= 50 ? '⚠️ Cukup' : '❌ Kurang');
+
+        tfoot.innerHTML = `
+          <tr style="background:#f1f5f9;font-weight:700;border-top:2px solid var(--primary);">
+            <td colspan="4" style="text-align:left;padding:8px 12px;">Total Skor (${filtered.length} siswa)</td>
+            ${habitTotals.map(v => `<td style="text-align:center;">${v}</td>`).join('')}
+            <td style="text-align:center;"><strong>${grandTotal}</strong></td>
+            <td style="text-align:center;">–</td>
+          </tr>
+          <tr style="background:#e2e8f0;font-weight:800;">
+            <td colspan="4" style="text-align:left;padding:8px 12px;color:var(--primary-dark);">Rata-rata Kelompok</td>
+            ${avgPerHabit.map((avg, i) => `<td style="text-align:center;">${avg}<br/><span style="font-size:9.5px;color:var(--text-muted);font-weight:600;">/${habitMax[i]}</span></td>`).join('')}
+            <td style="text-align:center;color:var(--primary-dark);">
+              <div>${avgTotal} <span style="font-size:9.5px;color:var(--text-muted);font-weight:600;">/ ${totalMaxScore}</span></div>
+              <div style="font-size:10.5px;">${avgPct}%</div>
+            </td>
+            <td style="text-align:center;font-weight:800;">${avgKet}</td>
+          </tr>
+        `;
       }
 
       renderTable();

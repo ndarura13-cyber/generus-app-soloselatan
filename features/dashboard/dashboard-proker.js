@@ -910,12 +910,15 @@ export async function renderAddEditProkerForm(p = null) {
         <textarea id="prokerInputRincianBiaya" rows="3" placeholder="Contoh: Konsumsi (100 org x Rp 25.000): Rp 2.500.000, Sewa Aula & Sound System: Rp 1.500.000, Modul & Hadiah: Rp 1.000.000" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.5;resize:vertical;">${isEdit ? (p.rincianBiaya || '') : ''}</textarea>
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px;border-top:1px solid var(--border);padding-top:14px;">
-        <button type="button" class="btn-cancel-proker-form" style="padding:10px 18px;border:1px solid var(--border);background:var(--surface);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
-          Kembali ke Tabel
+      <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
+      <div class="modal-sticky-footer">
+        <button type="button" class="btn-sticky-back btn-cancel-proker-form" title="Kembali ke Tabel">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali ke Tabel</span>
         </button>
-        <button type="submit" style="padding:10px 22px;border:none;background:linear-gradient(135deg, var(--blue), var(--blue-dark));color:#fff;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(26,86,196,.3);">
-          <span class="material-symbols-outlined" style="font-size:16px;">save</span> ${isEdit ? 'Simpan Perubahan' : 'Posting Program'}
+        <button type="submit" class="btn-sticky-save" title="${isEdit ? 'Simpan Perubahan' : 'Simpan Program'}">
+          <span class="material-symbols-outlined">save</span>
+          <span class="btn-text">${isEdit ? 'Simpan Perubahan' : 'Simpan Program'}</span>
         </button>
       </div>
     </form>
