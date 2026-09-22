@@ -1198,60 +1198,155 @@ export function naikkanJenjangSatuTingkat(currentJenjang) {
 }
 
 /**
- * Eksekusi Kenaikan Jenjang Massal untuk seluruh siswa
- * @param {Object} options - { mode: 'age' | 'annual_step' }
- * - 'age': Menyesuaikan kelas sesuai usia hari ini berdasarkan tanggal_lahir
- * - 'annual_step': Menaikkan seluruh siswa sekolah 1 jenjang ke atas (+1 kelas tahunan)
+ * Dapatkan informasi tahun ajaran aktif dan batas cut-off bulan Agustus
+ * @param {Date} refDate - Tanggal acuan (default hari ini)
  */
-export function autoPromoteAllSiswa(options = { mode: "age" }) {
-  const mode = options.mode || "age";
-  const list = getSiswaList();
-  const changes = [];
+export function getAcademicYearInfo(refDate = new Date()) {
+  const d = new Date(refDate);
+  const year = d.getFullYear();
+  const month = d.getMonth(); // 0 = Jan, 7 = Agu, 8 = Sep ... 11 = Des
+  const isAfterAugust = month >= 8;
+  
+  // Jika setelah Agustus (Sep–Des): tahun ajaran dimulai tahun ini (year / year+1)
+  // Jika Jan–Agu: tahun ajaran dimulai tahun lalu (year-1 / year)
+  const academicStartYear = isAfterAugust ? year : year - 1;
+  const academicYearLabel = `${academicStartYear}/${academicStartYear + 1}`;
+  
+  // Cut-off tanggal input: 31 Agustus pukul 23:59:59 pada tahun dimulainya tahun ajaran
+  const cutOffDate = new Date(academicStartYear, 7, 31, 23, 59, 59, 999);
 
-  const updatedList = list.map(siswa => {
-    // Hanya proses generus aktif (Sambung)
-    if (!isSiswaAktif(siswa)) return siswa;
+  return {
+    currentYear: year,
+    currentMonth: month,
+    isAfterAugust,
+    academicStartYear,
+    academicYearLabel,
+    cutOffDate
+  };
+}
 
-    let targetKat = siswa.kategori_usia;
-    let targetKelas = siswa.jenjang_kelas;
+/**
+ * Hitung pratinjau Kenaikan Jenjang Massal untuk seluruh siswa aktif:
+ * - Bertambah 1 tingkat ke jenjang berikutnya (PAUD s.d. SMA/Pra-Nikah)
+ * - Hanya untuk generus yang diinput sebelum/pada bulan Agustus
+ * - Generus yang diinput setelah Agustus pada tahun ajaran berjalan TIDAK BERTAMBAH
+ * - Generus yang tinggal kelas dapat disesuaikan secara manual oleh pamong
+ */
+export function calculateMassPromotionPreview(refDate = new Date()) {
+  const academicInfo = getAcademicYearInfo(refDate);
+  const allList = getSiswaList();
+  
+  const eligible = [];
+  const skipped = [];
 
-    if (mode === "age") {
-      if (siswa.tanggal_lahir) {
-        const res = determineJenjangByAge(siswa.tanggal_lahir, siswa.jenjang_kelas);
-        targetKat = res.kategori_usia;
-        targetKelas = res.jenjang_kelas;
-      }
-    } else if (mode === "annual_step") {
-      const res = naikkanJenjangSatuTingkat(siswa.jenjang_kelas);
-      if (res.berubah) {
-        targetKat = res.kategori_usia;
-        targetKelas = res.jenjang_kelas;
+  allList.forEach(siswa => {
+    // 1. Filter hanya generus aktif (Sambung)
+    if (!isSiswaAktif(siswa)) {
+      skipped.push({
+        siswa,
+        reason: "Non-Aktif",
+        detail: `Status: ${siswa.status_sambung || 'Bukan Sambung'}`
+      });
+      return;
+    }
+
+    // 2. Cek apakah sudah pernah dinaikkan untuk periode tahun ajaran ini
+    if (siswa.last_promoted_academic_year === academicInfo.academicYearLabel) {
+      skipped.push({
+        siswa,
+        reason: "Sudah Dinaikkan",
+        detail: `Sudah dipromosikan pada T.A. ${academicInfo.academicYearLabel}`
+      });
+      return;
+    }
+
+    // 3. Cek tanggal input data (created_at)
+    if (siswa.created_at) {
+      const createdDate = new Date(siswa.created_at);
+      if (!isNaN(createdDate.getTime()) && createdDate > academicInfo.cutOffDate) {
+        skipped.push({
+          siswa,
+          reason: "Input Setelah Agustus",
+          detail: `Diinput ${createdDate.toLocaleDateString('id-ID')} (setelah 31 Agustus ${academicInfo.academicStartYear})`
+        });
+        return;
       }
     }
 
-    if (targetKat !== siswa.kategori_usia || targetKelas !== siswa.jenjang_kelas) {
-      changes.push({
+    // 4. Cek urutan jenjang berikutnya (+1 tingkat)
+    const nextStep = naikkanJenjangSatuTingkat(siswa.jenjang_kelas);
+    if (!nextStep.berubah) {
+      skipped.push({
+        siswa,
+        reason: "Jenjang Maksimal/Khusus",
+        detail: `Kelas saat ini (${siswa.jenjang_kelas}) tidak memiliki jenjang otomatis`
+      });
+      return;
+    }
+
+    // Memenuhi semua syarat kenaikan
+    eligible.push({
+      siswa,
+      fromKat: siswa.kategori_usia,
+      fromKelas: siswa.jenjang_kelas,
+      toKat: nextStep.kategori_usia,
+      toKelas: nextStep.jenjang_kelas,
+      createdAtStr: siswa.created_at ? new Date(siswa.created_at).toLocaleDateString('id-ID') : '-'
+    });
+  });
+
+  return {
+    academicInfo,
+    totalSiswa: allList.length,
+    eligible,
+    skipped
+  };
+}
+
+/**
+ * Eksekusi Kenaikan Jenjang Massal untuk seluruh siswa yang memenuhi syarat
+ * @param {Object} options - { refDate, selectedIds }
+ */
+export function autoPromoteAllSiswa(options = {}) {
+  const refDate = options.refDate || new Date();
+  const selectedIds = options.selectedIds || null; // Jika null, proses semua eligible
+  const preview = calculateMassPromotionPreview(refDate);
+  const academicLabel = preview.academicInfo.academicYearLabel;
+
+  const list = getSiswaList();
+  const promotedList = [];
+
+  const eligibleMap = new Map();
+  preview.eligible.forEach(item => {
+    if (!selectedIds || selectedIds.has(item.siswa.id)) {
+      eligibleMap.set(item.siswa.id, item);
+    }
+  });
+
+  const updatedList = list.map(siswa => {
+    if (eligibleMap.has(siswa.id)) {
+      const item = eligibleMap.get(siswa.id);
+      promotedList.push({
         id: siswa.id,
         nama: siswa.nama_lengkap,
-        umur: getUmurNumber(siswa.tanggal_lahir),
-        before: `${siswa.kategori_usia} - ${siswa.jenjang_kelas}`,
-        after: `${targetKat} - ${targetKelas}`,
+        before: `${item.fromKat} - ${item.fromKelas}`,
+        after: `${item.toKat} - ${item.toKelas}`,
         desa: siswa.desa_nama,
         kelompok: siswa.kelompok_nama
       });
 
       return {
         ...siswa,
-        kategori_usia: targetKat,
-        jenjang_kelas: targetKelas,
+        kategori_usia: item.toKat,
+        jenjang_kelas: item.toKelas,
+        last_promoted_academic_year: academicLabel,
         updated_at: new Date().toISOString()
       };
     }
-
     return siswa;
   });
 
-  if (changes.length > 0) {
+  if (promotedList.length > 0) {
     saveSiswaList(updatedList);
 
     // Background Auto-Sync pembaruan massal ke Supabase Cloud
@@ -1262,10 +1357,11 @@ export function autoPromoteAllSiswa(options = { mode: "age" }) {
 
   return {
     success: true,
-    mode: mode,
+    academicYearLabel: academicLabel,
     totalDiproses: list.length,
-    countChanged: changes.length,
-    changes: changes
+    countChanged: promotedList.length,
+    changes: promotedList,
+    skippedCount: preview.skipped.length
   };
 }
 

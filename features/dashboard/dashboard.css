@@ -1473,6 +1473,10 @@ body {
   color: var(--blue);
 }
 
+.modal-sticky-footer .btn-sticky-back:first-child {
+  margin-right: auto;
+}
+
 .btn-sticky-save {
   padding: 10px 22px;
   border: none;
@@ -1499,6 +1503,23 @@ body {
 
 .btn-sticky-save:active {
   transform: translateY(0);
+}
+
+.btn-sticky-save:disabled,
+.btn-sticky-save[disabled] {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: grayscale(0.5) !important;
+}
+
+.btn-sticky-back:disabled,
+.btn-sticky-back[disabled] {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-sticky-delete {
@@ -1724,6 +1745,7 @@ body {
     align-items: center !important;
     justify-content: center !important;
     padding: 10px !important;
+    margin: 0 !important;
   }
 
   .modal-sticky-footer .btn-sticky-delete {
@@ -4768,6 +4790,84 @@ body {
   background: #2563eb !important;
 }
 
+/* ── Generus Banner Header (Mirip Proker Banner) ── */
+.generus-banner-header {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1.5px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.08);
+}
+
+.dark .generus-banner-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+.generus-banner-header-content {
+  flex: 1;
+  min-width: 240px;
+}
+
+.generus-banner-header-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dark .generus-banner-header-title {
+  color: #93c5fd !important;
+}
+
+.generus-banner-header-sub {
+  font-size: 12px;
+  color: #3b82f6;
+  margin-top: 3px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.dark .generus-banner-header-sub {
+  color: #94a3b8 !important;
+}
+
+.btn-generus-banner-add {
+  padding: 9px 18px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-generus-banner-add:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.dark .btn-generus-banner-add {
+  background: #3b82f6 !important;
+}
+
 .btn-tambah-siswa {
   padding: 8px 14px;
   background: var(--blue, #2563eb);
@@ -5138,8 +5238,13 @@ body {
     padding: 7px 6px;
   }
 
+  /* Baris 3: 4 tombol aksi terbagi rata dalam 4 kolom grid sehingga pas dan tidak overflow */
   .filter-wilayah-row-3 {
-    justify-content: space-between;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    justify-content: stretch !important;
+    width: 100% !important;
   }
 
   .btn-export-pdf .btn-label-text,
@@ -5160,8 +5265,9 @@ body {
   .btn-export-csv,
   .btn-import-csv,
   .btn-auto-promote {
-    padding: 8px 10px !important;
-    min-width: 38px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 8px 4px !important;
     height: 38px !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
@@ -5178,11 +5284,21 @@ body {
     gap: 0 !important;
   }
 
-  .btn-tambah-siswa {
-    flex: 1 !important;
-    height: 38px !important;
+  /* Banner Generus Mobile: Tombol Tambah Generus tepat di bawah judul memenuhi lebar kontainer */
+  .generus-banner-header {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+
+  .generus-banner-header-content {
+    min-width: 100% !important;
+  }
+
+  .btn-generus-banner-add {
+    width: 100% !important;
     justify-content: center !important;
-    white-space: nowrap !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
   }
 }
 
@@ -7621,5 +7737,335 @@ body {
   border-color: #334155;
   color: #cbd5e1;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   MODUL KBM: TABS, EVENT TABLE, MOBILE CARDS, & JURNAL KEGIATAN
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── KBM Tab Navigation ── */
+.kbm-tab-bar {
+  display: flex;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 6px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.kbm-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kbm-tab-btn:hover {
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.kbm-tab-btn.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dark .kbm-tab-btn.active {
+  background: #1e293b;
+  color: #60a5fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* ── KBM Filter Bar ── */
+.kbm-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.kbm-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.kbm-select {
+  padding: 7px 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.kbm-select:focus {
+  border-color: var(--primary);
+}
+
+/* ── Action Buttons ── */
+.kbm-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+
+.kbm-action-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.kbm-action-btn-print {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
+}
+
+.kbm-action-btn-print:hover {
+  background: #bbf7d0;
+  color: #166534;
+}
+
+.kbm-action-btn-journal {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.kbm-action-btn-journal:hover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.kbm-action-btn-report {
+  background: #fdf2f8;
+  color: #be185d;
+  border-color: #fbcfe8;
+}
+
+.kbm-action-btn-report:hover {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.kbm-action-btn-delete {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+  padding: 5px 7px;
+}
+
+.kbm-action-btn-delete:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.kbm-action-btn-view {
+  background: var(--bg);
+  color: var(--text-muted);
+  border-color: var(--border);
+  cursor: default;
+}
+
+/* Dark mode action buttons */
+.dark .kbm-action-btn-print {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dark .kbm-action-btn-journal {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.dark .kbm-action-btn-report {
+  background: rgba(236, 72, 153, 0.15);
+  color: #f472b6;
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.dark .kbm-action-btn-delete {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ── Status Badges ── */
+.kbm-badge-status-done {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kbm-badge-status-pending {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dark .kbm-badge-status-done {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dark .kbm-badge-status-pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* ── Mobile Event Cards ── */
+.kbm-event-cards-view {
+  display: none;
+}
+
+.kbm-event-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.kbm-event-card:hover {
+  border-color: var(--primary);
+}
+
+.kbm-event-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.kbm-event-card-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.kbm-event-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.kbm-event-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+/* ── Responsive Switch between Desktop Table & Mobile Cards ── */
+@media (max-width: 768px) {
+  .kbm-desktop-table-wrap {
+    display: none !important;
+  }
+
+  .kbm-event-cards-view {
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+
+  /* Ikon-Only pada Tombol Aksi di Mobile */
+  .kbm-action-btn {
+    width: 40px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    border-radius: 9px !important;
+    justify-content: center !important;
+  }
+
+  .kbm-action-btn .btn-text {
+    display: none !important;
+  }
+
+  .kbm-action-btn .material-symbols-outlined {
+    font-size: 20px !important;
+    margin: 0 !important;
+  }
+
+  .kbm-tab-btn span:not(.material-symbols-outlined) {
+    font-size: 11.5px;
+  }
+
+  .kbm-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .kbm-filter-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .kbm-select {
+    width: 100%;
+  }
+}
+
 
 

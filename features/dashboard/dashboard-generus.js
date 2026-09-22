@@ -15,7 +15,9 @@ import {
   isSiswaAktif,
   determineJenjangByAge,
   naikkanJenjangSatuTingkat,
-  autoPromoteAllSiswa
+  autoPromoteAllSiswa,
+  calculateMassPromotionPreview,
+  getAcademicYearInfo
 } from '../../src/db-master.js';
 
 import {
@@ -440,6 +442,21 @@ export function renderSiswaModal() {
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:14px;">
 
+      <!-- BANNER HEADER UTAMA DENGAN TOMBOL TAMBAH GENERUS (MIRIP PROKER) -->
+      <div class="generus-banner-header">
+        <div class="generus-banner-header-content">
+          <div class="generus-banner-header-title">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#2563eb;">groups</span>
+            Database Generus PPG Solo Selatan
+          </div>
+          <div class="generus-banner-header-sub">Kelola biodata santri, penjenjangan kelas, serta administrasi data generus.</div>
+        </div>
+        <button type="button" id="btnTambahSiswaBaru" class="btn-generus-banner-add" title="Tambah Data Generus Baru">
+          <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
+          <span>Tambah Generus</span>
+        </button>
+      </div>
+
       <!-- HIGHLIGHT KHUSUS: FILTER MULTI-LEVEL JENJANG GENERUS -->
       <div class="filter-jenjang-card-highlight">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
@@ -525,8 +542,7 @@ export function renderSiswaModal() {
           </div>
         </div>
 
-        <!-- BARIS 3: ICON TOMBOL SESUAI PERUBAHAN MOBILE -->
-        <!-- BARIS 3: TOMBOL AKSI TERPADU (EXPORT PDF, EXCEL, IMPORT WIZARD) -->
+        <!-- BARIS 3: TOMBOL AKSI TERPADU (EXPORT PDF, EXCEL, IMPORT WIZARD, KENAIKAN JENJANG) -->
         <div class="filter-wilayah-row-3">
           <button type="button" id="btnExportPdfGenerus" class="btn-export-pdf" title="Cetak atau Simpan Laporan PDF Resmi Data Generus (A4 Landscape)">
             <span class="material-symbols-outlined" style="font-size:18px;color:#d97706;">picture_as_pdf</span>
@@ -546,13 +562,9 @@ export function renderSiswaModal() {
           <input type="file" id="inputImportCsvGenerus" accept=".csv,.xlsx,.xls" style="display:none;" />
           <button type="button" id="btnImportCsvGenerus" style="display:none;" aria-hidden="true"></button>
 
-          <button type="button" id="btnAutoPromoteJenjang" class="btn-auto-promote" title="Kenaikan Jenjang Otomatis Sesuai Usia atau Pergantian Tahun Ajaran">
+          <button type="button" id="btnAutoPromoteJenjang" class="btn-auto-promote" title="Kenaikan Jenjang Otomatis (+1 Tingkat) Setelah Bulan Agustus">
             <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span>
             <span class="btn-label-text">Kenaikan Jenjang</span>
-          </button>
-          <button type="button" id="btnTambahSiswaBaru" class="btn-tambah-siswa" title="Tambah Data Generus Baru">
-            <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
-            <span>Tambah Generus</span>
           </button>
         </div>
       </div>
@@ -1556,167 +1568,217 @@ function confirmAndExecuteBatchImport() {
 }
 
 /**
- * Modal Interaktif untuk Kenaikan Jenjang Otomatis
- * Mode 1: Berdasarkan Usia Terkini (Real-time Age dari Tanggal Lahir)
- * Mode 2: Kenaikan Kelas Tahunan (Tahun Ajaran Baru / +1 Tingkat)
+ * Modal Interaktif untuk Kenaikan Jenjang Massal Otomatis
+ * Aturan:
+ * - Seluruh generus aktif naik 1 tingkat ke jenjang selanjutnya setelah bulan Agustus.
+ * - Data yang baru diinput setelah bulan Agustus pada tahun ajaran berjalan TIDAK BERTAMBAH.
+ * - Siswa yang tinggal kelas dapat disesuaikan manual oleh pamong/pengurus via tombol Edit.
  */
 export function renderAutoPromoteModal() {
-  const allList = getSiswaList();
-  const activeSiswa = allList.filter(isSiswaAktif);
-  let selectedMode = 'age'; // 'age' or 'annual_step'
+  const preview = calculateMassPromotionPreview();
+  const { academicInfo, eligible, skipped } = preview;
 
-  function calculatePreview(mode) {
-    const changes = [];
-    activeSiswa.forEach(s => {
-      let targetKat = s.kategori_usia;
-      let targetKelas = s.jenjang_kelas;
+  const countEligible = eligible.length;
+  const countAfterAugust = skipped.filter(s => s.reason === "Input Setelah Agustus").length;
+  const countMaxJenjang = skipped.filter(s => s.reason === "Jenjang Maksimal/Khusus").length;
+  const countAlreadyPromoted = skipped.filter(s => s.reason === "Sudah Dinaikkan").length;
 
-      if (mode === 'age') {
-        if (s.tanggal_lahir) {
-          const res = determineJenjangByAge(s.tanggal_lahir, s.jenjang_kelas);
-          targetKat = res.kategori_usia;
-          targetKelas = res.jenjang_kelas;
-        }
-      } else if (mode === 'annual_step') {
-        const res = naikkanJenjangSatuTingkat(s.jenjang_kelas);
-        if (res.berubah) {
-          targetKat = res.kategori_usia;
-          targetKelas = res.jenjang_kelas;
-        }
-      }
-
-      if (targetKat !== s.kategori_usia || targetKelas !== s.jenjang_kelas) {
-        changes.push({
-          siswa: s,
-          umur: getUmurNumber(s.tanggal_lahir),
-          fromKat: s.kategori_usia,
-          fromKelas: s.jenjang_kelas,
-          toKat: targetKat,
-          toKelas: targetKelas
-        });
-      }
-    });
-    return changes;
-  }
+  let activeTab = 'eligible'; // 'eligible' or 'skipped'
+  let searchFilter = '';
 
   function renderContent() {
-    const changes = calculatePreview(selectedMode);
+    let filteredEligible = eligible;
+    let filteredSkipped = skipped;
+
+    if (searchFilter) {
+      const q = searchFilter.toLowerCase();
+      filteredEligible = eligible.filter(item =>
+        (item.siswa.nama_lengkap || '').toLowerCase().includes(q) ||
+        (item.siswa.desa_nama || '').toLowerCase().includes(q) ||
+        (item.siswa.kelompok_nama || '').toLowerCase().includes(q)
+      );
+      filteredSkipped = skipped.filter(item =>
+        (item.siswa.nama_lengkap || '').toLowerCase().includes(q) ||
+        (item.siswa.desa_nama || '').toLowerCase().includes(q) ||
+        (item.siswa.kelompok_nama || '').toLowerCase().includes(q)
+      );
+    }
+
     const contentHtml = `
       <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;">
-        <div style="background:#f0f7ff;border:1.5px solid #3b82f6;border-radius:10px;padding:12px 14px;color:#1e3a8a;">
-          <div style="font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span class="material-symbols-outlined" style="font-size:18px;">auto_mode</span>
-            Otomatisasi Penyesuaian Jenjang Generus
+        
+        <!-- BANNER ATURAN TAHUN AJARAN SETELAH AGUSTUS -->
+        <div style="background:#eff6ff;border:1.5px solid #3b82f6;border-radius:12px;padding:14px 16px;color:#1e3a8a;">
+          <div style="font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#2563eb;">auto_mode</span>
+            Kenaikan Jenjang Massal Otomatis (Tahun Ajaran ${academicInfo.academicYearLabel})
           </div>
-          <div style="font-size:11.5px;color:#1e40af;line-height:1.5;">
-            Fitur ini secara cerdas hanya memproses <strong>${activeSiswa.length} generus aktif</strong> (status Sambung). Generus yang berstatus <em>Menikah</em> atau <em>Pindah Sambung</em> tetap tersimpan utuh dan tidak akan diubah jenjangnya.
+          <div style="font-size:12px;color:#1e40af;line-height:1.5;">
+            Seluruh generus aktif naik <strong>1 tingkat ke jenjang berikutnya</strong> setelah bulan Agustus. Generus yang baru diinput setelah bulan Agustus tidak bertambah (tetap pada kelas saat diinput).<br/>
+            <em>*Catatan: Bagi generus yang tinggal kelas, pamong/pengurus dapat memperbarui kelas secara manual melalui tombol Edit Generus.</em>
           </div>
         </div>
 
-        <!-- PILIHAN MODE OTOMATISASI -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <label style="border:2px solid ${selectedMode === 'age' ? '#2563eb' : 'var(--border)'};background:${selectedMode === 'age' ? '#eff6ff' : '#fff'};padding:12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.15s;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input type="radio" name="optPromoteMode" value="age" ${selectedMode === 'age' ? 'checked' : ''} style="cursor:pointer;" />
-              <strong style="color:#1e293b;font-size:12.5px;">1. Berdasarkan Usia Terkini</strong>
-            </div>
-            <div style="font-size:11px;color:var(--text-muted);padding-left:22px;line-height:1.4;">
-              Otomatis menghitung tanggal lahir generus secara real-time dan menyelaraskan ke jenjang PAUD, TK A/B, SD (1–6), SMP (1–3), SMA (1–3), atau Pra-Nikah.
-            </div>
-          </label>
-
-          <label style="border:2px solid ${selectedMode === 'annual_step' ? '#2563eb' : 'var(--border)'};background:${selectedMode === 'annual_step' ? '#eff6ff' : '#fff'};padding:12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.15s;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input type="radio" name="optPromoteMode" value="annual_step" ${selectedMode === 'annual_step' ? 'checked' : ''} style="cursor:pointer;" />
-              <strong style="color:#1e293b;font-size:12.5px;">2. Kenaikan Kelas Tahunan</strong>
-            </div>
-            <div style="font-size:11px;color:var(--text-muted);padding-left:22px;line-height:1.4;">
-              Menaikkan seluruh siswa sekolah 1 tingkat ke atas (+1 kelas / Tahun Ajaran Baru), dari PAUD ➔ TK A ➔ TK B ➔ 1–6 SD ➔ 1–3 SMP ➔ 1–3 SMA ➔ Pra-Nikah.
-            </div>
-          </label>
+        <!-- STAT STRIP / INFORMASI CEPAT -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 12px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#15803d;">SIAP NAIK KELAS</div>
+            <div style="font-size:20px;font-weight:900;color:#166534;margin-top:2px;">${countEligible}</div>
+            <div style="font-size:10px;color:#15803d;">+1 Tingkat Baru</div>
+          </div>
+          <div style="background:#fefce8;border:1px solid #fef08a;border-radius:10px;padding:10px 12px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#a16207;">INPUT SETELAH AGU</div>
+            <div style="font-size:20px;font-weight:900;color:#854d0e;margin-top:2px;">${countAfterAugust}</div>
+            <div style="font-size:10px;color:#a16207;">Tidak Bertambah</div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#475569;">JENJANG MAKSIMAL</div>
+            <div style="font-size:20px;font-weight:900;color:#334155;margin-top:2px;">${countMaxJenjang}</div>
+            <div style="font-size:10px;color:#475569;">Mahasiswa/Remaja/Dll</div>
+          </div>
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#1d4ed8;">SUDAH PERNAH NAIK</div>
+            <div style="font-size:20px;font-weight:900;color:#1e40af;margin-top:2px;">${countAlreadyPromoted}</div>
+            <div style="font-size:10px;color:#1d4ed8;">Periode T.A. Ini</div>
+          </div>
         </div>
 
-        <!-- PRATINJAU PERUBAHAN -->
+        <!-- SEARCH & TAB SELECTOR -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div style="display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#f1f5f9;padding:2px;">
+            <button type="button" id="tabShowEligible" style="padding:6px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;border-radius:6px;background:${activeTab === 'eligible' ? '#ffffff' : 'transparent'};color:${activeTab === 'eligible' ? '#2563eb' : 'var(--text-muted)'};box-shadow:${activeTab === 'eligible' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'};">
+              Siap Naik (${filteredEligible.length})
+            </button>
+            <button type="button" id="tabShowSkipped" style="padding:6px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;border-radius:6px;background:${activeTab === 'skipped' ? '#ffffff' : 'transparent'};color:${activeTab === 'skipped' ? '#2563eb' : 'var(--text-muted)'};box-shadow:${activeTab === 'skipped' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'};">
+              Tidak Bertambah (${filteredSkipped.length})
+            </button>
+          </div>
+          <div style="flex:1;max-width:260px;min-width:180px;">
+            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="🔍 Cari nama / desa..." style="width:100%;padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:8px;outline:none;" />
+          </div>
+        </div>
+
+        <!-- TABEL PRATINJAU -->
         <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;">
-          <div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-            <div style="font-weight:800;font-size:12px;color:var(--text);">
-              Pratinjau Kenaikan: <span style="color:#2563eb;font-weight:900;">${changes.length}</span> Generus Mengalami Perubahan
-            </div>
-            <div style="font-size:11px;color:var(--text-muted);">
-              ${changes.length === 0 ? 'Semua data sudah selaras' : 'Data di bawah ini akan disesuaikan'}
-            </div>
-          </div>
-
-          <div style="max-height:260px;overflow-y:auto;font-size:11.5px;">
-            ${changes.length === 0 ? `
-              <div style="padding:32px;text-align:center;color:var(--green-dark);">
-                <span class="material-symbols-outlined" style="font-size:36px;color:#16a34a;display:block;margin-bottom:6px;">check_circle</span>
-                <strong>Semua jenjang generus aktif sudah mutakhir!</strong>
-                <p style="margin:4px 0 0;font-size:11px;color:var(--text-muted);">Tidak ada generus yang perlu disesuaikan untuk mode ini saat ini.</p>
-              </div>
-            ` : `
-              <table style="width:100%;border-collapse:collapse;text-align:left;">
-                <thead style="background:#f1f5f9;position:sticky;top:0;font-size:11px;color:#475569;">
-                  <tr>
-                    <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Nama Generus</th>
-                    <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Usia</th>
-                    <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Desa / Kelompok</th>
-                    <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Jenjang Asal</th>
-                    <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">➔</th>
-                    <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Jenjang Baru</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${changes.map((c, i) => `
-                    <tr style="border-bottom:1px solid #f1f5f9;background:${i % 2 === 0 ? '#fff' : '#fafafa'};">
-                      <td style="padding:8px 10px;font-weight:700;color:var(--text);">${c.siswa.nama_lengkap}</td>
-                      <td style="padding:8px 10px;text-align:center;font-weight:600;">${c.umur} th</td>
-                      <td style="padding:8px 10px;color:var(--text-muted);font-size:11px;">Desa ${c.siswa.desa_nama || '-'} (${c.siswa.kelompok_nama || '-'})</td>
-                      <td style="padding:8px 10px;text-align:center;"><span style="background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${c.fromKelas}</span></td>
-                      <td style="padding:8px 10px;text-align:center;color:#64748b;font-weight:900;">➔</td>
-                      <td style="padding:8px 10px;text-align:center;"><span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${c.toKelas}</span></td>
+          <div style="max-height:280px;overflow-y:auto;font-size:11.5px;">
+            ${activeTab === 'eligible' ? (
+              filteredEligible.length === 0 ? `
+                <div style="padding:36px;text-align:center;color:var(--text-muted);">
+                  <span class="material-symbols-outlined" style="font-size:36px;color:#10b981;display:block;margin-bottom:6px;">check_circle</span>
+                  <strong style="color:var(--text);">Tidak ada generus yang perlu dinaikkan saat ini</strong>
+                  <p style="margin:4px 0 0;font-size:11px;">Semua data generus sudah mutakhir untuk Tahun Ajaran ${academicInfo.academicYearLabel}.</p>
+                </div>
+              ` : `
+                <table style="width:100%;border-collapse:collapse;text-align:left;">
+                  <thead style="background:#f8fafc;position:sticky;top:0;font-size:11px;color:#475569;z-index:2;">
+                    <tr>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;width:40px;">No</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Nama Generus</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Desa / Kelompok</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Kelas Asal</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">➔</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Kelas Baru</th>
                     </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            `}
+                  </thead>
+                  <tbody>
+                    ${filteredEligible.map((item, idx) => `
+                      <tr style="border-bottom:1px solid #f1f5f9;background:${idx % 2 === 0 ? '#fff' : '#fafafa'};">
+                        <td style="padding:8px 10px;text-align:center;color:var(--text-muted);">${idx + 1}</td>
+                        <td style="padding:8px 10px;font-weight:700;color:var(--text);">${item.siswa.nama_lengkap}</td>
+                        <td style="padding:8px 10px;color:var(--text-muted);font-size:11px;">Desa ${item.siswa.desa_nama || '-'} (${item.siswa.kelompok_nama || '-'})</td>
+                        <td style="padding:8px 10px;text-align:center;"><span style="background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.fromKelas}</span></td>
+                        <td style="padding:8px 10px;text-align:center;color:#64748b;font-weight:900;">➔</td>
+                        <td style="padding:8px 10px;text-align:center;"><span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.toKelas}</span></td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `
+            ) : (
+              filteredSkipped.length === 0 ? `
+                <div style="padding:32px;text-align:center;color:var(--text-muted);">Tidak ada data yang dilewati.</div>
+              ` : `
+                <table style="width:100%;border-collapse:collapse;text-align:left;">
+                  <thead style="background:#f8fafc;position:sticky;top:0;font-size:11px;color:#475569;z-index:2;">
+                    <tr>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;width:40px;">No</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Nama Generus</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Kelas Saat Ini</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Alasan Tidak Bertambah</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${filteredSkipped.map((item, idx) => `
+                      <tr style="border-bottom:1px solid #f1f5f9;background:${idx % 2 === 0 ? '#fff' : '#fafafa'};">
+                        <td style="padding:8px 10px;text-align:center;color:var(--text-muted);">${idx + 1}</td>
+                        <td style="padding:8px 10px;font-weight:700;color:var(--text);">${item.siswa.nama_lengkap}</td>
+                        <td style="padding:8px 10px;"><span style="background:#f1f5f9;color:#475569;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.siswa.jenjang_kelas || '-'}</span></td>
+                        <td style="padding:8px 10px;color:#b45309;font-size:11px;font-weight:600;">
+                          <span style="display:inline-block;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;margin-right:4px;">${item.reason}</span>
+                          ${item.detail}
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `
+            )}
           </div>
         </div>
 
-        <!-- FOOTER ACTIONS -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;">
-          <button type="button" id="btnCancelAutoPromote" style="padding:10px 18px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:700;cursor:pointer;">
-            Batal
+        <!-- MODAL STICKY FOOTER (STANDARISASI NAVIGASI TEMA) -->
+        <div class="modal-sticky-footer">
+          <button type="button" id="btnCancelAutoPromote" class="btn-sticky-back" title="Kembali ke Database">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span class="btn-text">Kembali ke Database</span>
           </button>
-          <button type="button" id="btnExecuteAutoPromote" ${changes.length === 0 ? 'disabled' : ''} style="padding:10px 20px;background:${changes.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'};color:#fff;border:none;border-radius:8px;font-weight:800;cursor:${changes.length === 0 ? 'not-allowed' : 'pointer'};display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(37,99,235,0.3);">
-            <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
-            Terapkan Perubahan (${changes.length} Generus)
+          <button type="button" id="btnExecuteAutoPromote" class="btn-sticky-save" title="Terapkan Kenaikan 1 Tingkat" ${countEligible === 0 ? 'disabled' : ''}>
+            <span class="material-symbols-outlined">upgrade</span>
+            <span class="btn-text">Terapkan Kenaikan 1 Tingkat (${countEligible} Generus)</span>
           </button>
         </div>
+
       </div>
     `;
 
-    openModal('Kenaikan & Penyesuaian Jenjang Otomatis', 'auto_mode', contentHtml, 'medium');
+    openModal(`Kenaikan Jenjang Massal (T.A. ${academicInfo.academicYearLabel})`, 'auto_mode', contentHtml, 'medium');
 
-    // Radios
-    document.querySelectorAll('input[name="optPromoteMode"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        selectedMode = e.target.value;
-        renderContent();
-      });
+    // Attach listeners
+    document.getElementById('tabShowEligible')?.addEventListener('click', () => {
+      activeTab = 'eligible';
+      renderContent();
+    });
+    document.getElementById('tabShowSkipped')?.addEventListener('click', () => {
+      activeTab = 'skipped';
+      renderContent();
+    });
+    document.getElementById('searchPromoteSiswa')?.addEventListener('input', (e) => {
+      searchFilter = e.target.value;
+      renderContent();
+      const el = document.getElementById('searchPromoteSiswa');
+      if (el) {
+        el.focus();
+        el.setSelectionRange(el.value.length, el.value.length);
+      }
     });
 
     document.getElementById('btnCancelAutoPromote')?.addEventListener('click', renderSiswaModal);
 
     document.getElementById('btnExecuteAutoPromote')?.addEventListener('click', () => {
-      const res = autoPromoteAllSiswa({ mode: selectedMode });
-      if (res.success) {
-        showToast(`Berhasil menyesuaikan jenjang untuk ${res.countChanged} generus aktif!`, 'success');
-        updateDashboardStats();
-        renderSiswaModal();
-      } else {
-        showToast('Gagal memproses penyesuaian jenjang.', 'danger');
-      }
+      if (countEligible === 0) return;
+      showConfirmModal(
+        'Konfirmasi Kenaikan Jenjang Massal',
+        `Apakah Anda yakin ingin menaikkan <strong>${countEligible} generus aktif</strong> ke 1 tingkat kelas berikutnya untuk Tahun Ajaran <strong>${academicInfo.academicYearLabel}</strong>?<br/><br/><small style="color:var(--text-muted);">*Data yang diinput setelah Agustus tidak akan bertambah. Siswa yang tinggal kelas dapat Anda sesuaikan manual via menu Edit Generus.</small>`,
+        () => {
+          const res = autoPromoteAllSiswa();
+          if (res.success) {
+            showToast(`Berhasil menaikkan ${res.countChanged} generus ke 1 tingkat selanjutnya!`, 'success');
+            renderSiswaModal();
+          } else {
+            showToast('Gagal memproses kenaikan jenjang.', 'danger');
+          }
+        }
+      );
     });
   }
 
