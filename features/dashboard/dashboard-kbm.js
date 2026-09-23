@@ -36,23 +36,22 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   const currentDesaId = currentUser.desaId || 'desa-timur-1';
   const currentKelId = currentUser.kelompokId || 'kel-gunung-wijil-1';
 
-  // Normalisasi tab dari pemanggil lama
-  if (activeTab === 'event_list') activeTab = 'agenda';
+  // Normalisasi tab lama jika ada
+  if (activeTab === 'event_list' || activeTab === 'jurnal') activeTab = 'agenda';
 
   const allEvents = getKbmEvents();
 
-  // State Filter
+  // State Filter & Pagination
   const filterDesa = options.filterDesa || (isDaerah ? 'all' : currentDesaId);
   const filterKel = options.filterKel || (isKelompok ? currentKelId : (options.filterKel || 'all'));
   const filterFormat = options.filterFormat || 'all';
   const scopeMode = options.scopeMode || (isKelompok ? 'kelompok_only' : 'all'); // 'kelompok_only' | 'desa_all'
-  const selectedEventId = options.selectedEventId || (allEvents[0]?.id || null);
+  const requestedPage = parseInt(options.page) || 1;
 
   // ── Saring Event Sesuai Hak Akses & Filter ──
   const filteredEvents = allEvents.filter(ev => {
     // Filter Hak Akses Wilayah
     if (isKelompok) {
-      // Pamong kelompok hanya melihat event di desanya atau event tingkat daerah (desa_id === 'all')
       const inDesa = (ev.desa_id === 'all' || ev.desa_id === currentDesaId);
       if (!inDesa) return false;
 
@@ -61,7 +60,6 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         if (!isOwn) return false;
       }
     } else if (isDesa) {
-      // Pengurus desa melihat event di desanya atau tingkat daerah
       const inDesa = (ev.desa_id === 'all' || ev.desa_id === currentDesaId);
       if (!inDesa) return false;
 
@@ -113,22 +111,8 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       kels.map(k => `<option value="${k.id}" ${selectedId === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('');
   }
 
-  // ── Tab Bar Navigation Header ──
-  const tabHeaderHtml = `
-    <div class="kbm-tab-bar">
-      <button type="button" class="kbm-tab-btn ${activeTab === 'agenda' ? 'active' : ''}" id="tabBtnAgenda">
-        <span class="material-symbols-outlined">calendar_month</span>
-        <span>Agenda &amp; Cetak Absensi (${allEvents.length})</span>
-      </button>
-      <button type="button" class="kbm-tab-btn ${activeTab === 'jurnal' ? 'active' : ''}" id="tabBtnJurnal">
-        <span class="material-symbols-outlined">menu_book</span>
-        <span>Jurnal Kegiatan KBM</span>
-      </button>
-    </div>
-  `;
-
   // ══════════════════════════════════════════════════════════════
-  // TAB 1: AGENDA & CETAK ABSENSI
+  // VIEW 1: AGENDA & CETAK ABSENSI (DENGAN PAGINATION & EDIT)
   // ══════════════════════════════════════════════════════════════
   let agendaContentHtml = '';
 
@@ -213,7 +197,18 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     `;
   }
 
-  if (filteredEvents.length === 0) {
+  // ── Perhitungan Pagination ──
+  const totalEvents = filteredEvents.length;
+  const pageSize = 6;
+  const totalPages = Math.max(1, Math.ceil(totalEvents / pageSize));
+  let currentPage = requestedPage;
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIdx = (currentPage - 1) * pageSize;
+  const paginatedEvents = filteredEvents.slice(startIdx, startIdx + pageSize);
+
+  if (totalEvents === 0) {
     agendaContentHtml = `
       ${filterBarHtml}
       <div style="text-align:center;padding:40px 20px;background:var(--bg);border-radius:12px;border:1.5px dashed var(--border);">
@@ -229,30 +224,26 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     `;
   } else {
     // ── Render Desktop Table & Mobile Cards ──
-    const rowsDesktopHtml = filteredEvents.map((ev, idx) => {
-      // Periksa status rekap sesuai wilayah aktif
+    const rowsDesktopHtml = paginatedEvents.map((ev, idx) => {
       const rekap = ev.rekap_kehadiran || {};
       let hasRekap = false;
-      let totalHadir = 0, totalIjin = 0, totalAlfa = 0;
+      let totalHadir = 0;
 
       if (isKelompok) {
         const kRekap = rekap[currentKelId];
         if (kRekap && ((kRekap.hadir || 0) + (kRekap.ijin || 0) + (kRekap.alfa || 0)) > 0) {
           hasRekap = true;
           totalHadir = kRekap.hadir || 0;
-          totalIjin = kRekap.ijin || 0;
-          totalAlfa = kRekap.alfa || 0;
         }
       } else {
+        let totAll = 0;
         Object.values(rekap).forEach(k => {
+          totAll += (parseInt(k.hadir) || 0) + (parseInt(k.ijin) || 0) + (parseInt(k.alfa) || 0);
           totalHadir += (parseInt(k.hadir) || 0);
-          totalIjin += (parseInt(k.ijin) || 0);
-          totalAlfa += (parseInt(k.alfa) || 0);
         });
-        hasRekap = (totalHadir + totalIjin + totalAlfa) > 0;
+        hasRekap = totAll > 0;
       }
 
-      // Format Pill
       let formatBadge = 'badge-primary';
       let formatName = 'Remaja';
       if (ev.format_kbm === 'caberawit') {
@@ -263,7 +254,6 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         formatName = 'GP Reguler';
       }
 
-      // Wilayah Label
       let wilayahLabel = 'Solo Selatan';
       if (ev.kelompok_id && ev.kelompok_id !== 'all') {
         const foundKel = allKels.find(k => k.id === ev.kelompok_id);
@@ -273,7 +263,6 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         wilayahLabel = foundDesa ? `Desa ${foundDesa.nama}` : 'Desa';
       }
 
-      // Hak Edit & Hapus
       let canManage = true;
       let isReadOnly = false;
       if (isKelompok) {
@@ -285,7 +274,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
 
       return `
         <tr style="border-bottom:1px solid var(--border);">
-          <td style="padding:10px 8px;text-align:center;font-weight:700;color:var(--text-muted);">${idx + 1}</td>
+          <td style="padding:10px 8px;text-align:center;font-weight:700;color:var(--text-muted);">${startIdx + idx + 1}</td>
           <td style="padding:10px 12px;">
             <div style="font-weight:800;color:var(--text);font-size:13px;margin-bottom:4px;">${ev.judul || 'Event KBM'}</div>
             <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -328,6 +317,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
                 <span class="btn-text">Laporan</span>
               </button>
               ${canManage ? `
+                <button type="button" class="kbm-action-btn kbm-action-btn-edit btn-action-edit-event" data-ev-id="${ev.id}" title="Edit Data Event KBM">
+                  <span class="material-symbols-outlined">edit</span>
+                  <span class="btn-text">Edit</span>
+                </button>
                 <button type="button" class="kbm-action-btn kbm-action-btn-delete btn-action-hapus-event" data-ev-id="${ev.id}" data-judul="${ev.judul || 'Event KBM'}" title="Hapus Event">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
@@ -339,7 +332,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     }).join('');
 
     // Cards View for Mobile
-    const cardsMobileHtml = filteredEvents.map(ev => {
+    const cardsMobileHtml = paginatedEvents.map(ev => {
       const rekap = ev.rekap_kehadiran || {};
       let hasRekap = false;
       let totalHadir = 0;
@@ -430,6 +423,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
               <span class="btn-text">Laporan</span>
             </button>
             ${canManage ? `
+              <button type="button" class="kbm-action-btn kbm-action-btn-edit btn-action-edit-event" data-ev-id="${ev.id}" title="Edit Data Event">
+                <span class="material-symbols-outlined">edit</span>
+                <span class="btn-text">Edit</span>
+              </button>
               <button type="button" class="kbm-action-btn kbm-action-btn-delete btn-action-hapus-event" data-ev-id="${ev.id}" data-judul="${ev.judul || 'Event KBM'}" title="Hapus Event">
                 <span class="material-symbols-outlined">delete</span>
               </button>
@@ -464,10 +461,28 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         ${cardsMobileHtml}
       </div>
 
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <!-- FOOTER PAGINATION & TUTUP -->
+      <div class="kbm-footer-pagination" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <span style="font-size:12px;font-weight:600;color:var(--text-muted);">
-          Menampilkan <strong>${filteredEvents.length}</strong> dari <strong>${allEvents.length}</strong> total agenda KBM.
+          Menampilkan <strong>${totalEvents > 0 ? startIdx + 1 : 0}–${Math.min(startIdx + pageSize, totalEvents)}</strong> dari <strong>${totalEvents}</strong> agenda KBM.
         </span>
+
+        ${totalPages > 1 ? `
+          <div class="kbm-pagination">
+            <button type="button" class="kbm-page-btn btn-page-nav" data-page="${currentPage - 1}" ${currentPage <= 1 ? 'disabled' : ''} title="Halaman Sebelumnya">
+              <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
+            </button>
+            ${Array.from({ length: totalPages }, (_, i) => i + 1).map(p => `
+              <button type="button" class="kbm-page-btn btn-page-nav ${p === currentPage ? 'active' : ''}" data-page="${p}">
+                ${p}
+              </button>
+            `).join('')}
+            <button type="button" class="kbm-page-btn btn-page-nav" data-page="${currentPage + 1}" ${currentPage >= totalPages ? 'disabled' : ''} title="Halaman Selanjutnya">
+              <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
+            </button>
+          </div>
+        ` : ''}
+
         <button type="button" class="btn-cancel-modal px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
           Tutup
         </button>
@@ -476,330 +491,38 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // TAB 2: JURNAL KEGIATAN KBM
+  // VIEW 2: FORM BUAT / EDIT EVENT KBM
   // ══════════════════════════════════════════════════════════════
-  let jurnalContentHtml = '';
-  const currentEvent = getKbmEventById(selectedEventId) || filteredEvents[0] || allEvents[0];
+  const isEdit = (activeTab === 'edit_event');
+  const editingEvent = isEdit ? getKbmEventById(options.editEventId) : null;
+  const formTitle = isEdit ? 'Edit Data Event KBM' : 'Buat Event KBM & Siapkan Lembar Absensi Cetak';
+  const formDesc = isEdit ? 'Perbarui judul, jadwal waktu pelaksanaan, format, atau wilayah event. Data rekapitulasi presensi yang sudah tersimpan akan tetap aman terjaga.' : 'Event akan tersimpan di agenda, siap dicetak kapan saja menggunakan data generus aktif, dan dapat langsung diisi jurnalnya pasca KBM.';
+  const formIcon = isEdit ? 'edit_calendar' : 'print';
 
-  if (!currentEvent) {
-    jurnalContentHtml = `
-      <div style="text-align:center;padding:40px 20px;background:var(--bg);border-radius:12px;border:1.5px dashed var(--border);">
-        <span class="material-symbols-outlined" style="font-size:42px;color:#94a3b8;margin-bottom:8px;">menu_book</span>
-        <h4 style="margin:0;font-size:14px;color:var(--text);font-weight:800;">Belum Ada Event untuk Diisi Jurnal</h4>
-        <p style="margin:4px 0 16px;font-size:12px;color:var(--text-muted);">
-          Buat event KBM terlebih dahulu pada tab Agenda &amp; Cetak Absensi.
-        </p>
-        <button type="button" id="btnJurnalToAgenda" style="padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
-          Ke Tab Agenda
-        </button>
-      </div>
-    `;
-  } else {
-    // Dropdown Pemilihan Event
-    const eventSelectorHtml = `
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:260px;">
-          <span class="material-symbols-outlined" style="color:var(--primary);font-size:20px;">event</span>
-          <label style="font-size:12px;font-weight:800;color:var(--text);white-space:nowrap;">Pilih Event KBM:</label>
-          <select id="selJurnalEventId" class="kbm-select" style="flex:1;font-weight:700;">
-            ${allEvents.map(ev => `
-              <option value="${ev.id}" ${ev.id === currentEvent.id ? 'selected' : ''}>
-                ${ev.judul} (${ev.hari_tanggal || '-'})
-              </option>
-            `).join('')}
-          </select>
-        </div>
-        <button type="button" id="btnJurnalPreviewPdf" style="padding:6px 12px;background:#fdf2f8;color:#db2777;border:1px solid #fbcfe8;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:16px;">print</span>
-          Preview Laporan PDF
-        </button>
-      </div>
-    `;
+  const defaultJudul = isEdit ? (editingEvent?.judul || '') : (isKelompok ? `PENGAJIAN REMAJA KELOMPOK ${currentKelObj ? currentKelObj.nama.toUpperCase() : ''}` : (isDesa ? `PENGAJIAN REMAJA DESA ${desaObj.nama.toUpperCase()}` : 'PENGAJIAN REMAJA DAERAH SOLO SELATAN'));
+  const defaultFormat = isEdit ? (editingEvent?.format_kbm || 'remaja') : 'remaja';
+  const defaultHariTgl = isEdit ? (editingEvent?.hari_tanggal || '') : 'Selasa, 20 Januari 2026';
+  const defaultJam = isEdit ? (editingEvent?.jam || '') : '19.30 – 21.00 WIB';
+  const defaultDesa = isEdit ? (editingEvent?.desa_id || 'all') : (isDaerah ? 'all' : currentDesaId);
+  const defaultKel = isEdit ? (editingEvent?.kelompok_id || 'all') : (isKelompok ? currentKelId : 'all');
+  const defaultGender = isEdit ? (editingEvent?.gender || 'pisah') : 'pisah';
+  const defaultBaris = isEdit ? (editingEvent?.baris_kosong || 'fill30') : 'fill30';
+  const defaultBulan = isEdit ? (editingEvent?.bulan || 'SEPTEMBER') : 'SEPTEMBER';
+  const defaultTahun = isEdit ? (editingEvent?.tahun || '2026') : '2026';
 
-    if (isKelompok) {
-      // ── FORM JURNAL PAMONG KELOMPOK ──
-      const rekapKel = (currentEvent.rekap_kehadiran && currentEvent.rekap_kehadiran[currentKelId]) || {};
-      const hVal = parseInt(rekapKel.hadir) || 0;
-      const iVal = parseInt(rekapKel.ijin) || 0;
-      const aVal = parseInt(rekapKel.alfa) || 0;
-      const totVal = hVal + iVal + aVal;
-      const pctAlfa = totVal > 0 ? ((aVal / totVal) * 100).toFixed(1) : '0.0';
-      const materiVal = rekapKel.materi || '';
-      const pengajarVal = rekapKel.pengajar || '';
-      const catatanVal = rekapKel.catatan || '';
-
-      jurnalContentHtml = `
-        ${eventSelectorHtml}
-
-        <!-- Header Info Kelompok -->
-        <div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div>
-              <span style="font-size:11px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:0.5px;">Jurnal KBM Kelompok</span>
-              <h3 style="margin:2px 0 0;font-size:14px;font-weight:800;color:#1e3a8a;">Kel. ${currentKelObj ? currentKelObj.nama : 'Kelompok Saya'} — Desa ${desaObj.nama}</h3>
-              <div style="font-size:11.5px;color:#3b82f6;margin-top:2px;">
-                ${currentEvent.judul} • ${currentEvent.hari_tanggal || '-'} (${currentEvent.jam || ''})
-              </div>
-            </div>
-            <div>
-              ${totVal > 0 ? `
-                <span class="kbm-badge-status-done" style="font-size:11.5px;padding:4px 10px;">
-                  <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span>
-                  Sudah Diisi (Total: ${totVal})
-                </span>
-              ` : `
-                <span class="kbm-badge-status-pending" style="font-size:11.5px;padding:4px 10px;">
-                  <span class="material-symbols-outlined" style="font-size:14px;">pending</span>
-                  Belum Ada Rekap
-                </span>
-              `}
-            </div>
-          </div>
-        </div>
-
-        <form id="formJurnalKelompok" style="display:flex;flex-direction:column;gap:14px;">
-          <!-- Section 1: Rekap Angka Fisik Kehadiran -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;">
-            <div style="margin-bottom:10px;">
-              <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;">
-                <span class="material-symbols-outlined" style="color:var(--green);font-size:18px;">fact_check</span>
-                1. Rekapitulasi Presensi Fisik Santri
-              </h4>
-              <p style="margin:2px 0 0;font-size:11px;color:var(--text-muted);">
-                Isi total angka hasil perhitungan dari lembar kertas absensi fisik yang telah diisi saat pengajian.
-              </p>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.2fr;gap:10px;align-items:center;">
-              <div>
-                <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:#166534;">Hadir</label>
-                <input type="number" min="0" id="iptJurnalHadir" value="${hVal}" style="width:100%;padding:8px;border:1.5px solid #86efac;border-radius:8px;text-align:center;font-weight:800;font-size:14px;background:#f0fdf4;" required />
-              </div>
-              <div>
-                <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:#1e40af;">Ijin</label>
-                <input type="number" min="0" id="iptJurnalIjin" value="${iVal}" style="width:100%;padding:8px;border:1.5px solid #bfdbfe;border-radius:8px;text-align:center;font-weight:800;font-size:14px;background:#eff6ff;" required />
-              </div>
-              <div>
-                <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:#991b1b;">Alfa</label>
-                <input type="number" min="0" id="iptJurnalAlfa" value="${aVal}" style="width:100%;padding:8px;border:1.5px solid #fecaca;border-radius:8px;text-align:center;font-weight:800;font-size:14px;background:#fef2f2;" required />
-              </div>
-              <div style="background:var(--bg);padding:8px 10px;border-radius:8px;border:1px solid var(--border);text-align:center;">
-                <div style="font-size:11px;color:var(--text-muted);font-weight:600;">Total &amp; % Alfa</div>
-                <div style="font-size:14px;font-weight:800;color:var(--text);margin-top:2px;">
-                  <span id="txtJurnalTotal">${totVal}</span> Santri 
-                  <span id="txtJurnalPctAlfa" style="font-size:12px;padding:2px 6px;border-radius:4px;margin-left:4px;${parseFloat(pctAlfa) >= 13.0 ? 'background:#fef08a;color:#854d0e;font-weight:800;' : 'color:var(--text-muted);'}">(${pctAlfa}%)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2: Jurnal Pembelajaran -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;">
-            <div style="margin-bottom:10px;">
-              <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;">
-                <span class="material-symbols-outlined" style="color:var(--primary);font-size:18px;">auto_stories</span>
-                2. Jurnal Pembelajaran &amp; Pengajar
-              </h4>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-              <div>
-                <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:var(--text);">
-                  Materi yang Disampaikan <span style="color:red">*</span>
-                </label>
-                <input type="text" id="iptJurnalMateri" value="${materiVal}" placeholder="Contoh: Surat Al-Baqarah ayat 1-20" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;" required />
-              </div>
-              <div>
-                <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:var(--text);">
-                  Pengajar / Pamong Pengisi <span style="color:red">*</span>
-                </label>
-                <input type="text" id="iptJurnalPengajar" value="${pengajarVal}" placeholder="Contoh: Bp. H. Ahmad / Pamong Kelompok" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;" required />
-              </div>
-            </div>
-
-            <div>
-              <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:var(--text);">
-                Catatan / Evaluasi Kegiatan
-              </label>
-              <textarea id="iptJurnalCatatan" rows="3" placeholder="Materi Alqur'an dan Khadist ataupun Tema Nasehat Bisa di catat disini" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;resize:vertical;">${catatanVal}</textarea>
-              <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:3px;">
-                💡 <em>Materi Alqur'an dan Khadist ataupun Tema Nasehat Bisa di catat disini</em>
-              </span>
-            </div>
-          </div>
-
-          <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
-          <div class="modal-sticky-footer">
-            <button type="button" id="btnJurnalKembaliAgenda" class="btn-sticky-back" title="Kembali ke Agenda">
-              <span class="material-symbols-outlined">arrow_back</span>
-              <span class="btn-text">Kembali ke Agenda</span>
-            </button>
-            <button type="submit" id="btnSubmitJurnalKelompok" class="btn-sticky-save" title="Simpan Jurnal KBM">
-              <span class="material-symbols-outlined">save</span>
-              <span class="btn-text">Simpan Jurnal KBM</span>
-            </button>
-          </div>
-        </form>
-      `;
-    } else {
-      // ── MONITORING JURNAL PENGURUS DAERAH & DESA ──
-      const targetDesaList = isDesa
-        ? desaList.filter(d => d.id === currentDesaId)
-        : (filterDesa === 'all' ? desaList : desaList.filter(d => d.id === filterDesa));
-
-      const rekapMap = currentEvent.rekap_kehadiran || {};
-
-      let totalKelompokInScope = 0;
-      let submittedKelompokCount = 0;
-      let grandHadir = 0, grandIjin = 0, grandAlfa = 0;
-
-      targetDesaList.forEach(d => {
-        d.kelompok.forEach(kel => {
-          totalKelompokInScope++;
-          const kVal = rekapMap[kel.id] || {};
-          const h = parseInt(kVal.hadir) || 0;
-          const i = parseInt(kVal.ijin) || 0;
-          const a = parseInt(kVal.alfa) || 0;
-          const tot = h + i + a;
-          if (tot > 0) {
-            submittedKelompokCount++;
-            grandHadir += h;
-            grandIjin += i;
-            grandAlfa += a;
-          }
-        });
-      });
-
-      const grandTotal = grandHadir + grandIjin + grandAlfa;
-      const grandPctAlfa = grandTotal > 0 ? ((grandAlfa / grandTotal) * 100).toFixed(1) : '0.0';
-      const pctProgress = totalKelompokInScope > 0 ? Math.round((submittedKelompokCount / totalKelompokInScope) * 100) : 0;
-
-      jurnalContentHtml = `
-        ${eventSelectorHtml}
-
-        <!-- Progress Monitoring Card -->
-        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-            <div>
-              <span style="font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;">
-                ${isDesa ? `Pemantauan Jurnal Desa ${desaObj.nama}` : 'Pemantauan Jurnal Daerah Solo Selatan'}
-              </span>
-              <h4 style="margin:2px 0 0;font-size:14px;font-weight:800;color:var(--text);">
-                Progres Pengisian: <strong>${submittedKelompokCount}</strong> dari <strong>${totalKelompokInScope}</strong> Kelompok (${pctProgress}%)
-              </h4>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <button type="button" id="btnBukaMatrixLengkap" style="padding:6px 12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-                <span class="material-symbols-outlined" style="font-size:16px;">table_chart</span>
-                Input Matrix Semua Kelompok
-              </button>
-            </div>
-          </div>
-
-          <!-- Progress Bar -->
-          <div style="width:100%;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border);">
-            <div style="width:${pctProgress}%;height:100%;background:${pctProgress >= 80 ? '#22c55e' : (pctProgress >= 40 ? '#3b82f6' : '#f59e0b')};border-radius:4px;transition:width 0.3s;"></div>
-          </div>
-
-          <div style="display:flex;gap:14px;margin-top:8px;font-size:11.5px;color:var(--text-muted);font-weight:600;">
-            <span>Total Hadir: <strong style="color:var(--text);">${grandHadir}</strong></span>
-            <span>Ijin: <strong style="color:var(--text);">${grandIjin}</strong></span>
-            <span>Alfa: <strong style="color:var(--text);">${grandAlfa} (${grandPctAlfa}%)</strong></span>
-          </div>
-        </div>
-
-        <!-- Tabel Ringkasan Monitoring Per Kelompok -->
-        <div style="max-height:360px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;">
-          <table style="width:100%;border-collapse:collapse;font-size:12px;">
-            <thead style="background:var(--bg);position:sticky;top:0;z-index:5;border-bottom:2px solid #cbd5e1;">
-              <tr>
-                <th style="padding:8px 10px;text-align:left;">Desa &amp; Kelompok</th>
-                <th style="padding:8px 10px;text-align:center;">Status Jurnal</th>
-                <th style="padding:8px 10px;text-align:center;">H / I / A</th>
-                <th style="padding:8px 10px;text-align:left;">Materi &amp; Pengajar</th>
-                <th style="padding:8px 10px;text-align:center;width:80px;">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${targetDesaList.map(d => {
-                let dRows = `
-                  <tr style="background:#e2e8f0;font-weight:800;">
-                    <td colspan="5" style="padding:6px 10px;color:var(--text);">Desa ${d.nama}</td>
-                  </tr>
-                `;
-                d.kelompok.forEach(kel => {
-                  const kVal = rekapMap[kel.id] || {};
-                  const h = parseInt(kVal.hadir) || 0;
-                  const i = parseInt(kVal.ijin) || 0;
-                  const a = parseInt(kVal.alfa) || 0;
-                  const tot = h + i + a;
-                  const isSubmitted = tot > 0;
-
-                  dRows += `
-                    <tr style="border-bottom:1px solid var(--border);">
-                      <td style="padding:8px 10px;font-weight:700;">Kel. ${kel.nama}</td>
-                      <td style="padding:8px 10px;text-align:center;white-space:nowrap;">
-                        ${isSubmitted ? `
-                          <span class="kbm-badge-status-done">
-                            <span class="material-symbols-outlined" style="font-size:12px;">check_circle</span>
-                            Sudah
-                          </span>
-                        ` : `
-                          <span class="kbm-badge-status-pending">
-                            <span class="material-symbols-outlined" style="font-size:12px;">pending</span>
-                            Belum
-                          </span>
-                        `}
-                      </td>
-                      <td style="padding:8px 10px;text-align:center;font-weight:700;white-space:nowrap;">
-                        ${isSubmitted ? `${h} / ${i} / ${a}` : '-'}
-                      </td>
-                      <td style="padding:8px 10px;">
-                        ${isSubmitted ? `
-                          <div style="font-weight:700;color:var(--text);">${kVal.materi || 'Materi KBM'}</div>
-                          <div style="font-size:11px;color:var(--text-muted);">${kVal.pengajar || '-'}</div>
-                        ` : '<span style="color:#94a3b8;font-style:italic;">Belum ada jurnal</span>'}
-                      </td>
-                      <td style="padding:8px 10px;text-align:center;">
-                        <button type="button" class="btn-edit-jurnal-single" data-ev-id="${currentEvent.id}" data-kel-id="${kel.id}" title="Input/Edit Jurnal Kelompok Ini" style="padding:4px 8px;background:var(--blue-light);color:var(--blue);border:1px solid #bfdbfe;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
-                          <span class="material-symbols-outlined" style="font-size:14px;">edit_note</span>
-                          <span>Edit</span>
-                        </button>
-                      </td>
-                    </tr>
-                  `;
-                });
-                return dRows;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-          <button type="button" id="btnJurnalKembaliAgenda2" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-            Kembali ke Agenda
-          </button>
-        </div>
-      `;
-    }
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // TAB 3 (SUB-VIEW): FORM BUAT EVENT BARU
-  // ══════════════════════════════════════════════════════════════
-  const createFormHtml = `
+  const eventFormHtml = `
     <!-- HIGHLIGHT INFO -->
-    <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
-      <span class="material-symbols-outlined" style="font-size:24px;color:#16a34a;flex-shrink:0;">print</span>
+    <div style="background:linear-gradient(135deg, ${isEdit ? '#fef3c7 0%, #fef9c3 100%' : '#f0fdf4 0%, #dcfce7 100%'});border:1.5px solid ${isEdit ? '#fde68a' : '#86efac'};border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+      <span class="material-symbols-outlined" style="font-size:24px;color:${isEdit ? '#d97706' : '#16a34a'};flex-shrink:0;">${formIcon}</span>
       <div>
-        <h4 style="margin:0;font-size:13px;font-weight:800;color:var(--green-dark);">Buat Event KBM &amp; Siapkan Lembar Absensi Cetak</h4>
-        <p style="margin:2px 0 0;font-size:11.5px;color:#15803d;line-height:1.4;">
-          Event akan tersimpan di agenda, siap dicetak kapan saja menggunakan data generus aktif, dan dapat langsung diisi jurnalnya pasca KBM.
+        <h4 style="margin:0;font-size:13px;font-weight:800;color:${isEdit ? '#92400e' : 'var(--green-dark)'};">${formTitle}</h4>
+        <p style="margin:2px 0 0;font-size:11.5px;color:${isEdit ? '#b45309' : '#15803d'};line-height:1.4;">
+          ${formDesc}
         </p>
       </div>
     </div>
 
-    <!-- FORM PENGATURAN CETAK -->
+    <!-- FORM PENGATURAN CETAK / EDIT -->
     <form id="formCetakAbsensi" style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
       
       <!-- Judul Event & Format KBM -->
@@ -808,16 +531,16 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
             Judul Event / Kegiatan <span style="color:red">*</span>
           </label>
-          <input type="text" id="modalIptCustomJudul" value="${isKelompok ? `PENGAJIAN REMAJA KELOMPOK ${currentKelObj ? currentKelObj.nama.toUpperCase() : ''}` : (isDesa ? `PENGAJIAN REMAJA DESA ${desaObj.nama.toUpperCase()}` : 'PENGAJIAN REMAJA DAERAH SOLO SELATAN')}" placeholder="Contoh: PENGAJIAN REMAJA" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:var(--text);font-size:12.5px;" required />
+          <input type="text" id="modalIptCustomJudul" value="${defaultJudul}" placeholder="Contoh: PENGAJIAN REMAJA" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:var(--text);font-size:12.5px;" required />
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
             Format KBM <span style="color:red">*</span>
           </label>
           <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:#1e3a8a;font-size:12.5px;">
-            <option value="remaja" selected>🎓 Remaja (SMP - Dewasa)</option>
-            <option value="gp_reguler">📚 GP Reguler (SMP - SMA)</option>
-            <option value="caberawit">🌱 Caberawit (PAUD - SD)</option>
+            <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>🎓 Remaja (SMP - Dewasa)</option>
+            <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
+            <option value="caberawit" ${defaultFormat === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
           </select>
         </div>
       </div>
@@ -826,11 +549,11 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;">
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Hari, Tanggal Pelaksanaan</label>
-          <input type="text" id="modalIptHariTanggal" placeholder="Contoh: Selasa, 20 Januari 2026" value="Selasa, 20 Januari 2026" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
+          <input type="text" id="modalIptHariTanggal" placeholder="Contoh: Selasa, 20 Januari 2026" value="${defaultHariTgl}" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Waktu / Jam KBM</label>
-          <input type="text" id="modalIptJam" placeholder="Contoh: 19.30 – 21.00 WIB" value="19.30 – 21.00 WIB" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
+          <input type="text" id="modalIptJam" placeholder="Contoh: 19.30 – 21.00 WIB" value="${defaultJam}" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
         </div>
       </div>
 
@@ -839,13 +562,13 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Desa</label>
           <select id="modalSelDesa" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
-            ${buildDesaOptions(isDaerah ? 'all' : currentDesaId)}
+            ${buildDesaOptions(defaultDesa)}
           </select>
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Kelompok</label>
           <select id="modalSelKelompok" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
-            ${buildKelOptions(isDaerah ? 'all' : currentDesaId, isKelompok ? currentKelId : 'all')}
+            ${buildKelOptions(defaultDesa, defaultKel)}
           </select>
         </div>
       </div>
@@ -855,20 +578,20 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Pemisahan Gender</label>
           <select id="modalSelGender" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
-            <option value="pisah" selected>🚻 Pisah Lembar (Putra &amp; Putri)</option>
-            <option value="L">👦 Khusus Putra Saja</option>
-            <option value="P">👧 Khusus Putri Saja</option>
-            <option value="gabung">👥 Gabung (Putra &amp; Putri)</option>
+            <option value="pisah" ${defaultGender === 'pisah' ? 'selected' : ''}>🚻 Pisah Lembar (Putra &amp; Putri)</option>
+            <option value="L" ${defaultGender === 'L' ? 'selected' : ''}>👦 Khusus Putra Saja</option>
+            <option value="P" ${defaultGender === 'P' ? 'selected' : ''}>👧 Khusus Putri Saja</option>
+            <option value="gabung" ${defaultGender === 'gabung' ? 'selected' : ''}>👥 Gabung (Putra &amp; Putri)</option>
           </select>
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Format Baris Kosong</label>
           <select id="modalSelBarisKosong" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12.5px;">
-            <option value="fill30" selected>Penuhi Halaman (Maks. 30 Baris)</option>
-            <option value="0">0 (Pas Jumlah Generus)</option>
-            <option value="3">+3 Baris Kosong</option>
-            <option value="5">+5 Baris Kosong</option>
-            <option value="10">+10 Baris Kosong</option>
+            <option value="fill30" ${defaultBaris === 'fill30' ? 'selected' : ''}>Penuhi Halaman (Maks. 30 Baris)</option>
+            <option value="0" ${defaultBaris === '0' ? 'selected' : ''}>0 (Pas Jumlah Generus)</option>
+            <option value="3" ${defaultBaris === '3' ? 'selected' : ''}>+3 Baris Kosong</option>
+            <option value="5" ${defaultBaris === '5' ? 'selected' : ''}>+5 Baris Kosong</option>
+            <option value="10" ${defaultBaris === '10' ? 'selected' : ''}>+10 Baris Kosong</option>
           </select>
         </div>
       </div>
@@ -878,23 +601,14 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Bulan Presensi</label>
           <select id="modalSelBulan" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
-            <option value="JANUARI">JANUARI</option>
-            <option value="FEBRUARI">FEBRUARI</option>
-            <option value="MARET">MARET</option>
-            <option value="APRIL">APRIL</option>
-            <option value="MEI">MEI</option>
-            <option value="JUNI">JUNI</option>
-            <option value="JULI">JULI</option>
-            <option value="AGUSTUS">AGUSTUS</option>
-            <option value="SEPTEMBER" selected>SEPTEMBER</option>
-            <option value="OKTOBER">OKTOBER</option>
-            <option value="NOVEMBER">NOVEMBER</option>
-            <option value="DESEMBER">DESEMBER</option>
+            ${['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'].map(m => `
+              <option value="${m}" ${defaultBulan === m ? 'selected' : ''}>${m}</option>
+            `).join('')}
           </select>
         </div>
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Tahun</label>
-          <input type="text" id="modalIptTahun" value="2026" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;" />
+          <input type="text" id="modalIptTahun" value="${defaultTahun}" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;" />
         </div>
       </div>
 
@@ -906,62 +620,54 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           <span class="material-symbols-outlined">arrow_back</span>
           <span class="btn-text">Kembali ke Agenda</span>
         </button>
-        <button type="button" id="btnCetakLangsungTanpaSimpan" class="btn-sticky-print" title="Cetak Saja">
-          <span class="material-symbols-outlined">print</span>
-          <span class="btn-text">Cetak Saja</span>
-        </button>
-        <button type="submit" id="btnSubmitEventKbm" class="btn-sticky-save" title="Simpan Event KBM">
+        ${!isEdit ? `
+          <button type="button" id="btnCetakLangsungTanpaSimpan" class="btn-sticky-print" title="Cetak Saja">
+            <span class="material-symbols-outlined">print</span>
+            <span class="btn-text">Cetak Saja</span>
+          </button>
+        ` : ''}
+        <button type="submit" id="btnSubmitEventKbm" class="btn-sticky-save" title="${isEdit ? 'Simpan Perubahan' : 'Simpan Event KBM'}">
           <span class="material-symbols-outlined">save</span>
-          <span class="btn-text">Simpan Event KBM</span>
+          <span class="btn-text">${isEdit ? 'Simpan Perubahan' : 'Simpan Event KBM'}</span>
         </button>
       </div>
     </form>
   `;
 
   // ── RENDER CONTAINER MODAL ──
+  const isFormView = (activeTab === 'create_event' || activeTab === 'edit_event');
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:10px;">
-      ${activeTab !== 'create_event' ? tabHeaderHtml : ''}
       <div id="tabContentContainer">
-        ${activeTab === 'agenda' ? agendaContentHtml : (activeTab === 'jurnal' ? jurnalContentHtml : createFormHtml)}
+        ${isFormView ? eventFormHtml : agendaContentHtml}
       </div>
     </div>
   `;
 
-  const modalSize = (activeTab === 'create_event') ? 'medium' : 'wide';
+  const modalSize = isFormView ? 'medium' : 'wide';
   openModal('Manajemen Event KBM & Presensi Cepat', 'event_available', modalHtml, modalSize);
 
   // ══════════════════════════════════════════════════════════════
   // EVENT LISTENERS & LOGIC BINDINGS
   // ══════════════════════════════════════════════════════════════
 
-  // 1. Tab Switching
-  document.getElementById('tabBtnAgenda')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode });
-  });
-  document.getElementById('tabBtnJurnal')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('jurnal', { filterDesa, filterKel, filterFormat, selectedEventId });
-  });
-
-  // 2. Open Create Event Form
+  // 1. Open Create Event Form
   document.getElementById('btnBukaCreateEvent')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat });
+    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
   });
   document.getElementById('btnEmptyCreateEvent')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat });
-  });
-  document.getElementById('btnJurnalToAgenda')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat, scopeMode, page: 1 });
   });
 
-  // 3. Tab 1 Filter Listeners
+  // 2. Agenda View Listeners
   if (activeTab === 'agenda') {
     document.getElementById('kbmFilterDesa')?.addEventListener('change', (e) => {
       renderCetakAbsensiModal('agenda', {
         filterDesa: e.target.value,
         filterKel: 'all',
         filterFormat,
-        scopeMode
+        scopeMode,
+        page: 1
       });
     });
 
@@ -970,7 +676,8 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         filterDesa,
         filterKel: e.target.value,
         filterFormat,
-        scopeMode
+        scopeMode,
+        page: 1
       });
     });
 
@@ -979,16 +686,33 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         filterDesa,
         filterKel,
         filterFormat: e.target.value,
-        scopeMode
+        scopeMode,
+        page: 1
       });
     });
 
     document.getElementById('btnScopeKelompok')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'kelompok_only' });
+      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'kelompok_only', page: 1 });
     });
 
     document.getElementById('btnScopeDesa')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'desa_all' });
+      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'desa_all', page: 1 });
+    });
+
+    // Pagination Listeners
+    document.querySelectorAll('.btn-page-nav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetPage = parseInt(btn.getAttribute('data-page'));
+        if (targetPage && targetPage >= 1 && targetPage <= totalPages && targetPage !== currentPage) {
+          renderCetakAbsensiModal('agenda', {
+            filterDesa,
+            filterKel,
+            filterFormat,
+            scopeMode,
+            page: targetPage
+          });
+        }
+      });
     });
 
     // Action: Cetak Lembar Presensi
@@ -999,11 +723,23 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       });
     });
 
-    // Action: Isi Jurnal
+    // Action: Isi Jurnal (Direct Scope)
     document.querySelectorAll('.btn-action-isi-jurnal').forEach(btn => {
       btn.addEventListener('click', () => {
         const evId = btn.getAttribute('data-ev-id');
-        renderCetakAbsensiModal('jurnal', { selectedEventId: evId });
+        const ev = getKbmEventById(evId);
+        if (!ev) return;
+
+        // Jika event tingkat Kelompok -> Langsung buka form khusus kelompok tersebut
+        if (ev.kelompok_id && ev.kelompok_id !== 'all') {
+          renderSingleKelompokEditModal(ev, ev.kelompok_id);
+        } else if (isKelompok) {
+          // Pamong kelompok mengisi kelompoknya sendiri
+          renderSingleKelompokEditModal(ev, currentKelId);
+        } else {
+          // Tingkat Desa atau Daerah -> Buka matrix terfilter sesuai wilayah event
+          renderFormRekapKehadiranModal(ev.id);
+        }
       });
     });
 
@@ -1012,6 +748,21 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       btn.addEventListener('click', () => {
         const evId = btn.getAttribute('data-ev-id');
         window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(evId)}`, '_blank');
+      });
+    });
+
+    // Action: Edit Event KBM
+    document.querySelectorAll('.btn-action-edit-event').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const evId = btn.getAttribute('data-ev-id');
+        renderCetakAbsensiModal('edit_event', {
+          filterDesa,
+          filterKel,
+          filterFormat,
+          scopeMode,
+          page: currentPage,
+          editEventId: evId
+        });
       });
     });
 
@@ -1031,123 +782,15 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           onConfirm: async () => {
             await deleteKbmEvent(evId);
             showToast('Event berhasil dihapus', 'success');
-            renderCetakAbsensiModal('agenda');
+            renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
           }
         });
       });
     });
   }
 
-  // 4. Tab 2 Jurnal Listeners
-  if (activeTab === 'jurnal' && currentEvent) {
-    // Dropdown change event
-    document.getElementById('selJurnalEventId')?.addEventListener('change', (e) => {
-      renderCetakAbsensiModal('jurnal', { selectedEventId: e.target.value });
-    });
-
-    document.getElementById('btnJurnalPreviewPdf')?.addEventListener('click', () => {
-      window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(currentEvent.id)}`, '_blank');
-    });
-
-    document.getElementById('btnJurnalKembaliAgenda')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda');
-    });
-    document.getElementById('btnJurnalKembaliAgenda2')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda');
-    });
-
-    // Pamong Kelompok Form
-    if (isKelompok) {
-      const iptH = document.getElementById('iptJurnalHadir');
-      const iptI = document.getElementById('iptJurnalIjin');
-      const iptA = document.getElementById('iptJurnalAlfa');
-      const txtTot = document.getElementById('txtJurnalTotal');
-      const txtPctA = document.getElementById('txtJurnalPctAlfa');
-
-      function updateJurnalSummary() {
-        const h = parseInt(iptH?.value) || 0;
-        const i = parseInt(iptI?.value) || 0;
-        const a = parseInt(iptA?.value) || 0;
-        const tot = h + i + a;
-        const pctA = tot > 0 ? ((a / tot) * 100).toFixed(1) : '0.0';
-        if (txtTot) txtTot.textContent = tot;
-        if (txtPctA) {
-          txtPctA.textContent = `(${pctA}%)`;
-          if (parseFloat(pctA) >= 13.0) {
-            txtPctA.style.background = '#fef08a';
-            txtPctA.style.color = '#854d0e';
-            txtPctA.style.fontWeight = '800';
-          } else {
-            txtPctA.style.background = 'transparent';
-            txtPctA.style.color = 'var(--text-muted)';
-            txtPctA.style.fontWeight = 'normal';
-          }
-        }
-      }
-
-      iptH?.addEventListener('input', updateJurnalSummary);
-      iptI?.addEventListener('input', updateJurnalSummary);
-      iptA?.addEventListener('input', updateJurnalSummary);
-
-      let isSavingJurnal = false;
-      document.getElementById('formJurnalKelompok')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (isSavingJurnal) return;
-        isSavingJurnal = true;
-
-        const btnSubmit = document.getElementById('btnSubmitJurnalKelompok');
-        if (btnSubmit) {
-          btnSubmit.disabled = true;
-          btnSubmit.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">sync</span> Menyimpan Jurnal...`;
-        }
-
-        const h = parseInt(iptH?.value) || 0;
-        const i = parseInt(iptI?.value) || 0;
-        const a = parseInt(iptA?.value) || 0;
-        const materi = document.getElementById('iptJurnalMateri')?.value.trim() || '';
-        const pengajar = document.getElementById('iptJurnalPengajar')?.value.trim() || '';
-        const catatan = document.getElementById('iptJurnalCatatan')?.value.trim() || '';
-
-        const rekap = { ...(currentEvent.rekap_kehadiran || {}) };
-        rekap[currentKelId] = {
-          hadir: h,
-          ijin: i,
-          alfa: a,
-          materi,
-          pengajar,
-          catatan,
-          updated_at: new Date().toISOString()
-        };
-
-        await saveKbmEvent({
-          ...currentEvent,
-          rekap_kehadiran: rekap
-        });
-
-        showToast('Jurnal kegiatan KBM berhasil disimpan!', 'success');
-        setTimeout(() => {
-          isSavingJurnal = false;
-          renderCetakAbsensiModal('jurnal', { selectedEventId: currentEvent.id });
-        }, 300);
-      });
-    } else {
-      // Pengurus Daerah / Desa
-      document.querySelectorAll('.btn-edit-jurnal-single').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const evId = btn.getAttribute('data-ev-id');
-          const kelId = btn.getAttribute('data-kel-id');
-          renderFormRekapKehadiranModal(evId, kelId);
-        });
-      });
-
-      document.getElementById('btnBukaMatrixLengkap')?.addEventListener('click', () => {
-        renderFormRekapKehadiranModal(currentEvent.id);
-      });
-    }
-  }
-
-  // 5. Create Event Subview Listeners
-  if (activeTab === 'create_event') {
+  // 3. Create / Edit Event Form Listeners
+  if (isFormView) {
     const selDesaEl = document.getElementById('modalSelDesa');
     const selKelEl = document.getElementById('modalSelKelompok');
     selDesaEl?.addEventListener('change', () => {
@@ -1155,7 +798,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     });
 
     document.getElementById('btnBatalKeAgenda')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda');
+      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
     });
 
     document.getElementById('btnCetakLangsungTanpaSimpan')?.addEventListener('click', () => {
@@ -1182,7 +825,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       const btnSubmit = document.getElementById('btnSubmitEventKbm');
       if (btnSubmit) {
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">sync</span> Menyimpan Event...`;
+        btnSubmit.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">sync</span> Menyimpan...`;
       }
 
       const jenjangVal = document.getElementById('modalSelJenisKbm').value;
@@ -1197,38 +840,63 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       const urutanVal = document.getElementById('modalSelUrutan').value;
       const barisVal = document.getElementById('modalSelBarisKosong').value;
 
-      const newEvent = await saveKbmEvent({
-        judul: judulVal,
-        subjudul: 'KEPENGURUSAN REMAJA DAERAH SOLO SELATAN',
-        format_kbm: jenjangVal,
-        desa_id: desaVal,
-        kelompok_id: kelVal,
-        gender: genderVal,
-        hari_tanggal: hariTglVal,
-        jam: jamVal,
-        bulan: bulanVal,
-        tahun: tahunVal,
-        sesi_kelas: [
-          {
-            kelas: '1 SMP - DEWASA',
-            tempat: 'Masjid Lt. 1',
-            materi: 'Materi KBM Pengajian',
-            penasehat: 'Penasehat KBM'
-          }
-        ],
-        rekap_kehadiran: {}
-      });
+      if (isEdit && editingEvent) {
+        // Mode Edit: Simpan perubahan pada event yang sudah ada
+        await saveKbmEvent({
+          ...editingEvent,
+          judul: judulVal,
+          format_kbm: jenjangVal,
+          desa_id: desaVal,
+          kelompok_id: kelVal,
+          gender: genderVal,
+          hari_tanggal: hariTglVal,
+          jam: jamVal,
+          bulan: bulanVal,
+          tahun: tahunVal,
+          baris_kosong: barisVal
+        });
 
-      showToast('Event KBM berhasil disimpan!', 'success');
+        showToast('Perubahan event KBM berhasil disimpan!', 'success');
+        setTimeout(() => {
+          isSavingEventKbm = false;
+          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
+        }, 250);
+      } else {
+        // Mode Buat Baru
+        const newEvent = await saveKbmEvent({
+          judul: judulVal,
+          subjudul: 'KEPENGURUSAN REMAJA DAERAH SOLO SELATAN',
+          format_kbm: jenjangVal,
+          desa_id: desaVal,
+          kelompok_id: kelVal,
+          gender: genderVal,
+          hari_tanggal: hariTglVal,
+          jam: jamVal,
+          bulan: bulanVal,
+          tahun: tahunVal,
+          baris_kosong: barisVal,
+          sesi_kelas: [
+            {
+              kelas: '1 SMP - DEWASA',
+              tempat: 'Masjid Lt. 1',
+              materi: 'Materi KBM Pengajian',
+              penasehat: 'Penasehat KBM'
+            }
+          ],
+          rekap_kehadiran: {}
+        });
 
-      // Buka Cetak Lembar Presensi
-      const targetUrl = `../laporan/cetak-absensi.html?eventId=${encodeURIComponent(newEvent.id)}&jenjang=${encodeURIComponent(jenjangVal)}&desa=${encodeURIComponent(desaVal)}&kelompok=${encodeURIComponent(kelVal)}&gender=${encodeURIComponent(genderVal)}&judul=${encodeURIComponent(judulVal)}&bulan=${encodeURIComponent(bulanVal)}&tahun=${encodeURIComponent(tahunVal)}&urutan=${encodeURIComponent(urutanVal)}&baris=${encodeURIComponent(barisVal)}`;
-      window.open(targetUrl, '_blank');
+        showToast('Event KBM berhasil disimpan!', 'success');
 
-      setTimeout(() => {
-        isSavingEventKbm = false;
-        renderCetakAbsensiModal('agenda');
-      }, 300);
+        // Buka Cetak Lembar Presensi
+        const targetUrl = `../laporan/cetak-absensi.html?eventId=${encodeURIComponent(newEvent.id)}&jenjang=${encodeURIComponent(jenjangVal)}&desa=${encodeURIComponent(desaVal)}&kelompok=${encodeURIComponent(kelVal)}&gender=${encodeURIComponent(genderVal)}&judul=${encodeURIComponent(judulVal)}&bulan=${encodeURIComponent(bulanVal)}&tahun=${encodeURIComponent(tahunVal)}&urutan=${encodeURIComponent(urutanVal)}&baris=${encodeURIComponent(barisVal)}`;
+        window.open(targetUrl, '_blank');
+
+        setTimeout(() => {
+          isSavingEventKbm = false;
+          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: 1 });
+        }, 250);
+      }
     });
   }
 
@@ -1236,7 +904,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FORM ISIAN REKAPITULASI KEHADIRAN KBM (MATRIX MULTI-KELOMPOK / SINGLE)
+   FORM ISIAN REKAPITULASI KEHADIRAN KBM (MATRIX DESA / DAERAH)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
@@ -1247,40 +915,36 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
     return;
   }
 
-  // Jika targetKelId diberikan, buka form jurnal fokus kelompok tersebut
+  // Jika targetKelId diberikan atau event adalah event tingkat kelompok tunggal:
   if (targetKelId) {
     renderSingleKelompokEditModal(event, targetKelId);
+    return;
+  }
+  if (event.kelompok_id && event.kelompok_id !== 'all') {
+    renderSingleKelompokEditModal(event, event.kelompok_id);
     return;
   }
 
   // Sesi Kelas
   let currentSesiList = (event.sesi_kelas && event.sesi_kelas.length > 0)
     ? JSON.parse(JSON.stringify(event.sesi_kelas))
-    : [{ kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1', materi: 'Seminar Senkom Kota', penasehat: 'Bp. Abdul Aziz , S.Kom., M.Cs.' }];
+    : [{ kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1', materi: '', penasehat: '' }];
 
   // Wilayah scoping for rekap table
   let scopedDesa = MASTER_WILAYAH.desa;
-  let wilayahRekapLabel = '27 Kelompok Solo Selatan';
+  let wilayahRekapLabel = 'Solo Selatan';
 
-  if (currentUser.tingkatan === 'desa') {
-    scopedDesa = MASTER_WILAYAH.desa.filter(d => d.id === currentUser.desaId);
-    wilayahRekapLabel = `Desa ${scopedDesa[0]?.nama || ''}`;
-  } else if (event.kelompok_id && event.kelompok_id !== 'all') {
-    scopedDesa = MASTER_WILAYAH.desa
-      .map(d => ({
-        ...d,
-        kelompok: d.kelompok.filter(k => k.id === event.kelompok_id)
-      }))
-      .filter(d => d.kelompok.length > 0);
-    const kelObj = scopedDesa[0]?.kelompok[0];
-    if (kelObj) {
-      wilayahRekapLabel = `Kelompok ${kelObj.nama} (Desa ${scopedDesa[0].nama})`;
-    }
-  } else if (event.desa_id && event.desa_id !== 'all') {
+  // PRIORITAS: Periksa scope wilayah event terlebih dahulu!
+  if (event.desa_id && event.desa_id !== 'all') {
     scopedDesa = MASTER_WILAYAH.desa.filter(d => d.id === event.desa_id);
     if (scopedDesa[0]) {
       wilayahRekapLabel = `Desa ${scopedDesa[0].nama}`;
     }
+  } else if (currentUser.tingkatan === 'desa') {
+    scopedDesa = MASTER_WILAYAH.desa.filter(d => d.id === currentUser.desaId);
+    wilayahRekapLabel = `Desa ${scopedDesa[0]?.nama || ''}`;
+  } else {
+    wilayahRekapLabel = '27 Kelompok Solo Selatan';
   }
 
   const currentRekap = event.rekap_kehadiran ? JSON.parse(JSON.stringify(event.rekap_kehadiran)) : {};
@@ -1290,8 +954,8 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
       <tr data-sesi-idx="${idx}">
         <td style="padding:6px;"><input type="text" class="ipt-sesi-kelas" value="${s.kelas || ''}" placeholder="misal: 1 SMP - 3 SMP" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;" /></td>
         <td style="padding:6px;"><input type="text" class="ipt-sesi-tempat" value="${s.tempat || ''}" placeholder="misal: Masjid Lt. 1" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;" /></td>
-        <td style="padding:6px;"><input type="text" class="ipt-sesi-materi" value="${s.materi || ''}" placeholder="misal: Seminar Senkom" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;" /></td>
-        <td style="padding:6px;"><input type="text" class="ipt-sesi-penasehat" value="${s.penasehat || ''}" placeholder="misal: Bp. Abdul Aziz" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;" /></td>
+        <td style="padding:6px;"><input type="text" class="ipt-sesi-materi" value="${s.materi || ''}" placeholder="misal: Surat Al-Baqarah" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;" /></td>
+        <td style="padding:6px;"><input type="text" class="ipt-sesi-penasehat" value="${s.penasehat || ''}" placeholder="misal: Ust. Ahmad" style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;" /></td>
         <td style="padding:6px;text-align:center;">
           <button type="button" class="btn-hapus-sesi" data-idx="${idx}" title="Hapus Baris Kelas" style="background:var(--red-light);color:#ef4444;border:none;border-radius:6px;padding:5px 8px;cursor:pointer;">
             <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
@@ -1454,9 +1118,9 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
 
       <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
       <div class="modal-sticky-footer">
-        <button type="button" id="btnBackToJurnalTab" class="btn-sticky-back" title="Kembali ke Jurnal">
+        <button type="button" id="btnBackToJurnalTab" class="btn-sticky-back" title="Kembali ke Agenda">
           <span class="material-symbols-outlined">arrow_back</span>
-          <span class="btn-text">Kembali ke Jurnal</span>
+          <span class="btn-text">Kembali ke Agenda</span>
         </button>
         <button type="button" id="btnSimpanDanCetakLaporan" class="btn-sticky-print" title="Simpan &amp; Cetak PDF">
           <span class="material-symbols-outlined">print</span>
@@ -1473,7 +1137,7 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
   openModal('Matrix Isian Rekapitulasi Kehadiran', 'edit_calendar', modalHtml, 'wide');
 
   document.getElementById('btnBackToJurnalTab')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('jurnal', { selectedEventId: event.id });
+    renderCetakAbsensiModal('agenda');
   });
 
   document.getElementById('btnBukaCetakLaporanLangsung')?.addEventListener('click', () => {
@@ -1630,7 +1294,9 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
           ...(collectedRekap[kel.id] || {}),
           hadir: parseInt(iptH?.value) || 0,
           ijin: parseInt(iptI?.value) || 0,
-          alfa: parseInt(iptA?.value) || 0
+          alfa: parseInt(iptA?.value) || 0,
+          materi: (collectedSesi[0]?.materi) || collectedRekap[kel.id]?.materi || '',
+          pengajar: (collectedSesi[0]?.penasehat) || collectedRekap[kel.id]?.pengajar || ''
         };
       });
     });
@@ -1653,9 +1319,9 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
     const btnSimpan = document.getElementById('btnSimpanRekap');
     if (btnSimpan) btnSimpan.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">sync</span>`;
     await saveCurrentRekapData();
-    if (btnSimpan) btnSimpan.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan Rekap`;
+    if (btnSimpan) btnSimpan.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan Laporan`;
     showToast('Rekapitulasi kehadiran KBM berhasil disimpan!', 'success');
-    renderCetakAbsensiModal('jurnal', { selectedEventId: event.id });
+    renderCetakAbsensiModal('agenda');
   });
 
   document.getElementById('btnSimpanDanCetakLaporan')?.addEventListener('click', async () => {
@@ -1665,12 +1331,15 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
     if (btnSimpanCetak) btnSimpanCetak.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">print</span> Simpan & Cetak`;
     showToast('Rekapitulasi disimpan! Membuka laporan PDF...', 'success');
     window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(saved.id)}`, '_blank');
-    renderCetakAbsensiModal('jurnal', { selectedEventId: saved.id });
+    renderCetakAbsensiModal('agenda');
   });
 }
 
-/* ── MODAL ISIAN JURNAL FOKUS SATU KELOMPOK (UNTUK DAERAH / DESA) ── */
-function renderSingleKelompokEditModal(event, kelId) {
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODAL ISIAN JURNAL FOKUS SATU KELOMPOK
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function renderSingleKelompokEditModal(event, kelId) {
   const allKels = getAllKelompok();
   const kelObj = allKels.find(k => k.id === kelId);
   const kelNama = kelObj ? kelObj.nama : 'Kelompok';
@@ -1681,8 +1350,11 @@ function renderSingleKelompokEditModal(event, kelId) {
   const aVal = parseInt(rekap.alfa) || 0;
   const totVal = hVal + iVal + aVal;
   const pctAlfa = totVal > 0 ? ((aVal / totVal) * 100).toFixed(1) : '0.0';
-  const materiVal = rekap.materi || '';
-  const pengajarVal = rekap.pengajar || '';
+
+  const defaultMateri = (event.sesi_kelas && event.sesi_kelas[0] ? event.sesi_kelas[0].materi : '') || '';
+  const defaultPengajar = (event.sesi_kelas && event.sesi_kelas[0] ? event.sesi_kelas[0].penasehat : '') || '';
+  const materiVal = rekap.materi || (defaultMateri === 'Seminar Senkom Kota' ? '' : defaultMateri);
+  const pengajarVal = rekap.pengajar || (defaultPengajar.includes('Abdul Aziz') ? '' : defaultPengajar);
   const catatanVal = rekap.catatan || '';
 
   const modalHtml = `
@@ -1741,9 +1413,9 @@ function renderSingleKelompokEditModal(event, kelId) {
 
         <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
         <div class="modal-sticky-footer">
-          <button type="button" id="btnBackToJurnalMonitoring" class="btn-sticky-back" title="Batal &amp; Kembali">
+          <button type="button" id="btnBackToJurnalMonitoring" class="btn-sticky-back" title="Kembali ke Agenda">
             <span class="material-symbols-outlined">arrow_back</span>
-            <span class="btn-text">Batal &amp; Kembali</span>
+            <span class="btn-text">Kembali ke Agenda</span>
           </button>
           <button type="submit" id="btnSaveSingleKelompok" class="btn-sticky-save" title="Simpan Jurnal">
             <span class="material-symbols-outlined">save</span>
@@ -1757,7 +1429,7 @@ function renderSingleKelompokEditModal(event, kelId) {
   openModal(`Jurnal KBM Kel. ${kelNama}`, 'edit_note', modalHtml, 'medium');
 
   document.getElementById('btnBackToJurnalMonitoring')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('jurnal', { selectedEventId: event.id });
+    renderCetakAbsensiModal('agenda');
   });
 
   const iptH = document.getElementById('iptSingleHadir');
@@ -1817,14 +1489,23 @@ function renderSingleKelompokEditModal(event, kelId) {
       updated_at: new Date().toISOString()
     };
 
+    // Sinkronkan ke sesi_kelas juga
+    const updatedSesi = (event.sesi_kelas && event.sesi_kelas.length > 0)
+      ? JSON.parse(JSON.stringify(event.sesi_kelas))
+      : [{ kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1' }];
+    if (!updatedSesi[0]) updatedSesi[0] = { kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1' };
+    if (materi) updatedSesi[0].materi = materi;
+    if (pengajar) updatedSesi[0].penasehat = pengajar;
+
     await saveKbmEvent({
       ...event,
+      sesi_kelas: updatedSesi,
       rekap_kehadiran: rekapMap
     });
 
-    showToast(`Jurnal Kel. ${kelNama} berhasil diperbarui!`, 'success');
+    showToast(`Jurnal Kel. ${kelNama} berhasil disimpan!`, 'success');
     setTimeout(() => {
-      renderCetakAbsensiModal('jurnal', { selectedEventId: event.id });
+      renderCetakAbsensiModal('agenda');
     }, 250);
   });
 }

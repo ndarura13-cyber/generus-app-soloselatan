@@ -13,6 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="report-viewer.css" />
 
   <style>
     :root {
@@ -421,33 +422,53 @@
 
 <body>
 
-  <!-- Screen Only Toolbar -->
-  <div class="screen-toolbar">
-    <div class="toolbar-inner">
-      <div class="toolbar-title">
-        <span class="material-symbols-outlined" style="font-size:22px;">description</span>
-        <span>Laporan Data Generus Resmi</span>
-        <span id="txtHeaderCount" class="badge-count">0 Santri</span>
+  <!-- STANDARDIZED REPORT VIEWER HEADER (NO-PRINT) -->
+  <header class="report-header-toolbar no-print">
+    <div class="report-header-inner">
+      <div class="report-header-left">
+        <button type="button" class="report-btn-back" onclick="handleKembaliDashboard()" title="Kembali">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali</span>
+        </button>
+        <div class="report-title-wrap">
+          <span class="report-doc-title">Laporan Data Generus Resmi</span>
+          <span class="report-doc-subtitle" id="txtHeaderCount">0 Santri</span>
+        </div>
       </div>
-      <div class="toolbar-actions">
-        <button type="button" class="btn-action btn-print" onclick="window.print()">
-          <span class="material-symbols-outlined" style="font-size:16px;">print</span>
-          <span>Cetak / Simpan PDF</span>
+
+      <div class="report-header-center" id="reportHeaderCenter">
+        <!-- Center section -->
+      </div>
+
+      <div class="report-header-right">
+        <button type="button" id="btnExportExcelLaporan" class="report-btn-print" style="background:#0284c7;" title="Unduh Excel (.xlsx)">
+          <span class="material-symbols-outlined">table_view</span>
+          <span class="btn-text">Unduh Excel</span>
         </button>
-        <button type="button" id="btnExportExcelLaporan" class="btn-action" style="background:#0284c7;color:#fff;">
-          <span class="material-symbols-outlined" style="font-size:16px;">table_view</span>
-          <span>Unduh Excel (.xlsx)</span>
-        </button>
-        <button type="button" class="btn-action btn-back" onclick="handleKembaliDashboard()">
-          <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
-          <span>Kembali</span>
+
+        <div class="report-zoom-pill">
+          <button type="button" class="report-zoom-btn" id="btnReportZoomOut" title="Zoom Out (Ctrl -)">
+            <span class="material-symbols-outlined">zoom_out</span>
+          </button>
+          <span class="report-zoom-val" id="reportZoomVal" title="Reset Zoom (Ctrl 0)">100%</span>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomIn" title="Zoom In (Ctrl +)">
+            <span class="material-symbols-outlined">zoom_in</span>
+          </button>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomFit" title="Pas Lebar Layar (Fit Width)">
+            <span class="material-symbols-outlined">fit_screen</span>
+          </button>
+        </div>
+
+        <button type="button" class="report-btn-print" id="btnReportPrint" onclick="window.print()" title="Cetak / Simpan PDF">
+          <span class="material-symbols-outlined">print</span>
+          <span class="btn-text">Cetak PDF</span>
         </button>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- Screen Only Filter Subbar -->
-  <div class="filter-subbar">
+  <div class="filter-subbar no-print">
     <div class="filter-subbar-inner">
       <div class="filter-item">
         <label for="filterDesa">Desa:</label>
@@ -485,11 +506,13 @@
     </div>
   </div>
 
-  <!-- Main Report Document -->
-  <div class="report-container">
+  <!-- PDF VIEWER CANVAS VIEWPORT -->
+  <div class="report-canvas-viewport">
+    <div class="report-sheet-scaler">
+      <div class="report-container report-paper-sheet" style="margin: 0 auto; max-width: 297mm; width: 100%;">
 
-    <!-- Formal Letterhead (Kop Surat) -->
-    <div class="kop-wrapper">
+        <!-- Formal Letterhead (Kop Surat) -->
+        <div class="kop-wrapper">
       <img src="../../src/image/Logo-PPG.png" alt="Logo PPG Solo Selatan" class="kop-logo" onerror="this.style.display='none'" />
       <div class="kop-text">
         <h1>PENGURUS PEMBINA PENGGERAK GENERASI PENERUS (PPG)</h1>
@@ -564,6 +587,8 @@
       </div>
     </div>
 
+      </div>
+    </div>
   </div>
 
   <!-- SheetJS for Export Excel from Report Page -->
@@ -577,6 +602,12 @@
       getSiswaList,
       calculateUmur
     } from '../../src/db-master.js';
+    import { ReportViewer } from './report-viewer.js';
+
+    // Initialize Report PDF Viewer
+    const reportViewer = new ReportViewer({
+      sheetSelector: '.report-container'
+    });
 
     let allSiswa = [];
     let currentFilter = {
@@ -871,6 +902,14 @@
       });
 
       container.innerHTML = html;
+
+      setTimeout(() => {
+        if (window.innerWidth < 768) {
+          reportViewer.fitToWidth(false);
+        } else {
+          reportViewer.setZoom(1.0);
+        }
+      }, 80);
     }
 
     function exportFilteredToExcel() {

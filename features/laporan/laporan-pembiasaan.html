@@ -13,6 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+  <link rel="stylesheet" href="report-viewer.css">
 
   <style>
     :root {
@@ -585,30 +586,42 @@
 
 <body>
 
-  <!-- TOP APP BAR (NO-PRINT) -->
-  <header class="screen-header no-print">
-    <div class="screen-header-inner">
-      <div class="screen-header-title">
-        <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">checklist</span>
-        <span>Laporan Pembiasaan Generus</span>
-        <span class="header-badge-count" id="headerBadge">Caberawit</span>
+  <!-- STANDARDIZED REPORT VIEWER HEADER (NO-PRINT) -->
+  <header class="report-header-toolbar no-print">
+    <div class="report-header-inner">
+      <div class="report-header-left">
+        <a href="../dashboard/dashboard.html?action=pembiasaan" class="report-btn-back" id="reportBtnBack" title="Kembali">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali</span>
+        </a>
+        <div class="report-title-wrap">
+          <span class="report-doc-title">Laporan Pembiasaan Karakter</span>
+          <span class="report-doc-subtitle">PPG Solo Selatan • Caberawit</span>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <a href="../../index.html" class="btn-header-action btn-back" title="Kembali ke Beranda">
-          <span class="material-symbols-outlined" style="font-size:18px;">home</span>
-          <span>Beranda</span>
-        </a>
-        <a href="../dashboard/dashboard.html?action=pembiasaan" class="btn-header-action btn-back" id="navLinkDashboard" title="Dashboard">
-          <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="cetak-absensi.html" class="btn-header-action" style="background:#2563eb;color:#fff;" title="Cetak Presensi KBM">
-          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          <span>Presensi KBM</span>
-        </a>
-        <button type="button" class="btn-header-action btn-print" onclick="window.print()" title="Cetak / Simpan PDF">
-          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          <span>Cetak Dokumen</span>
+
+      <div class="report-header-center" id="reportHeaderCenter">
+        <!-- Event selector populated dynamically -->
+        <select id="selReportEvent" title="Pilih Periode Laporan" style="display:none;"></select>
+      </div>
+
+      <div class="report-header-right">
+        <div class="report-zoom-pill">
+          <button type="button" class="report-zoom-btn" id="btnReportZoomOut" title="Zoom Out (Ctrl -)">
+            <span class="material-symbols-outlined">zoom_out</span>
+          </button>
+          <span class="report-zoom-val" id="reportZoomVal" title="Reset Zoom (Ctrl 0)">100%</span>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomIn" title="Zoom In (Ctrl +)">
+            <span class="material-symbols-outlined">zoom_in</span>
+          </button>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomFit" title="Pas Lebar Layar (Fit Width)">
+            <span class="material-symbols-outlined">fit_screen</span>
+          </button>
+        </div>
+
+        <button type="button" class="report-btn-print" id="btnReportPrint" title="Cetak / Simpan PDF">
+          <span class="material-symbols-outlined">print</span>
+          <span class="btn-text">Cetak PDF</span>
         </button>
       </div>
     </div>
@@ -632,9 +645,13 @@
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="container" id="mainContent">
-    <!-- Rendered by JS -->
+  <!-- PDF VIEWER CANVAS VIEWPORT -->
+  <div class="report-canvas-viewport">
+    <div class="report-sheet-scaler">
+      <div class="report-paper-sheet" id="mainContent" style="width: 1000px; min-height: 297mm; padding: 24px; border-radius: 4px;">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -648,6 +665,7 @@
       getAllKelompok,
       calculateUmur
     } from '../../src/db-master.js';
+    import { ReportViewer } from './report-viewer.js';
 
     // Auto-sync live data from Supabase if configured
     if (isSupabaseConfigured()) {
@@ -661,6 +679,11 @@
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('event');
     const mainContent = document.getElementById('mainContent');
+
+    // Initialize Report PDF Viewer
+    const reportViewer = new ReportViewer({
+      sheetSelector: '#mainContent'
+    });
 
     // Session check for Navigation Links & Breadcrumb
     let isLoggedIn = false;
@@ -692,6 +715,21 @@
 
     const allEvents = getEventPembiasaanList();
     const targetEvent = allEvents.find(e => e.id === eventId);
+
+    // Populate Header Center Event Dropdown
+    const selReportEvent = document.getElementById('selReportEvent');
+    if (selReportEvent && allEvents.length > 0) {
+      selReportEvent.style.display = 'block';
+      selReportEvent.innerHTML = `<option value="">-- Pilih Periode Pembiasaan (${allEvents.length}) --</option>` +
+        allEvents.map(e => `<option value="${e.id}" ${e.id === eventId ? 'selected' : ''}>${e.judul_periode}</option>`).join('');
+      selReportEvent.addEventListener('change', (ev) => {
+        if (ev.target.value) {
+          window.location.href = `?event=${ev.target.value}`;
+        } else {
+          window.location.href = `laporan-pembiasaan.html`;
+        }
+      });
+    }
 
     if (!targetEvent) {
       // SHOW EVENT LIST
@@ -729,6 +767,13 @@
           </div>
         </div>
       `;
+      setTimeout(() => {
+        if (window.innerWidth < 768) {
+          reportViewer.fitToWidth(false);
+        } else {
+          reportViewer.setZoom(1.0);
+        }
+      }, 80);
 
     } else {
       // SHOW LAPORAN DETAIL
@@ -915,7 +960,7 @@
 
         tbody.innerHTML = filtered.map((s, idx) => {
           const nilaiObj = allNilai.find(n => n.siswa_id === s.id);
-          const nilais = nilaiObj ? nilaiObj.nilai : new Array(targetEvent.habits.length).fill(0);
+          const nilais = targetEvent.habits.map((_, i) => (nilaiObj && Array.isArray(nilaiObj.nilai)) ? (parseInt(nilaiObj.nilai[i]) || 0) : 0);
           const total = nilais.reduce((a, b) => a + parseInt(b || 0), 0);
           const pct = totalMaxScore > 0 ? Math.round((total / totalMaxScore) * 1000) / 10 : 0;
           const ket = pct >= 75 ? '✅ Baik' : (pct >= 50 ? '⚠️ Cukup' : '❌ Kurang');
@@ -962,6 +1007,13 @@
       }
 
       renderTable();
+      setTimeout(() => {
+        if (window.innerWidth < 768) {
+          reportViewer.fitToWidth(false);
+        } else {
+          reportViewer.setZoom(1.0);
+        }
+      }, 80);
     }
   </script>
 </body>

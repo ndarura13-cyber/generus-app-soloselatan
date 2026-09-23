@@ -12,6 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+  <link rel="stylesheet" href="report-viewer.css">
 
   <style>
     :root {
@@ -442,29 +443,53 @@
 
 <body>
 
-  <!-- TOP APP BAR (NO-PRINT) -->
-  <header class="screen-header no-print">
-    <div class="screen-header-inner">
-      <div class="screen-header-title">
-        <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">assessment</span>
-        <span>Laporan Rekap Kehadiran KBM</span>
+  <!-- STANDARDIZED REPORT VIEWER HEADER (NO-PRINT) -->
+  <header class="report-header-toolbar no-print">
+    <div class="report-header-inner">
+      <div class="report-header-left">
+        <a href="../dashboard/dashboard.html?action=absensi" class="report-btn-back" id="reportBtnBack" title="Kembali">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali</span>
+        </a>
+        <div class="report-title-wrap">
+          <span class="report-doc-title">Rekap Kehadiran KBM</span>
+          <span class="report-doc-subtitle">PPG Solo Selatan • Remaja</span>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <a href="../../index.html" class="btn-header-action btn-back" title="Kembali ke Beranda">
-          <span class="material-symbols-outlined" style="font-size:18px;">home</span>
-          <span>Beranda</span>
+
+      <div class="report-header-center" id="reportHeaderCenter">
+        <select id="selEvent" title="Pilih Event KBM"></select>
+      </div>
+
+      <div class="report-header-right">
+        <div id="wrapEditEvent" style="display:none;">
+          <a href="#" id="btnEditEvent" class="report-btn-print" style="background:#f59e0b;" title="Edit Isian Laporan">
+            <span class="material-symbols-outlined">edit</span>
+            <span class="btn-text">Edit</span>
+          </a>
+        </div>
+
+        <a href="cetak-absensi.html" id="btnCetakAbsensiKbm" class="report-btn-print" style="background:#2563eb;" title="Lembar Presensi KBM">
+          <span class="material-symbols-outlined">description</span>
+          <span class="btn-text">Presensi KBM</span>
         </a>
-        <a href="../dashboard/dashboard.html?action=absensi" class="btn-header-action btn-back" id="navLinkDashboard" title="Dashboard">
-          <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="cetak-absensi.html" id="btnCetakAbsensiKbm" class="btn-header-action" style="background:#2563eb;color:#fff;" title="Cetak Lembar Presensi KBM">
-          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          <span>Presensi KBM</span>
-        </a>
-        <button type="button" class="btn-header-action btn-print" onclick="window.print()" title="Cetak Rekap / Simpan PDF">
-          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          <span>Cetak Rekap (PDF)</span>
+
+        <div class="report-zoom-pill">
+          <button type="button" class="report-zoom-btn" id="btnReportZoomOut" title="Zoom Out (Ctrl -)">
+            <span class="material-symbols-outlined">zoom_out</span>
+          </button>
+          <span class="report-zoom-val" id="reportZoomVal" title="Reset Zoom (Ctrl 0)">100%</span>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomIn" title="Zoom In (Ctrl +)">
+            <span class="material-symbols-outlined">zoom_in</span>
+          </button>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomFit" title="Pas Lebar Layar (Fit Width)">
+            <span class="material-symbols-outlined">fit_screen</span>
+          </button>
+        </div>
+
+        <button type="button" class="report-btn-print" id="btnReportPrint" title="Cetak Rekap / Simpan PDF">
+          <span class="material-symbols-outlined">print</span>
+          <span class="btn-text">Cetak PDF</span>
         </button>
       </div>
     </div>
@@ -488,97 +513,88 @@
     </div>
   </div>
 
-  <!-- EVENT SWITCHER TOOLBAR (NO-PRINT) -->
-  <div class="filter-panel no-print">
-    <div class="filter-card">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span class="material-symbols-outlined" style="color:var(--primary);">event</span>
-        <label style="font-size:12px;font-weight:700;">Pilih Event KBM:</label>
-        <select id="selEvent">
-          <!-- Populated by JS -->
-        </select>
-      </div>
-      <div id="wrapEditEvent" style="display:none;">
-        <a href="#" id="btnEditEvent" class="btn-header-action btn-edit" style="font-size:12px;padding:6px 14px;">
-          <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
-          Edit Isian Laporan
-        </a>
-      </div>
-    </div>
-  </div>
+  <!-- PDF VIEWER CANVAS VIEWPORT -->
+  <div class="report-canvas-viewport">
+    <div class="report-sheet-scaler">
+      <div class="doc-wrapper" style="margin:0;max-width:210mm;width:100%;">
+        <div class="report-sheet report-paper-sheet">
 
-  <!-- REPORT SHEET -->
-  <div class="doc-wrapper">
-    <div class="report-sheet">
+          <!-- KOP RESMI -->
+          <div class="sheet-kop">
+            <img src="../../src/image/Logo-PPG.png" alt="Logo PPG" class="kop-logo" />
+            <div class="kop-center">
+              <h1 id="kopTitle">REKAP KEHADIRAN PENGAJIAN REMAJA</h1>
+              <h2 id="kopSubTitle">KEPENGURUSAN REMAJA DAERAH SOLO SELATAN</h2>
+              <p>Sekretariat : Kompleks Masjid Roudhotul Jannah</p>
+              <p>Jl. Porong, Pucang Sawit, (03/III) , Jebres, Surakarta</p>
+            </div>
+            <img src="../../src/image/logoKMMda.png" alt="Logo Remaja Solo Selatan" class="kop-logo" />
+          </div>
 
-      <!-- KOP RESMI -->
-      <div class="sheet-kop">
-        <img src="../../src/image/Logo-PPG.png" alt="Logo PPG" class="kop-logo" />
-        <div class="kop-center">
-          <h1 id="kopTitle">REKAP KEHADIRAN PENGAJIAN REMAJA</h1>
-          <h2 id="kopSubTitle">KEPENGURUSAN REMAJA DAERAH SOLO SELATAN</h2>
-          <p>Sekretariat : Kompleks Masjid Roudhotul Jannah</p>
-          <p>Jl. Porong, Pucang Sawit, (03/III) , Jebres, Surakarta</p>
+          <!-- METADATA HARI, TANGGAL & JAM -->
+          <div class="meta-row">
+            <div>Hari, Tanggal &nbsp;: &nbsp;<span id="dispTanggal">Selasa, 20 Januari 2026</span></div>
+            <div>Jam &nbsp;: &nbsp;<span id="dispJam">19.30 – 21.00 WIB</span></div>
+          </div>
+
+          <!-- SESI KELAS, TEMPAT, MATERI, PENASEHAT -->
+          <table class="sesi-table">
+            <thead>
+              <tr>
+                <th style="width:25%;">Kelas</th>
+                <th style="width:22%;">Tempat</th>
+                <th style="width:25%;">Materi</th>
+                <th style="width:28%;">Penasehat / Pengisi</th>
+              </tr>
+            </thead>
+            <tbody id="sesiTbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+
+          <!-- TABEL REKAPITULASI KEHADIRAN -->
+          <table class="rekap-table">
+            <thead>
+              <tr>
+                <th rowspan="2" style="width:24%;">Kelompok</th>
+                <th rowspan="2" style="width:9%;">Hadir</th>
+                <th rowspan="2" style="width:8%;">Ijin</th>
+                <th rowspan="2" style="width:8%;">Alfa</th>
+                <th rowspan="2" style="width:9%;">Total</th>
+                <th colspan="3" style="width:42%;">Prosentase</th>
+              </tr>
+              <tr>
+                <th style="width:14%;">Kehadiran</th>
+                <th style="width:14%;">Ijin</th>
+                <th style="width:14%;">Alfa</th>
+              </tr>
+            </thead>
+            <tbody id="rekapTbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+
+          <!-- FOOTER NOTE -->
+          <div class="footer-note">
+            *) blok berwarna yang tingkat ALFA 13% dan keatas
+          </div>
+
         </div>
-        <img src="../../src/image/logoKMMda.png" alt="Logo Remaja Solo Selatan" class="kop-logo" />
       </div>
-
-      <!-- METADATA HARI, TANGGAL & JAM -->
-      <div class="meta-row">
-        <div>Hari, Tanggal &nbsp;: &nbsp;<span id="dispTanggal">Selasa, 20 Januari 2026</span></div>
-        <div>Jam &nbsp;: &nbsp;<span id="dispJam">19.30 – 21.00 WIB</span></div>
-      </div>
-
-      <!-- SESI KELAS, TEMPAT, MATERI, PENASEHAT -->
-      <table class="sesi-table">
-        <thead>
-          <tr>
-            <th style="width:25%;">Kelas</th>
-            <th style="width:22%;">Tempat</th>
-            <th style="width:25%;">Materi</th>
-            <th style="width:28%;">Penasehat / Pengisi</th>
-          </tr>
-        </thead>
-        <tbody id="sesiTbody">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
-
-      <!-- TABEL REKAPITULASI KEHADIRAN -->
-      <table class="rekap-table">
-        <thead>
-          <tr>
-            <th rowspan="2" style="width:24%;">Kelompok</th>
-            <th rowspan="2" style="width:9%;">Hadir</th>
-            <th rowspan="2" style="width:8%;">Ijin</th>
-            <th rowspan="2" style="width:8%;">Alfa</th>
-            <th rowspan="2" style="width:9%;">Total</th>
-            <th colspan="3" style="width:42%;">Prosentase</th>
-          </tr>
-          <tr>
-            <th style="width:14%;">Kehadiran</th>
-            <th style="width:14%;">Ijin</th>
-            <th style="width:14%;">Alfa</th>
-          </tr>
-        </thead>
-        <tbody id="rekapTbody">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
-
-      <!-- FOOTER NOTE -->
-      <div class="footer-note">
-        *) blok berwarna yang tingkat ALFA 13% dan keatas
-      </div>
-
     </div>
   </div>
 
   <script type="module">
     import { MASTER_WILAYAH, getKbmEvents, getKbmEventById } from '../../src/db-master.js';
+    import { ReportViewer } from './report-viewer.js';
 
     const urlParams = new URLSearchParams(window.location.search);
     let eventId = urlParams.get('eventId') || 'kbm-evt-001';
+
+    // Initialize Standard PDF Viewer
+    const reportViewer = new ReportViewer({
+      sheetSelector: '.report-sheet'
+    });
 
     // Session check for Nav links and Edit Button
     let isLoggedIn = false;
@@ -655,10 +671,28 @@
       dispTanggal.textContent = event.hari_tanggal || '-';
       dispJam.textContent = event.jam || '-';
 
-      // Render Sesi Kelas
-      const sesiList = (event.sesi_kelas && event.sesi_kelas.length > 0)
-        ? event.sesi_kelas
-        : [{ kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1', materi: 'Seminar Senkom Kota', penasehat: 'Bp. Abdul Aziz , S.Kom., M.Cs.' }];
+      // Render Rekapitulasi sesuai cakupan wilayah event (Kelompok, Desa, atau Se-Daerah)
+      const rekapData = event.rekap_kehadiran || {};
+
+      // Render Sesi Kelas (Sinkron dengan Jurnal KBM)
+      let sesiList = (event.sesi_kelas && event.sesi_kelas.length > 0)
+        ? JSON.parse(JSON.stringify(event.sesi_kelas))
+        : [{ kelas: '1 SMP - DEWASA', tempat: 'Masjid Lt. 1', materi: '', penasehat: '' }];
+
+      if (event.kelompok_id && event.kelompok_id !== 'all') {
+        const kRekap = rekapData[event.kelompok_id];
+        if (kRekap && (kRekap.materi || kRekap.pengajar)) {
+          if (!sesiList[0]) sesiList[0] = { kelas: '1 SMP - DEWASA', tempat: 'Masjid' };
+          if (kRekap.materi) sesiList[0].materi = kRekap.materi;
+          if (kRekap.pengajar) sesiList[0].penasehat = kRekap.pengajar;
+        }
+      } else {
+        const firstEntry = Object.values(rekapData).find(r => r && (r.materi || r.pengajar));
+        if (firstEntry && (!sesiList[0].materi || sesiList[0].materi === 'Seminar Senkom Kota')) {
+          if (firstEntry.materi) sesiList[0].materi = firstEntry.materi;
+          if (firstEntry.pengajar) sesiList[0].penasehat = firstEntry.pengajar;
+        }
+      }
 
       sesiTbody.innerHTML = sesiList.map(s => `
         <tr>
@@ -668,9 +702,6 @@
           <td style="font-weight:600;">${s.penasehat || '-'}</td>
         </tr>
       `).join('');
-
-      // Render Rekapitulasi sesuai cakupan wilayah event (Kelompok, Desa, atau Se-Daerah)
-      const rekapData = event.rekap_kehadiran || {};
       let html = '';
 
       let grandHadir = 0;
@@ -808,6 +839,14 @@
       `;
 
       rekapTbody.innerHTML = html;
+
+      setTimeout(() => {
+        if (window.innerWidth < 768) {
+          reportViewer.fitToWidth(false);
+        } else {
+          reportViewer.setZoom(1.0);
+        }
+      }, 80);
     }
 
     renderReport();

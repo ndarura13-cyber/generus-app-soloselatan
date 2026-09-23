@@ -13,6 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+  <link rel="stylesheet" href="report-viewer.css">
 
   <style>
     :root {
@@ -532,30 +533,46 @@
 
 <body>
 
-  <!-- TOP APP BAR (NO-PRINT) -->
-  <header class="screen-header no-print">
-    <div class="screen-header-inner">
-      <div class="screen-header-title">
-        <span class="material-symbols-outlined" style="font-size:24px;color:#60a5fa;">print</span>
-        <span>Cetak Presensi KBM Generus</span>
-        <span class="header-badge-count" id="sheetCountBadge">1 Lembar</span>
+  <!-- STANDARDIZED REPORT VIEWER HEADER (NO-PRINT) -->
+  <header class="report-header-toolbar no-print">
+    <div class="report-header-inner">
+      <div class="report-header-left">
+        <a href="../dashboard/dashboard.html?action=absensi" class="report-btn-back" id="reportBtnBack" title="Kembali">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="btn-text">Kembali</span>
+        </a>
+        <div class="report-title-wrap">
+          <span class="report-doc-title">Cetak Presensi KBM</span>
+          <span class="report-doc-subtitle" id="sheetCountBadge">1 Lembar</span>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <a href="../../index.html" class="btn-header-action btn-back" title="Kembali ke Beranda">
-          <span class="material-symbols-outlined" style="font-size:18px;">home</span>
-          <span>Beranda</span>
+
+      <div class="report-header-center" id="reportHeaderCenter">
+        <!-- Center indicator / search -->
+      </div>
+
+      <div class="report-header-right">
+        <a href="laporan-kehadiran.html" class="report-btn-print" style="background:#4338ca;" title="Buka Rekap Kehadiran KBM">
+          <span class="material-symbols-outlined">bar_chart</span>
+          <span class="btn-text">Rekap Kehadiran</span>
         </a>
-        <a href="../dashboard/dashboard.html" class="btn-header-action btn-back" id="navLinkDashboard" title="Dashboard">
-          <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="laporan-kehadiran.html" class="btn-header-action" style="background:#4338ca;color:#fff;" title="Buka Rekap Kehadiran KBM">
-          <span class="material-symbols-outlined" style="font-size:18px;">bar_chart</span>
-          <span>Rekap Kehadiran</span>
-        </a>
-        <button type="button" class="btn-header-action btn-print" onclick="window.print()" title="Cetak / Simpan PDF">
-          <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-          <span>Cetak Dokumen</span>
+
+        <div class="report-zoom-pill">
+          <button type="button" class="report-zoom-btn" id="btnReportZoomOut" title="Zoom Out (Ctrl -)">
+            <span class="material-symbols-outlined">zoom_out</span>
+          </button>
+          <span class="report-zoom-val" id="reportZoomVal" title="Reset Zoom (Ctrl 0)">100%</span>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomIn" title="Zoom In (Ctrl +)">
+            <span class="material-symbols-outlined">zoom_in</span>
+          </button>
+          <button type="button" class="report-zoom-btn" id="btnReportZoomFit" title="Pas Lebar Layar (Fit Width)">
+            <span class="material-symbols-outlined">fit_screen</span>
+          </button>
+        </div>
+
+        <button type="button" class="report-btn-print" id="btnReportPrint" title="Cetak Dokumen / Simpan PDF">
+          <span class="material-symbols-outlined">print</span>
+          <span class="btn-text">Cetak Dokumen</span>
         </button>
       </div>
     </div>
@@ -665,14 +682,24 @@
     </div>
   </div>
 
-  <!-- PRINTABLE SHEETS CONTAINER -->
-  <div class="sheet-wrapper" id="sheetsContainer">
-    <!-- Populated dynamically by JS -->
+  <!-- PDF VIEWER CANVAS VIEWPORT -->
+  <div class="report-canvas-viewport">
+    <div class="report-sheet-scaler">
+      <div class="sheet-wrapper" id="sheetsContainer" style="margin: 0 auto; max-width: 210mm;">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
   </div>
 
   <!-- SCRIPT LOGIC -->
   <script type="module">
     import { MASTER_WILAYAH, getAllKelompok, getSiswaList, getKbmEventById } from '../../src/db-master.js';
+    import { ReportViewer } from './report-viewer.js';
+
+    // Initialize Report PDF Viewer
+    const reportViewer = new ReportViewer({
+      sheetSelector: '.absensi-sheet'
+    });
 
     // Session detection for Navigation Links & Breadcrumb
     (function initNavSession() {
@@ -854,7 +881,7 @@
       const halText = totalPages > 1 ? ` (HALAMAN ${pageIndex}/${totalPages})` : '';
 
       return `
-        <div class="absensi-sheet">
+        <div class="absensi-sheet report-paper-sheet">
           <!-- KOP RESMI -->
           <div>
             <div class="sheet-kop">
@@ -1098,6 +1125,14 @@
 
       sheetsContainer.innerHTML = sheetsHtml;
       sheetCountBadge.textContent = `${totalSheets} Lembar Siap Cetak`;
+
+      setTimeout(() => {
+        if (window.innerWidth < 768) {
+          reportViewer.fitToWidth(false);
+        } else {
+          reportViewer.setZoom(1.0);
+        }
+      }, 80);
     }
 
     // Attach Listeners

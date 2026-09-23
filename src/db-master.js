@@ -1676,7 +1676,18 @@ export function getKbmEvents() {
       localStorage.setItem(KBM_EVENTS_STORAGE_KEY, JSON.stringify(MOCK_KBM_EVENTS));
       return [...MOCK_KBM_EVENTS];
     }
-    return parsed;
+    let hasFixes = false;
+    const sanitized = parsed.map((ev, i) => {
+      if (!ev.id || ev.id === 'undefined' || ev.id === 'null') {
+        hasFixes = true;
+        return { ...ev, id: `kbm-evt-${Date.now()}-${i}` };
+      }
+      return ev;
+    });
+    if (hasFixes) {
+      localStorage.setItem(KBM_EVENTS_STORAGE_KEY, JSON.stringify(sanitized));
+    }
+    return sanitized;
   } catch (e) {
     return [...MOCK_KBM_EVENTS];
   }
@@ -1699,19 +1710,22 @@ export async function saveKbmEvent(eventData) {
   } else {
     savedData = {
       ...eventData,
+      id: `kbm-evt-${Date.now()}`,
       created_at: new Date().toISOString()
     };
   }
 
   if (isSupabaseConfigured()) {
-    const res = await upsertKbmEventToSupabase(savedData);
-    if (res.success && res.data) {
-      savedData = { ...savedData, ...res.data };
-    } else {
-      console.warn("Gagal simpan KBM ke Supabase:", res.error);
+    try {
+      const res = await upsertKbmEventToSupabase(savedData);
+      if (res.success && res.data) {
+        savedData = { ...savedData, ...res.data };
+      } else {
+        console.warn("Gagal simpan KBM ke Supabase:", res.error);
+      }
+    } catch (err) {
+      console.warn("Exception simpan KBM ke Supabase:", err);
     }
-  } else if (!savedData.id) {
-    savedData.id = `kbm-evt-${Date.now()}`;
   }
 
   if (eventData.id) {

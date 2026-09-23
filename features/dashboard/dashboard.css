@@ -7889,11 +7889,62 @@ body {
   color: #b91c1c;
 }
 
+.kbm-action-btn-edit {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.kbm-action-btn-edit:hover {
+  background: #fde68a;
+  color: #92400e;
+}
+
 .kbm-action-btn-view {
   background: var(--bg);
   color: var(--text-muted);
   border-color: var(--border);
   cursor: default;
+}
+
+/* Pagination */
+.kbm-pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kbm-page-btn {
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kbm-page-btn:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--text);
+}
+
+.kbm-page-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.kbm-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* Dark mode action buttons */
@@ -7919,6 +7970,12 @@ body {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
   border-color: rgba(239, 68, 68, 0.3);
+}
+
+.dark .kbm-action-btn-edit {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
 /* ── Status Badges ── */

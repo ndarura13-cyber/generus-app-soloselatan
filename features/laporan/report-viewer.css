@@ -1,0 +1,354 @@
+/* ═══════════════════════════════════════════════════════════════
+   report-viewer.css — Standarisasi Tampilan Dokumen Laporan (PDF Viewer Mode)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --viewer-bg: #0f172a;           /* Dark slate canvas backdrop */
+  --viewer-surface: #1e293b;      /* Slate header/panels */
+  --viewer-border: #334155;
+  --viewer-text: #f8fafc;
+  --viewer-text-muted: #94a3b8;
+  --viewer-primary: #3b82f6;
+  --viewer-green: #22c55e;
+}
+
+/* ── STANDARDIZED STICKY HEADER TOOLBAR ── */
+.report-header-toolbar {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #ffffff;
+  padding: 10px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+}
+
+.report-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Bagian Kiri: Tombol Kembali & Judul */
+.report-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+}
+
+.report-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.report-btn-back:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.report-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-doc-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+.report-doc-subtitle {
+  font-size: 11px;
+  color: #bfdbfe;
+  font-weight: 600;
+}
+
+/* Bagian Tengah: Dropdown Pemilih Event / Filter */
+.report-header-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  max-width: 480px;
+}
+
+.report-header-center select {
+  width: 100%;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(15, 23, 42, 0.4);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.report-header-center select option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.report-header-center select:focus {
+  border-color: #60a5fa;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+/* Bagian Kanan: Kontrol Zoom & Tombol Cetak */
+.report-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Zoom Widget Pill */
+.report-zoom-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.report-zoom-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.report-zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.report-zoom-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.report-zoom-val {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 6px;
+  min-width: 44px;
+  text-align: center;
+  color: #f8fafc;
+  cursor: pointer;
+}
+
+/* Tombol Cetak / Simpan PDF */
+.report-btn-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #22c55e;
+  color: #ffffff;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.report-btn-print:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
+.report-btn-print .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* ── KANVAS VIEWPORT DOKUMEN (PDF VIEWER MODE) ── */
+.report-canvas-viewport {
+  background: var(--viewer-bg);
+  min-height: calc(100vh - 60px);
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  padding: 24px 16px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+.report-sheet-scaler {
+  transform-origin: top center;
+  transition: transform 0.15s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Lembar Kertas Dokumen */
+.report-paper-sheet {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  border-radius: 2px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* ── RESPONSIVE MOBILE VIEW (< 768px): STRICT ICON-ONLY ── */
+@media (max-width: 768px) {
+  .report-header-toolbar {
+    padding: 8px 10px;
+  }
+
+  .report-header-inner {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: space-between;
+  }
+
+  /* Sembunyikan seluruh teks label tombol di mobile — CUKUP ICON SAJA */
+  .report-btn-back .btn-text,
+  .report-btn-print .btn-text,
+  .btn-action .btn-text,
+  .btn-header-action .btn-text,
+  .report-btn-back span:not(.material-symbols-outlined),
+  .report-btn-print span:not(.material-symbols-outlined) {
+    display: none !important;
+  }
+
+  .report-btn-back,
+  .report-btn-print {
+    padding: 0 !important;
+    width: 38px !important;
+    height: 38px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-shrink: 0;
+  }
+
+  .report-header-left {
+    min-width: unset;
+    gap: 8px;
+  }
+
+  .report-doc-title {
+    font-size: 12.5px;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .report-doc-subtitle {
+    display: none;
+  }
+
+  .report-header-center {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 2px;
+  }
+
+  .report-header-center:empty,
+  .report-header-center select[style*="display: none"],
+  .report-header-center select[style*="display:none"] {
+    display: none !important;
+  }
+
+  .report-header-center select {
+    width: 100%;
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+
+  .report-zoom-pill {
+    padding: 1px;
+    gap: 1px;
+  }
+
+  .report-zoom-btn {
+    width: 28px;
+    height: 30px;
+  }
+
+  .report-zoom-val {
+    font-size: 11px;
+    min-width: 36px;
+    padding: 0 2px;
+  }
+
+  .report-canvas-viewport {
+    padding: 12px 6px 40px;
+  }
+}
+
+/* ── ATURAN CETAK FISIK (@media print): 100% BERSIH DARI TOOLBAR & KANVAS ── */
+@media print {
+  .no-print,
+  .report-header-toolbar,
+  .nav-subbar,
+  .filter-panel,
+  .quick-nav-pills {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .report-canvas-viewport {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  .report-sheet-scaler {
+    transform: none !important;
+    gap: 0 !important;
+  }
+
+  .report-paper-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    page-break-after: always;
+  }
+}
