@@ -91,9 +91,17 @@ export class ReportViewer {
         const scaledWidth = unscaledWidth * this.currentScale;
         const scaledHeight = unscaledHeight * this.currentScale;
         
-        // Provide adequate padding
         this.scaler.style.width = `${unscaledWidth}px`;
-        this.scaler.style.marginBottom = `${Math.max(40, scaledHeight - unscaledHeight + 40)}px`;
+        if (this.currentScale < 1.0) {
+          const marginHoriz = (scaledWidth - unscaledWidth) / 2;
+          this.scaler.style.marginLeft = `${marginHoriz}px`;
+          this.scaler.style.marginRight = `${marginHoriz}px`;
+          this.scaler.style.marginBottom = `${Math.max(20, scaledHeight - unscaledHeight + 30)}px`;
+        } else {
+          this.scaler.style.marginLeft = '0px';
+          this.scaler.style.marginRight = '0px';
+          this.scaler.style.marginBottom = `${Math.max(40, scaledHeight - unscaledHeight + 40)}px`;
+        }
       }
     }
 
@@ -114,12 +122,13 @@ export class ReportViewer {
     const firstSheet = document.querySelector(this.sheetSelector);
     if (!firstSheet || !this.viewport) return;
 
-    const viewportWidth = this.viewport.clientWidth - (window.innerWidth < 768 ? 16 : 40);
+    const pad = (window.innerWidth < 768 ? 12 : 36);
+    const viewportWidth = this.viewport.clientWidth - pad;
     const sheetWidth = firstSheet.offsetWidth || 794;
 
     if (sheetWidth > 0 && viewportWidth > 0) {
       let idealScale = viewportWidth / sheetWidth;
-      // Cap at 1.1x so desktop doesn't blow up too large
+      // Cap at 1.0x so desktop doesn't blow up too large
       if (window.innerWidth >= 768) {
         idealScale = Math.min(idealScale, 1.0);
       }

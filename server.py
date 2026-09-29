@@ -17,4 +17,6 @@ class CleanURLHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
 if __name__ == '__main__':
-    http.server.test(HandlerClass=CleanURLHandler, port=PORT, bind=None)
+    with http.server.ThreadingHTTPServer(('', PORT), CleanURLHandler) as httpd:
+        print(f"Serving HTTP on 0.0.0.0 port {PORT} (http://localhost:{PORT}/) ...", flush=True)
+        httpd.serve_forever()

@@ -525,90 +525,84 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     <!-- FORM PENGATURAN CETAK / EDIT -->
     <form id="formCetakAbsensi" style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
       
-      <!-- Judul Event & Format KBM -->
-      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;">
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
-            Judul Event / Kegiatan <span style="color:red">*</span>
+      <!-- Pilihan Format KBM -->
+      <div>
+        <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
+          Format KBM <span style="color:red">*</span>
+        </label>
+        <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:#1e3a8a;font-size:12.5px;box-sizing:border-box;">
+          <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>🎓 Remaja (SMP - Dewasa)</option>
+          <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
+          <option value="caberawit" ${defaultFormat === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
+        </select>
+      </div>
+
+      <!-- Baris 1: Kolom Isian Judul Event 1 Baris Penuh -->
+      <div>
+        <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
+          Judul Event / Kegiatan <span style="color:red">*</span>
+        </label>
+        <input type="text" id="modalIptCustomJudul" value="${defaultJudul}" placeholder="Contoh: PENGAJIAN REMAJA KELOMPOK" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:var(--text);font-size:12.5px;box-sizing:border-box;" required />
+      </div>
+
+      <!-- Baris 2: Hari, Tanggal Pelaksanaan & Jam Pelaksanaan (Sejajar) -->
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
+        <div style="min-width:0;">
+          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            Hari, Tanggal Pelaksanaan
           </label>
-          <input type="text" id="modalIptCustomJudul" value="${defaultJudul}" placeholder="Contoh: PENGAJIAN REMAJA" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:var(--text);font-size:12.5px;" required />
+          <div style="position:relative;display:flex;align-items:center;width:100%;">
+            <input type="text" id="modalIptHariTanggal" placeholder="Contoh: Selasa, 20 Januari 2026" value="${defaultHariTgl}" style="width:100%;padding:9px 36px 9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;box-sizing:border-box;font-weight:600;color:var(--text);" />
+            <input type="date" id="modalIptDatePicker" style="position:absolute;right:0;top:0;width:36px;height:100%;opacity:0;cursor:pointer;z-index:2;color:transparent;background:transparent;border:none;-webkit-appearance:none;" title="Pilih Tanggal dari Kalender" />
+            <div id="btnOpenDatePicker" style="position:absolute;right:8px;color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1;" title="Pilih Tanggal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+          </div>
         </div>
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">
-            Format KBM <span style="color:red">*</span>
+        <div style="min-width:0;">
+          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            Jam Pelaksanaan
           </label>
-          <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:#1e3a8a;font-size:12.5px;">
-            <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>🎓 Remaja (SMP - Dewasa)</option>
-            <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
-            <option value="caberawit" ${defaultFormat === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
-          </select>
+          <input type="text" id="modalIptJam" placeholder="Contoh: 19.30 – 21.00 WIB" value="${defaultJam}" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;box-sizing:border-box;font-weight:600;color:var(--text);" />
         </div>
       </div>
 
-      <!-- Hari, Tanggal & Jam Pelaksanaan -->
-      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;">
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Hari, Tanggal Pelaksanaan</label>
-          <input type="text" id="modalIptHariTanggal" placeholder="Contoh: Selasa, 20 Januari 2026" value="${defaultHariTgl}" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
-        </div>
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Waktu / Jam KBM</label>
-          <input type="text" id="modalIptJam" placeholder="Contoh: 19.30 – 21.00 WIB" value="${defaultJam}" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;" />
-        </div>
-      </div>
-
-      <!-- Wilayah: Desa & Kelompok -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
+      <!-- Baris 3: Desa & Kelompok (Sejajar) -->
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
+        <div style="min-width:0;">
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Desa</label>
-          <select id="modalSelDesa" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
+          <select id="modalSelDesa" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12px;box-sizing:border-box;">
             ${buildDesaOptions(defaultDesa)}
           </select>
         </div>
-        <div>
+        <div style="min-width:0;">
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Kelompok</label>
-          <select id="modalSelKelompok" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
+          <select id="modalSelKelompok" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12px;box-sizing:border-box;">
             ${buildKelOptions(defaultDesa, defaultKel)}
           </select>
         </div>
       </div>
 
-      <!-- Pemisahan Gender & Baris Kosong -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Pemisahan Gender</label>
-          <select id="modalSelGender" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
-            <option value="pisah" ${defaultGender === 'pisah' ? 'selected' : ''}>🚻 Pisah Lembar (Putra &amp; Putri)</option>
+      <!-- Baris 4: Format Penulisan Absensi (Pemisahan Gender & Baris Kosong Sejajar) -->
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
+        <div style="min-width:0;">
+          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Pemisahan Gender</label>
+          <select id="modalSelGender" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12px;box-sizing:border-box;">
+            <option value="pisah" ${defaultGender === 'pisah' ? 'selected' : ''}>🚻 Pisah Lembar (Pa &amp; Pi)</option>
             <option value="L" ${defaultGender === 'L' ? 'selected' : ''}>👦 Khusus Putra Saja</option>
             <option value="P" ${defaultGender === 'P' ? 'selected' : ''}>👧 Khusus Putri Saja</option>
-            <option value="gabung" ${defaultGender === 'gabung' ? 'selected' : ''}>👥 Gabung (Putra &amp; Putri)</option>
+            <option value="gabung" ${defaultGender === 'gabung' ? 'selected' : ''}>👥 Gabung (Pa &amp; Pi)</option>
           </select>
         </div>
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Format Baris Kosong</label>
-          <select id="modalSelBarisKosong" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12.5px;">
-            <option value="fill30" ${defaultBaris === 'fill30' ? 'selected' : ''}>Penuhi Halaman (Maks. 30 Baris)</option>
-            <option value="0" ${defaultBaris === '0' ? 'selected' : ''}>0 (Pas Jumlah Generus)</option>
+        <div style="min-width:0;">
+          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Format Baris Kosong</label>
+          <select id="modalSelBarisKosong" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-size:12px;box-sizing:border-box;">
+            <option value="fill30" ${defaultBaris === 'fill30' ? 'selected' : ''}>Penuhi (Maks 30)</option>
+            <option value="0" ${defaultBaris === '0' ? 'selected' : ''}>0 (Pas Generus)</option>
             <option value="3" ${defaultBaris === '3' ? 'selected' : ''}>+3 Baris Kosong</option>
             <option value="5" ${defaultBaris === '5' ? 'selected' : ''}>+5 Baris Kosong</option>
             <option value="10" ${defaultBaris === '10' ? 'selected' : ''}>+10 Baris Kosong</option>
           </select>
-        </div>
-      </div>
-
-      <!-- Bulan & Tahun Presensi -->
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Bulan Presensi</label>
-          <select id="modalSelBulan" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;">
-            ${['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'].map(m => `
-              <option value="${m}" ${defaultBulan === m ? 'selected' : ''}>${m}</option>
-            `).join('')}
-          </select>
-        </div>
-        <div>
-          <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);">Tahun</label>
-          <input type="text" id="modalIptTahun" value="${defaultTahun}" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12.5px;" />
         </div>
       </div>
 
@@ -797,6 +791,48 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       selKelEl.innerHTML = buildKelOptions(selDesaEl.value, 'all');
     });
 
+    // Setup Date Picker sync with Hari, Tanggal Pelaksanaan
+    const datePickerEl = document.getElementById('modalIptDatePicker');
+    const hariTglEl = document.getElementById('modalIptHariTanggal');
+    if (datePickerEl && hariTglEl) {
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const blnMap = {
+        'januari': '01', 'februari': '02', 'maret': '03', 'april': '04',
+        'mei': '05', 'juni': '06', 'juli': '07', 'agustus': '08',
+        'september': '09', 'oktober': '10', 'november': '11', 'desember': '12'
+      };
+
+      const dMatch = hariTglEl.value.match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/);
+      if (dMatch) {
+        const dd = dMatch[1].padStart(2, '0');
+        const mm = blnMap[dMatch[2].toLowerCase()] || '01';
+        const yyyy = dMatch[3];
+        datePickerEl.value = `${yyyy}-${mm}-${dd}`;
+      }
+
+      datePickerEl.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (!val) return;
+        const [y, m, d] = val.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        const dayName = days[dt.getDay()];
+        const monthName = months[m - 1];
+        hariTglEl.value = `${dayName}, ${d} ${monthName} ${y}`;
+      });
+    }
+
+    function deriveBulanTahun(hariTgl) {
+      let b = 'JANUARI';
+      let t = new Date().getFullYear().toString();
+      const m = (hariTgl || '').match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/);
+      if (m) {
+        b = m[2].toUpperCase();
+        t = m[3];
+      }
+      return { bulan: b, tahun: t };
+    }
+
     document.getElementById('btnBatalKeAgenda')?.addEventListener('click', () => {
       renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
     });
@@ -807,9 +843,9 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       const kelVal = document.getElementById('modalSelKelompok').value;
       const genderVal = document.getElementById('modalSelGender').value;
       const judulVal = document.getElementById('modalIptCustomJudul').value.trim();
-      const bulanVal = document.getElementById('modalSelBulan').value;
-      const tahunVal = document.getElementById('modalIptTahun').value.trim() || '2026';
-      const urutanVal = document.getElementById('modalSelUrutan').value;
+      const hariTglVal = document.getElementById('modalIptHariTanggal').value.trim() || 'Selasa, 20 Januari 2026';
+      const { bulan: bulanVal, tahun: tahunVal } = deriveBulanTahun(hariTglVal);
+      const urutanVal = document.getElementById('modalSelUrutan')?.value || 'official';
       const barisVal = document.getElementById('modalSelBarisKosong').value;
 
       const targetUrl = `../laporan/cetak-absensi.html?jenjang=${encodeURIComponent(jenjangVal)}&desa=${encodeURIComponent(desaVal)}&kelompok=${encodeURIComponent(kelVal)}&gender=${encodeURIComponent(genderVal)}&judul=${encodeURIComponent(judulVal)}&bulan=${encodeURIComponent(bulanVal)}&tahun=${encodeURIComponent(tahunVal)}&urutan=${encodeURIComponent(urutanVal)}&baris=${encodeURIComponent(barisVal)}`;
@@ -835,9 +871,8 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       const judulVal = document.getElementById('modalIptCustomJudul').value.trim() || 'REKAP KEHADIRAN PENGAJIAN REMAJA';
       const hariTglVal = document.getElementById('modalIptHariTanggal').value.trim() || 'Selasa, 20 Januari 2026';
       const jamVal = document.getElementById('modalIptJam').value.trim() || '19.30 – 21.00 WIB';
-      const bulanVal = document.getElementById('modalSelBulan').value;
-      const tahunVal = document.getElementById('modalIptTahun').value.trim() || '2026';
-      const urutanVal = document.getElementById('modalSelUrutan').value;
+      const { bulan: bulanVal, tahun: tahunVal } = deriveBulanTahun(hariTglVal);
+      const urutanVal = document.getElementById('modalSelUrutan')?.value || 'official';
       const barisVal = document.getElementById('modalSelBarisKosong').value;
 
       if (isEdit && editingEvent) {

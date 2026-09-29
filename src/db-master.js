@@ -255,7 +255,7 @@ export async function syncSiswaFromSupabase() {
 export async function syncKbmFromSupabase() {
   if (!isSupabaseConfigured()) return;
   const res = await fetchKbmEventsFromSupabase();
-  if (res.success && res.data) {
+  if (res.success && Array.isArray(res.data) && res.data.length > 0) {
     localStorage.setItem(KBM_EVENTS_STORAGE_KEY, JSON.stringify(res.data));
   }
 }

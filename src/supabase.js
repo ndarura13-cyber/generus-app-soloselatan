@@ -785,6 +785,29 @@ export async function deletePengurusFromSupabase(id) {
    FUNGSI SINKRONISASI ABSENSI / KBM
    ═══════════════════════════════════════════════════════════════ */
 
+function parseIndonesianDateToIso(str) {
+  if (!str) return null;
+  const isoMatch = str.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+  if (isoMatch) return isoMatch[0];
+
+  const blnMap = {
+    'januari': '01', 'februari': '02', 'maret': '03', 'april': '04',
+    'mei': '05', 'juni': '06', 'juli': '07', 'agustus': '08',
+    'september': '09', 'oktober': '10', 'november': '11', 'desember': '12',
+    'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04', 'may': '05', 'jun': '06',
+    'jul': '07', 'aug': '08', 'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+  };
+
+  const dMatch = str.match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/);
+  if (dMatch) {
+    const day = dMatch[1].padStart(2, '0');
+    const month = blnMap[dMatch[2].toLowerCase()] || '01';
+    const year = dMatch[3];
+    return `${year}-${month}-${day}`;
+  }
+  return null;
+}
+
 export async function fetchKbmEventsFromSupabase() {
   const client = getSupabase();
   if (!client) return { success: false, message: "Supabase client belum aktif." };
@@ -798,22 +821,50 @@ export async function fetchKbmEventsFromSupabase() {
     if (error) throw error;
     
     const formattedData = data.map(evt => {
-      let rekapKehadiran = {};
+      let meta = {};
       try {
         if (evt.catatan_sesi) {
-          rekapKehadiran = JSON.parse(evt.catatan_sesi);
+          meta = JSON.parse(evt.catatan_sesi);
         }
       } catch(e) {}
+
+      if (meta && typeof meta === 'object' && (meta.judul || meta.format_kbm)) {
+        return {
+          id: evt.id,
+          judul: meta.judul || evt.materi_kbm || "Event KBM",
+          subjudul: meta.subjudul || "KEPENGURUSAN REMAJA DAERAH SOLO SELATAN",
+          format_kbm: meta.format_kbm || (evt.kategori_usia === 'caberawit' ? 'caberawit' : (evt.kategori_usia === 'gp_reguler' ? 'gp_reguler' : 'remaja')),
+          desa_id: meta.desa_id || "all",
+          kelompok_id: meta.kelompok_id || mapUuidToId(evt.kelompok_id) || "all",
+          gender: meta.gender || "pisah",
+          hari_tanggal: meta.hari_tanggal || evt.tanggal_kbm,
+          tanggal_iso: meta.tanggal_iso || evt.tanggal_kbm,
+          jam: meta.jam || '19.30 – 21.00 WIB',
+          bulan: meta.bulan || '',
+          tahun: meta.tahun || '',
+          baris_kosong: meta.baris_kosong || 'fill30',
+          sesi_kelas: meta.sesi_kelas || [],
+          rekap_kehadiran: meta.rekap_kehadiran || {},
+          created_at: evt.created_at
+        };
+      }
       
+      const rekapKehadiran = (meta && meta.rekap_kehadiran) ? meta.rekap_kehadiran : (meta || {});
       return {
         id: evt.id,
-        format_kbm: evt.kategori_usia === 'caberawit' ? 'kelompok' : 'desa',
+        format_kbm: evt.kategori_usia === 'caberawit' ? 'caberawit' : (evt.kategori_usia === 'gp_reguler' ? 'gp_reguler' : 'remaja'),
         judul: evt.materi_kbm || "Event KBM",
+        subjudul: "KEPENGURUSAN REMAJA DAERAH SOLO SELATAN",
+        desa_id: "all",
+        kelompok_id: mapUuidToId(evt.kelompok_id) || "all",
+        gender: "pisah",
         hari_tanggal: evt.tanggal_kbm,
-        jam: '19.30 - 21.00 WIB',
-        kategori_usia: [evt.kategori_usia],
-        materi: evt.materi_kbm,
-        pengajar: "Pengajar",
+        tanggal_iso: evt.tanggal_kbm,
+        jam: '19.30 – 21.00 WIB',
+        bulan: '',
+        tahun: '',
+        baris_kosong: 'fill30',
+        sesi_kelas: [],
         rekap_kehadiran: rekapKehadiran,
         created_at: evt.created_at
       };
@@ -830,16 +881,50 @@ export async function upsertKbmEventToSupabase(evtData) {
   if (!client) return { success: false, message: "Supabase client belum aktif." };
 
   try {
-    const { data: kelData } = await client.from("kelompok").select("id").limit(1);
-    const validKelompokId = kelData && kelData.length > 0 ? kelData[0].id : null;
-    if (!validKelompokId) return { success: false, message: "Tidak ada data kelompok di Supabase" };
+    let kelompokUuid = mapIdToUuid(evtData.kelompok_id);
+    const isKelUuid = typeof kelompokUuid === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(kelompokUuid);
+
+    if (!isKelUuid) {
+      const { data: kelData } = await client.from("kelompok").select("id").limit(1);
+      kelompokUuid = kelData && kelData.length > 0 ? kelData[0].id : null;
+    }
+    if (!kelompokUuid) return { success: false, message: "Tidak ada data kelompok di Supabase" };
+
+    let isoDate = (evtData.tanggal_iso && /^\d{4}-\d{2}-\d{2}$/.test(evtData.tanggal_iso)) 
+      ? evtData.tanggal_iso 
+      : parseIndonesianDateToIso(evtData.hari_tanggal);
+    if (!isoDate) {
+      isoDate = new Date().toISOString().split('T')[0];
+    }
+
+    let kategoriUsia = 'remaja';
+    if (evtData.format_kbm === 'caberawit') kategoriUsia = 'caberawit';
+    else if (evtData.format_kbm === 'gp_reguler') kategoriUsia = 'gp_reguler';
+
+    const fullMeta = {
+      id: evtData.id,
+      judul: evtData.judul || evtData.materi || 'Event KBM',
+      subjudul: evtData.subjudul || 'KEPENGURUSAN REMAJA DAERAH SOLO SELATAN',
+      format_kbm: evtData.format_kbm || 'remaja',
+      desa_id: evtData.desa_id || 'all',
+      kelompok_id: evtData.kelompok_id || 'all',
+      gender: evtData.gender || 'pisah',
+      hari_tanggal: evtData.hari_tanggal || '',
+      tanggal_iso: isoDate,
+      jam: evtData.jam || '19.30 – 21.00 WIB',
+      bulan: evtData.bulan || '',
+      tahun: evtData.tahun || '',
+      baris_kosong: evtData.baris_kosong || 'fill30',
+      sesi_kelas: evtData.sesi_kelas || [],
+      rekap_kehadiran: evtData.rekap_kehadiran || {}
+    };
 
     const payload = {
-      kelompok_id: validKelompokId,
-      kategori_usia: evtData.format_kbm === 'kelompok' ? 'caberawit' : 'remaja',
-      tanggal_kbm: evtData.hari_tanggal || new Date().toISOString().split('T')[0],
+      kelompok_id: kelompokUuid,
+      kategori_usia: kategoriUsia,
+      tanggal_kbm: isoDate,
       materi_kbm: evtData.judul || evtData.materi || 'Materi KBM',
-      catatan_sesi: JSON.stringify(evtData.rekap_kehadiran || {})
+      catatan_sesi: JSON.stringify(fullMeta)
     };
 
     const isUuid = typeof evtData.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evtData.id);
@@ -855,9 +940,10 @@ export async function upsertKbmEventToSupabase(evtData) {
     if (error) throw error;
     
     const returnedRow = data[0];
+    fullMeta.id = returnedRow.id;
     evtData.id = returnedRow.id;
     
-    return { success: true, data: evtData };
+    return { success: true, data: fullMeta };
   } catch (err) {
     return { success: false, error: err.message };
   }
