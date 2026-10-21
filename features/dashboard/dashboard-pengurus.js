@@ -21,6 +21,7 @@ import {
 import {
   currentUser,
   openModal,
+  closeModal,
   showToast,
   showConfirmModal,
   modalBody
@@ -170,7 +171,7 @@ export function renderApprovalListModal() {
 }
 
 /* ── 2. Struktur Pengurus Daerah Solo Selatan (Clean Web & Compact Mobile) ─── */
-export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', filterDesa = 'all', isFilterOpen = false) {
+export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', filterDesa = 'all', isFilterOpen = false, currentPage = 1) {
   const allDaerahList = getPengurusDaerahList();
   const isSuper = currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah');
 
@@ -237,8 +238,17 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     <option value="${d.id}" ${filterDesa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>
   `).join('');
 
+  // Pagination parameters (8 pengurus per page: 4 baris x 2 kolom di desktop, nyaman & rapi di mobile)
+  const itemsPerPage = 8;
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedList = filtered.slice(startIndex, startIndex + itemsPerPage);
+
   // 1. DESKTOP CARDS HTML (2-Column Grid)
-  const desktopCardsHtml = filtered.map((p, idx) => {
+  const desktopCardsHtml = paginatedList.map((p, idx) => {
     const isP_Bph = isBph(p);
     const waClean = (p.noWa || '').replace(/[^0-9]/g, '');
     const waIntl = waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean;
@@ -284,7 +294,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   }).join('');
 
   // 2. MOBILE CARDS HTML (Compact Accordion Cards)
-  const mobileCardsHtml = filtered.map((p, idx) => {
+  const mobileCardsHtml = paginatedList.map((p, idx) => {
     const isP_Bph = isBph(p);
     const waClean = (p.noWa || '').replace(/[^0-9]/g, '');
     const waIntl = waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean;
@@ -342,6 +352,64 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
       <p style="font-size:12px;margin:0;">Tidak ada pengurus daerah yang cocok dengan pencarian atau filter aktif.</p>
     </div>
   `;
+
+  // 3. PAGINATION BUILDER HTML
+  let paginationHtml = '';
+  if (totalItems > 0) {
+    let pageButtonsHtml = '';
+    const maxButtons = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    if (endPage - startPage + 1 < maxButtons) {
+      startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+
+    if (startPage > 1) {
+      pageButtonsHtml += `
+        <button type="button" class="pagination-btn struktur-page-btn" data-page="1">1</button>
+      `;
+      if (startPage > 2) {
+        pageButtonsHtml += `<span style="color:var(--text-muted);padding:0 2px;">&hellip;</span>`;
+      }
+    }
+
+    for (let pNum = startPage; pNum <= endPage; pNum++) {
+      const isActivePage = pNum === currentPage;
+      pageButtonsHtml += `
+        <button type="button" class="pagination-btn struktur-page-btn ${isActivePage ? 'active' : ''}" data-page="${pNum}">
+          ${pNum}
+        </button>
+      `;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pageButtonsHtml += `<span style="color:var(--text-muted);padding:0 2px;">&hellip;</span>`;
+      }
+      pageButtonsHtml += `
+        <button type="button" class="pagination-btn struktur-page-btn" data-page="${totalPages}">${totalPages}</button>
+      `;
+    }
+
+    paginationHtml = `
+      <div class="pagination-wrap" style="margin-top: 10px;">
+        <span style="font-size:12px;color:var(--text-muted);">
+          Menampilkan <strong>${startIndex + 1} &ndash; ${Math.min(startIndex + itemsPerPage, totalItems)}</strong> dari <strong>${totalItems}</strong> pengurus
+        </span>
+        ${totalPages > 1 ? `
+        <div class="pagination-controls">
+          <button type="button" class="pagination-btn struktur-page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}" title="Halaman Sebelumnya">
+            <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
+          </button>
+          ${pageButtonsHtml}
+          <button type="button" class="pagination-btn struktur-page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}" title="Halaman Selanjutnya">
+            <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
+          </button>
+        </div>
+        ` : ''}
+      </div>
+    `;
+  }
 
   openModal(`Struktur Pengurus PPG Solo Selatan (${filtered.length} Pengurus)`, 'diversity_2', 'large');
   modalBody.innerHTML = `
@@ -410,22 +478,17 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
       <div style="max-height:48vh;overflow-y:auto;padding-right:2px;" class="custom-scrollbar">
         <!-- 1. Desktop View (2 Columns Grid) -->
         <div class="struktur-desktop-grid">
-          ${filtered.length > 0 ? desktopCardsHtml : emptyStateHtml}
+          ${totalItems > 0 ? desktopCardsHtml : emptyStateHtml}
         </div>
 
         <!-- 2. Mobile View (Compact Accordion Cards) -->
         <div class="struktur-mobile-list">
-          ${filtered.length > 0 ? mobileCardsHtml : emptyStateHtml}
+          ${totalItems > 0 ? mobileCardsHtml : emptyStateHtml}
         </div>
       </div>
 
-      <!-- STICKY FOOTER NAVIGATION -->
-      <div class="modal-sticky-footer">
-        <button type="button" class="btn-sticky-back" id="btnCloseStrukturModal" title="Tutup Modal">
-          <span class="material-symbols-outlined">close</span>
-          <span class="btn-text">Tutup</span>
-        </button>
-      </div>
+      <!-- PAGINATION CONTROLS -->
+      ${paginationHtml}
 
     </div>
   `;
@@ -435,7 +498,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   document.querySelectorAll('.struktur-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
-      renderStrukturDaerahModal(tab, searchQuery, filterDesa, isFilterOpen);
+      renderStrukturDaerahModal(tab, searchQuery, filterDesa, isFilterOpen, 1);
     });
   });
 
@@ -443,7 +506,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   const inputSearch = document.getElementById('inputSearchStruktur');
   inputSearch?.addEventListener('input', (e) => {
     const q = e.target.value;
-    renderStrukturDaerahModal(activeTab, q, filterDesa, isFilterOpen);
+    renderStrukturDaerahModal(activeTab, q, filterDesa, isFilterOpen, 1);
     const updatedInput = document.getElementById('inputSearchStruktur');
     if (updatedInput) {
       updatedInput.focus();
@@ -464,12 +527,12 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   // 4. Select filter desa
   const selDesa = document.getElementById('selectFilterDesa');
   selDesa?.addEventListener('change', () => {
-    renderStrukturDaerahModal(activeTab, searchQuery, selDesa.value, true);
+    renderStrukturDaerahModal(activeTab, searchQuery, selDesa.value, true, 1);
   });
 
   // 5. Reset filter
   document.getElementById('btnResetFilterStruktur')?.addEventListener('click', () => {
-    renderStrukturDaerahModal('all', '', 'all', false);
+    renderStrukturDaerahModal('all', '', 'all', false, 1);
   });
 
   // 6. Mobile accordion card toggle
@@ -490,9 +553,16 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     });
   }
 
-  // 8. Close button in sticky footer
-  document.getElementById('btnCloseStrukturModal')?.addEventListener('click', () => {
-    closeModal();
+  // 8. Pagination buttons
+  modalBody.querySelectorAll('.struktur-page-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pNum = parseInt(btn.dataset.page, 10);
+      if (pNum && pNum >= 1 && pNum <= totalPages && pNum !== currentPage) {
+        renderStrukturDaerahModal(activeTab, searchQuery, filterDesa, isFilterOpen, pNum);
+        const scrollArea = modalBody.querySelector('.custom-scrollbar');
+        if (scrollArea) scrollArea.scrollTop = 0;
+      }
+    });
   });
 }
 
