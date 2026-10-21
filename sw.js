@@ -4,11 +4,12 @@
              Cache-First for static assets (images, icons, styles, fonts)
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'ppg-generus-v5.2';
+const CACHE_NAME = 'ppg-generus-v5.3';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/404.html',
   '/features/login/login.html',
   '/features/login/login.css',
   '/features/login/login.js',
@@ -81,24 +82,34 @@ self.addEventListener('fetch', (event) => {
 
   // Hanya tangani GET requests
   if (request.method !== 'GET') return;
-  // Skip ekstensi chrome
-  if (url.protocol === 'chrome-extension:') return;
+  // Skip protokol non-HTTP seperti chrome-extension: atau mailto:
+  if (!url.protocol.startsWith('http')) return;
+  // Cegah URL mailto yang tidak sengaja ter-trigger sebagai path HTTP
+  if (url.pathname.includes('mailto:')) {
+    event.respondWith(new Response(null, { status: 204 }));
+    return;
+  }
 
   // A. Navigasi Halaman HTML (Network-First -> Cache fallback)
   if (request.mode === 'navigate' || (request.headers.get('Accept') && request.headers.get('Accept').includes('text/html'))) {
     event.respondWith(
       fetch(request)
-        .then((networkResponse) => {
+        .then(async (networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+            return networkResponse;
+          }
+          if (networkResponse && networkResponse.status === 404) {
+            const cached404 = await caches.match('/404.html');
+            return cached404 || networkResponse;
           }
           return networkResponse;
         })
         .catch(async () => {
           const cachedResponse = await caches.match(request);
           if (cachedResponse) return cachedResponse;
-          return caches.match('/index.html') || caches.match('/');
+          return caches.match('/404.html') || caches.match('/index.html') || caches.match('/');
         })
     );
     return;

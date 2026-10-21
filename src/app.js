@@ -514,3 +514,39 @@ window.addEventListener('appinstalled', () => {
   pwaBar?.classList.remove('visible');
 });
 
+/* ── 12. SAFE MAILTO PROTOCOL HANDLER ──────────────────────── */
+// Prevent mailto clicks on desktop from navigating the current tab to a 404 page
+(function setupSafeMailtoHandler() {
+  function dispatchSafeMailto(mailUrl) {
+    if (!mailUrl || !mailUrl.startsWith('mailto:')) return;
+    let iframe = document.getElementById('_ppg_mailto_dispatcher');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = '_ppg_mailto_dispatcher';
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-9999px';
+      iframe.style.left = '-9999px';
+      iframe.style.width = '1px';
+      iframe.style.height = '1px';
+      iframe.style.opacity = '0';
+      iframe.style.border = 'none';
+      iframe.style.pointerEvents = 'none';
+      iframe.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(iframe);
+    }
+    iframe.src = mailUrl;
+  }
+
+  window.addEventListener('click', function (e) {
+    const mailLink = e.target.closest('a[href^="mailto:"]');
+    if (mailLink) {
+      e.preventDefault();
+      e.stopPropagation();
+      const href = mailLink.getAttribute('href');
+      if (href) {
+        dispatchSafeMailto(href);
+      }
+    }
+  }, true);
+})();
+

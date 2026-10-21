@@ -323,7 +323,7 @@ export function renderKontakModal(desaId, kelompokId = null) {
             </div>
           `}
           ${p.email ? `
-            <a href="mailto:${p.email}" class="btn-action-mail" title="Kirim Email (${p.email})">
+            <a href="mailto:${p.email}" target="_blank" rel="noopener noreferrer" class="btn-action-mail" title="Kirim Email (${p.email})">
               <span class="material-symbols-outlined">mail</span>
             </a>
           ` : `
@@ -351,4 +351,39 @@ export function renderKontakModal(desaId, kelompokId = null) {
     </div>
   `, 'medium');
 }
+
+/* ── SAFE MAILTO PROTOCOL HANDLER FOR DASHBOARD ────────────── */
+(function setupDashboardSafeMailto() {
+  function dispatchSafeMailto(mailUrl) {
+    if (!mailUrl || !mailUrl.startsWith('mailto:')) return;
+    let iframe = document.getElementById('_ppg_mailto_dispatcher');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = '_ppg_mailto_dispatcher';
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-9999px';
+      iframe.style.left = '-9999px';
+      iframe.style.width = '1px';
+      iframe.style.height = '1px';
+      iframe.style.opacity = '0';
+      iframe.style.border = 'none';
+      iframe.style.pointerEvents = 'none';
+      iframe.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(iframe);
+    }
+    iframe.src = mailUrl;
+  }
+
+  window.addEventListener('click', function (e) {
+    const mailLink = e.target.closest('a[href^="mailto:"]');
+    if (mailLink) {
+      e.preventDefault();
+      e.stopPropagation();
+      const href = mailLink.getAttribute('href');
+      if (href) {
+        dispatchSafeMailto(href);
+      }
+    }
+  }, true);
+})();
 

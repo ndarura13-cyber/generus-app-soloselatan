@@ -273,7 +273,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
             </a>
           ` : ''}
           ${p.email ? `
-            <a href="mailto:${p.email}" class="btn-kontak-email" title="Kirim Email ke ${p.nama}">
+            <a href="mailto:${p.email}" target="_blank" rel="noopener noreferrer" class="btn-kontak-email" title="Kirim Email ke ${p.nama}">
               <span class="material-symbols-outlined" style="font-size:14px;">mail</span>
               <span>Email</span>
             </a>
@@ -324,7 +324,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
               </a>
             ` : ''}
             ${p.email ? `
-              <a href="mailto:${p.email}" class="btn-kontak-email">
+              <a href="mailto:${p.email}" target="_blank" rel="noopener noreferrer" class="btn-kontak-email">
                 <span class="material-symbols-outlined" style="font-size:15px;">mail</span>
                 <span>Email</span>
               </a>
