@@ -91,6 +91,21 @@ const btnApprovalList = document.getElementById('btnApprovalList');
 export function renderUserProfile() {
   if (userNameEl) userNameEl.textContent = currentUser.nama;
   if (headingUserNameEl) headingUserNameEl.textContent = currentUser.nama;
+  
+  const mobHeadingUserName = document.getElementById('mobHeadingUserName');
+  if (mobHeadingUserName) mobHeadingUserName.textContent = currentUser.nama;
+
+  const mobScopeText = document.getElementById('mobScopeText');
+  if (mobScopeText) {
+    if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
+      mobScopeText.textContent = 'Daerah Solo Selatan';
+    } else if (currentUser.tingkatan === 'desa') {
+      mobScopeText.textContent = `Desa ${currentUser.desaNama || ''}`;
+    } else {
+      mobScopeText.textContent = `Kel. ${currentUser.kelompokNama || ''}`;
+    }
+  }
+
   updateDashboardStats();
   renderInlineProkerWidget();
 
@@ -98,7 +113,7 @@ export function renderUserProfile() {
   const prokerActionText = document.getElementById('prokerActionText');
   const badgeProkerStatus = document.getElementById('badgeProkerStatus');
 
-  const strukturPpgDesc = document.getElementById('strukturPpgDesc');
+  const strukturPpgDesc = document.getElementById('strukturCardDesc') || document.getElementById('strukturPpgDesc');
   if (strukturPpgDesc) {
     const totalPpgDaerah = getPengurusDaerahList().length;
     strukturPpgDesc.textContent = `Susunan 14 Bidang & ${totalPpgDaerah} Pengurus PPG Daerah Solo Selatan.`;
@@ -116,7 +131,6 @@ export function renderUserProfile() {
 
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'flex';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'block');
-    document.getElementById('drawerBtnKelolaPengurus')?.style.setProperty('display', 'block');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'flex');
     checkPendingApprovals();
 
@@ -148,7 +162,6 @@ export function renderUserProfile() {
     scopeTextEl.innerHTML = `<strong>Wilayah Koordinasi:</strong> Desa ${currentUser.desaNama || 'Barat'} &bull; Asal Kel. ${currentUser.kelompokNama || '-'}`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
-    document.getElementById('drawerBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
@@ -170,7 +183,6 @@ export function renderUserProfile() {
     scopeTextEl.innerHTML = `<strong>Kelompok Binaan:</strong> Kelompok ${currentUser.kelompokNama || 'Gentan'} (Desa ${currentUser.desaNama || 'Barat'})`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
-    document.getElementById('drawerBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
@@ -563,69 +575,15 @@ document.getElementById('cardStatCaberawit')?.addEventListener('click', () => re
 document.getElementById('cardStatGp')?.addEventListener('click', () => renderDetailRingkasanModal('gp_reguler'));
 document.getElementById('cardStatRemaja')?.addEventListener('click', () => renderDetailRingkasanModal('remaja'));
 
-/* ── 6. Mobile Dashboard Drawer (Hamburger Menu) ──────────── */
-(function setupMobileDrawer() {
-  const hamburgerBtn = document.getElementById('dashHamburger') || document.getElementById('dashHamburgerBtn');
-  const drawerOverlay = document.getElementById('dashDrawerOverlay') || document.getElementById('dashDrawerBackdrop');
-  const drawerPanel = document.getElementById('dashDrawer') || document.getElementById('dashDrawerPanel');
-  const drawerCloseBtn = document.getElementById('dashDrawerClose') || document.getElementById('dashDrawerCloseBtn');
-
-  if (!hamburgerBtn || !drawerOverlay || !drawerPanel) return;
-
-  function openDrawer() {
-    drawerOverlay.classList.add('visible');
-    drawerPanel.classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    // Populate drawer profile
-    const drawerUserName = document.getElementById('drawerUserName');
-    const drawerUserBadge = document.getElementById('drawerUserBadge');
-
-    if (drawerUserName) drawerUserName.textContent = currentUser.nama || 'Pengurus';
-    if (drawerUserBadge) {
-      drawerUserBadge.textContent = currentUser.isSuperadmin ? '🌟 Superadmin Daerah' : (currentUser.tingkatan === 'desa' ? '🏛️ Koordinator Desa' : '👥 Pamong Kelompok');
-    }
-
-    const drawerKelolaItem = document.getElementById('drawerBtnKelolaPengurus');
-    if (drawerKelolaItem) {
-      drawerKelolaItem.style.display = (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') ? 'block' : 'none';
-    }
-    const drawerStrukturItem = document.getElementById('drawerBtnStruktur');
-    if (drawerStrukturItem) {
-      drawerStrukturItem.style.display = 'block';
-    }
-  }
-
-  function closeDrawer() {
-    drawerOverlay.classList.remove('visible');
-    drawerPanel.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  hamburgerBtn.addEventListener('click', openDrawer);
-  drawerCloseBtn?.addEventListener('click', closeDrawer);
-  drawerOverlay.addEventListener('click', closeDrawer);
-
-  document.getElementById('drawerBtnSiswa')?.addEventListener('click', () => { closeDrawer(); renderSiswaModal(); });
-  document.getElementById('drawerBtnProker')?.addEventListener('click', () => { closeDrawer(); renderProkerModal(); });
-  document.getElementById('drawerBtnPembiasaan')?.addEventListener('click', () => { closeDrawer(); renderEventPembiasaanModal(); });
-  document.getElementById('drawerBtnAbsensi')?.addEventListener('click', () => { closeDrawer(); renderCetakAbsensiModal(); });
-  document.getElementById('drawerBtnStruktur')?.addEventListener('click', () => { closeDrawer(); renderStrukturDaerahModal(); });
-  document.getElementById('drawerBtnProfil')?.addEventListener('click', () => { closeDrawer(); renderSelfProfileModal(); });
-  document.getElementById('drawerBtnPengurusDaerah')?.addEventListener('click', () => { closeDrawer(); renderStrukturDaerahModal(); });
-  document.getElementById('drawerBtnLogout')?.addEventListener('click', () => {
-    closeDrawer();
-    doLogout();
-  });
-
+/* ── 6. Navigation Listeners (Sidebar, Bottom Nav, & Shortcuts) ──── */
+(function setupNavigation() {
   // Desktop Sidebar Listeners
   document.getElementById('sideBtnLogout')?.addEventListener('click', doLogout);
-
-  document.getElementById('sideBtnProker')?.addEventListener('click', () => { renderProkerModal(); });
-  document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   document.getElementById('sideBtnSiswa')?.addEventListener('click', () => { renderSiswaModal(); });
   document.getElementById('sideBtnPembiasaan')?.addEventListener('click', () => { renderEventPembiasaanModal(); });
   document.getElementById('sideBtnAbsensi')?.addEventListener('click', () => { renderCetakAbsensiModal(); });
+  document.getElementById('sideBtnProker')?.addEventListener('click', () => { renderProkerModal(); });
+  document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   document.getElementById('sideBtnPengurus')?.addEventListener('click', () => { renderManagePengurusModal(); });
   document.getElementById('sideBtnProfil')?.addEventListener('click', () => { renderSelfProfileModal(); });
 
@@ -647,10 +605,6 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   };
 
   document.getElementById('sideBtnKelolaPengurus')?.addEventListener('click', handleOpenKelolaPengurus);
-  document.getElementById('drawerBtnKelolaPengurus')?.addEventListener('click', () => {
-    closeDrawer();
-    handleOpenKelolaPengurus();
-  });
   document.getElementById('mobBtnKelolaPengurus')?.addEventListener('click', () => {
     toggleDropUp();
     handleOpenKelolaPengurus();
@@ -662,26 +616,26 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   mobNavLogout?.addEventListener('click', doLogout);
 
   const toggleDropUp = () => {
+    if (!mobDropUpMenu || !mobDropUpBackdrop) return;
     const isActive = mobDropUpMenu.classList.contains('active');
     if (isActive) {
       mobDropUpMenu.classList.remove('active');
       mobDropUpBackdrop.classList.remove('active');
-      mobNavFiturIcon.classList.remove('rotate-180');
+      if (mobNavFiturIcon) mobNavFiturIcon.classList.remove('rotate-180');
     } else {
       mobDropUpMenu.classList.add('active');
       mobDropUpBackdrop.classList.add('active');
-      mobNavFiturIcon.classList.add('rotate-180');
+      if (mobNavFiturIcon) mobNavFiturIcon.classList.add('rotate-180');
     }
   };
 
   mobNavFitur?.addEventListener('click', toggleDropUp);
   mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
 
-  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProkerModal(); });
-  document.getElementById('mobBtnStruktur')?.addEventListener('click', () => { toggleDropUp(); renderStrukturDaerahModal(); });
   document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); renderSiswaModal(); });
   document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { toggleDropUp(); renderEventPembiasaanModal(); });
   document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); renderCetakAbsensiModal(); });
+  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProkerModal(); });
 
   const btnToggleSidebar = document.getElementById('btnToggleSidebar');
   if (btnToggleSidebar) {
@@ -690,8 +644,15 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     });
   }
 
+  // Backup listener for Kelola Program in Dashboard widget
+  document.getElementById('btnKelolaProkerDashboard')?.addEventListener('click', () => {
+    renderProkerModal();
+  });
+
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeDrawer();
+    if (e.key === 'Escape' && mobDropUpMenu?.classList.contains('active')) {
+      toggleDropUp();
+    }
   });
 })();
 
