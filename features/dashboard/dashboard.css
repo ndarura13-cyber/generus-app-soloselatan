@@ -2116,6 +2116,102 @@ body {
   outline: none;
 }
 
+/* ── Proker Realisasi & LPJ Badges & Buttons ────────────── */
+.proker-realisasi-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.proker-realisasi-badge.terlaksana {
+  background-color: #057a55;
+  color: #ffffff;
+}
+.proker-realisasi-badge.belum_terlaksana {
+  background-color: #c81e1e;
+  color: #ffffff;
+}
+.proker-realisasi-badge.pending {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.proker-realisasi-quick-select {
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.proker-realisasi-quick-select.terlaksana {
+  background-color: #0e7039 !important;
+  color: #ffffff !important;
+  border: 1px solid #0a5229 !important;
+}
+.proker-realisasi-quick-select.belum_terlaksana {
+  background-color: #991b1b !important;
+  color: #ffffff !important;
+  border: 1px solid #7f1d1d !important;
+}
+.proker-bidang-header-row {
+  background: #cfe2f3 !important;
+  color: #0b386b !important;
+  font-weight: 800;
+  font-size: 12.5px;
+  letter-spacing: 0.5px;
+}
+.dark .proker-bidang-header-row {
+  background: #1e3a5f !important;
+  color: #93c5fd !important;
+}
+.proker-subtotal-row {
+  background: #f8fafc;
+  font-weight: 800;
+  border-top: 2px solid #cbd5e1;
+  border-bottom: 2px solid #cbd5e1;
+}
+.dark .proker-subtotal-row {
+  background: #1e293b;
+  border-top: 2px solid #334155;
+  border-bottom: 2px solid #334155;
+}
+
+.btn-proker-lpj {
+  padding: 5px 9px;
+  border: 1px solid #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+.btn-proker-lpj:hover {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+.dark .btn-proker-lpj {
+  background: rgba(30, 58, 138, 0.25);
+  border-color: #1d4ed8;
+  color: #93c5fd;
+}
+.dark .btn-proker-lpj:hover {
+  background: rgba(30, 58, 138, 0.45);
+  color: #bfdbfe;
+}
+
 .proker-badge-status {
   display: inline-flex;
   align-items: center;

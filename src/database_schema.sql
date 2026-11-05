@@ -297,6 +297,10 @@ CREATE TABLE IF NOT EXISTS program_kerja (
     kelompok_id UUID REFERENCES kelompok(id) ON DELETE SET NULL,
     penanggung_jawab_id UUID REFERENCES pengurus(id) ON DELETE SET NULL,
     semester INT DEFAULT 1,
+    realisasi_status VARCHAR(50) DEFAULT 'belum_terlaksana', -- 'terlaksana', 'belum_terlaksana'
+    deskripsi_realisasi TEXT, -- Catatan LPJ & evaluasi kegiatan
+    realisasi_biaya NUMERIC(15, 2) DEFAULT 0, -- Realisasi penggunaan dana aktual
+    tgl_realisasi DATE, -- Tanggal pelaporan realisasi
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -8,6 +8,7 @@ import {
   getProkerList,
   addProker,
   updateProker,
+  updateRealisasiProker,
   deleteProker,
   getProkerStats,
   syncProkerFromSupabase
@@ -50,8 +51,9 @@ export const DAFTAR_BIDANG_PPG = [
 
 export async function exportProkerCsv() {
   const prokerList = getProkerList();
+  const stats = getProkerStats();
   let csvContent = "\uFEFF"; // UTF-8 BOM
-  csvContent += "NO;KEGIATAN;WAKTU;SASARAN/PESERTA;TUJUAN KEGIATAN;RINCIAN BIAYA;EST. BIAYA (RP);TEMPAT PELAKSANAAN;STATUS;PENANGGUNG JAWAB (PIC)\n";
+  csvContent += "NO;KEGIATAN;WAKTU;SASARAN/ PESERTA;TUJUAN KEGIATAN;RINCIAN BIAYA;EST. BIAYA;TEMPAT PELAKSANAAN;REALISASI PROKER;DESKRIPSI REALISASI PROKER;REALISASI PENGGUNAAN DANA\n";
 
   // Group by PIC
   const grouped = prokerList.reduce((acc, curr) => {
@@ -61,9 +63,18 @@ export async function exportProkerCsv() {
     return acc;
   }, {});
 
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let letterIdx = 0;
+
   Object.keys(grouped).sort().forEach(pic => {
-    // Add Header Row for PIC
-    csvContent += `\n"--- BIDANG: ${pic.toUpperCase()} ---";;;;;;;;;\n`;
+    const letter = alphabet[letterIdx % alphabet.length] || '';
+    letterIdx++;
+    let subtotalEst = 0;
+    let subtotalReal = 0;
+
+    // Section Header row matching Excel format (e.g. A. BENDAHARA)
+    csvContent += `\n"${letter}.";"${pic.toUpperCase()}";;;;;;;;;\n`;
+
     grouped[pic].forEach((p, idx) => {
       const no = p.no || (idx + 1);
       const kegiatan = `"${(p.kegiatan || '').replace(/"/g, '""')}"`;
@@ -73,18 +84,28 @@ export async function exportProkerCsv() {
       const rincianBiaya = `"${(p.rincianBiaya || '').replace(/"/g, '""')}"`;
       const estBiaya = p.estBiaya || 0;
       const tempat = `"${(p.tempat || '').replace(/"/g, '""')}"`;
-      const status = p.status || 'planned';
-      const picField = `"${(p.penanggungJawab || '').replace(/"/g, '""')}"`;
+      const realisasiStatus = p.realisasiStatus === 'terlaksana' ? 'Terlaksana' : 'Belum Terlaksana';
+      const deskripsiRealisasi = `"${(p.deskripsiRealisasi || '').replace(/"/g, '""')}"`;
+      const realisasiBiaya = p.realisasiBiaya || 0;
 
-      csvContent += `${no};${kegiatan};${waktu};${sasaran};${tujuan};${rincianBiaya};${estBiaya};${tempat};${status};${picField}\n`;
+      subtotalEst += estBiaya;
+      subtotalReal += realisasiBiaya;
+
+      csvContent += `${no};${kegiatan};${waktu};${sasaran};${tujuan};${rincianBiaya};${estBiaya};${tempat};${realisasiStatus};${deskripsiRealisasi};${realisasiBiaya}\n`;
     });
+
+    // Subtotal row per bidang matching spreadsheet format
+    csvContent += `;"SUB TOTAL ${pic.toUpperCase()}";;;;;${subtotalEst};;;;${subtotalReal}\n`;
   });
+
+  // Grand Total row at the bottom
+  csvContent += `\n;"TOTAL KESELURUHAN (SEMUA BIDANG)";;;;;${stats.totalAnggaran};;;;${stats.totalRealisasiDana}\n`;
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `Program_Kerja_Tahunan_PPG_Solo_Selatan_2026_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute('download', `Laporan_Realisasi_RAB_PPG_Solo_Selatan_2026_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -105,68 +126,133 @@ export async function printProkerTable() {
     return acc;
   }, {});
 
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let letterIdx = 0;
   let rowsHtml = '';
+
   Object.keys(grouped).sort().forEach(pic => {
+    const letter = alphabet[letterIdx % alphabet.length] || '';
+    letterIdx++;
+    let subtotalEst = 0;
+    let subtotalReal = 0;
+
+    // Section Header row matching Excel format (e.g. A. BENDAHARA)
     rowsHtml += `
-      <tr style="background:#e2e8f0;">
-        <td colspan="9" style="padding:10px 8px;border:1px solid var(--border);font-weight:bold;font-size:12px;color:var(--text);">
-          BIDANG: ${pic.toUpperCase()}
+      <tr style="background:#cfe2f3;">
+        <td style="text-align:center;padding:7px 5px;border:1px solid #94a3b8;font-weight:900;font-size:12px;color:#0b386b;">${letter}.</td>
+        <td colspan="10" style="padding:7px 8px;border:1px solid #94a3b8;font-weight:900;font-size:12px;color:#0b386b;letter-spacing:0.5px;">
+          ${pic.toUpperCase()}
         </td>
       </tr>
     `;
+
     grouped[pic].forEach((p, idx) => {
+      const isTerlaksana = p.realisasiStatus === 'terlaksana';
+      const est = p.estBiaya || 0;
+      const real = p.realisasiBiaya || 0;
+      subtotalEst += est;
+      subtotalReal += real;
+
+      const estText = est > 0 ? `Rp ${est.toLocaleString('id-ID')}` : 'Rp -';
+      const realText = real > 0 ? `Rp ${real.toLocaleString('id-ID')}` : (isTerlaksana ? 'Rp -' : '');
+
       rowsHtml += `
         <tr>
-          <td style="text-align:center;padding:8px;border:1px solid var(--border);font-weight:bold;">${p.no || (idx + 1)}</td>
-          <td style="padding:8px;border:1px solid var(--border);"><strong>${p.kegiatan}</strong></td>
-          <td style="padding:8px;border:1px solid var(--border);white-space:nowrap;">${p.waktu}</td>
-          <td style="padding:8px;border:1px solid var(--border);">${p.sasaran}</td>
-          <td style="padding:8px;border:1px solid var(--border);font-size:11px;">${p.tujuan}</td>
-          <td style="padding:8px;border:1px solid var(--border);font-size:10.5px;font-style:italic;">${p.rincianBiaya || '-'}</td>
-          <td style="padding:8px;border:1px solid var(--border);text-align:right;font-weight:bold;color:var(--green-dark);">Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</td>
-          <td style="padding:8px;border:1px solid var(--border);">${p.tempat}</td>
-          <td style="padding:8px;border:1px solid var(--border);text-align:center;font-weight:bold;font-size:10px;">${(p.status || '').toUpperCase()}</td>
+          <td style="text-align:center;padding:6px 4px;border:1px solid #cbd5e1;font-weight:bold;font-size:11px;">${p.no || (idx + 1)}</td>
+          <td style="padding:6px 8px;border:1px solid #cbd5e1;font-size:11px;font-weight:600;">${p.kegiatan}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;font-size:10.5px;white-space:nowrap;">${p.waktu || ''}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;font-size:10.5px;">${p.sasaran || ''}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;font-size:10.5px;line-height:1.3;">${p.tujuan || ''}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;font-size:10px;font-style:italic;line-height:1.3;">${p.rincianBiaya || '-'}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;text-align:right;font-size:11px;font-weight:bold;color:#0e7039;white-space:nowrap;">${estText}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;font-size:10.5px;">${p.tempat || ''}</td>
+          <td style="padding:6px 4px;border:1px solid #cbd5e1;text-align:center;">
+            <span style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:9.5px;font-weight:bold;color:#ffffff;background:${isTerlaksana ? '#0e7039' : '#991b1b'};white-space:nowrap;">
+              ${isTerlaksana ? 'Terlaksana' : 'Belum Terlaksana'}
+            </span>
+          </td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;font-size:10px;line-height:1.3;">${p.deskripsiRealisasi || ''}</td>
+          <td style="padding:6px 6px;border:1px solid #cbd5e1;text-align:right;font-size:11px;font-weight:bold;color:#1e40af;white-space:nowrap;">${realText}</td>
         </tr>
       `;
     });
+
+    // Subtotal row matching screenshot
+    rowsHtml += `
+      <tr style="background:#f8fafc;font-weight:bold;border-top:1.5px solid #64748b;border-bottom:1.5px solid #64748b;">
+        <td colspan="6" style="text-align:right;padding:6px 8px;border:1px solid #cbd5e1;font-size:10.5px;font-weight:900;">
+          SUB TOTAL ${pic.toUpperCase()}
+        </td>
+        <td style="text-align:right;padding:6px 6px;border:1px solid #cbd5e1;font-size:11px;font-weight:900;color:#0e7039;white-space:nowrap;">
+          Rp ${subtotalEst.toLocaleString('id-ID')}
+        </td>
+        <td colspan="3" style="border:1px solid #cbd5e1;"></td>
+        <td style="text-align:right;padding:6px 6px;border:1px solid #cbd5e1;font-size:11px;font-weight:900;color:#1e40af;white-space:nowrap;">
+          Rp ${subtotalReal.toLocaleString('id-ID')}
+        </td>
+      </tr>
+    `;
   });
+
+  // Grand Total row
+  rowsHtml += `
+    <tr style="background:#cfe2f3;font-weight:900;border-top:2px solid #0b386b;border-bottom:2px solid #0b386b;">
+      <td colspan="6" style="text-align:right;padding:8px 8px;border:1px solid #94a3b8;font-size:11.5px;color:#0b386b;">
+        TOTAL KESELURUHAN (SEMUA BIDANG)
+      </td>
+      <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:12px;color:#0e7039;white-space:nowrap;">
+        Rp ${stats.totalAnggaran.toLocaleString('id-ID')}
+      </td>
+      <td colspan="3" style="border:1px solid #94a3b8;"></td>
+      <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:12px;color:#1e40af;white-space:nowrap;">
+        Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}
+      </td>
+    </tr>
+  `;
 
   printWindow.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Program Kerja Tahunan PPG Solo Selatan 2026</title>
+      <title>Laporan Program Kerja & Realisasi RAB PPG Solo Selatan 2026</title>
       <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 24px; color:var(--text); }
-        h2 { margin: 0 0 4px 0; color: #1a56c4; font-size: 18px; }
-        p { margin: 2px 0 16px 0; font-size: 12px; color:var(--text-muted); }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; }
-        th { background: #f1f5f9; padding: 8px; border:1px solid var(--border); text-align: left; font-size: 10px; text-transform: uppercase; }
-        .summary-box { display: flex; gap: 20px; font-size: 12px; padding: 10px 14px; background:var(--bg); border:1px solid var(--border); border-radius: 8px; margin-bottom: 12px; }
-        @media print { button { display: none; } }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 16px; color:#1e293b; }
+        h2 { margin: 0 0 2px 0; color: #0b386b; font-size: 16px; font-weight: 800; }
+        p { margin: 2px 0 12px 0; font-size: 11px; color:#64748b; }
+        table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
+        th { background: #f1f5f9; padding: 7px 5px; border:1px solid #94a3b8; text-align: left; font-size: 9.5px; font-weight: 800; color:#334155; }
+        .summary-box { display: flex; gap: 16px; font-size: 11px; padding: 8px 12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+        @media print {
+          button { display: none; }
+          body { margin: 8px; }
+          @page { size: landscape; margin: 8mm; }
+        }
       </style>
     </head>
     <body>
-      <h2>PROGRAM KERJA TAHUNAN PPG SOLO SELATAN</h2>
-      <p>Tahun Anggaran 2026 &bull; Dicetak pada: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
+      <h2>PROGRAM KERJA & LAPORAN REALISASI ANGGARAN PPG SOLO SELATAN</h2>
+      <p>Tahun Anggaran 2026 &bull; Format Resmi LPJ &bull; Dicetak: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
       <div class="summary-box">
-        <div><strong>Total Agenda:</strong> ${stats.total} Program</div>
-        <div><strong>Total Est. Anggaran:</strong> Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</div>
-        <div><strong>Sedang Berjalan:</strong> ${stats.ongoing} Program</div>
-        <div><strong>Selesai:</strong> ${stats.done} Program</div>
+        <div><strong>Total Program:</strong> ${stats.total}</div>
+        <div><strong>Est. Anggaran (RAB):</strong> Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</div>
+        <div><strong>Realisasi Dana:</strong> Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</div>
+        <div><strong>Penyerapan:</strong> ${stats.persenRealisasiDana}%</div>
+        <div><strong>Ketercapaian:</strong> ${stats.totalTerlaksana} Terlaksana &bull; ${stats.totalBelumTerlaksana} Belum</div>
       </div>
       <table>
         <thead>
           <tr>
-            <th style="width:30px;text-align:center;">NO</th>
-            <th>KEGIATAN</th>
-            <th>WAKTU</th>
-            <th>SASARAN/ PESERTA</th>
-            <th>TUJUAN KEGIATAN</th>
-            <th>RINCIAN BIAYA</th>
-            <th>EST. BIAYA</th>
-            <th>TEMPAT PELAKSANAAN</th>
-            <th>STATUS</th>
+            <th style="width:25px;text-align:center;">NO</th>
+            <th style="min-width:180px;">KEGIATAN</th>
+            <th style="min-width:90px;">WAKTU</th>
+            <th style="min-width:110px;">SASARAN/ PESERTA</th>
+            <th style="min-width:150px;">TUJUAN KEGIATAN</th>
+            <th style="min-width:140px;">RINCIAN BIAYA</th>
+            <th style="min-width:95px;text-align:right;">EST. BIAYA</th>
+            <th style="min-width:90px;">TEMPAT PELAKSANAAN</th>
+            <th style="min-width:110px;text-align:center;">REALISASI PROKER<br/>(TERLAKSANA/BELUM)</th>
+            <th style="min-width:140px;">DESKRIPSI REALISASI PROKER</th>
+            <th style="min-width:95px;text-align:right;">REALISASI PENGGUNAAN</th>
           </tr>
         </thead>
         <tbody>
@@ -278,30 +364,30 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     `;
   }
 
-  // Summary Stat Strip (Screenshot Layout 3 x 2 Grid with Icons)
+  // Summary Stat Strip (Realisasi & LPJ Integrated)
   const statsHtml = `
     <div class="proker-stats-container">
-      <!-- BARIS 1: INFORMASI CEPAT (1 BARIS 3 KOLOM) -->
+      <!-- BARIS 1: INFORMASI KETERCAPAIAN & STATUS -->
       <div class="proker-stats-row-1">
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
           <div class="proker-stat-info">
-            <span class="stat-label">TOTAL KERJA</span>
+            <span class="stat-label">TOTAL PROGRAM</span>
             <span class="stat-num">${stats.total} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon text-emerald-500">hourglass_top</span>
+          <span class="material-symbols-outlined proker-stat-icon" style="color:#057a55;">check_circle</span>
           <div class="proker-stat-info">
-            <span class="stat-label">BERJALAN</span>
-            <span class="stat-num stat-emerald">${stats.ongoing} <span class="stat-unit">Prog</span></span>
+            <span class="stat-label">TERLAKSANA (LPJ)</span>
+            <span class="stat-num" style="color:#057a55;">${stats.totalTerlaksana} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon text-blue-500">done_all</span>
+          <span class="material-symbols-outlined proker-stat-icon" style="color:#c81e1e;">pending_actions</span>
           <div class="proker-stat-info">
-            <span class="stat-label">SELESAI</span>
-            <span class="stat-num stat-blue">${stats.done} <span class="stat-unit">Prog</span></span>
+            <span class="stat-label">BELUM TERLAKSANA</span>
+            <span class="stat-num" style="color:#c81e1e;">${stats.totalBelumTerlaksana} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
       </div>
@@ -311,42 +397,46 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon">payments</span>
           <div class="proker-stat-info">
-            <span class="stat-label">EST. ANGGARAN TAHUN INI</span>
+            <span class="stat-label">EST. BIAYA (RAB AWAL)</span>
             <span class="stat-num">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
-            <span class="stat-sub">EST. ANGGARAN (TAHUN INI)</span>
+            <span class="stat-sub">Rencana Anggaran Belanja</span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon">savings</span>
+          <span class="material-symbols-outlined proker-stat-icon" style="color:#0e7039;">account_balance_wallet</span>
           <div class="proker-stat-info">
-            <span class="stat-label">EST. ANGGARAN TAHUN SEBELUMNYA</span>
-            <span class="stat-num">Rp ${stats.anggaranTahunLalu.toLocaleString('id-ID')}</span>
-            <span class="stat-sub">EST. ANGGARAN (LALU)</span>
+            <span class="stat-label">REALISASI DANA (LPJ)</span>
+            <span class="stat-num" style="color:#0e7039;">Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</span>
+            <span class="stat-sub">Aktual Pengeluaran LPJ</span>
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon text-emerald-400">trending_up</span>
+          <span class="material-symbols-outlined proker-stat-icon" style="color:#2563eb;">pie_chart</span>
           <div class="proker-stat-info">
-            <span class="stat-label">PERTUMBUHAN ANGGARAN</span>
-            <span class="stat-num stat-emerald">${stats.percentGrowth > 0 ? '+' : ''}${stats.percentGrowth}%</span>
-            <span class="stat-sub">${stats.percentGrowth >= 0 ? 'NAIK (VS LALU)' : 'TURUN (VS LALU)'}</span>
+            <span class="stat-label">PENYERAPAN DANA (${stats.persenRealisasiDana}%)</span>
+            <span class="stat-num" style="color:${stats.selisihDana >= 0 ? '#057a55' : '#c81e1e'};">
+              ${stats.selisihDana >= 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID')}
+            </span>
+            <span class="stat-sub">${stats.selisihDana >= 0 ? 'Efisiensi Anggaran' : 'Melebihi Estimasi RAB'}</span>
           </div>
         </div>
       </div>
 
-      <!-- BARIS 2 ANGGARAN MOBILE (2 BARIS SESUAI PERMINTAAN USER) -->
+      <!-- BARIS 2 ANGGARAN MOBILE -->
       <div class="proker-stats-anggaran-mobile">
         <div class="proker-anggaran-line-1">
           <div class="anggaran-line-label">
             <span class="material-symbols-outlined" style="font-size:15px;color:#2563eb;">payments</span>
-            <span>Est. Anggaran Tahun Ini</span>
+            <span>RAB: Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
           </div>
-          <strong class="anggaran-line-val-now">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</strong>
+          <strong style="color:#0e7039;">Realisasi: Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</strong>
         </div>
         <div class="proker-anggaran-line-2">
           <div class="anggaran-line-prev">
-            <span>Tahun Sebelumnya:</span>
-            <strong>Rp ${stats.anggaranTahunLalu.toLocaleString('id-ID')}</strong>
+            <span>Penyerapan: <strong>${stats.persenRealisasiDana}%</strong> &bull; </span>
+            <span style="font-weight:700;color:${stats.selisihDana >= 0 ? '#057a55' : '#c81e1e'};">
+              ${stats.selisihDana >= 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID')}
+            </span>
           </div>
           <div class="proker-growth-pill ${stats.percentGrowth >= 0 ? 'up' : 'down'}">
             <span>${stats.percentGrowth > 0 ? '+' : ''}${stats.percentGrowth}%</span>
@@ -459,19 +549,19 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
   if (activeTab === 'table') {
     let rowsHtml = paginatedItems.map((p, idx) => {
-      let statusClass = p.status || 'planned';
+      const isTerlaksana = p.realisasiStatus === 'terlaksana';
+      const estVal = p.estBiaya || 0;
+      const realVal = p.realisasiBiaya || 0;
+      const diffVal = estVal - realVal;
 
-      let quickStatusSelect = isSuper ? `
-        <select class="proker-quick-select proker-quick-status-change" data-id="${p.id}" style="font-size:11px;padding:4px 6px;">
-          <option value="planned" ${statusClass === 'planned' ? 'selected' : ''}>🔵 Direncanakan</option>
-          <option value="upcoming" ${statusClass === 'upcoming' ? 'selected' : ''}>🟡 Akan Datang</option>
-          <option value="ongoing" ${statusClass === 'ongoing' ? 'selected' : ''}>🟢 Berlangsung</option>
-          <option value="done" ${statusClass === 'done' ? 'selected' : ''}>⚪ Selesai</option>
+      let realisasiSelectOrBadge = isSuper ? `
+        <select class="proker-realisasi-quick-select ${isTerlaksana ? 'terlaksana' : 'belum_terlaksana'}" data-id="${p.id}" title="Klik untuk cepat ubah status realisasi LPJ">
+          <option value="terlaksana" ${isTerlaksana ? 'selected' : ''}>Terlaksana</option>
+          <option value="belum_terlaksana" ${!isTerlaksana ? 'selected' : ''}>Belum Terlaksana</option>
         </select>
       ` : `
-        <span class="proker-badge-status ${statusClass}">
-          <span class="dot ${statusClass}"></span>
-          <span>${statusClass === 'done' ? 'Selesai' : (statusClass === 'ongoing' ? 'Berlangsung' : (statusClass === 'upcoming' ? 'Akan Datang' : 'Direncanakan'))}</span>
+        <span class="proker-realisasi-badge ${isTerlaksana ? 'terlaksana' : 'belum_terlaksana'}">
+          ${isTerlaksana ? 'Terlaksana' : 'Belum Terlaksana'}
         </span>
       `;
 
@@ -479,11 +569,14 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       if (isSuper) {
         actionsCell = `
           <td style="white-space:nowrap;text-align:right;">
-            <div style="display:inline-flex;gap:4px;">
-              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program Kerja" style="padding:5px 8px;border:1px solid var(--border);background:var(--surface);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
-                <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
+            <div style="display:inline-flex;gap:4px;align-items:center;">
+              <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Penggunaan Dana">
+                <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
               </button>
-              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 8px;border:1px solid var(--border);background:var(--surface);color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:2px;">
+              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program Kerja" style="padding:5px 7px;border:1px solid var(--border);background:var(--surface);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;">
+                <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
+              </button>
+              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 7px;border:1px solid var(--border);background:var(--surface);color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;">
                 <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
               </button>
             </div>
@@ -496,37 +589,52 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           <td style="font-weight:800;text-align:center;color:var(--blue);">${p.no || (startIndex + idx + 1)}</td>
           <td>
             <div style="font-weight:800;font-size:13px;color:var(--text);">${p.kegiatan}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">PIC: <strong style="color:var(--blue-dark);">${p.penanggungJawab || 'Pengurus PPG'}</strong></div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+              <span style="background:rgba(37,99,235,0.08);color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10.5px;">
+                ${p.penanggungJawab || 'Pengurus PPG'}
+              </span>
+            </div>
           </td>
           <td style="white-space:nowrap;">
-            <div style="font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px;">
+            <div style="font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px;font-size:11.5px;">
               <span class="material-symbols-outlined" style="font-size:14px;color:var(--blue);">calendar_today</span>
-              ${p.waktu}
+              ${p.waktu || '-'}
             </div>
           </td>
           <td>
-            <div style="font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:4px;font-size:11.5px;">
+            <div style="font-weight:600;color:var(--blue-dark);display:flex;align-items:center;gap:4px;font-size:11px;">
               <span class="material-symbols-outlined" style="font-size:14px;">group</span>
-              ${p.sasaran}
+              ${p.sasaran || '-'}
             </div>
           </td>
           <td>
-            <div style="font-size:11.5px;color:var(--text);max-width:200px;line-height:1.4;">${p.tujuan}</div>
+            <div style="font-size:11px;color:var(--text);max-width:180px;line-height:1.4;">${p.tujuan || '-'}</div>
           </td>
           <td>
-            <div style="font-size:11px;color:var(--text-muted);font-style:italic;max-width:180px;line-height:1.4;">${p.rincianBiaya || '-'}</div>
+            <div style="font-size:10.5px;color:var(--text-muted);font-style:italic;max-width:160px;line-height:1.3;">${p.rincianBiaya || '-'}</div>
           </td>
-          <td style="white-space:nowrap;">
-            <strong style="color:var(--green-dark);font-size:12.5px;">Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</strong>
+          <td style="white-space:nowrap;text-align:right;">
+            <strong style="color:var(--green-dark);font-size:12px;">Rp ${estVal.toLocaleString('id-ID')}</strong>
           </td>
           <td>
-            <div style="font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:4px;font-size:11.5px;">
-              <span class="material-symbols-outlined" style="font-size:14px;">location_on</span>
-              ${p.tempat}
+            <div style="font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px;font-size:11px;">
+              <span class="material-symbols-outlined" style="font-size:14px;color:var(--blue);">location_on</span>
+              ${p.tempat || '-'}
             </div>
           </td>
+          <td style="text-align:center;">
+            ${realisasiSelectOrBadge}
+          </td>
           <td>
-            ${quickStatusSelect}
+            ${p.deskripsiRealisasi ? `<div style="font-size:11px;color:var(--text);max-width:180px;line-height:1.35;">${p.deskripsiRealisasi}</div>` : '<span style="color:var(--text-muted);font-style:italic;font-size:10.5px;">-</span>'}
+          </td>
+          <td style="white-space:nowrap;text-align:right;">
+            <strong style="color:#1e40af;font-size:12px;">Rp ${realVal.toLocaleString('id-ID')}</strong>
+            ${realVal > 0 ? `
+              <div style="font-size:10px;margin-top:2px;font-weight:700;color:${diffVal >= 0 ? '#057a55' : '#c81e1e'};">
+                ${diffVal >= 0 ? `+Rp ${diffVal.toLocaleString('id-ID')} (Hemat)` : `-Rp ${Math.abs(diffVal).toLocaleString('id-ID')} (Lebih)`}
+              </div>
+            ` : ''}
           </td>
           ${actionsCell}
         </tr>
@@ -536,7 +644,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     if (filtered.length === 0) {
       rowsHtml = `
         <tr>
-          <td colspan="${isSuper ? 10 : 9}" style="text-align:center;padding:32px;color:var(--text-muted);">
+          <td colspan="${isSuper ? 12 : 11}" style="text-align:center;padding:32px;color:var(--text-muted);">
             <span class="material-symbols-outlined" style="font-size:36px;color:var(--border);margin-bottom:6px;">event_busy</span>
             <div style="font-weight:700;font-size:13px;color:var(--text);">Tidak Ada Program Kerja Sesuai Filter</div>
             <div style="font-size:12px;margin-top:2px;">Silakan sesuaikan kata kunci pencarian atau pilihan bidang.</div>
@@ -545,31 +653,70 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       `;
     }
 
+    const pageSubtotalEst = paginatedItems.reduce((acc, c) => acc + (c.estBiaya || 0), 0);
+    const pageSubtotalReal = paginatedItems.reduce((acc, c) => acc + (c.realisasiBiaya || 0), 0);
+    const totalEstAll = filtered.reduce((acc, c) => acc + (c.estBiaya || 0), 0);
+    const totalRealAll = filtered.reduce((acc, c) => acc + (c.realisasiBiaya || 0), 0);
+
     contentHtml = `
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-muted);">
-          <span>👉 Geser tabel ke kanan dan ke kiri untuk melihat seluruh 8 kolom program kerja 👈</span>
+          <span>👉 Geser tabel ke samping untuk melihat seluruh 11 kolom format resmi pelaporan LPJ & realisasi RAB 👈</span>
           <span style="font-weight:700;">Halaman ${currentPage} dari ${totalPages} (${totalItems} Total Program)</span>
         </div>
         <div class="proker-table-wrap">
           <table class="proker-table">
             <thead>
               <tr>
-                <th style="width:40px;text-align:center;">NO</th>
+                <th style="width:35px;text-align:center;">NO</th>
                 <th style="min-width:200px;">KEGIATAN</th>
-                <th style="min-width:130px;">WAKTU</th>
-                <th style="min-width:150px;">SASARAN/ PESERTA</th>
-                <th style="min-width:200px;">TUJUAN KEGIATAN</th>
-                <th style="min-width:180px;">RINCIAN BIAYA</th>
-                <th style="min-width:120px;">EST. BIAYA</th>
-                <th style="min-width:140px;">TEMPAT</th>
-                <th style="min-width:130px;">STATUS</th>
-                ${isSuper ? '<th style="width:90px;text-align:right;">AKSI</th>' : ''}
+                <th style="min-width:115px;">WAKTU</th>
+                <th style="min-width:130px;">SASARAN/ PESERTA</th>
+                <th style="min-width:170px;">TUJUAN KEGIATAN</th>
+                <th style="min-width:160px;">RINCIAN BIAYA</th>
+                <th style="min-width:115px;text-align:right;">EST. BIAYA</th>
+                <th style="min-width:120px;">TEMPAT</th>
+                <th style="min-width:140px;text-align:center;">REALISASI PROKER<br/>(TERLAKSANA/BELUM)</th>
+                <th style="min-width:170px;">DESKRIPSI REALISASI PROKER</th>
+                <th style="min-width:125px;text-align:right;">REALISASI PENGGUNAAN</th>
+                ${isSuper ? '<th style="width:115px;text-align:right;">AKSI</th>' : ''}
               </tr>
             </thead>
             <tbody>
               ${rowsHtml}
             </tbody>
+            <tfoot>
+              <tr class="proker-subtotal-row">
+                <td colspan="6" style="text-align:right;padding:8px 10px;font-size:11px;color:var(--text);font-weight:800;">
+                  SUB TOTAL (HALAMAN INI):
+                </td>
+                <td style="text-align:right;padding:8px 10px;color:var(--green-dark);font-size:12px;white-space:nowrap;font-weight:800;">
+                  Rp ${pageSubtotalEst.toLocaleString('id-ID')}
+                </td>
+                <td colspan="3" style="text-align:right;padding:8px 10px;font-size:11px;color:var(--text-muted);font-weight:700;">
+                  Realisasi Halaman Ini:
+                </td>
+                <td style="text-align:right;padding:8px 10px;color:#1e40af;font-size:12px;white-space:nowrap;font-weight:800;">
+                  Rp ${pageSubtotalReal.toLocaleString('id-ID')}
+                </td>
+                ${isSuper ? '<td></td>' : ''}
+              </tr>
+              <tr style="background:#e0f2fe;font-weight:900;border-top:2px solid #0284c7;">
+                <td colspan="6" style="text-align:right;padding:9px 10px;font-size:11.5px;color:#0369a1;">
+                  TOTAL KESELURUHAN (${filtered.length} PROGRAM):
+                </td>
+                <td style="text-align:right;padding:9px 10px;color:#057a55;font-size:12.5px;white-space:nowrap;">
+                  Rp ${totalEstAll.toLocaleString('id-ID')}
+                </td>
+                <td colspan="3" style="text-align:right;padding:9px 10px;font-size:11.5px;color:#0369a1;">
+                  Total Realisasi LPJ:
+                </td>
+                <td style="text-align:right;padding:9px 10px;color:#1e40af;font-size:12.5px;white-space:nowrap;">
+                  Rp ${totalRealAll.toLocaleString('id-ID')}
+                </td>
+                ${isSuper ? '<td></td>' : ''}
+              </tr>
+            </tfoot>
           </table>
         </div>
         ${paginationHtml}
@@ -596,7 +743,21 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       else if (statusClass === 'ongoing') statusLabel = 'Berlangsung';
       else if (statusClass === 'upcoming') statusLabel = 'Akan Datang';
 
+      const isTerlaksana = p.realisasiStatus === 'terlaksana';
+      let realisasiBadge = isTerlaksana ? `
+        <span class="proker-realisasi-badge terlaksana" style="font-size:10px;padding:2px 8px;">
+          <span class="material-symbols-outlined" style="font-size:12px;">check_circle</span> Terlaksana
+        </span>
+      ` : `
+        <span class="proker-realisasi-badge belum_terlaksana" style="font-size:10px;padding:2px 8px;">
+          <span class="material-symbols-outlined" style="font-size:12px;">cancel</span> Belum Terlaksana
+        </span>
+      `;
+
       let superButtons = isSuper ? `
+              <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Dana">
+                <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
+              </button>
               <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program">
                 <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
               </button>
@@ -607,17 +768,14 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       return `
               <div class="proker-card-item" data-id="${p.id}">
-                <!-- HEADER: HANYA NOMOR, PROGRAM, STATUS, DAN CHEVRON TOGGLE SESUAI REQUEST MOBILE -->
+                <!-- HEADER: NOMOR, PROGRAM, STATUS, DAN CHEVRON TOGGLE -->
                 <div class="proker-card-header" role="button" tabindex="0" aria-expanded="false" title="Klik untuk menampilkan / menyembunyikan detail program">
                   <div class="proker-card-title-wrap">
                     <span class="proker-card-num">${p.no || (startIndex + idx + 1)}.</span>
                     <strong class="proker-card-title">${p.kegiatan}</strong>
                   </div>
                   <div class="proker-card-actions">
-                    <span class="proker-status-pill ${statusClass}">
-                      <span class="proker-status-dot"></span>
-                      <span class="proker-status-text">${statusLabel}</span>
-                    </span>
+                    ${realisasiBadge}
                     <button type="button" class="btn-toggle-proker-detail" aria-label="Toggle Detail Program" title="Tampilkan/Sembunyikan Detail">
                       <span class="material-symbols-outlined proker-chevron-icon">expand_more</span>
                     </button>
@@ -648,10 +806,19 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                     <strong>Tujuan:</strong> ${p.tujuan}
                   </div>
 
+                  ${p.deskripsiRealisasi ? `
+                    <div style="background:#f0fdf4;border-left:3px solid #057a55;padding:8px 12px;font-size:11.5px;color:#065f46;border-radius:4px;margin-top:6px;">
+                      <strong>Catatan LPJ:</strong> ${p.deskripsiRealisasi}
+                    </div>
+                  ` : ''}
+
                   <div class="proker-card-footer">
-                    <div class="proker-rincian">Rincian Biaya: <em>${p.rincianBiaya || '-'}</em></div>
+                    <div class="proker-rincian">Rincian: <em>${p.rincianBiaya || '-'}</em></div>
                     <div class="proker-footer-right">
-                      <div class="proker-est-biaya">Est. Biaya: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</div>
+                      <div class="proker-est-biaya">
+                        Est. RAB: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}
+                        ${p.realisasiBiaya ? ` &bull; <span style="color:#1e40af;">Realisasi: Rp ${(p.realisasiBiaya || 0).toLocaleString('id-ID')}</span>` : ''}
+                      </div>
                       ${superButtons ? `<div class="proker-admin-actions">${superButtons}</div>` : ''}
                     </div>
                   </div>
@@ -724,24 +891,34 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     renderAddEditProkerForm(null);
   });
 
-  // Aksi Cepat Pergantian Status Program Kerja Langsung Tersimpan
-  modalBody.querySelectorAll('.proker-quick-status-change').forEach(select => {
+  // Aksi Cepat Pergantian Realisasi Proker (Terlaksana / Belum Terlaksana) Langsung Tersimpan
+  modalBody.querySelectorAll('.proker-realisasi-quick-select').forEach(select => {
     select.addEventListener('change', async (e) => {
       const pId = select.dataset.id;
       const newStatus = select.value;
-      await updateProker(pId, { status: newStatus });
-      showToast(`Status program berhasil diubah menjadi: "${newStatus}"`, 'info');
+      await updateRealisasiProker(pId, { realisasiStatus: newStatus });
+      showToast(`Realisasi program diubah menjadi "${newStatus === 'terlaksana' ? 'Terlaksana' : 'Belum Terlaksana'}"`, 'info');
       renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
       renderInlineProkerWidget();
       appHooks.renderUserProfile();
     });
   });
 
+  // Tombol Pelaporan LPJ & Realisasi Dana Khusus
+  modalBody.querySelectorAll('.btn-proker-lpj').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pId = btn.dataset.id;
+      const prokerItem = prokerList.find(p => p.id === pId);
+      if (prokerItem) renderLaporRealisasiModal(prokerItem);
+    });
+  });
+
   // Accordion Dropdown: Tampilkan / Sembunyikan Detil Program Kerja
   modalBody.querySelectorAll('.proker-card-header').forEach(header => {
     header.addEventListener('click', (e) => {
-      // Abaikan jika user mengklik tombol edit atau hapus
-      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del')) {
+      // Abaikan jika user mengklik tombol edit, hapus, atau LPJ
+      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del') || e.target.closest('.btn-proker-lpj')) {
         return;
       }
       const card = header.closest('.proker-card-item');
@@ -798,6 +975,157 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         }
       });
     });
+  });
+}
+
+export function renderLaporRealisasiModal(p) {
+  if (!p) return;
+  const isTerlaksana = p.realisasiStatus === 'terlaksana';
+  const estBiaya = p.estBiaya || 0;
+  const initialRealBiaya = p.realisasiBiaya !== undefined && p.realisasiBiaya !== null ? p.realisasiBiaya : (isTerlaksana ? estBiaya : 0);
+  const initialTgl = p.tglRealisasi || new Date().toISOString().slice(0, 10);
+  const deskripsi = p.deskripsiRealisasi || '';
+
+  openModal(`Pelaporan Realisasi & LPJ: ${p.kegiatan}`, 'assignment_turned_in', `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <!-- Ringkasan Info Proker -->
+      <div style="background:var(--bg);padding:14px;border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span style="font-size:11px;font-weight:700;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;">
+              BIDANG: ${(p.penanggungJawab || 'Pengurus PPG').toUpperCase()}
+            </span>
+            <h4 style="margin:6px 0 2px;font-size:15px;color:var(--text);font-weight:800;">${p.kegiatan}</h4>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:11px;color:var(--text-muted);display:block;">Estimasi Biaya (RAB):</span>
+            <strong style="font-size:15px;color:var(--green-dark);">Rp ${estBiaya.toLocaleString('id-ID')}</strong>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+          <span>📅 Waktu: <strong style="color:var(--text);">${p.waktu || '-'}</strong></span>
+          <span>📍 Tempat: <strong style="color:var(--text);">${p.tempat || '-'}</strong></span>
+          <span>👥 Sasaran: <strong style="color:var(--text);">${p.sasaran || '-'}</strong></span>
+        </div>
+      </div>
+
+      <form id="formLaporLpj" style="display:flex;flex-direction:column;gap:14px;">
+        <!-- Status Realisasi Proker -->
+        <div style="background:var(--surface);padding:14px;border:1.5px solid var(--border);border-radius:10px;">
+          <label style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:8px;display:block;">
+            STATUS REALISASI KEGIATAN *
+          </label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1.5px solid ${isTerlaksana ? '#057a55' : 'var(--border)'};background:${isTerlaksana ? '#f0fdf4' : 'var(--bg)'};cursor:pointer;font-weight:700;font-size:13px;color:${isTerlaksana ? '#057a55' : 'var(--text)'};">
+              <input type="radio" name="radioStatusRealisasi" value="terlaksana" ${isTerlaksana ? 'checked' : ''} style="accent-color:#057a55;" />
+              <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+              Terlaksana
+            </label>
+            <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1.5px solid ${!isTerlaksana ? '#c81e1e' : 'var(--border)'};background:${!isTerlaksana ? '#fef2f2' : 'var(--bg)'};cursor:pointer;font-weight:700;font-size:13px;color:${!isTerlaksana ? '#c81e1e' : 'var(--text)'};">
+              <input type="radio" name="radioStatusRealisasi" value="belum_terlaksana" ${!isTerlaksana ? 'checked' : ''} style="accent-color:#c81e1e;" />
+              <span class="material-symbols-outlined" style="font-size:18px;">cancel</span>
+              Belum Terlaksana
+            </label>
+          </div>
+        </div>
+
+        <!-- Realisasi Penggunaan Dana & Tanggal Pelaksanaan -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">
+              REALISASI PENGGUNAAN DANA (RP) *
+            </label>
+            <input type="number" id="lpjInputBiaya" value="${initialRealBiaya}" min="0" step="1000" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:800;color:var(--blue-dark);background:var(--surface);" />
+            <div id="lpjDiffCalc" style="font-size:11.5px;margin-top:4px;font-weight:700;"></div>
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">
+              TANGGAL REALISASI / PELAPORAN *
+            </label>
+            <input type="date" id="lpjInputTanggal" value="${initialTgl}" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);" />
+          </div>
+        </div>
+
+        <!-- Deskripsi Realisasi Proker / Ringkasan LPJ -->
+        <div class="form-group">
+          <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">
+            DESKRIPSI REALISASI PROKER & RINGKASAN LPJ
+          </label>
+          <textarea id="lpjInputDeskripsi" rows="4" placeholder="Uraikan laporan hasil pelaksanaan kegiatan, jumlah peserta hadir, evaluasi/kendala, atau catatan pertanggungjawaban dana..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.5;resize:vertical;">${deskripsi}</textarea>
+        </div>
+
+        <!-- Sticky Footer -->
+        <div class="modal-sticky-footer">
+          <button type="button" class="btn-sticky-back btn-back-to-proker-modal" title="Kembali ke Daftar Program">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span class="btn-text">Kembali</span>
+          </button>
+          <button type="submit" class="btn-sticky-save" title="Simpan Laporan LPJ">
+            <span class="material-symbols-outlined">save</span>
+            <span class="btn-text">Simpan Laporan LPJ</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  `);
+
+  // Diff calculator logic
+  const lpjInputBiaya = document.getElementById('lpjInputBiaya');
+  const lpjDiffCalc = document.getElementById('lpjDiffCalc');
+
+  function updateDiff() {
+    const val = parseFloat(lpjInputBiaya?.value) || 0;
+    const selisih = estBiaya - val;
+    if (lpjDiffCalc) {
+      if (val === 0 && estBiaya === 0) {
+        lpjDiffCalc.innerHTML = '<span style="color:var(--text-muted);">Sesuai Estimasi Rp 0</span>';
+      } else if (selisih > 0) {
+        lpjDiffCalc.innerHTML = `<span style="color:#057a55;">✓ Hemat Rp ${selisih.toLocaleString('id-ID')} dari RAB Awal</span>`;
+      } else if (selisih < 0) {
+        lpjDiffCalc.innerHTML = `<span style="color:#c81e1e;">⚠ Over Budget Rp ${Math.abs(selisih).toLocaleString('id-ID')} dari RAB Awal</span>`;
+      } else {
+        lpjDiffCalc.innerHTML = `<span style="color:#2563eb;">✓ Tepat 100% Sesuai Estimasi RAB</span>`;
+      }
+    }
+  }
+
+  lpjInputBiaya?.addEventListener('input', updateDiff);
+  updateDiff();
+
+  // Radio button color change
+  const radioLabels = modalBody.querySelectorAll('input[name="radioStatusRealisasi"]');
+  radioLabels.forEach(r => {
+    r.addEventListener('change', () => {
+      const selected = document.querySelector('input[name="radioStatusRealisasi"]:checked')?.value;
+      if (selected === 'terlaksana' && parseFloat(lpjInputBiaya.value) === 0 && estBiaya > 0) {
+        lpjInputBiaya.value = estBiaya;
+        updateDiff();
+      }
+    });
+  });
+
+  document.querySelector('.btn-back-to-proker-modal')?.addEventListener('click', () => {
+    renderProkerModal();
+  });
+
+  document.getElementById('formLaporLpj')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const realStatus = document.querySelector('input[name="radioStatusRealisasi"]:checked')?.value || 'belum_terlaksana';
+    const realBiaya = parseFloat(document.getElementById('lpjInputBiaya')?.value) || 0;
+    const tgl = document.getElementById('lpjInputTanggal')?.value;
+    const deskripsiText = document.getElementById('lpjInputDeskripsi')?.value.trim();
+
+    await updateRealisasiProker(p.id, {
+      realisasiStatus: realStatus,
+      realisasiBiaya: realBiaya,
+      tglRealisasi: tgl,
+      deskripsiRealisasi: deskripsiText
+    });
+
+    showToast(`Laporan Realisasi & LPJ "${p.kegiatan}" berhasil disimpan!`, 'success');
+    renderProkerModal();
+    renderInlineProkerWidget();
+    appHooks.renderUserProfile();
   });
 }
 
@@ -908,6 +1236,35 @@ export async function renderAddEditProkerForm(p = null) {
       <div class="form-group">
         <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">RINCIAN KOMPONEN BIAYA</label>
         <textarea id="prokerInputRincianBiaya" rows="3" placeholder="Contoh: Konsumsi (100 org x Rp 25.000): Rp 2.500.000, Sewa Aula & Sound System: Rp 1.500.000, Modul & Hadiah: Rp 1.000.000" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.5;resize:vertical;">${isEdit ? (p.rincianBiaya || '') : ''}</textarea>
+      </div>
+
+      <!-- 8. Realisasi Proker & Pelaporan Penggunaan Dana (LPJ) -->
+      <div style="background:#f8fafc;padding:14px;border:1.5px solid #cbd5e1;border-radius:10px;">
+        <label style="font-size:11.5px;font-weight:800;color:var(--blue-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span class="material-symbols-outlined" style="font-size:18px;color:#0e7039;">assignment_turned_in</span>
+          REALISASI PROGRAM KERJA & PENGGUNAAN DANA (LPJ)
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;">
+          <div class="form-group">
+            <label style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;display:block;">STATUS REALISASI</label>
+            <select id="prokerInputRealisasiStatus" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);font-weight:700;">
+              <option value="belum_terlaksana" ${isEdit && p.realisasiStatus === 'belum_terlaksana' ? 'selected' : ''}>🔴 Belum Terlaksana</option>
+              <option value="terlaksana" ${isEdit && p.realisasiStatus === 'terlaksana' ? 'selected' : ''}>🟢 Terlaksana</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;display:block;">REALISASI PENGGUNAAN DANA (RP)</label>
+            <input type="number" id="prokerInputRealisasiBiaya" value="${isEdit && p.realisasiBiaya !== undefined ? p.realisasiBiaya : ''}" placeholder="0" min="0" step="1000" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:800;color:#0e7039;background:var(--surface);" />
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;display:block;">TANGGAL REALISASI / SELESAI</label>
+          <input type="date" id="prokerInputTglRealisasi" value="${isEdit && p.tglRealisasi ? p.tglRealisasi : ''}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:var(--surface);" />
+        </div>
+        <div class="form-group">
+          <label style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;display:block;">DESKRIPSI REALISASI PROKER (CATATAN LPJ)</label>
+          <textarea id="prokerInputDeskripsiRealisasi" rows="3" placeholder="Catatan evaluasi keterlaksanaan, hasil kegiatan, kendala, atau pertanggungjawaban dana..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.5;resize:vertical;">${isEdit ? (p.deskripsiRealisasi || '') : ''}</textarea>
+        </div>
       </div>
 
       <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
@@ -1030,7 +1387,11 @@ export async function renderAddEditProkerForm(p = null) {
       estBiaya: document.getElementById('prokerInputEstBiaya').value,
       status: document.getElementById('prokerInputStatus').value,
       penanggungJawab: document.getElementById('prokerInputPic').value.trim(),
-      targetWilayah: 'Daerah Solo Selatan'
+      targetWilayah: 'Daerah Solo Selatan',
+      realisasiStatus: document.getElementById('prokerInputRealisasiStatus')?.value || 'belum_terlaksana',
+      realisasiBiaya: parseFloat(document.getElementById('prokerInputRealisasiBiaya')?.value) || 0,
+      tglRealisasi: document.getElementById('prokerInputTglRealisasi')?.value || '',
+      deskripsiRealisasi: document.getElementById('prokerInputDeskripsiRealisasi')?.value.trim() || ''
     };
 
     if (isEdit) {
@@ -1149,6 +1510,12 @@ export function renderInlineProkerWidget() {
     const rawStatus = item.status || 'planned';
     const statusClass = getProkerStatusClass(rawStatus);
     const statusLabel = getProkerStatusLabel(rawStatus);
+    const isTerlaksana = item.realisasiStatus === 'terlaksana';
+    const realisasiBadge = isTerlaksana ? `
+      <span class="proker-realisasi-badge terlaksana" style="font-size:10px;padding:2px 7px;">
+        Terlaksana
+      </span>
+    ` : '';
     const tempatHtml = item.tempat ? `
       <span class="proker-meta-sep">&bull;</span>
       <span class="proker-meta-item">
@@ -1171,6 +1538,7 @@ export function renderInlineProkerWidget() {
               <span class="proker-num">${item.no || globalIndex}.</span> ${item.kegiatan}
             </div>
             <div class="flex items-center gap-2">
+              ${realisasiBadge}
               <span class="proker-status-badge ${statusClass}">
                 <span class="dot ${statusClass}"></span>
                 <span>${statusLabel}</span>
@@ -1192,6 +1560,13 @@ export function renderInlineProkerWidget() {
                 <span class="material-symbols-outlined ms-proker-ic">group</span>
                 <span>${item.sasaran}</span>
               </span>
+              ${(item.estBiaya || 0) > 0 ? `
+                <span class="proker-meta-sep">&bull;</span>
+                <span class="proker-meta-item" style="color:#057a55;font-weight:700;">
+                  <span class="material-symbols-outlined ms-proker-ic" style="color:#057a55;">payments</span>
+                  <span>RAB: Rp ${(item.estBiaya || 0).toLocaleString('id-ID')}</span>
+                </span>
+              ` : ''}
             </div>
             ${tujuanHtml}
           </div>

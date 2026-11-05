@@ -1064,6 +1064,10 @@ export async function fetchProkerFromSupabase() {
       targetWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
       penanggungJawab: row.penanggung_jawab_id || defaultPicByNo[row.nomor_urut] || 'Pengurus PPG',
       semester: row.semester || 1,
+      realisasiStatus: row.realisasi_status || (row.status === 'selesai' ? 'terlaksana' : 'belum_terlaksana'),
+      deskripsiRealisasi: row.deskripsi_realisasi || '',
+      realisasiBiaya: Number(row.realisasi_biaya) || 0,
+      tglRealisasi: row.tgl_realisasi || null,
       desaId: row.desa_id,
       kelompokId: row.kelompok_id
     }));
@@ -1100,18 +1104,35 @@ export async function upsertProkerToSupabase(proker) {
       tempat_pelaksanaan: proker.tempat || null,
       status: statusMapToDb[proker.status] || proker.status || 'direncanakan',
       tingkat_wilayah: proker.tingkatWilayah || 'daerah',
-      semester: parseInt(proker.semester) || 1
+      semester: parseInt(proker.semester) || 1,
+      realisasi_status: proker.realisasiStatus || (proker.status === 'done' ? 'terlaksana' : 'belum_terlaksana'),
+      deskripsi_realisasi: proker.deskripsiRealisasi || null,
+      realisasi_biaya: Number(proker.realisasiBiaya) || 0,
+      tgl_realisasi: proker.tglRealisasi || null
     };
 
     if (isUuid) record.id = proker.id;
 
-    const { data, error } = await client
+    let { data, error } = await client
       .from("program_kerja")
       .upsert(record)
       .select()
       .single();
 
-    if (error) throw error;
+    // Fallback gracefully if realisasi columns not migrated yet on remote Supabase DB
+    if (error && (String(error.message || '').includes('realisasi') || error.code === '42703')) {
+      const fallbackRecord = { ...record };
+      delete fallbackRecord.realisasi_status;
+      delete fallbackRecord.deskripsi_realisasi;
+      delete fallbackRecord.realisasi_biaya;
+      delete fallbackRecord.tgl_realisasi;
+      const res = await client.from("program_kerja").upsert(fallbackRecord).select().single();
+      if (res.error) throw res.error;
+      data = res.data;
+    } else if (error) {
+      throw error;
+    }
+
     return data;
   } catch (err) {
     console.error("Supabase Error upserting Proker:", err.message);
