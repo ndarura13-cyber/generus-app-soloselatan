@@ -565,24 +565,21 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </span>
       `;
 
-      let actionsCell = '';
-      if (isSuper) {
-        actionsCell = `
-          <td style="white-space:nowrap;text-align:right;">
-            <div style="display:inline-flex;gap:4px;align-items:center;">
+      let actionsCell = `
+        <td style="white-space:nowrap;text-align:right;">
+          <div style="display:inline-flex;gap:5px;align-items:center;justify-content:flex-end;">
+            <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Tampilkan Mode Presentasi / Pleno">
+              <span class="material-symbols-outlined" style="font-size:15px;color:var(--blue);">visibility</span>
+              <span>Pleno</span>
+            </button>
+            ${isSuper ? `
               <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Penggunaan Dana">
                 <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
               </button>
-              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program Kerja" style="padding:5px 7px;border:1px solid var(--border);background:var(--surface);color:var(--blue);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;">
-                <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
-              </button>
-              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program" style="padding:5px 7px;border:1px solid var(--border);background:var(--surface);color:var(--red);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;">
-                <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
-              </button>
-            </div>
-          </td>
-        `;
-      }
+            ` : ''}
+          </div>
+        </td>
+      `;
 
       return `
         <tr>
@@ -644,7 +641,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     if (filtered.length === 0) {
       rowsHtml = `
         <tr>
-          <td colspan="${isSuper ? 12 : 11}" style="text-align:center;padding:32px;color:var(--text-muted);">
+          <td colspan="12" style="text-align:center;padding:32px;color:var(--text-muted);">
             <span class="material-symbols-outlined" style="font-size:36px;color:var(--border);margin-bottom:6px;">event_busy</span>
             <div style="font-weight:700;font-size:13px;color:var(--text);">Tidak Ada Program Kerja Sesuai Filter</div>
             <div style="font-size:12px;margin-top:2px;">Silakan sesuaikan kata kunci pencarian atau pilihan bidang.</div>
@@ -679,7 +676,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 <th style="min-width:140px;text-align:center;">REALISASI PROKER<br/>(TERLAKSANA/BELUM)</th>
                 <th style="min-width:170px;">DESKRIPSI REALISASI PROKER</th>
                 <th style="min-width:125px;text-align:right;">REALISASI PENGGUNAAN</th>
-                ${isSuper ? '<th style="width:115px;text-align:right;">AKSI</th>' : ''}
+                <th style="width:130px;text-align:right;">AKSI</th>
               </tr>
             </thead>
             <tbody>
@@ -699,7 +696,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 <td style="text-align:right;padding:8px 10px;color:#1e40af;font-size:12px;white-space:nowrap;font-weight:800;">
                   Rp ${pageSubtotalReal.toLocaleString('id-ID')}
                 </td>
-                ${isSuper ? '<td></td>' : ''}
+                <td></td>
               </tr>
               <tr style="background:#e0f2fe;font-weight:900;border-top:2px solid #0284c7;">
                 <td colspan="6" style="text-align:right;padding:9px 10px;font-size:11.5px;color:#0369a1;">
@@ -714,7 +711,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 <td style="text-align:right;padding:9px 10px;color:#1e40af;font-size:12.5px;white-space:nowrap;">
                   Rp ${totalRealAll.toLocaleString('id-ID')}
                 </td>
-                ${isSuper ? '<td></td>' : ''}
+                <td></td>
               </tr>
             </tfoot>
           </table>
@@ -754,17 +751,18 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </span>
       `;
 
-      let superButtons = isSuper ? `
-              <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Dana">
-                <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
-              </button>
-              <button type="button" class="btn-proker-edit" data-id="${p.id}" title="Edit Program">
-                <span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit
-              </button>
-              <button type="button" class="btn-proker-del" data-id="${p.id}" data-title="${p.kegiatan}" title="Hapus Program">
-                <span class="material-symbols-outlined" style="font-size:14px;">delete</span> Hapus
-              </button>
-            ` : '';
+      let cardActions = `
+        <div style="display:inline-flex;gap:5px;align-items:center;">
+          <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Mode Presentasi / Pleno">
+            <span class="material-symbols-outlined" style="font-size:15px;color:var(--blue);">visibility</span> Pleno
+          </button>
+          ${isSuper ? `
+            <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Dana">
+              <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
+            </button>
+          ` : ''}
+        </div>
+      `;
 
       return `
               <div class="proker-card-item" data-id="${p.id}">
@@ -819,7 +817,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                         Est. RAB: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}
                         ${p.realisasiBiaya ? ` &bull; <span style="color:#1e40af;">Realisasi: Rp ${(p.realisasiBiaya || 0).toLocaleString('id-ID')}</span>` : ''}
                       </div>
-                      ${superButtons ? `<div class="proker-admin-actions">${superButtons}</div>` : ''}
+                      <div class="proker-admin-actions">${cardActions}</div>
                     </div>
                   </div>
                 </div>
@@ -905,6 +903,15 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // Tombol Pelaporan LPJ & Realisasi Dana Khusus
+  modalBody.querySelectorAll('.btn-proker-preview').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pId = btn.dataset.id;
+      renderProkerPresentationModal(pId, filtered);
+    });
+  });
+
+  // Tombol Pelaporan LPJ & Realisasi Dana Khusus
   modalBody.querySelectorAll('.btn-proker-lpj').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -912,6 +919,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       const prokerItem = prokerList.find(p => p.id === pId);
       if (prokerItem) renderLaporRealisasiModal(prokerItem);
     });
+  });
   });
 
   // Accordion Dropdown: Tampilkan / Sembunyikan Detil Program Kerja
@@ -976,6 +984,310 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       });
     });
   });
+}
+
+
+export function renderProkerPresentationModal(prokerId, contextList = null) {
+  let list = contextList && contextList.length > 0 ? contextList : getProkerList();
+  list = [...list].sort((a, b) => (a.no || 0) - (b.no || 0));
+  if (list.length === 0) return;
+
+  const currIdx = list.findIndex(item => String(item.id) === String(prokerId));
+  const currentIndex = currIdx !== -1 ? currIdx : 0;
+  const currentItem = list[currentIndex];
+  if (!currentItem) return;
+
+  const prevItem = currentIndex > 0 ? list[currentIndex - 1] : null;
+  const nextItem = currentIndex < list.length - 1 ? list[currentIndex + 1] : null;
+
+  const isSuper = currentUser && currentUser.role === 'superadmin';
+  const isTerlaksana = currentItem.realisasiStatus === 'terlaksana';
+  const estVal = currentItem.estBiaya || 0;
+  const realVal = currentItem.realisasiBiaya || 0;
+  const diffVal = estVal - realVal;
+
+  let efficiencyHtml = '';
+  if (realVal === 0 && !isTerlaksana) {
+    efficiencyHtml = `<span style="color:var(--text-muted);font-weight:700;">Belum Terealisasi</span>`;
+  } else if (diffVal > 0) {
+    const pct = estVal > 0 ? Math.round((diffVal / estVal) * 100) : 0;
+    efficiencyHtml = `<span style="color:#057a55;font-weight:800;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">trending_down</span> +Rp ${diffVal.toLocaleString('id-ID')} (Hemat ${pct}%)</span>`;
+  } else if (diffVal < 0) {
+    const pct = estVal > 0 ? Math.round((Math.abs(diffVal) / estVal) * 100) : 0;
+    efficiencyHtml = `<span style="color:#c81e1e;font-weight:800;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">trending_up</span> -Rp ${Math.abs(diffVal).toLocaleString('id-ID')} (Lebih ${pct}%)</span>`;
+  } else if (diffVal === 0 && realVal > 0) {
+    efficiencyHtml = `<span style="color:#0284c7;font-weight:800;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Tepat 100% Sesuai RAB</span>`;
+  } else {
+    efficiencyHtml = `<span style="color:var(--text-muted);font-weight:700;">Tanpa Anggaran (Rp 0)</span>`;
+  }
+
+  let statusClass = currentItem.status || 'planned';
+  let statusLabel = 'Direncanakan';
+  if (statusClass === 'done') statusLabel = 'Selesai';
+  else if (statusClass === 'ongoing') statusLabel = 'Berlangsung';
+  else if (statusClass === 'upcoming') statusLabel = 'Akan Datang';
+
+  let overlay = document.getElementById('prokerPresentationOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'prokerPresentationOverlay';
+    overlay.className = 'proker-presentation-backdrop';
+    document.body.appendChild(overlay);
+  }
+
+  function closePlenoPresentation() {
+    if (overlay) {
+      overlay.classList.remove('show');
+      setTimeout(() => {
+        if (overlay && overlay.parentNode && !overlay.classList.contains('show')) {
+          overlay.innerHTML = '';
+        }
+      }, 250);
+    }
+    if (window._plenoKeyHandler) {
+      window.removeEventListener('keydown', window._plenoKeyHandler);
+      window._plenoKeyHandler = null;
+    }
+  }
+
+  overlay.innerHTML = `
+    <div class="proker-presentation-modal" role="dialog" aria-modal="true" aria-label="Mode Presentasi Program Kerja">
+      <!-- HEADER PLENO TOOLBAR -->
+      <div class="proker-presentation-header">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1e40af;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid #bfdbfe;">
+            <span class="material-symbols-outlined" style="font-size:15px;">visibility</span>
+            <span>MODE PLENO</span>
+          </span>
+          <span style="font-size:12.5px;font-weight:800;color:var(--text);letter-spacing:0.3px;">
+            BIDANG ${(currentItem.penanggungJawab || 'Pengurus PPG').toUpperCase()}
+          </span>
+          <span style="font-size:11.5px;color:var(--text-muted);font-weight:700;">
+            &bull; Agenda #${currentItem.no || (currentIndex + 1)} (${currentIndex + 1} dari ${list.length})
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${isSuper ? `
+            <button type="button" class="btn-pleno-action btn-pleno-lpj" id="btnPlenoLpj" title="Lapor LPJ & Realisasi Dana">
+              <span class="material-symbols-outlined" style="font-size:15px;">assignment_turned_in</span>
+              <span>LPJ Realisasi</span>
+            </button>
+            <button type="button" class="btn-pleno-action btn-pleno-edit" id="btnPlenoEdit" title="Edit Program Kerja">
+              <span class="material-symbols-outlined" style="font-size:15px;">edit</span>
+              <span>Edit</span>
+            </button>
+            <button type="button" class="btn-pleno-action btn-pleno-del" id="btnPlenoDel" title="Hapus Program Kerja">
+              <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
+              <span>Hapus</span>
+            </button>
+          ` : ''}
+          <button type="button" class="btn-pleno-close" id="btnPlenoClose" aria-label="Tutup Pleno" title="Tutup Mode Presentasi (Esc)">
+            <span class="material-symbols-outlined" style="font-size:20px;">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BODY PRESENTASI PROKER -->
+      <div class="proker-presentation-body">
+        <!-- Hero Section -->
+        <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:12px;border-bottom:1.5px dashed var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="proker-realisasi-badge ${isTerlaksana ? 'terlaksana' : 'belum_terlaksana'}" style="font-size:11.5px;padding:3px 10px;font-weight:800;">
+              <span class="material-symbols-outlined" style="font-size:14px;">${isTerlaksana ? 'check_circle' : 'cancel'}</span>
+              ${isTerlaksana ? 'TERLAKSANA' : 'BELUM TERLAKSANA'}
+            </span>
+            <span class="proker-badge-status proker-badge-${statusClass}" style="font-size:11.5px;padding:3px 10px;font-weight:800;">
+              ${statusLabel.toUpperCase()}
+            </span>
+          </div>
+          <h2 style="margin:4px 0 0;font-size:19px;font-weight:900;color:var(--text);line-height:1.35;">
+            #${currentItem.no || (currentIndex + 1)}. ${currentItem.kegiatan}
+          </h2>
+          <div style="font-size:12px;color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span>Tingkat Pelaksanaan: <strong style="color:var(--text);">Daerah Solo Selatan</strong></span>
+            <span>&bull;</span>
+            <span>Penanggung Jawab: <strong style="color:var(--blue-dark);">${currentItem.penanggungJawab || 'Pengurus PPG'}</strong></span>
+          </div>
+        </div>
+
+        <!-- 2-Column Grid Info -->
+        <div class="proker-pleno-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <!-- Card Maksud & Tujuan -->
+          <div class="proker-pleno-card">
+            <div class="proker-pleno-card-title">
+              <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">target</span>
+              <span>Maksud & Tujuan Kegiatan</span>
+            </div>
+            <div class="proker-pleno-card-body">
+              ${currentItem.tujuan || '<span style="color:var(--text-muted);font-style:italic;">Belum ada deskripsi tujuan kegiatan.</span>'}
+            </div>
+          </div>
+
+          <!-- Card Waktu, Tempat & Sasaran -->
+          <div class="proker-pleno-card">
+            <div class="proker-pleno-card-title">
+              <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">schedule</span>
+              <span>Waktu, Tempat & Sasaran</span>
+            </div>
+            <div class="proker-pleno-card-body" style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">calendar_today</span>
+                <span><strong>Waktu:</strong> ${currentItem.waktu || '-'}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">location_on</span>
+                <span><strong>Tempat:</strong> ${currentItem.tempat || '-'}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">group</span>
+                <span><strong>Sasaran:</strong> ${currentItem.sasaran || '-'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Rencana Anggaran Biaya (RAB) & Realisasi -->
+        <div class="proker-pleno-card">
+          <div class="proker-pleno-card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:17px;color:#057a55;">payments</span>
+              <span>Rencana Anggaran Biaya (RAB) & Realisasi Keuangan</span>
+            </div>
+          </div>
+          <!-- 3-Pillar Metrics -->
+          <div class="proker-pleno-rab-pillars" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:6px 0;">
+            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Estimasi Biaya (RAB)</span>
+              <strong style="font-size:16px;color:var(--green-dark);">Rp ${estVal.toLocaleString('id-ID')}</strong>
+            </div>
+            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Realisasi Penggunaan</span>
+              <strong style="font-size:16px;color:#1e40af;">Rp ${realVal.toLocaleString('id-ID')}</strong>
+            </div>
+            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Status Efisiensi RAB</span>
+              <div style="font-size:13px;line-height:1.3;">${efficiencyHtml}</div>
+            </div>
+          </div>
+          <!-- Rincian Biaya -->
+          <div style="font-size:12px;color:var(--text);border-top:1px dashed var(--border);padding-top:10px;margin-top:4px;">
+            <strong style="color:var(--text-muted);font-size:11px;text-transform:uppercase;display:block;margin-bottom:3px;">Rincian Komponen Biaya:</strong>
+            <div style="font-style:italic;color:var(--text);">${currentItem.rincianBiaya || 'Tidak ada rincian biaya spesifik.'}</div>
+          </div>
+        </div>
+
+        <!-- Card Catatan Evaluasi & Realisasi LPJ -->
+        <div class="proker-pleno-card" style="background:${currentItem.deskripsiRealisasi ? '#f0fdf4' : 'var(--bg)'};border-color:${currentItem.deskripsiRealisasi ? '#86efac' : 'var(--border)'};">
+          <div class="proker-pleno-card-title" style="color:${currentItem.deskripsiRealisasi ? '#166534' : 'var(--blue-dark)'};">
+            <span class="material-symbols-outlined" style="font-size:17px;">rate_review</span>
+            <span>Catatan Evaluasi & Realisasi LPJ (Hasil Pleno)</span>
+          </div>
+          <div class="proker-pleno-card-body" style="color:${currentItem.deskripsiRealisasi ? '#065f46' : 'var(--text)'};">
+            ${currentItem.deskripsiRealisasi ? currentItem.deskripsiRealisasi : '<span style="color:var(--text-muted);font-style:italic;">Belum ada catatan deskripsi realisasi/LPJ yang dicatat untuk kegiatan ini.</span>'}
+          </div>
+          ${currentItem.tglRealisasi ? `
+            <div style="font-size:11px;color:${currentItem.deskripsiRealisasi ? '#047857' : 'var(--text-muted)'};font-weight:700;margin-top:4px;">
+              📅 Tanggal Pelaporan LPJ: ${currentItem.tglRealisasi}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+
+      <!-- FOOTER SLIDE NAVIGATION -->
+      <div class="proker-presentation-footer">
+        <button type="button" class="btn-pleno-nav" id="btnPlenoPrev" ${!prevItem ? 'disabled' : ''} title="Agenda Sebelumnya (Tombol Panah Kiri ←)">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span>Sebelumnya</span>
+        </button>
+
+        <div style="font-size:12.5px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;">
+          <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">slideshow</span>
+          <span>Agenda ${currentIndex + 1} dari ${list.length}</span>
+        </div>
+
+        <button type="button" class="btn-pleno-nav" id="btnPlenoNext" ${!nextItem ? 'disabled' : ''} title="Agenda Selanjutnya (Tombol Panah Kanan →)">
+          <span>Selanjutnya</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('show');
+  });
+
+  // Attach event handlers
+  document.getElementById('btnPlenoClose')?.addEventListener('click', closePlenoPresentation);
+
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      closePlenoPresentation();
+    }
+  };
+
+  document.getElementById('btnPlenoPrev')?.addEventListener('click', () => {
+    if (prevItem) {
+      renderProkerPresentationModal(prevItem.id, list);
+    }
+  });
+
+  document.getElementById('btnPlenoNext')?.addEventListener('click', () => {
+    if (nextItem) {
+      renderProkerPresentationModal(nextItem.id, list);
+    }
+  });
+
+  if (isSuper) {
+    document.getElementById('btnPlenoLpj')?.addEventListener('click', () => {
+      closePlenoPresentation();
+      renderLaporRealisasiModal(currentItem);
+    });
+
+    document.getElementById('btnPlenoEdit')?.addEventListener('click', () => {
+      closePlenoPresentation();
+      renderAddEditProkerForm(currentItem);
+    });
+
+    document.getElementById('btnPlenoDel')?.addEventListener('click', () => {
+      showConfirmModal({
+        title: 'Hapus Program Kerja',
+        message: `Apakah Anda yakin ingin menghapus program "${currentItem.kegiatan}" dari agenda tahunan?`,
+        icon: 'delete_forever',
+        iconBg: 'var(--red-light)',
+        iconColor: 'var(--red)',
+        confirmText: 'Ya, Hapus',
+        confirmBtnColor: 'var(--red)',
+        onConfirm: async () => {
+          await deleteProker(currentItem.id);
+          closePlenoPresentation();
+          showToast(`Program kerja "${currentItem.kegiatan}" berhasil dihapus`, 'success');
+          renderProkerModal();
+          renderInlineProkerWidget();
+          appHooks.renderUserProfile();
+        }
+      });
+    });
+  }
+
+  // Keyboard navigation
+  if (window._plenoKeyHandler) {
+    window.removeEventListener('keydown', window._plenoKeyHandler);
+  }
+  window._plenoKeyHandler = (e) => {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+    if (e.key === 'ArrowLeft' && prevItem) {
+      e.preventDefault();
+      renderProkerPresentationModal(prevItem.id, list);
+    } else if (e.key === 'ArrowRight' && nextItem) {
+      e.preventDefault();
+      renderProkerPresentationModal(nextItem.id, list);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      closePlenoPresentation();
+    }
+  };
+  window.addEventListener('keydown', window._plenoKeyHandler);
 }
 
 export function renderLaporRealisasiModal(p) {

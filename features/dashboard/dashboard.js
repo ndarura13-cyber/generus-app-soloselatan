@@ -48,7 +48,7 @@ import {
   setProkerHooks,
   initInlineProkerWidget,
   renderInlineProkerWidget
-} from './dashboard-proker.js?v=6.1';
+} from './dashboard-proker.js?v=6.5';
 
 import {
   renderEventPembiasaanModal
