@@ -315,7 +315,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     }
   }
 
-  const isSuper = currentUser.isSuperadmin || currentUser.tingkatan === 'daerah';
+  const isSuper = Boolean(currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah'));
   const prokerList = getProkerList();
   const stats = getProkerStats();
 
@@ -1000,7 +1000,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
   const prevItem = currentIndex > 0 ? list[currentIndex - 1] : null;
   const nextItem = currentIndex < list.length - 1 ? list[currentIndex + 1] : null;
 
-  const isSuper = currentUser && currentUser.role === 'superadmin';
+  const isSuper = Boolean(currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah'));
   const isTerlaksana = currentItem.realisasiStatus === 'terlaksana';
   const estVal = currentItem.estBiaya || 0;
   const realVal = currentItem.realisasiBiaya || 0;

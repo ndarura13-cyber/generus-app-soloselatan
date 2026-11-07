@@ -14,7 +14,8 @@ import {
   syncPengurusFromSupabase,
   syncKbmFromSupabase,
   syncSiswaFromSupabase,
-  syncProkerFromSupabase
+  syncProkerFromSupabase,
+  syncWilayahFromSupabase
 } from '../../src/db-master.js';
 
 import { isSupabaseConfigured } from '../../src/supabase.js';
@@ -28,12 +29,12 @@ import {
   showConfirmModal,
   renderKontakModal,
   modalBody
-} from './dashboard-common.js?v=6.1';
+} from './dashboard-common.js';
 
 import {
   updateSupabaseStatusUI,
   renderSupabaseModal
-} from './dashboard-supabase.js?v=6.1';
+} from './dashboard-supabase.js';
 
 import {
   checkPendingApprovals,
@@ -41,29 +42,29 @@ import {
   renderStrukturDaerahModal,
   renderManagePengurusModal,
   setPengurusHooks
-} from './dashboard-pengurus.js?v=6.2';
+} from './dashboard-pengurus.js';
 
 import {
   renderProkerModal,
   setProkerHooks,
   initInlineProkerWidget,
   renderInlineProkerWidget
-} from './dashboard-proker.js?v=6.5';
+} from './dashboard-proker.js';
 
 import {
   renderEventPembiasaanModal
-} from './dashboard-pembiasaan.js?v=6.1';
+} from './dashboard-pembiasaan.js';
 
 import {
   updateDashboardStats,
   renderSiswaModal,
   renderDetailRingkasanModal
-} from './dashboard-generus.js?v=6.1';
+} from './dashboard-generus.js';
 
 import {
   renderCetakAbsensiModal,
   renderFormRekapKehadiranModal
-} from './dashboard-kbm.js?v=6.1';
+} from './dashboard-kbm.js';
 
 // DOM Elements
 const userNameEl = document.getElementById('userName');
@@ -89,8 +90,9 @@ const btnApprovalList = document.getElementById('btnApprovalList');
 
 /* ── 1. Render Header Profile & Role Indicators ───────────── */
 export function renderUserProfile() {
-  if (userNameEl) userNameEl.textContent = currentUser.nama;
-  if (headingUserNameEl) headingUserNameEl.textContent = currentUser.nama;
+  if (!currentUser) return;
+  if (userNameEl) userNameEl.textContent = currentUser.nama || 'Pengurus';
+  if (headingUserNameEl) headingUserNameEl.textContent = currentUser.nama || 'Pengurus';
   
   const mobHeadingUserName = document.getElementById('mobHeadingUserName');
   if (mobHeadingUserName) mobHeadingUserName.textContent = currentUser.nama;
@@ -669,6 +671,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     // Fetch live data from Supabase (minimizing reliance on localStorage)
     console.log('Fetching live data from Supabase...');
     await Promise.allSettled([
+      syncWilayahFromSupabase(),
       syncPengurusFromSupabase(),
       syncPembiasaanFromSupabase(),
       syncKbmFromSupabase(),
@@ -677,11 +680,13 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     ]);
 
     // Cross-check session against live data and update UI
-    const livePengurus = getPengurusList();
-    const liveAccount = livePengurus.find(p => p.id === currentUser.id || p.email === currentUser.email);
+    if (currentUser) {
+      const livePengurus = getPengurusList();
+      const liveAccount = livePengurus.find(p => p.id === currentUser.id || p.email === currentUser.email);
 
-    if (liveAccount) {
-      setCurrentUser({ ...currentUser, ...liveAccount });
+      if (liveAccount) {
+        setCurrentUser({ ...currentUser, ...liveAccount });
+      }
     }
 
     // Re-render UI with freshly synced live data from Supabase

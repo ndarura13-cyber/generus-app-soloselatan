@@ -27,7 +27,7 @@ import {
   showToast,
   showConfirmModal,
   modalBody
-} from './dashboard-common.js?v=5.8';
+} from './dashboard-common.js';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EVENT PEMBIASAAN MODULE

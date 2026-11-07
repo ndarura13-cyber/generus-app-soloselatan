@@ -22,6 +22,7 @@ import {
   fetchProkerFromSupabase,
   upsertProkerToSupabase,
   deleteProkerFromSupabase,
+  fetchWilayahFromSupabase,
   getSupabase,
 } from "./supabase.js";
 
@@ -94,24 +95,19 @@ export let MASTER_WILAYAH = {
   ],
 };
 
-// Fetch wilayah dari Supabase saat module ini pertama kali dimuat (Top-Level Await)
-try {
-  const supabaseWilayah = await fetchWilayahFromSupabase();
-  if (supabaseWilayah) {
-    MASTER_WILAYAH = supabaseWilayah;
+// Sinkronisasi wilayah dari Supabase saat inisialisasi aplikasi (Non-blocking)
+export async function syncWilayahFromSupabase() {
+  if (!isSupabaseConfigured()) return MASTER_WILAYAH;
+  try {
+    const supabaseWilayah = await fetchWilayahFromSupabase();
+    if (supabaseWilayah) {
+      MASTER_WILAYAH = supabaseWilayah;
+      return MASTER_WILAYAH;
+    }
+  } catch (error) {
+    console.warn("Gagal sinkronisasi MASTER_WILAYAH dari Supabase:", error);
   }
-} catch (error) {
-  console.error("Failed to load MASTER_WILAYAH from Supabase:", error);
-}
-
-// Fetch pengurus dari Supabase saat module ini pertama kali dimuat (Top-Level Await)
-try {
-  const resPengurus = await fetchPengurusFromSupabase();
-  if (resPengurus && resPengurus.success && resPengurus.data) {
-    savePengurusList(resPengurus.data);
-  }
-} catch (error) {
-  console.warn("Failed to load initial pengurus from Supabase:", error);
+  return MASTER_WILAYAH;
 }
 
 // Helper: Ambil semua kelompok sebagai flat array (Terurut Alfabetis)
