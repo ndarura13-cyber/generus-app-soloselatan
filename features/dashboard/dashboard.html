@@ -152,6 +152,11 @@
         display: flex !important;
         flex-direction: column !important;
       }
+@media (max-width: 767px) {
+  aside#desktopSidebar {
+    display: none !important;
+  }
+}
       body.sidebar-collapsed aside#desktopSidebar { width: 5rem; overflow: visible !important; }
       body.sidebar-collapsed aside#desktopSidebar .sidebar-nav-container { overflow: visible !important; }
       body.sidebar-collapsed aside#desktopSidebar .logo-text,
