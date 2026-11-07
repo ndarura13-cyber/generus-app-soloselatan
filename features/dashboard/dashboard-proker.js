@@ -920,7 +920,6 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       if (prokerItem) renderLaporRealisasiModal(prokerItem);
     });
   });
-  });
 
   // Accordion Dropdown: Tampilkan / Sembunyikan Detil Program Kerja
   modalBody.querySelectorAll('.proker-card-header').forEach(header => {
