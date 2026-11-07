@@ -1018,15 +1018,10 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
         </select>
       </div>
 
-      <div>
-        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Reset Kata Sandi Akun (Opsional)</label>
-        <div style="position:relative;display:flex;align-items:center;">
-          <input type="password" id="editPassword" placeholder="Kosongkan jika tidak ingin mereset password" style="width:100%;padding:10px 42px 10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);" />
-          <button type="button" id="btnToggleEditPass" class="btn-toggle-password" style="position:absolute;right:8px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px;" title="Lihat / Sembunyikan Kata Sandi">
-            <span class="material-symbols-outlined" style="font-size:20px;pointer-events:none;">visibility</span>
-          </button>
-        </div>
-        <span style="font-size:11px;color:var(--text-muted);margin-top:3px;display:block;">Gunakan ini jika pengurus bersangkutan lupa password akunnya.</span>
+      <!-- Info Keamanan: Kata sandi bersifat privat dan tidak dapat diubah oleh akun lain/superadmin -->
+      <div style="background:var(--surface-alt, #f8fafc);border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:10px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--brandBlue, #3b82f6);flex-shrink:0;">lock</span>
+        <span>Kata sandi bersifat privat. Pengurus dapat memperbarui kata sandinya masing-masing secara mandiri melalui menu <b>Edit Profil</b>.</span>
       </div>
 
       <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->
@@ -1042,16 +1037,6 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       </div>
     </form>
   `;
-
-  // Toggle visibility password
-  const btnToggleEditPass = document.getElementById('btnToggleEditPass');
-  const editPasswordInput = document.getElementById('editPassword');
-  btnToggleEditPass?.addEventListener('click', () => {
-    const isPass = editPasswordInput.type === 'password';
-    editPasswordInput.type = isPass ? 'text' : 'password';
-    const icon = btnToggleEditPass.querySelector('.material-symbols-outlined');
-    if (icon) icon.textContent = isPass ? 'visibility_off' : 'visibility';
-  });
 
   const editTingkatan = document.getElementById('editTingkatan');
   const editPeran = document.getElementById('editPeran');
@@ -1087,7 +1072,6 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
     const selectedDesaOption = editDesa.options[editDesa.selectedIndex];
     const selectedKelOption = editKelompok.options[editKelompok.selectedIndex];
     const roleVal = editPeran.value;
-    const newPass = document.getElementById('editPassword')?.value;
 
     const updateData = {
       nama: document.getElementById('editNama').value.trim(),
@@ -1102,15 +1086,6 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       kelompokNama: selectedKelOption?.dataset.name || 'Gentan',
       isActive: document.getElementById('editStatusActive').value === 'true'
     };
-
-    if (newPass) {
-      if (newPass.length < 6) {
-        showToast('Password baru minimal 6 karakter.', 'error');
-        document.getElementById('editPassword')?.focus();
-        return;
-      }
-      updateData.password = newPass;
-    }
 
     const submitBtn = document.querySelector('#formEditPengurus button[type="submit"]');
     if (submitBtn) submitBtn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Menyimpan...`;

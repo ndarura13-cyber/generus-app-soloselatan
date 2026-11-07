@@ -412,9 +412,8 @@ export async function updatePengurus(pengurusId, updateData) {
     updatedAt: new Date().toISOString(),
   };
 
-  if (updateData.password) {
-    list[idx].password = updateData.password;
-  }
+  // Keamanan: Password tidak dapat diubah melalui updatePengurus (Kelola Hak Akses).
+  // Perubahan password hanya dapat dilakukan mandiri oleh pengguna via updateCurrentProfile (Edit Profil).
 
   savePengurusList(list);
 
