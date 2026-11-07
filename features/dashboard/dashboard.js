@@ -133,6 +133,7 @@ export function renderUserProfile() {
 
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'flex';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'block');
+    document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'flex');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'flex');
     checkPendingApprovals();
 
@@ -164,6 +165,7 @@ export function renderUserProfile() {
     scopeTextEl.innerHTML = `<strong>Wilayah Koordinasi:</strong> Desa ${currentUser.desaNama || 'Barat'} &bull; Asal Kel. ${currentUser.kelompokNama || '-'}`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
+    document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
@@ -185,6 +187,7 @@ export function renderUserProfile() {
     scopeTextEl.innerHTML = `<strong>Kelompok Binaan:</strong> Kelompok ${currentUser.kelompokNama || 'Gentan'} (Desa ${currentUser.desaNama || 'Barat'})`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
+    document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
@@ -640,11 +643,60 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProkerModal(); });
 
   const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+  const sideFiturFlyout = document.getElementById('sideFiturFlyout');
+  const sideMenuFitur = document.getElementById('sideMenuFitur');
+  const sideBtnFiturToggle = document.getElementById('sideBtnFiturToggle');
+
   if (btnToggleSidebar) {
     btnToggleSidebar.addEventListener('click', () => {
       document.body.classList.toggle('sidebar-collapsed');
+      sideFiturFlyout?.classList.add('hidden');
     });
   }
+
+  // Toggle "Data & Fitur": Accordion jika terbuka, Floating Flyout jika Sidebar Tertutup (Collapse)
+  sideBtnFiturToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (document.body.classList.contains('sidebar-collapsed')) {
+      sideFiturFlyout?.classList.toggle('hidden');
+    } else {
+      sideMenuFitur?.classList.toggle('hidden');
+      sideBtnFiturToggle.querySelector('.arrow')?.classList.toggle('rotate-180');
+    }
+  });
+
+  // Tutup flyout jika klik di luar sidebar
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('sideFiturWrapper')?.contains(e.target)) {
+      sideFiturFlyout?.classList.add('hidden');
+    }
+  });
+
+  // Action listeners untuk menu flyout saat sidebar collapsed
+  document.getElementById('flyBtnSiswa')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    renderSiswaModal();
+  });
+  document.getElementById('flyBtnPembiasaan')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    renderEventPembiasaanModal();
+  });
+  document.getElementById('flyBtnAbsensi')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    renderCetakAbsensiModal();
+  });
+  document.getElementById('flyBtnProker')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    renderProkerModal();
+  });
+  document.getElementById('flyBtnStruktur')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    renderStrukturDaerahModal();
+  });
+  document.getElementById('flyBtnKelolaPengurus')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    handleOpenKelolaPengurus();
+  });
 
   // Backup listener for Kelola Program in Dashboard widget
   document.getElementById('btnKelolaProkerDashboard')?.addEventListener('click', () => {

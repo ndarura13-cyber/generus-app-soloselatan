@@ -1051,162 +1051,157 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
 
   overlay.innerHTML = `
     <div class="proker-presentation-modal" role="dialog" aria-modal="true" aria-label="Mode Presentasi Program Kerja">
-      <!-- HEADER PLENO TOOLBAR -->
+      <!-- HEADER PLENO TOOLBAR (Gambar 3: Mode Pleno Pill & Tombol Tutup) -->
       <div class="proker-presentation-header">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span style="display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1e40af;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid #bfdbfe;">
-            <span class="material-symbols-outlined" style="font-size:15px;">visibility</span>
-            <span>MODE PLENO</span>
-          </span>
-          <span style="font-size:12.5px;font-weight:800;color:var(--text);letter-spacing:0.3px;">
-            BIDANG ${(currentItem.penanggungJawab || 'Pengurus PPG').toUpperCase()}
-          </span>
-          <span style="font-size:11.5px;color:var(--text-muted);font-weight:700;">
-            &bull; Agenda #${currentItem.no || (currentIndex + 1)} (${currentIndex + 1} dari ${list.length})
-          </span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          ${isSuper ? `
-            <button type="button" class="btn-pleno-action btn-pleno-lpj" id="btnPlenoLpj" title="Lapor LPJ & Realisasi Dana">
-              <span class="material-symbols-outlined" style="font-size:15px;">assignment_turned_in</span>
-              <span>LPJ Realisasi</span>
-            </button>
-            <button type="button" class="btn-pleno-action btn-pleno-edit" id="btnPlenoEdit" title="Edit Program Kerja">
-              <span class="material-symbols-outlined" style="font-size:15px;">edit</span>
-              <span>Edit</span>
-            </button>
-            <button type="button" class="btn-pleno-action btn-pleno-del" id="btnPlenoDel" title="Hapus Program Kerja">
-              <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
-              <span>Hapus</span>
-            </button>
-          ` : ''}
-          <button type="button" class="btn-pleno-close" id="btnPlenoClose" aria-label="Tutup Pleno" title="Tutup Mode Presentasi (Esc)">
-            <span class="material-symbols-outlined" style="font-size:20px;">close</span>
-          </button>
-        </div>
+        <span class="proker-pleno-pill-mode">
+          <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
+          <span>MODE PLENO</span>
+        </span>
+        <button type="button" class="btn-pleno-close" id="btnPlenoClose" aria-label="Tutup Pleno" title="Tutup Mode Presentasi (Esc)">
+          <span class="material-symbols-outlined" style="font-size:20px;">close</span>
+        </button>
       </div>
 
       <!-- BODY PRESENTASI PROKER -->
       <div class="proker-presentation-body">
-        <!-- Hero Section -->
-        <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:12px;border-bottom:1.5px dashed var(--border);">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span class="proker-realisasi-badge ${isTerlaksana ? 'terlaksana' : 'belum_terlaksana'}" style="font-size:11.5px;padding:3px 10px;font-weight:800;">
-              <span class="material-symbols-outlined" style="font-size:14px;">${isTerlaksana ? 'check_circle' : 'cancel'}</span>
-              ${isTerlaksana ? 'TERLAKSANA' : 'BELUM TERLAKSANA'}
+        <!-- BARIS TOMBOL AKSI TIGA KOLOM (LPJ Realisasi, Edit, Hapus - Sesuai Gambar 3) -->
+        <div class="proker-pleno-actions-bar">
+          <button type="button" class="btn-pleno-action btn-pleno-lpj" id="btnPlenoLpj" title="Lapor LPJ & Realisasi Dana">
+            <span class="material-symbols-outlined" style="font-size:16px;">assignment_turned_in</span>
+            <span>LPJ Realisasi</span>
+          </button>
+          <button type="button" class="btn-pleno-action btn-pleno-edit" id="btnPlenoEdit" ${!isSuper ? 'disabled title="Hanya Superadmin"' : 'title="Edit Program Kerja"'}>
+            <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+            <span>Edit</span>
+          </button>
+          <button type="button" class="btn-pleno-action btn-pleno-del" id="btnPlenoDel" ${!isSuper ? 'disabled title="Hanya Superadmin"' : 'title="Hapus Program Kerja"'}>
+            <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+            <span>Hapus</span>
+          </button>
+        </div>
+
+        <!-- HERO STATUS & JUDUL AGENDA -->
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="proker-pleno-badge-terlaksana ${isTerlaksana ? 'is-yes' : 'is-no'}">
+              <span class="material-symbols-outlined" style="font-size:15px;">${isTerlaksana ? 'check_circle' : 'pending_actions'}</span>
+              <span>${isTerlaksana ? 'TERLAKSANA' : 'BELUM TERLAKSANA'}</span>
             </span>
-            <span class="proker-badge-status proker-badge-${statusClass}" style="font-size:11.5px;padding:3px 10px;font-weight:800;">
+            <span class="proker-pleno-badge-substatus">
               ${statusLabel.toUpperCase()}
             </span>
           </div>
-          <h2 style="margin:4px 0 0;font-size:19px;font-weight:900;color:var(--text);line-height:1.35;">
+
+          <h2 style="margin:4px 0 2px;font-size:20px;font-weight:900;color:var(--text);line-height:1.35;">
             #${currentItem.no || (currentIndex + 1)}. ${currentItem.kegiatan}
           </h2>
-          <div style="font-size:12px;color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+
+          <div style="font-size:12.5px;color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
             <span>Tingkat Pelaksanaan: <strong style="color:var(--text);">Daerah Solo Selatan</strong></span>
             <span>&bull;</span>
-            <span>Penanggung Jawab: <strong style="color:var(--blue-dark);">${currentItem.penanggungJawab || 'Pengurus PPG'}</strong></span>
+            <span>Penanggung Jawab: <strong style="color:#1d4ed8;">${currentItem.penanggungJawab || 'Sekretaris & Ketua'}</strong></span>
+          </div>
+
+          <div style="border-bottom:1.5px dashed var(--border);margin:8px 0 12px;"></div>
+        </div>
+
+        <!-- CARD 1: MAKSUD & TUJUAN KEGIATAN -->
+        <div class="proker-pleno-box">
+          <div class="proker-pleno-box-header">
+            <span class="material-symbols-outlined" style="font-size:18px;">track_changes</span>
+            <span>MAKSUD &amp; TUJUAN KEGIATAN</span>
+          </div>
+          <div class="proker-pleno-box-body">
+            ${currentItem.tujuan || '<span style="color:var(--text-muted);font-style:italic;">Belum ada deskripsi maksud dan tujuan kegiatan.</span>'}
           </div>
         </div>
 
-        <!-- 2-Column Grid Info -->
-        <div class="proker-pleno-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <!-- Card Maksud & Tujuan -->
-          <div class="proker-pleno-card">
-            <div class="proker-pleno-card-title">
-              <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">target</span>
-              <span>Maksud & Tujuan Kegiatan</span>
-            </div>
-            <div class="proker-pleno-card-body">
-              ${currentItem.tujuan || '<span style="color:var(--text-muted);font-style:italic;">Belum ada deskripsi tujuan kegiatan.</span>'}
-            </div>
+        <!-- CARD 2: WAKTU, TEMPAT & SASARAN -->
+        <div class="proker-pleno-box">
+          <div class="proker-pleno-box-header">
+            <span class="material-symbols-outlined" style="font-size:18px;">schedule</span>
+            <span>WAKTU, TEMPAT &amp; SASARAN</span>
           </div>
-
-          <!-- Card Waktu, Tempat & Sasaran -->
-          <div class="proker-pleno-card">
-            <div class="proker-pleno-card-title">
-              <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">schedule</span>
-              <span>Waktu, Tempat & Sasaran</span>
+          <div class="proker-pleno-box-list">
+            <div class="list-item">
+              <span class="material-symbols-outlined">calendar_today</span>
+              <span><strong>Waktu:</strong> ${currentItem.waktu || '-'}</span>
             </div>
-            <div class="proker-pleno-card-body" style="display:flex;flex-direction:column;gap:8px;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">calendar_today</span>
-                <span><strong>Waktu:</strong> ${currentItem.waktu || '-'}</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">location_on</span>
-                <span><strong>Tempat:</strong> ${currentItem.tempat || '-'}</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">group</span>
-                <span><strong>Sasaran:</strong> ${currentItem.sasaran || '-'}</span>
-              </div>
+            <div class="list-item">
+              <span class="material-symbols-outlined">location_on</span>
+              <span><strong>Tempat:</strong> ${currentItem.tempat || '-'}</span>
+            </div>
+            <div class="list-item">
+              <span class="material-symbols-outlined">group</span>
+              <span><strong>Sasaran:</strong> ${currentItem.sasaran || '-'}</span>
             </div>
           </div>
         </div>
 
-        <!-- Card Rencana Anggaran Biaya (RAB) & Realisasi -->
-        <div class="proker-pleno-card">
-          <div class="proker-pleno-card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span class="material-symbols-outlined" style="font-size:17px;color:#057a55;">payments</span>
-              <span>Rencana Anggaran Biaya (RAB) & Realisasi Keuangan</span>
+        <!-- CARD 3: RENCANA ANGGARAN BIAYA (RAB) & REALISASI KEUANGAN -->
+        <div class="proker-pleno-box">
+          <div class="proker-pleno-box-header">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#057a55;">payments</span>
+            <span>RENCANA ANGGARAN BIAYA (RAB) &amp; REALISASI KEUANGAN</span>
+          </div>
+          <div class="proker-pleno-rab-grid">
+            <div class="proker-pleno-rab-item">
+              <span class="rab-lbl">ESTIMASI BIAYA (RAB)</span>
+              <strong class="rab-val est">Rp ${estVal.toLocaleString('id-ID')}</strong>
+            </div>
+            <div class="proker-pleno-rab-item">
+              <span class="rab-lbl">REALISASI PENGGUNAAN DANA</span>
+              <strong class="rab-val real">Rp ${realVal.toLocaleString('id-ID')}</strong>
+            </div>
+            <div class="proker-pleno-rab-item">
+              <span class="rab-lbl">STATUS EFISIENSI DANA</span>
+              <div class="rab-val status" style="font-size:12px;margin-top:2px;">${efficiencyHtml}</div>
             </div>
           </div>
-          <!-- 3-Pillar Metrics -->
-          <div class="proker-pleno-rab-pillars" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:6px 0;">
-            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Estimasi Biaya (RAB)</span>
-              <strong style="font-size:16px;color:var(--green-dark);">Rp ${estVal.toLocaleString('id-ID')}</strong>
-            </div>
-            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Realisasi Penggunaan</span>
-              <strong style="font-size:16px;color:#1e40af;">Rp ${realVal.toLocaleString('id-ID')}</strong>
-            </div>
-            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;">Status Efisiensi RAB</span>
-              <div style="font-size:13px;line-height:1.3;">${efficiencyHtml}</div>
-            </div>
-          </div>
-          <!-- Rincian Biaya -->
-          <div style="font-size:12px;color:var(--text);border-top:1px dashed var(--border);padding-top:10px;margin-top:4px;">
-            <strong style="color:var(--text-muted);font-size:11px;text-transform:uppercase;display:block;margin-bottom:3px;">Rincian Komponen Biaya:</strong>
-            <div style="font-style:italic;color:var(--text);">${currentItem.rincianBiaya || 'Tidak ada rincian biaya spesifik.'}</div>
-          </div>
-        </div>
-
-        <!-- Card Catatan Evaluasi & Realisasi LPJ -->
-        <div class="proker-pleno-card" style="background:${currentItem.deskripsiRealisasi ? '#f0fdf4' : 'var(--bg)'};border-color:${currentItem.deskripsiRealisasi ? '#86efac' : 'var(--border)'};">
-          <div class="proker-pleno-card-title" style="color:${currentItem.deskripsiRealisasi ? '#166534' : 'var(--blue-dark)'};">
-            <span class="material-symbols-outlined" style="font-size:17px;">rate_review</span>
-            <span>Catatan Evaluasi & Realisasi LPJ (Hasil Pleno)</span>
-          </div>
-          <div class="proker-pleno-card-body" style="color:${currentItem.deskripsiRealisasi ? '#065f46' : 'var(--text)'};">
-            ${currentItem.deskripsiRealisasi ? currentItem.deskripsiRealisasi : '<span style="color:var(--text-muted);font-style:italic;">Belum ada catatan deskripsi realisasi/LPJ yang dicatat untuk kegiatan ini.</span>'}
-          </div>
-          ${currentItem.tglRealisasi ? `
-            <div style="font-size:11px;color:${currentItem.deskripsiRealisasi ? '#047857' : 'var(--text-muted)'};font-weight:700;margin-top:4px;">
-              📅 Tanggal Pelaporan LPJ: ${currentItem.tglRealisasi}
+          ${currentItem.rincianBiaya ? `
+            <div style="font-size:12px;color:var(--text);border-top:1px dashed var(--border);padding-top:8px;margin-top:4px;">
+              <strong style="color:var(--text-muted);font-size:10.5px;text-transform:uppercase;display:block;margin-bottom:2px;">Rincian Komponen Biaya:</strong>
+              <div style="font-style:italic;color:var(--text);">${currentItem.rincianBiaya}</div>
             </div>
           ` : ''}
         </div>
+
+        <!-- CARD 4: CATATAN EVALUASI & REALISASI LPJ (HASIL FORUM) -->
+        ${currentItem.deskripsiRealisasi ? `
+          <div class="proker-pleno-box" style="background:#f0fdf4;border-color:#86efac;">
+            <div class="proker-pleno-box-header" style="color:#166534;">
+              <span class="material-symbols-outlined" style="font-size:18px;color:#166534;">rate_review</span>
+              <span>CATATAN EVALUASI &amp; REALISASI LPJ (HASIL FORUM)</span>
+            </div>
+            <div class="proker-pleno-box-body" style="color:#065f46;">
+              ${currentItem.deskripsiRealisasi}
+            </div>
+            ${currentItem.tglRealisasi ? `
+              <div style="font-size:11px;color:#047857;font-weight:700;margin-top:4px;">
+                📅 Tanggal Pelaporan LPJ: ${currentItem.tglRealisasi}
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
       </div>
 
-      <!-- FOOTER SLIDE NAVIGATION -->
+      <!-- FOOTER SLIDE NAVIGATION (Gambar 3: Sebelumnya, Counter, Selanjutnya) -->
       <div class="proker-presentation-footer">
-        <button type="button" class="btn-pleno-nav" id="btnPlenoPrev" ${!prevItem ? 'disabled' : ''} title="Agenda Sebelumnya (Tombol Panah Kiri ←)">
-          <span class="material-symbols-outlined">arrow_back</span>
+        <button type="button" class="btn-pleno-prev-clean" id="btnPlenoPrev" ${!prevItem ? 'disabled' : ''} title="Agenda Sebelumnya (Tombol Panah Kiri ←)">
+          <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
           <span>Sebelumnya</span>
         </button>
 
-        <div style="font-size:12.5px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;">
-          <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">slideshow</span>
-          <span>Agenda ${currentIndex + 1} dari ${list.length}</span>
+        <div class="proker-pleno-counter-pill">
+          <span class="counter-icon-box">
+            <span class="material-symbols-outlined" style="font-size:15px;">slideshow</span>
+          </span>
+          <span>Agenda <strong>${currentIndex + 1}</strong> dari ${list.length}</span>
         </div>
 
-        <button type="button" class="btn-pleno-nav" id="btnPlenoNext" ${!nextItem ? 'disabled' : ''} title="Agenda Selanjutnya (Tombol Panah Kanan →)">
+        <button type="button" class="btn-pleno-next-clean" id="btnPlenoNext" ${!nextItem ? 'disabled' : ''} title="Agenda Selanjutnya (Tombol Panah Kanan →)">
           <span>Selanjutnya</span>
-          <span class="material-symbols-outlined">arrow_forward</span>
+          <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
         </button>
       </div>
     </div>
@@ -1237,12 +1232,12 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
     }
   });
 
-  if (isSuper) {
-    document.getElementById('btnPlenoLpj')?.addEventListener('click', () => {
-      closePlenoPresentation();
-      renderLaporRealisasiModal(currentItem);
-    });
+  document.getElementById('btnPlenoLpj')?.addEventListener('click', () => {
+    closePlenoPresentation();
+    renderLaporRealisasiModal(currentItem);
+  });
 
+  if (isSuper) {
     document.getElementById('btnPlenoEdit')?.addEventListener('click', () => {
       closePlenoPresentation();
       renderAddEditProkerForm(currentItem);
