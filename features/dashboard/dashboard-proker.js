@@ -633,13 +633,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
         <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon" style="color:#2563eb;">pie_chart</span>
+          <span class="material-symbols-outlined proker-stat-icon" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#2563eb'};">pie_chart</span>
           <div class="proker-stat-info">
             <span class="stat-label">PENYERAPAN DANA (${stats.persenRealisasiDana}%)</span>
-            <span class="stat-num" style="color:${stats.selisihDana >= 0 ? '#057a55' : '#c81e1e'};">
-              ${stats.selisihDana >= 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID')}
+            <span class="stat-num" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#057a55'};">
+              ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
             </span>
-            <span class="stat-sub">${stats.selisihDana >= 0 ? 'Efisiensi Anggaran' : 'Melebihi Estimasi RAB'}</span>
+            <span class="stat-sub">${stats.selisihDana > 0 ? 'Sisa Pagu Anggaran' : (stats.selisihDana < 0 ? 'Melebihi Estimasi RAB' : 'Tepat 100% Sesuai RAB')}</span>
           </div>
         </div>
       </div>
@@ -656,8 +656,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div class="proker-anggaran-line-2">
           <div class="anggaran-line-prev">
             <span>Penyerapan: <strong>${stats.persenRealisasiDana}%</strong> &bull; </span>
-            <span style="font-weight:700;color:${stats.selisihDana >= 0 ? '#057a55' : '#c81e1e'};">
-              ${stats.selisihDana >= 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID')}
+            <span style="font-weight:700;color:${stats.selisihDana < 0 ? '#c81e1e' : '#057a55'};">
+              ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
             </span>
           </div>
           <div class="proker-growth-pill ${stats.percentGrowth >= 0 ? 'up' : 'down'}">

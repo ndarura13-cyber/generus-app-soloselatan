@@ -1302,7 +1302,10 @@ export function getProkerStats(filterKategori = 'ALL') {
   const totalTerlaksana = targetList.filter(p => p.realisasiStatus === 'terlaksana').length;
   const totalBelumTerlaksana = targetList.filter(p => p.realisasiStatus === 'belum_terlaksana').length;
   const persenRealisasiDana = targetAnggaran > 0 ? parseFloat(((targetRealisasi / targetAnggaran) * 100).toFixed(1)) : 0;
-  const selisihDana = targetRealisasi - targetAnggaran;
+  // Sisa Anggaran (Pagu - Realisasi). Positif = Sisa / Hemat / Efisiensi; Negatif = Over Budget / Melebihi RAB
+  const selisihDana = targetAnggaran - targetRealisasi;
+  const sisaAnggaran = selisihDana;
+  const isOverBudget = targetRealisasi > targetAnggaran;
 
   // Baseline Anggaran Tahun Sebelumnya (Tahun 2025: Rp 30.000.000)
   const anggaranTahunLalu = 30000000;
@@ -1317,6 +1320,8 @@ export function getProkerStats(filterKategori = 'ALL') {
     totalBelumTerlaksana,
     persenRealisasiDana,
     selisihDana,
+    sisaAnggaran,
+    isOverBudget,
     ongoing,
     done,
     upcoming,
