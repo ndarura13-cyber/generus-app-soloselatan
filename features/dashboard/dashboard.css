@@ -1835,7 +1835,7 @@ body {
   inset: 0;
   background: rgba(10, 25, 60, .75);
   backdrop-filter: blur(8px);
-  z-index: 2000;
+  z-index: 9999 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1938,6 +1938,187 @@ body {
 }
 
 /* ── PROGRAM KERJA TAHUNAN MODAL STYLES ────────────────── */
+/* ── Proker Category Tabs (PPG vs KMM) ── */
+.proker-category-nav-wrap {
+  margin-bottom: 14px;
+}
+
+.proker-category-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.proker-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.proker-cat-btn:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.proker-cat-btn.active {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  border-color: #1d4ed8;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.proker-cat-btn .proker-cat-icon {
+  font-size: 26px;
+  color: #2563eb;
+  padding: 8px;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.proker-cat-btn.active .proker-cat-icon {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.proker-cat-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.proker-cat-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.proker-cat-btn.active .proker-cat-title {
+  color: #ffffff !important;
+}
+
+.proker-cat-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.proker-cat-btn.active .proker-cat-subtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.proker-cat-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  flex-shrink: 0;
+}
+
+.proker-cat-badge.kmm {
+  background: #fdf2f8;
+  color: #be185d;
+  border-color: #fbcfe8;
+}
+
+.proker-cat-btn.active .proker-cat-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.proker-sub-badge-kmm {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: #fdf2f8;
+  color: #9d174d;
+  border: 1px solid #fbcfe8;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.proker-btn-gabungan {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: #faf5ff;
+  border: 1.5px solid #d8b4fe;
+  color: #6b21a8;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.proker-btn-gabungan:hover {
+  background: #f3e8ff;
+  border-color: #a855f7;
+  color: #581c87;
+  transform: translateY(-1px);
+}
+
+.dark .proker-cat-btn {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark .proker-cat-btn:hover {
+  background: #334155;
+}
+
+.dark .proker-cat-btn.active {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+}
+
+.dark .proker-sub-badge-kmm {
+  background: rgba(219, 39, 119, 0.15);
+  color: #f472b6;
+  border-color: rgba(219, 39, 119, 0.3);
+}
+
+.dark .proker-btn-gabungan {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: #d8b4fe;
+}
+
+.dark .proker-btn-gabungan:hover {
+  background: rgba(168, 85, 247, 0.25);
+  color: #f3e8ff;
+}
+
+@media (max-width: 640px) {
+  .proker-category-tabs {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .proker-cat-btn {
+    padding: 10px 12px;
+  }
+}
+
 .proker-modal-header-strip {
   display: flex;
   align-items: center;

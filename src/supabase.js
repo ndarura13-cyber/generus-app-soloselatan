@@ -1063,6 +1063,8 @@ export async function fetchProkerFromSupabase() {
       tingkatWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
       targetWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
       penanggungJawab: row.penanggung_jawab_id || defaultPicByNo[row.nomor_urut] || 'Pengurus PPG',
+      kategori: row.kategori || (String(row.penanggung_jawab_id || '').startsWith('KMM') ? 'KMM' : 'PPG'),
+      subBidang: row.sub_bidang || '',
       semester: row.semester || 1,
       realisasiStatus: row.realisasi_status || (row.status === 'selesai' ? 'terlaksana' : 'belum_terlaksana'),
       deskripsiRealisasi: row.deskripsi_realisasi || '',

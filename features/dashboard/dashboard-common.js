@@ -236,6 +236,7 @@ export function showConfirmModal(opts) {
   currentConfirmCallback = opts.onConfirm || null;
   if (confirmModalBackdrop) {
     confirmModalBackdrop.style.display = 'flex';
+    confirmModalBackdrop.style.zIndex = '9999';
     setTimeout(() => confirmModalBackdrop.classList.add('show'), 10);
   }
 }

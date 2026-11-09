@@ -819,6 +819,211 @@ export const DEFAULT_PROKER_LIST = [
     realisasiStatus: "belum_terlaksana",
     deskripsiRealisasi: "",
     realisasiBiaya: 0,
+    tglRealisasi: null,
+    kategori: "PPG"
+  }
+];
+
+export const DAFTAR_SUB_BIDANG_KMM = [
+  'Umum',
+  'Sekretaris',
+  'Bendahara',
+  'Keilmuan',
+  'Kemandirian',
+  'Keputrian',
+  'Olahraga',
+  'Kemahasiswaan',
+  'Taman Media'
+];
+
+export const DEFAULT_KMM_PROKER_LIST = [
+  {
+    id: "proker-kmm-1",
+    kategori: "KMM",
+    subBidang: "Umum",
+    penanggungJawab: "KMM - Umum",
+    no: 1,
+    kegiatan: "Konsolidasi & Rapat Koordinasi Rutin Pengurus KMM",
+    waktu: "Februari – November 2026",
+    sasaran: "Seluruh BPH & Koordinator Divisi KMM Solo Selatan",
+    tujuan: "Penyelarasan target kerja berkala, monitoring program kerja tiap sub-bidang, dan konsolidasi pemuda.",
+    rincianBiaya: "Konsumsi Rapat Pleno KMM (10 pertemuan x Rp 150.000): Rp 1.500.000",
+    estBiaya: 1500000,
+    tempat: "Gedung PPG Solo Selatan",
+    status: "ongoing",
+    targetWilayah: "Tingkat Daerah",
+    semester: 1,
+    realisasiStatus: "terlaksana",
+    deskripsiRealisasi: "Rapat koordinasi terlaksana rutin setiap awal bulan berjalan tertib dan lancar.",
+    realisasiBiaya: 1500000,
+    tglRealisasi: "2026-03-01"
+  },
+  {
+    id: "proker-kmm-2",
+    kategori: "KMM",
+    subBidang: "Sekretaris",
+    penanggungJawab: "KMM - Sekretaris",
+    no: 2,
+    kegiatan: "Digitalisasi Database & Pemutakhiran Sensus Anggota KMM",
+    waktu: "Maret – April 2026",
+    sasaran: "Seluruh Generus Usia Muda-Mudi 5 Desa",
+    tujuan: "Pendataan akurat profil pendidikan, keahlian, status pekerjaan, dan domisili seluruh generus muda-mudi.",
+    rincianBiaya: "Formulir digital, server cloud, dan kuota pendataan: Rp 1.000.000",
+    estBiaya: 1000000,
+    tempat: "Sekretariat PPG Solo Selatan",
+    status: "done",
+    targetWilayah: "Seluruh Wilayah (5 Desa)",
+    semester: 1,
+    realisasiStatus: "terlaksana",
+    deskripsiRealisasi: "Database 100% tersinkronisasi mencakup 350+ data generus muda-mudi.",
+    realisasiBiaya: 950000,
+    tglRealisasi: "2026-04-15"
+  },
+  {
+    id: "proker-kmm-3",
+    kategori: "KMM",
+    subBidang: "Bendahara",
+    penanggungJawab: "KMM - Bendahara",
+    no: 3,
+    kegiatan: "Tertib Pembukuan Kas & Sosialisasi Tabungan Mandiri Pemuda",
+    waktu: "Mei 2026",
+    sasaran: "Bendahara KMM Desa & Generus Usia Mandiri",
+    tujuan: "Transparansi arus kas muda-mudi dan edukasi literasi keuangan syariah untuk persiapan mandiri.",
+    rincianBiaya: "Buku kas digital & modul keuangan: Rp 800.000",
+    estBiaya: 800000,
+    tempat: "Aula Baitul Makmur (Desa Barat)",
+    status: "done",
+    targetWilayah: "Tingkat Daerah",
+    semester: 1,
+    realisasiStatus: "terlaksana",
+    deskripsiRealisasi: "Laporan kas bulanan terbit tepat waktu dan SOP perbendaharaan berjalan rapi.",
+    realisasiBiaya: 800000,
+    tglRealisasi: "2026-05-20"
+  },
+  {
+    id: "proker-kmm-4",
+    kategori: "KMM",
+    subBidang: "Keilmuan",
+    penanggungJawab: "KMM - Keilmuan",
+    no: 4,
+    kegiatan: "Halaqah Penguatan Akidah & Kajian Kitabus Sholah Remaja",
+    waktu: "Juni – Juli 2026",
+    sasaran: "Remaja & Muda-Mudi Usia Mandiri",
+    tujuan: "Memperdalam pemahaman dalil-dalil sholat, thoharoh, dan adab pergaulan islami benteng akhir zaman.",
+    rincianBiaya: "Kitab materi, modul saku, dan narasumber: Rp 2.500.000",
+    estBiaya: 2500000,
+    tempat: "Masjid Luhur Baluwarti (Desa Tengah)",
+    status: "done",
+    targetWilayah: "Seluruh Wilayah (5 Desa)",
+    semester: 1,
+    realisasiStatus: "terlaksana",
+    deskripsiRealisasi: "Dihadiri 180 peserta dengan antusiasme tanya-jawab tinggi.",
+    realisasiBiaya: 2450000,
+    tglRealisasi: "2026-07-10"
+  },
+  {
+    id: "proker-kmm-5",
+    kategori: "KMM",
+    subBidang: "Kemandirian",
+    penanggungJawab: "KMM - Kemandirian",
+    no: 5,
+    kegiatan: "Workshop Kewirausahaan & Expo Usaha Generus Mandiri",
+    waktu: "Agustus 2026",
+    sasaran: "Generus Usia Mandiri yang Merintis Usaha",
+    tujuan: "Menciptakan ekosistem jejaring bisnis generus, pelatihan digital marketing, dan permodalan halal.",
+    rincianBiaya: "Sewa booth bazar, konsumsi pelatihan, narasumber praktisi: Rp 4.000.000",
+    estBiaya: 4000000,
+    tempat: "Gedung Pertemuan Solo Baru (Desa Selatan)",
+    status: "upcoming",
+    targetWilayah: "Tingkat Daerah",
+    semester: 2,
+    realisasiStatus: "belum_terlaksana",
+    deskripsiRealisasi: "Proposal dan kurasi produk wirausaha muda sedang berlangsung.",
+    realisasiBiaya: 0,
+    tglRealisasi: null
+  },
+  {
+    id: "proker-kmm-6",
+    kategori: "KMM",
+    subBidang: "Keputrian",
+    penanggungJawab: "KMM - Keputrian",
+    no: 6,
+    kegiatan: "Kelas Tata Boga & Keterampilan Pra-Nikah Keputrian",
+    waktu: "September 2026",
+    sasaran: "Muda-Mudi Putri & Calon Pengantin",
+    tujuan: "Membekali generus putri dengan keahlian kuliner praktis, manajemen rumah tangga islami, dan parenting.",
+    rincianBiaya: "Bahan praktik masak, sewa perlengkapan, modul resep: Rp 2.000.000",
+    estBiaya: 2000000,
+    tempat: "Dapur Utama Gedung PPG Solo Selatan",
+    status: "planned",
+    targetWilayah: "Tingkat Daerah",
+    semester: 2,
+    realisasiStatus: "belum_terlaksana",
+    deskripsiRealisasi: "",
+    realisasiBiaya: 0,
+    tglRealisasi: null
+  },
+  {
+    id: "proker-kmm-7",
+    kategori: "KMM",
+    subBidang: "Olahraga",
+    penanggungJawab: "KMM - Olahraga",
+    no: 7,
+    kegiatan: "Turnamen Futsal & Badminton Kerukunan Muda-Mudi Daerah",
+    waktu: "Oktober 2026",
+    sasaran: "Kontingen Muda-Mudi 5 Desa",
+    tujuan: "Menjalin kerukunan, kesehatan jasmani, jiwa sportivitas, dan kekompakan pemuda lintas kelompok.",
+    rincianBiaya: "Sewa lapangan olahraga, wasit resmi, tropi & hadiah, tim medis: Rp 3.500.000",
+    estBiaya: 3500000,
+    tempat: "Kompleks Gelanggang Olahraga Solo Selatan",
+    status: "planned",
+    targetWilayah: "Seluruh Wilayah (5 Desa)",
+    semester: 2,
+    realisasiStatus: "belum_terlaksana",
+    deskripsiRealisasi: "",
+    realisasiBiaya: 0,
+    tglRealisasi: null
+  },
+  {
+    id: "proker-kmm-8",
+    kategori: "KMM",
+    subBidang: "Kemahasiswaan",
+    penanggungJawab: "KMM - Kemahasiswaan",
+    no: 8,
+    kegiatan: "Forum Silaturahim & Bedah Karir Mahasiswa Solo Selatan",
+    waktu: "November 2026",
+    sasaran: "Mahasiswa Aktif & Calon Mahasiswa Baru",
+    tujuan: "Pendampingan studi kampus, tips magang & beasiswa, serta penataan jam sambung di sela perkuliahan.",
+    rincianBiaya: "Konsumsi sharing session, booklet direktori karir, cinderamata: Rp 2.200.000",
+    estBiaya: 2200000,
+    tempat: "Aula Sampangan (Desa Tengah)",
+    status: "planned",
+    targetWilayah: "Tingkat Daerah",
+    semester: 2,
+    realisasiStatus: "belum_terlaksana",
+    deskripsiRealisasi: "",
+    realisasiBiaya: 0,
+    tglRealisasi: null
+  },
+  {
+    id: "proker-kmm-9",
+    kategori: "KMM",
+    subBidang: "Taman Media",
+    penanggungJawab: "KMM - Taman Media",
+    no: 9,
+    kegiatan: "Pelatihan Konten Kreatif, Videografi & Publikasi Syiar Positif",
+    waktu: "Desember 2026",
+    sasaran: "Tim Media Kreatif Muda-Mudi 5 Desa",
+    tujuan: "Peningkatan kualitas dokumentasi kegiatan, pembuatan materi infografis KBM, dan dakwah digital santun.",
+    rincianBiaya: "Peralatan lighting pendukung, lisensi aset multimedia, narasumber: Rp 1.800.000",
+    estBiaya: 1800000,
+    tempat: "Studio Multimedia PPG Solo Selatan",
+    status: "planned",
+    targetWilayah: "Tingkat Daerah",
+    semester: 2,
+    realisasiStatus: "belum_terlaksana",
+    deskripsiRealisasi: "",
+    realisasiBiaya: 0,
     tglRealisasi: null
   }
 ];
@@ -827,18 +1032,19 @@ const PROKER_STORAGE_KEY = "ppg_program_kerja_v1";
 
 export function getProkerList() {
   try {
+    const combinedDefaults = [...DEFAULT_PROKER_LIST, ...DEFAULT_KMM_PROKER_LIST];
     const raw = localStorage.getItem(PROKER_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(DEFAULT_PROKER_LIST));
-      return DEFAULT_PROKER_LIST;
+      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(combinedDefaults));
+      return combinedDefaults;
     }
     let parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(DEFAULT_PROKER_LIST));
-      return DEFAULT_PROKER_LIST;
+      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(combinedDefaults));
+      return combinedDefaults;
     }
 
-    // Auto-migrasi data lokal lama agar memiliki field realisasi LPJ
+    // Auto-migrasi data lokal lama agar memiliki field kategori & realisasi LPJ
     let hasMigration = false;
     parsed = parsed.map(item => {
       let isChanged = false;
@@ -857,10 +1063,25 @@ export function getProkerList() {
         deskripsiRealisasi = '';
         isChanged = true;
       }
+      let kategori = item.kategori;
+      if (!kategori) {
+        kategori = 'PPG';
+        isChanged = true;
+      }
+      let subBidang = item.subBidang;
+      if (kategori === 'KMM' && !subBidang) {
+        const pj = item.penanggungJawab || '';
+        const match = DAFTAR_SUB_BIDANG_KMM.find(sb => pj.toLowerCase().includes(sb.toLowerCase()));
+        subBidang = match || 'Umum';
+        isChanged = true;
+      }
+
       if (isChanged) hasMigration = true;
 
       return {
         ...item,
+        kategori,
+        subBidang: subBidang || '',
         realisasiStatus,
         realisasiBiaya: Number(realisasiBiaya) || 0,
         deskripsiRealisasi,
@@ -868,13 +1089,20 @@ export function getProkerList() {
       };
     });
 
+    // Injeksi otomatis data default KMM jika belum ada sama sekali di data lokal
+    const hasKmm = parsed.some(p => p.kategori === 'KMM');
+    if (!hasKmm) {
+      parsed = [...parsed, ...DEFAULT_KMM_PROKER_LIST];
+      hasMigration = true;
+    }
+
     if (hasMigration) {
       localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(parsed));
     }
 
     return parsed;
   } catch (e) {
-    return DEFAULT_PROKER_LIST;
+    return [...DEFAULT_PROKER_LIST, ...DEFAULT_KMM_PROKER_LIST];
   }
 }
 
@@ -884,9 +1112,22 @@ export function saveProkerList(list) {
 
 export function addProker(data) {
   const list = getProkerList();
-  const nextNo = list.length > 0 ? Math.max(...list.map(p => p.no || 0)) + 1 : 1;
+  const kategori = data.kategori === 'KMM' ? 'KMM' : 'PPG';
+  const subBidang = data.subBidang || (kategori === 'KMM' ? 'Umum' : '');
+  
+  // Hitung nomor berikutnya khusus kategori ini agar independen
+  const catList = list.filter(p => (p.kategori || 'PPG') === kategori);
+  const nextNo = catList.length > 0 ? Math.max(...catList.map(p => p.no || 0)) + 1 : 1;
+
+  let penanggungJawab = data.penanggungJawab;
+  if (!penanggungJawab) {
+    penanggungJawab = kategori === 'KMM' ? `KMM - ${subBidang}` : 'Pengurus PPG';
+  }
+
   const newProker = {
     id: `proker-${Date.now()}`,
+    kategori,
+    subBidang,
     no: data.no ? parseInt(data.no) : nextNo,
     kegiatan: data.kegiatan || "Kegiatan Baru",
     waktu: data.waktu || "Periode 2026",
@@ -897,7 +1138,7 @@ export function addProker(data) {
     tempat: data.tempat || "Solo Selatan",
     status: data.status || "planned",
     targetWilayah: data.targetWilayah || "Tingkat Daerah",
-    penanggungJawab: data.penanggungJawab || "Pengurus PPG",
+    penanggungJawab,
     semester: data.semester ? parseInt(data.semester) : 1,
     realisasiStatus: data.realisasiStatus || (data.status === 'done' ? 'terlaksana' : 'belum_terlaksana'),
     deskripsiRealisasi: data.deskripsiRealisasi || "",
@@ -929,8 +1170,13 @@ export function updateProker(id, updateData) {
     ? (typeof updateData.realisasiBiaya === 'number' ? updateData.realisasiBiaya : parseInt(String(updateData.realisasiBiaya).replace(/[^0-9]/g, '')) || 0)
     : (list[idx].realisasiBiaya || 0);
 
+  const kategori = updateData.kategori !== undefined ? updateData.kategori : (list[idx].kategori || 'PPG');
+  const subBidang = updateData.subBidang !== undefined ? updateData.subBidang : (list[idx].subBidang || '');
+
   list[idx] = {
     ...list[idx],
+    kategori,
+    subBidang,
     no: updateData.no !== undefined ? parseInt(updateData.no) : list[idx].no,
     kegiatan: updateData.kegiatan || list[idx].kegiatan,
     waktu: updateData.waktu || list[idx].waktu,
@@ -994,10 +1240,15 @@ export function deleteProker(id) {
   const item = list.find(p => p.id === id);
   if (!item) return { success: false, message: "Data program kerja tidak ditemukan." };
 
+  const targetCategory = item.kategori || 'PPG';
   list = list.filter(p => p.id !== id);
-  // Re-index nomor urut
-  list.forEach((p, index) => {
-    p.no = index + 1;
+  
+  // Re-index nomor urut hanya untuk kategori terkait (independen)
+  let catIndex = 1;
+  list.forEach(p => {
+    if ((p.kategori || 'PPG') === targetCategory) {
+      p.no = catIndex++;
+    }
   });
   saveProkerList(list);
 
@@ -1008,30 +1259,60 @@ export function deleteProker(id) {
   return { success: true, message: `Program kerja "${item.kegiatan}" berhasil dihapus.` };
 }
 
-export function getProkerStats() {
+export function getProkerStats(filterKategori = 'ALL') {
   const list = getProkerList();
-  const total = list.length;
-  const totalAnggaran = list.reduce((acc, p) => acc + (p.estBiaya || 0), 0);
-  const totalRealisasiDana = list.reduce((acc, p) => acc + (p.realisasiBiaya || 0), 0);
-  const ongoing = list.filter(p => p.status === 'ongoing').length;
-  const done = list.filter(p => p.status === 'done').length;
-  const upcoming = list.filter(p => p.status === 'upcoming').length;
-  const planned = list.filter(p => p.status === 'planned').length;
+  
+  const ppgList = list.filter(p => (p.kategori || 'PPG') === 'PPG');
+  const kmmList = list.filter(p => p.kategori === 'KMM');
 
-  const totalTerlaksana = list.filter(p => p.realisasiStatus === 'terlaksana').length;
-  const totalBelumTerlaksana = list.filter(p => p.realisasiStatus === 'belum_terlaksana').length;
-  const persenRealisasiDana = totalAnggaran > 0 ? parseFloat(((totalRealisasiDana / totalAnggaran) * 100).toFixed(1)) : 0;
-  const selisihDana = totalRealisasiDana - totalAnggaran;
+  const ppgAnggaran = ppgList.reduce((acc, p) => acc + (p.estBiaya || 0), 0);
+  const ppgRealisasi = ppgList.reduce((acc, p) => acc + (p.realisasiBiaya || 0), 0);
+  const kmmAnggaran = kmmList.reduce((acc, p) => acc + (p.estBiaya || 0), 0);
+  const kmmRealisasi = kmmList.reduce((acc, p) => acc + (p.realisasiBiaya || 0), 0);
+
+  // Roll-Up: Total Anggaran Konsolidasi
+  const consolidatedAnggaran = ppgAnggaran + kmmAnggaran;
+  const consolidatedRealisasi = ppgRealisasi + kmmRealisasi;
+
+  let targetList;
+  let targetAnggaran;
+  let targetRealisasi;
+
+  if (filterKategori === 'KMM') {
+    targetList = kmmList;
+    targetAnggaran = kmmAnggaran;
+    targetRealisasi = kmmRealisasi;
+  } else if (filterKategori === 'PPG') {
+    targetList = ppgList;
+    // Roll-up konsolidasi untuk dashboard PPG sesuai kesepakatan
+    targetAnggaran = consolidatedAnggaran;
+    targetRealisasi = consolidatedRealisasi;
+  } else {
+    targetList = list;
+    targetAnggaran = consolidatedAnggaran;
+    targetRealisasi = consolidatedRealisasi;
+  }
+
+  const total = targetList.length;
+  const ongoing = targetList.filter(p => p.status === 'ongoing').length;
+  const done = targetList.filter(p => p.status === 'done').length;
+  const upcoming = targetList.filter(p => p.status === 'upcoming').length;
+  const planned = targetList.filter(p => p.status === 'planned').length;
+
+  const totalTerlaksana = targetList.filter(p => p.realisasiStatus === 'terlaksana').length;
+  const totalBelumTerlaksana = targetList.filter(p => p.realisasiStatus === 'belum_terlaksana').length;
+  const persenRealisasiDana = targetAnggaran > 0 ? parseFloat(((targetRealisasi / targetAnggaran) * 100).toFixed(1)) : 0;
+  const selisihDana = targetRealisasi - targetAnggaran;
 
   // Baseline Anggaran Tahun Sebelumnya (Tahun 2025: Rp 30.000.000)
   const anggaranTahunLalu = 30000000;
-  const diffAnggaran = totalAnggaran - anggaranTahunLalu;
+  const diffAnggaran = targetAnggaran - anggaranTahunLalu;
   const percentGrowth = anggaranTahunLalu > 0 ? parseFloat(((diffAnggaran / anggaranTahunLalu) * 100).toFixed(1)) : 0;
 
   return {
     total,
-    totalAnggaran,
-    totalRealisasiDana,
+    totalAnggaran: targetAnggaran,
+    totalRealisasiDana: targetRealisasi,
     totalTerlaksana,
     totalBelumTerlaksana,
     persenRealisasiDana,
@@ -1041,7 +1322,13 @@ export function getProkerStats() {
     upcoming,
     planned,
     anggaranTahunLalu,
-    percentGrowth
+    percentGrowth,
+    ppgListCount: ppgList.length,
+    kmmListCount: kmmList.length,
+    ppgAnggaran,
+    ppgRealisasi,
+    kmmAnggaran,
+    kmmRealisasi
   };
 }
 

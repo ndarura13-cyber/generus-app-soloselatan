@@ -11,7 +11,8 @@ import {
   updateRealisasiProker,
   deleteProker,
   getProkerStats,
-  syncProkerFromSupabase
+  syncProkerFromSupabase,
+  DAFTAR_SUB_BIDANG_KMM
 } from '../../src/db-master.js';
 
 import {
@@ -47,17 +48,33 @@ export const DAFTAR_BIDANG_PPG = [
   'Tahfidz'
 ];
 
+export { DAFTAR_SUB_BIDANG_KMM };
 
+// State aktif kategori tab: 'PPG' | 'KMM'
+export let currentActiveKategori = 'PPG';
 
-export async function exportProkerCsv() {
-  const prokerList = getProkerList();
-  const stats = getProkerStats();
+export function setCurrentActiveKategori(cat) {
+  currentActiveKategori = cat === 'KMM' ? 'KMM' : 'PPG';
+}
+
+export async function exportProkerCsv(kategori = currentActiveKategori) {
+  const isKmm = (kategori || currentActiveKategori) === 'KMM';
+  const prokerList = getProkerList().filter(p => isKmm ? p.kategori === 'KMM' : (p.kategori || 'PPG') === 'PPG');
+  const stats = getProkerStats(isKmm ? 'KMM' : 'PPG');
   let csvContent = "\uFEFF"; // UTF-8 BOM
+
+  if (isKmm) {
+    csvContent += "LAPORAN REALISASI & RAB BIDANG KEGIATAN MUDA-MUDI (KMM) - 9 SUB-BIDANG\n";
+  } else {
+    csvContent += "LAPORAN REALISASI & RAB TAHUNAN PROGRAM KERJA PPG SOLO SELATAN\n";
+  }
   csvContent += "NO;KEGIATAN;WAKTU;SASARAN/ PESERTA;TUJUAN KEGIATAN;RINCIAN BIAYA;EST. BIAYA;TEMPAT PELAKSANAAN;REALISASI PROKER;DESKRIPSI REALISASI PROKER;REALISASI PENGGUNAAN DANA\n";
 
-  // Group by PIC
+  // Group by PIC or Sub-Bidang
   const grouped = prokerList.reduce((acc, curr) => {
-    const pic = curr.penanggungJawab || 'Tanpa Bidang';
+    let pic = isKmm
+      ? (curr.subBidang ? `DIVISI ${curr.subBidang.toUpperCase()}` : (curr.penanggungJawab || 'DIVISI UMUM'))
+      : (curr.penanggungJawab || 'Tanpa Bidang');
     if (!acc[pic]) acc[pic] = [];
     acc[pic].push(curr);
     return acc;
@@ -66,13 +83,20 @@ export async function exportProkerCsv() {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let letterIdx = 0;
 
-  Object.keys(grouped).sort().forEach(pic => {
+  const sortedKeys = isKmm
+    ? Object.keys(grouped).sort((a, b) => {
+      const idxA = DAFTAR_SUB_BIDANG_KMM.findIndex(sb => a.includes(sb.toUpperCase()));
+      const idxB = DAFTAR_SUB_BIDANG_KMM.findIndex(sb => b.includes(sb.toUpperCase()));
+      return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+    })
+    : Object.keys(grouped).sort();
+
+  sortedKeys.forEach(pic => {
     const letter = alphabet[letterIdx % alphabet.length] || '';
     letterIdx++;
     let subtotalEst = 0;
     let subtotalReal = 0;
 
-    // Section Header row matching Excel format (e.g. A. BENDAHARA)
     csvContent += `\n"${letter}.";"${pic.toUpperCase()}";;;;;;;;;\n`;
 
     grouped[pic].forEach((p, idx) => {
@@ -94,33 +118,29 @@ export async function exportProkerCsv() {
       csvContent += `${no};${kegiatan};${waktu};${sasaran};${tujuan};${rincianBiaya};${estBiaya};${tempat};${realisasiStatus};${deskripsiRealisasi};${realisasiBiaya}\n`;
     });
 
-    // Subtotal row per bidang matching spreadsheet format
     csvContent += `;"SUB TOTAL ${pic.toUpperCase()}";;;;;${subtotalEst};;;;${subtotalReal}\n`;
   });
 
-  // Grand Total row at the bottom
-  csvContent += `\n;"TOTAL KESELURUHAN (SEMUA BIDANG)";;;;;${stats.totalAnggaran};;;;${stats.totalRealisasiDana}\n`;
+  const totalLabel = isKmm ? "TOTAL KESELURUHAN BIDANG KMM" : "TOTAL KESELURUHAN (PPG KONSOLIDASI)";
+  csvContent += `\n;"${totalLabel}";;;;;${stats.totalAnggaran};;;;${stats.totalRealisasiDana}\n`;
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `Laporan_Realisasi_RAB_PPG_Solo_Selatan_2026_${new Date().toISOString().slice(0, 10)}.csv`);
+  const filePrefix = isKmm ? 'Laporan_RAB_LPJ_KMM_Solo_Selatan_2026_' : 'Laporan_Realisasi_RAB_PPG_Solo_Selatan_2026_';
+  link.setAttribute('download', `${filePrefix}${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
-export async function printProkerTable() {
-  const prokerList = getProkerList();
-  const stats = getProkerStats();
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
-
-  // Group by PIC
-  const grouped = prokerList.reduce((acc, curr) => {
-    const pic = curr.penanggungJawab || 'Tanpa Bidang';
+function generatePrintRows(items, isKmm) {
+  const grouped = items.reduce((acc, curr) => {
+    let pic = isKmm
+      ? (curr.subBidang ? `DIVISI ${curr.subBidang.toUpperCase()}` : (curr.penanggungJawab || 'DIVISI UMUM'))
+      : (curr.penanggungJawab || 'Tanpa Bidang');
     if (!acc[pic]) acc[pic] = [];
     acc[pic].push(curr);
     return acc;
@@ -129,14 +149,23 @@ export async function printProkerTable() {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let letterIdx = 0;
   let rowsHtml = '';
+  let catTotalEst = 0;
+  let catTotalReal = 0;
 
-  Object.keys(grouped).sort().forEach(pic => {
+  const sortedKeys = isKmm
+    ? Object.keys(grouped).sort((a, b) => {
+      const idxA = DAFTAR_SUB_BIDANG_KMM.findIndex(sb => a.includes(sb.toUpperCase()));
+      const idxB = DAFTAR_SUB_BIDANG_KMM.findIndex(sb => b.includes(sb.toUpperCase()));
+      return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+    })
+    : Object.keys(grouped).sort();
+
+  sortedKeys.forEach(pic => {
     const letter = alphabet[letterIdx % alphabet.length] || '';
     letterIdx++;
     let subtotalEst = 0;
     let subtotalReal = 0;
 
-    // Section Header row matching Excel format (e.g. A. BENDAHARA)
     rowsHtml += `
       <tr style="background:#cfe2f3;">
         <td style="text-align:center;padding:7px 5px;border:1px solid #94a3b8;font-weight:900;font-size:12px;color:#0b386b;">${letter}.</td>
@@ -152,6 +181,8 @@ export async function printProkerTable() {
       const real = p.realisasiBiaya || 0;
       subtotalEst += est;
       subtotalReal += real;
+      catTotalEst += est;
+      catTotalReal += real;
 
       const estText = est > 0 ? `Rp ${est.toLocaleString('id-ID')}` : 'Rp -';
       const realText = real > 0 ? `Rp ${real.toLocaleString('id-ID')}` : (isTerlaksana ? 'Rp -' : '');
@@ -177,7 +208,6 @@ export async function printProkerTable() {
       `;
     });
 
-    // Subtotal row matching screenshot
     rowsHtml += `
       <tr style="background:#f8fafc;font-weight:bold;border-top:1.5px solid #64748b;border-bottom:1.5px solid #64748b;">
         <td colspan="6" style="text-align:right;padding:6px 8px;border:1px solid #cbd5e1;font-size:10.5px;font-weight:900;">
@@ -194,27 +224,31 @@ export async function printProkerTable() {
     `;
   });
 
-  // Grand Total row
-  rowsHtml += `
-    <tr style="background:#cfe2f3;font-weight:900;border-top:2px solid #0b386b;border-bottom:2px solid #0b386b;">
-      <td colspan="6" style="text-align:right;padding:8px 8px;border:1px solid #94a3b8;font-size:11.5px;color:#0b386b;">
-        TOTAL KESELURUHAN (SEMUA BIDANG)
-      </td>
-      <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:12px;color:#0e7039;white-space:nowrap;">
-        Rp ${stats.totalAnggaran.toLocaleString('id-ID')}
-      </td>
-      <td colspan="3" style="border:1px solid #94a3b8;"></td>
-      <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:12px;color:#1e40af;white-space:nowrap;">
-        Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}
-      </td>
-    </tr>
-  `;
+  return { rowsHtml, catTotalEst, catTotalReal };
+}
+
+export async function printProkerTable(kategori = currentActiveKategori) {
+  const isKmm = (kategori || currentActiveKategori) === 'KMM';
+  const prokerList = getProkerList().filter(p => isKmm ? p.kategori === 'KMM' : (p.kategori || 'PPG') === 'PPG');
+  const stats = getProkerStats(isKmm ? 'KMM' : 'PPG');
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+
+  const { rowsHtml, catTotalEst, catTotalReal } = generatePrintRows(prokerList, isKmm);
+
+  const titleText = isKmm
+    ? 'PROGRAM KERJA & LAPORAN REALISASI ANGGARAN BIDANG KEGIATAN MUDA-MUDI (KMM)'
+    : 'PROGRAM KERJA & LAPORAN REALISASI ANGGARAN PPG SOLO SELATAN';
+  const subtitleText = isKmm
+    ? '9 Sub-Bidang / Divisi Resmi KMM &bull; Tahun Anggaran 2026 &bull; Format Resmi LPJ'
+    : 'Bidang-Bidang Pengurus Daerah &bull; Tahun Anggaran 2026 &bull; Format Resmi LPJ';
+  const totalLabel = isKmm ? 'TOTAL KESELURUHAN BIDANG KMM' : 'TOTAL KESELURUHAN (SEMUA BIDANG)';
 
   printWindow.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Laporan Program Kerja & Realisasi RAB PPG Solo Selatan 2026</title>
+      <title>${titleText} 2026</title>
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 16px; color:#1e293b; }
         h2 { margin: 0 0 2px 0; color: #0b386b; font-size: 16px; font-weight: 800; }
@@ -230,8 +264,8 @@ export async function printProkerTable() {
       </style>
     </head>
     <body>
-      <h2>PROGRAM KERJA & LAPORAN REALISASI ANGGARAN PPG SOLO SELATAN</h2>
-      <p>Tahun Anggaran 2026 &bull; Format Resmi LPJ &bull; Dicetak: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
+      <h2>${titleText}</h2>
+      <p>${subtitleText} &bull; Dicetak: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
       <div class="summary-box">
         <div><strong>Total Program:</strong> ${stats.total}</div>
         <div><strong>Est. Anggaran (RAB):</strong> Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</div>
@@ -257,6 +291,154 @@ export async function printProkerTable() {
         </thead>
         <tbody>
           ${rowsHtml}
+          <tr style="background:#cfe2f3;font-weight:900;border-top:2px solid #0b386b;border-bottom:2px solid #0b386b;">
+            <td colspan="6" style="text-align:right;padding:8px 8px;border:1px solid #94a3b8;font-size:11.5px;color:#0b386b;">
+              ${totalLabel}
+            </td>
+            <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:12px;color:#0e7039;white-space:nowrap;">
+              Rp ${catTotalEst.toLocaleString('id-ID')}
+            </td>
+            <td colspan="3" style="border:1px solid #94a3b8;"></td>
+            <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:12px;color:#1e40af;white-space:nowrap;">
+              Rp ${catTotalReal.toLocaleString('id-ID')}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <script>window.onload = function() { window.print(); };<\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+
+export async function printProkerBukuPlenoLengkap() {
+  const allProker = getProkerList();
+  const ppgList = allProker.filter(p => (p.kategori || 'PPG') === 'PPG');
+  const kmmList = allProker.filter(p => p.kategori === 'KMM');
+  const statsConsolidated = getProkerStats('ALL');
+
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+
+  const ppgSection = generatePrintRows(ppgList, false);
+  const kmmSection = generatePrintRows(kmmList, true);
+
+  const grandEst = ppgSection.catTotalEst + kmmSection.catTotalEst;
+  const grandReal = ppgSection.catTotalReal + kmmSection.catTotalReal;
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Buku Pleno Lengkap Program Kerja & LPJ PPG Solo Selatan 2026</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 16px; color:#1e293b; }
+        h2 { margin: 0 0 2px 0; color: #0b386b; font-size: 17px; font-weight: 900; }
+        h3 { margin: 20px 0 6px 0; color: #1e40af; font-size: 13.5px; font-weight: 800; border-bottom: 2px solid #93c5fd; padding-bottom: 4px; }
+        p { margin: 2px 0 12px 0; font-size: 11px; color:#64748b; }
+        table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 8px; margin-bottom: 16px; }
+        th { background: #f1f5f9; padding: 7px 5px; border:1px solid #94a3b8; text-align: left; font-size: 9.5px; font-weight: 800; color:#334155; }
+        .summary-box { display: flex; gap: 16px; font-size: 11px; padding: 8px 12px; background:#f0f9ff; border:1.5px solid #bae6fd; border-radius: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+        @media print {
+          button { display: none; }
+          body { margin: 8px; }
+          @page { size: landscape; margin: 8mm; }
+          .page-break { page-break-before: always; }
+        }
+      </style>
+    </head>
+    <body>
+      <h2>BUKU PLENO GABUNGAN: PROGRAM KERJA &amp; LAPORAN REALISASI DANA (LPJ)</h2>
+      <p>PENGURUS DAERAH PPG SOLO SELATAN &amp; BIDANG KEGIATAN MUDA-MUDI (KMM) &bull; TAHUN ANGGARAN 2026 &bull; Dicetak: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
+
+      <div class="summary-box">
+        <div><strong>Total Program Se-Daerah:</strong> ${allProker.length} Program (${ppgList.length} PPG + ${kmmList.length} KMM)</div>
+        <div><strong>Total Anggaran RAB Konsolidasi:</strong> Rp ${grandEst.toLocaleString('id-ID')}</div>
+        <div><strong>Total Realisasi Dana LPJ:</strong> Rp ${grandReal.toLocaleString('id-ID')}</div>
+        <div><strong>Rasio Penyerapan:</strong> ${statsConsolidated.persenRealisasiDana}%</div>
+        <div><strong>Ketercapaian:</strong> ${statsConsolidated.totalTerlaksana} Terlaksana &bull; ${statsConsolidated.totalBelumTerlaksana} Belum</div>
+      </div>
+
+      <h3>BAGIAN I: PROGRAM KERJA BIDANG-BIDANG PENGURUS PPG DAERAH</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:25px;text-align:center;">NO</th>
+            <th style="min-width:180px;">KEGIATAN</th>
+            <th style="min-width:90px;">WAKTU</th>
+            <th style="min-width:110px;">SASARAN/ PESERTA</th>
+            <th style="min-width:150px;">TUJUAN KEGIATAN</th>
+            <th style="min-width:140px;">RINCIAN BIAYA</th>
+            <th style="min-width:95px;text-align:right;">EST. BIAYA</th>
+            <th style="min-width:90px;">TEMPAT PELAKSANAAN</th>
+            <th style="min-width:110px;text-align:center;">REALISASI PROKER<br/>(TERLAKSANA/BELUM)</th>
+            <th style="min-width:140px;">DESKRIPSI REALISASI PROKER</th>
+            <th style="min-width:95px;text-align:right;">REALISASI PENGGUNAAN</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ppgSection.rowsHtml}
+          <tr style="background:#e2e8f0;font-weight:900;">
+            <td colspan="6" style="text-align:right;padding:8px;border:1px solid #94a3b8;font-size:11px;color:#1e293b;">
+              SUB TOTAL BAGIAN I (BIDANG PPG)
+            </td>
+            <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:11.5px;color:#0e7039;white-space:nowrap;">
+              Rp ${ppgSection.catTotalEst.toLocaleString('id-ID')}
+            </td>
+            <td colspan="3" style="border:1px solid #94a3b8;"></td>
+            <td style="text-align:right;padding:8px 6px;border:1px solid #94a3b8;font-size:11.5px;color:#1e40af;white-space:nowrap;">
+              Rp ${ppgSection.catTotalReal.toLocaleString('id-ID')}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="page-break"></div>
+
+      <h3>BAGIAN II: PROGRAM KERJA 9 DIVISI BIDANG KEGIATAN MUDA-MUDI (KMM)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:25px;text-align:center;">NO</th>
+            <th style="min-width:180px;">KEGIATAN</th>
+            <th style="min-width:90px;">WAKTU</th>
+            <th style="min-width:110px;">SASARAN/ PESERTA</th>
+            <th style="min-width:150px;">TUJUAN KEGIATAN</th>
+            <th style="min-width:140px;">RINCIAN BIAYA</th>
+            <th style="min-width:95px;text-align:right;">EST. BIAYA</th>
+            <th style="min-width:90px;">TEMPAT PELAKSANAAN</th>
+            <th style="min-width:110px;text-align:center;">REALISASI PROKER<br/>(TERLAKSANA/BELUM)</th>
+            <th style="min-width:140px;">DESKRIPSI REALISASI PROKER</th>
+            <th style="min-width:95px;text-align:right;">REALISASI PENGGUNAAN</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${kmmSection.rowsHtml}
+          <tr style="background:#fce7f3;font-weight:900;">
+            <td colspan="6" style="text-align:right;padding:8px;border:1px solid #f472b6;font-size:11px;color:#831843;">
+              SUB TOTAL BAGIAN II (9 DIVISI KMM)
+            </td>
+            <td style="text-align:right;padding:8px 6px;border:1px solid #f472b6;font-size:11.5px;color:#0e7039;white-space:nowrap;">
+              Rp ${kmmSection.catTotalEst.toLocaleString('id-ID')}
+            </td>
+            <td colspan="3" style="border:1px solid #f472b6;"></td>
+            <td style="text-align:right;padding:8px 6px;border:1px solid #f472b6;font-size:11.5px;color:#1e40af;white-space:nowrap;">
+              Rp ${kmmSection.catTotalReal.toLocaleString('id-ID')}
+            </td>
+          </tr>
+          <tr style="background:#cfe2f3;font-weight:900;border-top:2.5px solid #0b386b;border-bottom:2.5px solid #0b386b;">
+            <td colspan="6" style="text-align:right;padding:9px;border:1.5px solid #0b386b;font-size:12px;color:#0b386b;">
+              GRAND TOTAL KONSOLIDASI DAERAH (PPG + KMM)
+            </td>
+            <td style="text-align:right;padding:9px 6px;border:1.5px solid #0b386b;font-size:12.5px;color:#0e7039;white-space:nowrap;">
+              Rp ${grandEst.toLocaleString('id-ID')}
+            </td>
+            <td colspan="3" style="border:1.5px solid #0b386b;"></td>
+            <td style="text-align:right;padding:9px 6px;border:1.5px solid #0b386b;font-size:12.5px;color:#1e40af;white-space:nowrap;">
+              Rp ${grandReal.toLocaleString('id-ID')}
+            </td>
+          </tr>
         </tbody>
       </table>
       <script>window.onload = function() { window.print(); };<\/script>
@@ -305,7 +487,11 @@ export function formatDateRange(startDateStr, endDateStr) {
   return `${s.getDate()} ${monthNames[s.getMonth()]} ${s.getFullYear()} – ${e.getDate()} ${monthNames[e.getMonth()]} ${e.getFullYear()}`;
 }
 
-export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true) {
+export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true, activeKategori = currentActiveKategori) {
+  // Update state kategori aktif
+  currentActiveKategori = activeKategori === 'KMM' ? 'KMM' : 'PPG';
+  const isKmmActive = currentActiveKategori === 'KMM';
+
   // Synchronize with Supabase if requested (e.g. on initial modal open)
   if (shouldSync) {
     try {
@@ -317,13 +503,26 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
   const isSuper = Boolean(currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah'));
   const prokerList = getProkerList();
-  const stats = getProkerStats();
+  const stats = getProkerStats(currentActiveKategori);
 
-  // Filter proker data: Status, Bidang Penanggung Jawab (PIC), Search
-  let filtered = prokerList.filter(p => {
+  const ppgCount = prokerList.filter(p => (p.kategori || 'PPG') === 'PPG').length;
+  const kmmCount = prokerList.filter(p => p.kategori === 'KMM').length;
+
+  // Filter proker berdasarkan kategori aktif (PPG vs KMM)
+  const categoryItems = prokerList.filter(p => isKmmActive ? p.kategori === 'KMM' : (p.kategori || 'PPG') === 'PPG');
+
+  // Filter proker data: Status, Bidang Penanggung Jawab / Sub-bidang, Search
+  let filtered = categoryItems.filter(p => {
     if (filterBidang !== 'all') {
-      const picText = (p.penanggungJawab || '').toLowerCase();
-      if (!picText.includes(filterBidang.toLowerCase())) return false;
+      if (isKmmActive) {
+        const sub = (p.subBidang || '').toLowerCase();
+        const pic = (p.penanggungJawab || '').toLowerCase();
+        const fb = filterBidang.toLowerCase();
+        if (sub !== fb && !pic.includes(fb)) return false;
+      } else {
+        const picText = (p.penanggungJawab || '').toLowerCase();
+        if (!picText.includes(filterBidang.toLowerCase())) return false;
+      }
     }
     if (filterStatus !== 'all' && p.status !== filterStatus) return false;
     if (searchQuery) {
@@ -333,7 +532,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       const matchTujuan = (p.tujuan || '').toLowerCase().includes(q);
       const matchSasaran = (p.sasaran || '').toLowerCase().includes(q);
       const matchPic = (p.penanggungJawab || '').toLowerCase().includes(q);
-      if (!matchKegiatan && !matchTempat && !matchTujuan && !matchSasaran && !matchPic) return false;
+      const matchSub = (p.subBidang || '').toLowerCase().includes(q);
+      if (!matchKegiatan && !matchTempat && !matchTujuan && !matchSasaran && !matchPic && !matchSub) return false;
     }
     return true;
   });
@@ -341,17 +541,47 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   // Sort by 'no' ascending
   filtered.sort((a, b) => (a.no || 0) - (b.no || 0));
 
+  // Category Tab Switcher
+  const categoryTabsHtml = `
+    <div class="proker-category-nav-wrap">
+      <div class="proker-category-tabs">
+        <button type="button" class="proker-cat-btn ${!isKmmActive ? 'active' : ''}" id="catTabPpg" data-cat="PPG">
+          <span class="material-symbols-outlined proker-cat-icon">assignment</span>
+          <div class="proker-cat-text">
+            <span class="proker-cat-title">Program Kerja PPG</span>
+            <span class="proker-cat-subtitle">14 Bidang Pengurus Daerah</span>
+          </div>
+          <span class="proker-cat-badge">${ppgCount} Prog</span>
+        </button>
+        <button type="button" class="proker-cat-btn ${isKmmActive ? 'active' : ''}" id="catTabKmm" data-cat="KMM">
+          <span class="material-symbols-outlined proker-cat-icon">diversity_3</span>
+          <div class="proker-cat-text">
+            <span class="proker-cat-title">Bidang KMM (Muda-Mudi)</span>
+            <span class="proker-cat-subtitle">9 Sub-Bidang / Divisi</span>
+          </div>
+          <span class="proker-cat-badge kmm">${kmmCount} Prog</span>
+        </button>
+      </div>
+    </div>
+  `;
+
   // Role Header Banner
   let bannerNoticeHtml = '';
   if (isSuper) {
+    const bannerTitle = isKmmActive ? 'Wewenang Manajemen Bidang KMM' : 'Wewenang Superadmin Daerah';
+    const bannerSub = isKmmActive
+      ? 'Kelola program kerja untuk 9 sub-bidang KMM (Umum, Sekretaris, Bendahara, Keilmuan, Kemandirian, Keputrian, Olahraga, Kemahasiswaan, Taman Media).'
+      : 'Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️ .';
+    const btnAddText = isKmmActive ? 'Tambah Proker KMM' : 'Tambah Program Kerja';
+
     bannerNoticeHtml = `
       <div class="proker-banner-gold">
         <div class="proker-banner-gold-content">
-          <div class="proker-banner-gold-title">Wewenang Superadmin Daerah</div>
-          <div class="proker-banner-gold-sub">Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️ .</div>
+          <div class="proker-banner-gold-title">${bannerTitle}</div>
+          <div class="proker-banner-gold-sub">${bannerSub}</div>
         </div>
         <button type="button" id="btnTambahProkerBaru" class="btn-proker-banner-gold">
-          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span> Tambah Program Kerja
+          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span> ${btnAddText}
         </button>
       </div>
     `;
@@ -359,7 +589,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     bannerNoticeHtml = `
       <div class="proker-banner-wilayah">
         <strong>Mode Koordinasi Wilayah (${currentUser.tingkatan === 'desa' ? 'Tingkat Desa ' + (currentUser.desaNama || '') : 'Pamong Kelompok ' + (currentUser.kelompokNama || '')}):</strong><br/>
-        Berikut adalah agenda resmi Program Kerja PPG Solo Selatan beserta rincian sasaran, tujuan, waktu, dan tempat pelaksanaan kegiatan.
+        Berikut adalah agenda resmi Program Kerja ${isKmmActive ? 'Bidang KMM (9 Divisi)' : 'PPG Solo Selatan'} beserta rincian sasaran, tujuan, waktu, dan tempat pelaksanaan kegiatan.
       </div>
     `;
   }
@@ -372,7 +602,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
           <div class="proker-stat-info">
-            <span class="stat-label">TOTAL PROGRAM</span>
+            <span class="stat-label">TOTAL PROGRAM ${isKmmActive ? 'KMM' : 'PPG'}</span>
             <span class="stat-num">${stats.total} <span class="stat-unit">Prog</span></span>
           </div>
         </div>
@@ -397,17 +627,17 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon">payments</span>
           <div class="proker-stat-info">
-            <span class="stat-label">EST. BIAYA (RAB AWAL)</span>
+            <span class="stat-label">EST. BIAYA (${isKmmActive ? 'RAB KMM' : 'RAB KONSOLIDASI'})</span>
             <span class="stat-num">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
-            <span class="stat-sub">Rencana Anggaran Belanja</span>
+            <span class="stat-sub">${isKmmActive ? 'Rencana Anggaran 9 Divisi KMM' : `Termasuk alokasi KMM Rp ${(stats.kmmAnggaran || 0).toLocaleString('id-ID')}`}</span>
           </div>
         </div>
         <div class="proker-stat-box">
           <span class="material-symbols-outlined proker-stat-icon" style="color:#0e7039;">account_balance_wallet</span>
           <div class="proker-stat-info">
-            <span class="stat-label">REALISASI DANA (LPJ)</span>
+            <span class="stat-label">REALISASI DANA (${isKmmActive ? 'LPJ KMM' : 'KONSOLIDASI'})</span>
             <span class="stat-num" style="color:#0e7039;">Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</span>
-            <span class="stat-sub">Aktual Pengeluaran LPJ</span>
+            <span class="stat-sub">${isKmmActive ? 'Aktual Pengeluaran KMM' : `PPG Rp ${(stats.ppgRealisasi || 0).toLocaleString('id-ID')} + KMM Rp ${(stats.kmmRealisasi || 0).toLocaleString('id-ID')}`}</span>
           </div>
         </div>
         <div class="proker-stat-box">
@@ -448,9 +678,15 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   `;
 
   // Filter Bar
-  const bidangOptions = DAFTAR_BIDANG_PPG.map(b =>
-    `<option value="${b}" ${filterBidang === b ? 'selected' : ''}>Bidang ${b}</option>`
-  ).join('');
+  const bidangOptions = isKmmActive
+    ? DAFTAR_SUB_BIDANG_KMM.map(sb =>
+      `<option value="${sb}" ${filterBidang === sb ? 'selected' : ''}>Divisi ${sb}</option>`
+    ).join('')
+    : DAFTAR_BIDANG_PPG.map(b =>
+      `<option value="${b}" ${filterBidang === b ? 'selected' : ''}>Bidang ${b}</option>`
+    ).join('');
+
+  const bidangAllLabel = isKmmActive ? 'Semua Sub-Bidang KMM (9 Divisi)' : 'Semua Bidang PPG (14 Bidang)';
 
   const filterHtml = `
     <div class="proker-filter-bar">
@@ -476,7 +712,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
         <div class="proker-filter-col">
           <select id="selectFilterBidang" class="proker-select">
-            <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>Semua Bidang</option>
+            <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>${bidangAllLabel}</option>
             ${bidangOptions}
           </select>
         </div>
@@ -486,10 +722,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       <div class="proker-filter-row-3">
         <div class="proker-export-btns">
           <button type="button" id="btnExportCsv" class="proker-btn-csv" title="Download data dalam format Excel CSV">
-            <span class="material-symbols-outlined" style="font-size:16px;">file_download</span> CSV
+            <span class="material-symbols-outlined" style="font-size:16px;">file_download</span> CSV ${isKmmActive ? 'KMM' : 'PPG'}
           </button>
-          <button type="button" id="btnPrintTable" class="proker-btn-print" title="Cetak dokumen resmi">
+          <button type="button" id="btnPrintTable" class="proker-btn-print" title="Cetak dokumen resmi tab ini">
             <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak
+          </button>
+          <button type="button" id="btnPrintPlenoGabungan" class="proker-btn-gabungan" title="Cetak Buku Pleno Komprehensif Gabungan (PPG + 9 Divisi KMM)">
+            <span class="material-symbols-outlined" style="font-size:16px;">menu_book</span> Buku Gabungan
           </button>
         </div>
 
@@ -587,9 +826,16 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           <td>
             <div style="font-weight:800;font-size:13px;color:var(--text);">${p.kegiatan}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
-              <span style="background:rgba(37,99,235,0.08);color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10.5px;">
-                ${p.penanggungJawab || 'Pengurus PPG'}
-              </span>
+              ${p.kategori === 'KMM' ? `
+                <span class="proker-sub-badge-kmm">
+                  <span class="material-symbols-outlined" style="font-size:12px;">diversity_3</span>
+                  Divisi ${p.subBidang || 'Umum'}
+                </span>
+              ` : `
+                <span style="background:rgba(37,99,235,0.08);color:#1d4ed8;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10.5px;">
+                  ${p.penanggungJawab || 'Pengurus PPG'}
+                </span>
+              `}
             </div>
           </td>
           <td style="white-space:nowrap;">
@@ -783,7 +1029,14 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 <!-- DETAIL PANEL: TERSEMBUNYI SECARA DEFAULT DI MOBILE VIEW -->
                 <div class="proker-card-detail-panel">
                   <div class="proker-card-meta">
-                    <span class="proker-pic-pill">PIC: ${p.penanggungJawab || 'Pengurus PPG'}</span>
+                    ${p.kategori === 'KMM' ? `
+                      <span class="proker-sub-badge-kmm" style="font-size:11px;padding:2px 8px;">
+                        <span class="material-symbols-outlined" style="font-size:13px;">diversity_3</span>
+                        Divisi: ${p.subBidang || 'Umum'}
+                      </span>
+                    ` : `
+                      <span class="proker-pic-pill">PIC: ${p.penanggungJawab || 'Pengurus PPG'}</span>
+                    `}
                     <span class="proker-meta-item">
                       <span class="material-symbols-outlined" style="font-size:15px;color:#94a3b8;">calendar_today</span>
                       ${p.waktu}
@@ -832,6 +1085,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
   openModal('Program Kerja Tahunan PPG Solo Selatan', 'event_note', `
     <div style="display:flex;flex-direction:column;gap:16px;">
+      ${categoryTabsHtml}
       ${bannerNoticeHtml}
       ${statsHtml}
       ${filterHtml}
@@ -840,6 +1094,18 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   `, 'wide');
 
   // Event Listeners
+  // 1. Kategori Switcher (PPG vs KMM)
+  document.getElementById('catTabPpg')?.addEventListener('click', () => {
+    currentActiveKategori = 'PPG';
+    renderProkerModal('all', 'all', '', activeTab, 1, false, 'PPG');
+  });
+
+  document.getElementById('catTabKmm')?.addEventListener('click', () => {
+    currentActiveKategori = 'KMM';
+    renderProkerModal('all', 'all', '', activeTab, 1, false, 'KMM');
+  });
+
+  // 2. Pencarian & Filter
   const searchInput = document.getElementById('inputProkerSearch');
   if (searchInput) {
     searchInput.focus();
@@ -847,46 +1113,53 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     searchInput.value = '';
     searchInput.value = val;
     searchInput.addEventListener('input', (e) => {
-      renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false);
+      renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori);
     });
   }
 
   document.getElementById('selectFilterStatus')?.addEventListener('change', (e) => {
-    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab, 1, false);
+    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab, 1, false, currentActiveKategori);
   });
 
   document.getElementById('selectFilterBidang')?.addEventListener('change', (e) => {
-    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false);
+    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori);
   });
 
+  // 3. Tombol Ekspor CSV & Cetak Dokumen
   document.getElementById('btnExportCsv')?.addEventListener('click', () => {
-    exportProkerCsv();
+    exportProkerCsv(currentActiveKategori);
   });
 
   document.getElementById('btnPrintTable')?.addEventListener('click', () => {
-    printProkerTable();
+    printProkerTable(currentActiveKategori);
   });
 
+  document.getElementById('btnPrintPlenoGabungan')?.addEventListener('click', () => {
+    printProkerBukuPlenoLengkap();
+  });
+
+  // 4. View Switcher (Tabel vs Timeline)
   document.getElementById('tabViewTable')?.addEventListener('click', () => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, 'table', currentPage, false);
+    renderProkerModal(filterBidang, filterStatus, searchQuery, 'table', currentPage, false, currentActiveKategori);
   });
 
   document.getElementById('tabViewTimeline')?.addEventListener('click', () => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline', currentPage, false);
+    renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline', currentPage, false, currentActiveKategori);
   });
 
-  // Pagination click listeners
+  // 5. Pagination
   modalBody.querySelectorAll('.proker-page-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const pNum = parseInt(btn.dataset.page);
       if (pNum && pNum >= 1 && pNum <= totalPages && pNum !== currentPage) {
-        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, pNum, false);
+        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, pNum, false, currentActiveKategori);
       }
     });
   });
 
+  // 6. Tambah Program Kerja Baru
   document.getElementById('btnTambahProkerBaru')?.addEventListener('click', () => {
-    renderAddEditProkerForm(null);
+    renderAddEditProkerForm(null, currentActiveKategori);
   });
 
   // Aksi Cepat Pergantian Realisasi Proker (Terlaksana / Belum Terlaksana) Langsung Tersimpan
@@ -896,13 +1169,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       const newStatus = select.value;
       await updateRealisasiProker(pId, { realisasiStatus: newStatus });
       showToast(`Realisasi program diubah menjadi "${newStatus === 'terlaksana' ? 'Terlaksana' : 'Belum Terlaksana'}"`, 'info');
-      renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
+      renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori);
       renderInlineProkerWidget();
       appHooks.renderUserProfile();
     });
   });
 
-  // Tombol Pelaporan LPJ & Realisasi Dana Khusus
+  // Tombol Mode Pleno (Menayangkan Agenda Terpilih)
   modalBody.querySelectorAll('.btn-proker-preview').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -924,8 +1197,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   // Accordion Dropdown: Tampilkan / Sembunyikan Detil Program Kerja
   modalBody.querySelectorAll('.proker-card-header').forEach(header => {
     header.addEventListener('click', (e) => {
-      // Abaikan jika user mengklik tombol edit, hapus, atau LPJ
-      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del') || e.target.closest('.btn-proker-lpj')) {
+      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del') || e.target.closest('.btn-proker-lpj') || e.target.closest('.btn-proker-preview')) {
         return;
       }
       const card = header.closest('.proker-card-item');
@@ -955,7 +1227,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       e.stopPropagation();
       const pId = btn.dataset.id;
       const prokerItem = prokerList.find(p => p.id === pId);
-      if (prokerItem) renderAddEditProkerForm(prokerItem);
+      if (prokerItem) renderAddEditProkerForm(prokerItem, currentActiveKategori);
     });
   });
 
@@ -976,7 +1248,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         onConfirm: async () => {
           await deleteProker(pId);
           showToast(`Program kerja "${pTitle}" berhasil dihapus`, 'success');
-          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false);
+          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori);
           renderInlineProkerWidget();
           appHooks.renderUserProfile();
         }
@@ -1082,7 +1354,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
 
         <!-- HERO STATUS & JUDUL AGENDA -->
         <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <span class="proker-pleno-badge-terlaksana ${isTerlaksana ? 'is-yes' : 'is-no'}">
               <span class="material-symbols-outlined" style="font-size:15px;">${isTerlaksana ? 'check_circle' : 'pending_actions'}</span>
               <span>${isTerlaksana ? 'TERLAKSANA' : 'BELUM TERLAKSANA'}</span>
@@ -1090,6 +1362,12 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
             <span class="proker-pleno-badge-substatus">
               ${statusLabel.toUpperCase()}
             </span>
+            ${currentItem.kategori === 'KMM' ? `
+              <span class="proker-sub-badge-kmm" style="font-size:11px;padding:3px 10px;">
+                <span class="material-symbols-outlined" style="font-size:14px;">diversity_3</span>
+                KMM &bull; Divisi ${currentItem.subBidang || 'Umum'}
+              </span>
+            ` : ''}
           </div>
 
           <h2 style="margin:4px 0 2px;font-size:20px;font-weight:900;color:var(--text);line-height:1.35;">
@@ -1099,7 +1377,11 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
           <div style="font-size:12.5px;color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
             <span>Tingkat Pelaksanaan: <strong style="color:var(--text);">Daerah Solo Selatan</strong></span>
             <span>&bull;</span>
-            <span>Penanggung Jawab: <strong style="color:#1d4ed8;">${currentItem.penanggungJawab || 'Sekretaris & Ketua'}</strong></span>
+            ${currentItem.kategori === 'KMM' ? `
+              <span>Divisi: <strong style="color:#7c3aed;">Divisi ${currentItem.subBidang || 'Umum'}</strong></span>
+            ` : `
+              <span>Penanggung Jawab: <strong style="color:#1d4ed8;">${currentItem.penanggungJawab || 'Sekretaris & Ketua'}</strong></span>
+            `}
           </div>
 
           <div style="border-bottom:1.5px dashed var(--border);margin:8px 0 12px;"></div>
@@ -1240,7 +1522,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
   if (isSuper) {
     document.getElementById('btnPlenoEdit')?.addEventListener('click', () => {
       closePlenoPresentation();
-      renderAddEditProkerForm(currentItem);
+      renderAddEditProkerForm(currentItem, currentItem.kategori || currentActiveKategori);
     });
 
     document.getElementById('btnPlenoDel')?.addEventListener('click', () => {
@@ -1256,7 +1538,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
           await deleteProker(currentItem.id);
           closePlenoPresentation();
           showToast(`Program kerja "${currentItem.kegiatan}" berhasil dihapus`, 'success');
-          renderProkerModal();
+          renderProkerModal('all', 'all', '', 'timeline', 1, false, currentItem.kategori || currentActiveKategori);
           renderInlineProkerWidget();
           appHooks.renderUserProfile();
         }
@@ -1298,8 +1580,8 @@ export function renderLaporRealisasiModal(p) {
       <div style="background:var(--bg);padding:14px;border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
           <div>
-            <span style="font-size:11px;font-weight:700;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;">
-              BIDANG: ${(p.penanggungJawab || 'Pengurus PPG').toUpperCase()}
+            <span style="font-size:11px;font-weight:700;background:${p.kategori === 'KMM' ? '#f3e8ff' : '#dbeafe'};color:${p.kategori === 'KMM' ? '#7e22ce' : '#1e40af'};padding:2px 8px;border-radius:4px;">
+              ${p.kategori === 'KMM' ? `KMM - DIVISI ${(p.subBidang || 'Umum').toUpperCase()}` : `BIDANG: ${(p.penanggungJawab || 'Pengurus PPG').toUpperCase()}`}
             </span>
             <h4 style="margin:6px 0 2px;font-size:15px;color:var(--text);font-weight:800;">${p.kegiatan}</h4>
           </div>
@@ -1411,7 +1693,7 @@ export function renderLaporRealisasiModal(p) {
   });
 
   document.querySelector('.btn-back-to-proker-modal')?.addEventListener('click', () => {
-    renderProkerModal();
+    renderProkerModal('all', 'all', '', 'timeline', 1, false, p.kategori || currentActiveKategori);
   });
 
   document.getElementById('formLaporLpj')?.addEventListener('submit', async (e) => {
@@ -1429,23 +1711,52 @@ export function renderLaporRealisasiModal(p) {
     });
 
     showToast(`Laporan Realisasi & LPJ "${p.kegiatan}" berhasil disimpan!`, 'success');
-    renderProkerModal();
+    renderProkerModal('all', 'all', '', 'timeline', 1, false, p.kategori || currentActiveKategori);
     renderInlineProkerWidget();
     appHooks.renderUserProfile();
   });
 }
 
-export async function renderAddEditProkerForm(p = null) {
+export async function renderAddEditProkerForm(p = null, defaultKategori = currentActiveKategori) {
   const isEdit = !!p;
-  const modalTitleText = isEdit ? `Edit Program Kerja: ${p.kegiatan}` : 'Tambah Program Kerja Baru';
+  let formKategori = p?.kategori || defaultKategori || currentActiveKategori || 'PPG';
   const prokerList = getProkerList();
-  const autoNo = isEdit ? p.no : (prokerList.length > 0 ? Math.max(...prokerList.map(item => item.no || 0)) + 1 : 1);
 
-  // Opsi Bidang PIC
-  const picOptions = DAFTAR_BIDANG_PPG.map(b => {
-    const isSelected = isEdit ? (p.penanggungJawab === b || (p.penanggungJawab && p.penanggungJawab.includes(b))) : false;
-    return `<option value="${b}" ${isSelected ? 'selected' : ''}>Bidang ${b}</option>`;
-  }).join('');
+  const getNextNoForCat = (cat) => {
+    const catList = prokerList.filter(item => (item.kategori || 'PPG') === cat);
+    return catList.length > 0 ? Math.max(...catList.map(item => item.no || 0)) + 1 : 1;
+  };
+
+  let autoNo = isEdit ? p.no : getNextNoForCat(formKategori);
+
+  const modalTitleText = isEdit
+    ? `Edit Program Kerja ${formKategori === 'KMM' ? 'Bidang KMM' : 'PPG'}: ${p.kegiatan}`
+    : `Tambah Program Kerja Baru (${formKategori === 'KMM' ? 'Bidang KMM' : 'PPG Daerah'})`;
+
+  // Helper untuk generate opsi PIC dropdown
+  function getPicOptionsHtml(cat, selectedVal = '') {
+    if (cat === 'KMM') {
+      const matchSub = p?.subBidang || selectedVal;
+      return `
+        <option value="">-- Pilih Salah Satu dari 9 Divisi KMM --</option>
+        ${DAFTAR_SUB_BIDANG_KMM.map(sb => {
+        const isSel = (matchSub === sb || (selectedVal && selectedVal.includes(sb)));
+        return `<option value="${sb}" ${isSel ? 'selected' : ''}>Divisi ${sb}</option>`;
+      }).join('')}
+      `;
+    } else {
+      const matchPj = p?.penanggungJawab || selectedVal;
+      return `
+        <option value="">-- Pilih Salah Satu dari 14 Bidang Pengurus PPG --</option>
+        ${DAFTAR_BIDANG_PPG.map(b => {
+        const isSel = (matchPj === b || (matchPj && matchPj.includes(b)));
+        return `<option value="${b}" ${isSel ? 'selected' : ''}>Bidang ${b}</option>`;
+      }).join('')}
+      `;
+    }
+  }
+
+  const initialPicOptions = getPicOptionsHtml(formKategori, p?.subBidang || p?.penanggungJawab || '');
 
   openModal(modalTitleText, isEdit ? 'edit_note' : 'add_task', `
     ${!isEdit ? `
@@ -1463,15 +1774,34 @@ export async function renderAddEditProkerForm(p = null) {
     <form id="formAddEditProker" style="display:flex;flex-direction:column;gap:14px;">
       <input type="hidden" id="prokerInputNo" value="${autoNo}" />
 
+      <!-- 0. Kategori Switcher (PPG vs KMM) -->
+      <div style="background:var(--surface-2);padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;">
+        <label style="font-size:11.5px;font-weight:800;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">category</span>
+          KATEGORI PROGRAM KERJA *
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label style="display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid ${formKategori === 'PPG' ? '#2563eb' : 'var(--border)'};background:${formKategori === 'PPG' ? '#eff6ff' : 'var(--surface)'};cursor:pointer;font-weight:700;font-size:12.5px;color:${formKategori === 'PPG' ? '#1d4ed8' : 'var(--text)'};">
+            <input type="radio" name="prokerInputKategori" value="PPG" ${formKategori === 'PPG' ? 'checked' : ''} style="accent-color:#2563eb;" />
+            <span class="material-symbols-outlined" style="font-size:17px;">assignment</span>
+            Program PPG (14 Bidang)
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid ${formKategori === 'KMM' ? '#db2777' : 'var(--border)'};background:${formKategori === 'KMM' ? '#fdf2f8' : 'var(--surface)'};cursor:pointer;font-weight:700;font-size:12.5px;color:${formKategori === 'KMM' ? '#be185d' : 'var(--text)'};">
+            <input type="radio" name="prokerInputKategori" value="KMM" ${formKategori === 'KMM' ? 'checked' : ''} style="accent-color:#db2777;" />
+            <span class="material-symbols-outlined" style="font-size:17px;">diversity_3</span>
+            Bidang KMM (9 Divisi)
+          </label>
+        </div>
+      </div>
+
       <!-- 1. PIC Bidang Penanggung Jawab di Atas -->
       <div style="background:var(--bg);padding:12px 14px;border:1px solid var(--border);border-radius:10px;">
-        <label style="font-size:11.5px;font-weight:800;color:var(--blue-dark);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+        <label id="lblProkerPicText" style="font-size:11.5px;font-weight:800;color:var(--blue-dark);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
           <span class="material-symbols-outlined" style="font-size:16px;">badge</span>
-          BIDANG PENANGGUNG JAWAB (PIC) *
+          ${formKategori === 'KMM' ? 'SUB-BIDANG / DIVISI KMM *' : 'BIDANG PENANGGUNG JAWAB (PIC) *'}
         </label>
         <select id="prokerInputPic" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;background:var(--surface);color:var(--text);outline:none;">
-          <option value="">-- Pilih Salah Satu dari 14 Bidang Pengurus PPG --</option>
-          ${picOptions}
+          ${initialPicOptions}
         </select>
       </div>
 
@@ -1587,6 +1917,26 @@ export async function renderAddEditProkerForm(p = null) {
     </form>
   `);
 
+  // Dinamis: Ketika user mengubah kategori PPG / KMM di form modal
+  const catRadios = modalBody.querySelectorAll('input[name="prokerInputKategori"]');
+  catRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const selectedCat = e.target.value;
+      const selectPic = document.getElementById('prokerInputPic');
+      const lblPic = document.getElementById('lblProkerPicText');
+      const inputNo = document.getElementById('prokerInputNo');
+
+      if (selectPic && lblPic) {
+        lblPic.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">badge</span> ${selectedCat === 'KMM' ? 'SUB-BIDANG / DIVISI KMM *' : 'BIDANG PENANGGUNG JAWAB (PIC) *'}`;
+        selectPic.innerHTML = getPicOptionsHtml(selectedCat);
+      }
+
+      if (!isEdit && inputNo) {
+        inputNo.value = getNextNoForCat(selectedCat);
+      }
+    });
+  });
+
   // Auto Format Date Picker
   const pStart = document.getElementById('prokerPickerStart');
   const pEnd = document.getElementById('prokerPickerEnd');
@@ -1594,7 +1944,6 @@ export async function renderAddEditProkerForm(p = null) {
 
   function syncDateRangeText() {
     if (pStart.value || pEnd.value) {
-      // If only start selected, default end to same date
       const sVal = pStart.value;
       const eVal = pEnd.value || sVal;
       const formatted = formatDateRange(sVal, eVal);
@@ -1617,7 +1966,7 @@ export async function renderAddEditProkerForm(p = null) {
   });
 
   document.querySelector('.btn-cancel-proker-form')?.addEventListener('click', () => {
-    renderProkerModal();
+    renderProkerModal('all', 'all', '', 'timeline', 1, false, currentActiveKategori);
   });
 
   if (!isEdit) {
@@ -1653,6 +2002,10 @@ export async function renderAddEditProkerForm(p = null) {
             const cols = lines[i].split(';');
             if (cols.length >= 8) {
               const clean = (str) => str ? str.replace(/(^"|"$)/g, '').trim() : '';
+              const picVal = clean(cols[7]);
+              const isKmmRow = DAFTAR_SUB_BIDANG_KMM.some(sb => picVal.toLowerCase().includes(sb.toLowerCase())) || picVal.toLowerCase().includes('kmm');
+              const subB = isKmmRow ? (DAFTAR_SUB_BIDANG_KMM.find(sb => picVal.toLowerCase().includes(sb.toLowerCase())) || 'Umum') : '';
+
               await addProker({
                 kegiatan: clean(cols[0]),
                 waktu: clean(cols[1]),
@@ -1661,7 +2014,9 @@ export async function renderAddEditProkerForm(p = null) {
                 rincianBiaya: clean(cols[4]),
                 estBiaya: parseInt(clean(cols[5])) || 0,
                 tempat: clean(cols[6]),
-                penanggungJawab: clean(cols[7]),
+                penanggungJawab: isKmmRow ? `KMM - ${subB}` : picVal,
+                kategori: isKmmRow ? 'KMM' : 'PPG',
+                subBidang: subB,
                 status: 'planned',
                 targetWilayah: 'Daerah Solo Selatan'
               });
@@ -1669,7 +2024,7 @@ export async function renderAddEditProkerForm(p = null) {
             }
           }
           alert('Berhasil mengimpor ' + count + ' program kerja!');
-          renderProkerModal();
+          renderProkerModal('all', 'all', '', 'timeline', 1, false, currentActiveKategori);
           appHooks.renderUserProfile();
         } else {
           alert('Format CSV kosong atau tidak valid.');
@@ -1682,8 +2037,21 @@ export async function renderAddEditProkerForm(p = null) {
   document.getElementById('formAddEditProker')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const selectedKategori = document.querySelector('input[name="prokerInputKategori"]:checked')?.value || formKategori;
+    const rawPic = document.getElementById('prokerInputPic').value.trim();
+    let subBidang = '';
+    let penanggungJawab = rawPic;
+
+    if (selectedKategori === 'KMM') {
+      subBidang = rawPic;
+      penanggungJawab = `KMM - ${rawPic}`;
+    }
+
     const prokerDataPayload = {
       no: document.getElementById('prokerInputNo').value,
+      kategori: selectedKategori,
+      subBidang,
+      penanggungJawab,
       kegiatan: document.getElementById('prokerInputKegiatan').value.trim(),
       waktu: document.getElementById('prokerInputWaktu').value.trim(),
       tempat: document.getElementById('prokerInputTempat').value.trim(),
@@ -1692,7 +2060,6 @@ export async function renderAddEditProkerForm(p = null) {
       rincianBiaya: document.getElementById('prokerInputRincianBiaya').value.trim(),
       estBiaya: document.getElementById('prokerInputEstBiaya').value,
       status: document.getElementById('prokerInputStatus').value,
-      penanggungJawab: document.getElementById('prokerInputPic').value.trim(),
       targetWilayah: 'Daerah Solo Selatan',
       realisasiStatus: document.getElementById('prokerInputRealisasiStatus')?.value || 'belum_terlaksana',
       realisasiBiaya: parseFloat(document.getElementById('prokerInputRealisasiBiaya')?.value) || 0,
@@ -1708,7 +2075,8 @@ export async function renderAddEditProkerForm(p = null) {
       showToast(`Program Kerja "${prokerDataPayload.kegiatan}" berhasil ditambahkan!`, 'success');
     }
 
-    renderProkerModal();
+    currentActiveKategori = selectedKategori;
+    renderProkerModal('all', 'all', '', 'timeline', 1, false, selectedKategori);
     renderInlineProkerWidget();
     appHooks.renderUserProfile();
   });
@@ -1856,6 +2224,18 @@ export function renderInlineProkerWidget() {
           </div>
           <div class="proker-details hidden md:block mt-2.5">
             <div class="proker-meta">
+              ${item.kategori === 'KMM' ? `
+                <span class="proker-sub-badge-kmm" style="font-size:10px;padding:2px 7px;">
+                  <span class="material-symbols-outlined" style="font-size:12px;">diversity_3</span>
+                  Divisi ${item.subBidang || 'Umum'}
+                </span>
+                <span class="proker-meta-sep">&bull;</span>
+              ` : `
+                <span class="proker-pic-pill" style="font-size:10px;padding:2px 7px;">
+                  ${item.penanggungJawab || 'PPG'}
+                </span>
+                <span class="proker-meta-sep">&bull;</span>
+              `}
               <span class="proker-meta-item">
                 <span class="material-symbols-outlined ms-proker-ic">calendar_today</span>
                 <span>${item.waktu}</span>
