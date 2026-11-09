@@ -1049,30 +1049,39 @@ export async function fetchProkerFromSupabase() {
       7: 'Ketua, Sekretaris & Bendahara'
     };
 
-    const mapped = (data || []).map(row => ({
-      id: row.id,
-      no: row.nomor_urut || 1,
-      kegiatan: row.judul_program || 'Program Kerja',
-      waktu: row.waktu_pelaksanaan || '-',
-      sasaran: row.sasaran_peserta || '-',
-      tujuan: row.tujuan_kegiatan || '-',
-      rincianBiaya: row.rincian_biaya || '-',
-      estBiaya: Number(row.estimasi_biaya) || 0,
-      tempat: row.tempat_pelaksanaan || '-',
-      status: statusMapFromDb[row.status] || row.status || 'planned',
-      tingkatWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
-      targetWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
-      penanggungJawab: row.penanggung_jawab_id || defaultPicByNo[row.nomor_urut] || 'Pengurus PPG',
-      kategori: row.kategori || (String(row.penanggung_jawab_id || '').startsWith('KMM') ? 'KMM' : 'PPG'),
-      subBidang: row.sub_bidang || '',
-      semester: row.semester || 1,
-      realisasiStatus: row.realisasi_status || (row.status === 'selesai' ? 'terlaksana' : 'belum_terlaksana'),
-      deskripsiRealisasi: row.deskripsi_realisasi || '',
-      realisasiBiaya: Number(row.realisasi_biaya) || 0,
-      tglRealisasi: row.tgl_realisasi || null,
-      desaId: row.desa_id,
-      kelompokId: row.kelompok_id
-    }));
+    const mapped = (data || []).map(row => {
+      const isKmmRow = (row.kategori === 'KMM') || String(row.penanggung_jawab_id || '').toUpperCase().startsWith('KMM');
+      let subBidang = row.sub_bidang || '';
+      if (isKmmRow && !subBidang) {
+        const pj = String(row.penanggung_jawab_id || '');
+        subBidang = pj.startsWith('KMM - ') ? pj.replace('KMM - ', '').trim() : 'Umum';
+      }
+
+      return {
+        id: row.id,
+        no: row.nomor_urut || 1,
+        kegiatan: row.judul_program || 'Program Kerja',
+        waktu: row.waktu_pelaksanaan || '-',
+        sasaran: row.sasaran_peserta || '-',
+        tujuan: row.tujuan_kegiatan || '-',
+        rincianBiaya: row.rincian_biaya || '-',
+        estBiaya: Number(row.estimasi_biaya) || 0,
+        tempat: row.tempat_pelaksanaan || '-',
+        status: statusMapFromDb[row.status] || row.status || 'planned',
+        tingkatWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
+        targetWilayah: row.tingkat_wilayah || 'Tingkat Daerah',
+        penanggungJawab: row.penanggung_jawab_id || defaultPicByNo[row.nomor_urut] || (isKmmRow ? `KMM - ${subBidang || 'Umum'}` : 'Pengurus PPG'),
+        kategori: isKmmRow ? 'KMM' : (row.kategori || 'PPG'),
+        subBidang: isKmmRow ? (subBidang || 'Umum') : '',
+        semester: row.semester || 1,
+        realisasiStatus: row.realisasi_status || (row.status === 'selesai' ? 'terlaksana' : 'belum_terlaksana'),
+        deskripsiRealisasi: row.deskripsi_realisasi || '',
+        realisasiBiaya: Number(row.realisasi_biaya) || 0,
+        tglRealisasi: row.tgl_realisasi || null,
+        desaId: row.desa_id,
+        kelompokId: row.kelompok_id
+      };
+    });
 
     return { success: true, data: mapped };
   } catch (err) {
@@ -1095,6 +1104,9 @@ export async function upsertProkerToSupabase(proker) {
 
     const isUuid = typeof proker.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(proker.id);
 
+    const isKmm = proker.kategori === 'KMM' || String(proker.penanggungJawab || '').toUpperCase().startsWith('KMM');
+    const penanggungJawab = proker.penanggungJawab || (isKmm ? `KMM - ${proker.subBidang || 'Umum'}` : 'Pengurus PPG');
+
     const record = {
       nomor_urut: parseInt(proker.no) || 1,
       judul_program: proker.kegiatan,
@@ -1107,6 +1119,9 @@ export async function upsertProkerToSupabase(proker) {
       status: statusMapToDb[proker.status] || proker.status || 'direncanakan',
       tingkat_wilayah: proker.tingkatWilayah || 'daerah',
       semester: parseInt(proker.semester) || 1,
+      penanggung_jawab_id: penanggungJawab,
+      kategori: isKmm ? 'KMM' : 'PPG',
+      sub_bidang: isKmm ? (proker.subBidang || 'Umum') : null,
       realisasi_status: proker.realisasiStatus || (proker.status === 'done' ? 'terlaksana' : 'belum_terlaksana'),
       deskripsi_realisasi: proker.deskripsiRealisasi || null,
       realisasi_biaya: Number(proker.realisasiBiaya) || 0,
@@ -1121,9 +1136,11 @@ export async function upsertProkerToSupabase(proker) {
       .select()
       .single();
 
-    // Fallback gracefully if realisasi columns not migrated yet on remote Supabase DB
-    if (error && (String(error.message || '').includes('realisasi') || error.code === '42703')) {
+    // Fallback gracefully if kategori / sub_bidang / realisasi columns not migrated yet on remote Supabase DB
+    if (error && (String(error.message || '').includes('kategori') || String(error.message || '').includes('sub_bidang') || String(error.message || '').includes('realisasi') || error.code === '42703')) {
       const fallbackRecord = { ...record };
+      delete fallbackRecord.kategori;
+      delete fallbackRecord.sub_bidang;
       delete fallbackRecord.realisasi_status;
       delete fallbackRecord.deskripsi_realisasi;
       delete fallbackRecord.realisasi_biaya;

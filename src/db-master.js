@@ -1032,20 +1032,23 @@ const PROKER_STORAGE_KEY = "ppg_program_kerja_v1";
 
 export function getProkerList() {
   try {
-    const combinedDefaults = [...DEFAULT_PROKER_LIST, ...DEFAULT_KMM_PROKER_LIST];
     const raw = localStorage.getItem(PROKER_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(combinedDefaults));
-      return combinedDefaults;
+      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(DEFAULT_PROKER_LIST));
+      return DEFAULT_PROKER_LIST;
     }
     let parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(combinedDefaults));
-      return combinedDefaults;
+      localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(DEFAULT_PROKER_LIST));
+      return DEFAULT_PROKER_LIST;
     }
 
-    // Auto-migrasi data lokal lama agar memiliki field kategori & realisasi LPJ
-    let hasMigration = false;
+    // Bersihkan mock dummy local proker KMM lama (hanya gunakan data nyata dari Supabase)
+    const initialLen = parsed.length;
+    parsed = parsed.filter(p => !String(p.id).startsWith('proker-kmm-'));
+    let hasMigration = parsed.length !== initialLen;
+
+    // Auto-migrasi data lokal agar memiliki field kategori & realisasi LPJ
     parsed = parsed.map(item => {
       let isChanged = false;
       let realisasiStatus = item.realisasiStatus;
@@ -1065,7 +1068,7 @@ export function getProkerList() {
       }
       let kategori = item.kategori;
       if (!kategori) {
-        kategori = 'PPG';
+        kategori = String(item.penanggungJawab || '').toUpperCase().startsWith('KMM') ? 'KMM' : 'PPG';
         isChanged = true;
       }
       let subBidang = item.subBidang;
@@ -1089,20 +1092,13 @@ export function getProkerList() {
       };
     });
 
-    // Injeksi otomatis data default KMM jika belum ada sama sekali di data lokal
-    const hasKmm = parsed.some(p => p.kategori === 'KMM');
-    if (!hasKmm) {
-      parsed = [...parsed, ...DEFAULT_KMM_PROKER_LIST];
-      hasMigration = true;
-    }
-
     if (hasMigration) {
       localStorage.setItem(PROKER_STORAGE_KEY, JSON.stringify(parsed));
     }
 
     return parsed;
   } catch (e) {
-    return [...DEFAULT_PROKER_LIST, ...DEFAULT_KMM_PROKER_LIST];
+    return [...DEFAULT_PROKER_LIST];
   }
 }
 

@@ -138,6 +138,93 @@ export async function exportProkerCsv(kategori = currentActiveKategori) {
   URL.revokeObjectURL(url);
 }
 
+// ── TABEL REKAPAN UMUM BIDANG KMM (9 DIVISI) SESUAI FORMAT RESMI EXCEL (GAMBAR 2) ──
+export function generateKmmRekapanUmumTableHtml(kmmItems = []) {
+  const SUB_BIDANG_MAP = [
+    { key: 'Umum', label: 'UMUM' },
+    { key: 'Sekretaris', label: 'SEKRETARIS' },
+    { key: 'Bendahara', label: 'BENDAHARA' },
+    { key: 'Keilmuan', label: 'SIE KEILMUAN' },
+    { key: 'Kemandirian', label: 'KEMANDIRIAN' },
+    { key: 'Keputrian', label: 'SIE KEPUTRIAN' },
+    { key: 'Olahraga', label: 'SIE OLAHRAGA' },
+    { key: 'Kemahasiswaan', label: 'KEMAHASISWAAN' },
+    { key: 'Taman Media', label: 'TAMAN MEDIA' }
+  ];
+
+  let totalKmmEst = 0;
+
+  const rows = SUB_BIDANG_MAP.map((item, idx) => {
+    const matchingProker = kmmItems.filter(p => {
+      const sub = (p.subBidang || '').toLowerCase();
+      const pj = (p.penanggungJawab || '').toLowerCase();
+      const k = item.key.toLowerCase();
+      return sub === k || pj.includes(k);
+    });
+
+    const estSum = matchingProker.reduce((sum, p) => sum + (Number(p.estBiaya) || 0), 0);
+    totalKmmEst += estSum;
+
+    const formattedEst = estSum > 0 ? `Rp ${estSum.toLocaleString('id-ID')}` : 'Rp -';
+
+    // Rincian Biaya: Terlampir with rowspan=9 on the first row
+    const rincianCell = (idx === 0)
+      ? `<td rowspan="9" style="text-align:center;vertical-align:middle;padding:10px 6px;border:1px solid #000;font-weight:bold;color:#0066cc;font-size:12px;letter-spacing:0.3px;">Terlampir</td>`
+      : '';
+
+    return `
+      <tr style="height:26px;">
+        <td style="text-align:center;padding:5px 4px;border:1px solid #000;font-weight:bold;font-size:11px;">${idx + 1}</td>
+        <td style="padding:5px 8px;border:1px solid #000;font-weight:bold;font-size:11px;letter-spacing:0.3px;">${item.label}</td>
+        <td style="border:1px solid #000;width:80px;"></td>
+        <td style="border:1px solid #000;width:110px;"></td>
+        <td style="border:1px solid #000;width:140px;"></td>
+        ${rincianCell}
+        <td style="text-align:right;padding:5px 8px;border:1px solid #000;font-weight:bold;font-size:11px;white-space:nowrap;">
+          ${formattedEst}
+        </td>
+        <td style="text-align:center;padding:5px 6px;border:1px solid #000;font-size:11px;font-weight:600;">Daerah</td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <div class="kmm-rekapan-section" style="margin-bottom:24px;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;border:1.5px solid #000;margin-top:6px;">
+        <thead>
+          <tr style="background:#f1f5f9;">
+            <th style="width:35px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">NO</th>
+            <th style="min-width:180px;text-align:center;border:1px solid #000;padding:6px 8px;font-weight:800;font-size:10px;">KEGIATAN</th>
+            <th style="width:80px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">WAKTU</th>
+            <th style="width:110px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">SASARAN/<br/>PESERTA</th>
+            <th style="width:140px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">TUJUAN KEGIATAN</th>
+            <th style="width:110px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">RINCIAN BIAYA</th>
+            <th style="width:125px;text-align:center;border:1px solid #000;padding:6px 8px;font-weight:800;font-size:10px;">EST. BIAYA</th>
+            <th style="width:100px;text-align:center;border:1px solid #000;padding:6px 6px;font-weight:800;font-size:10px;">TEMPAT<br/>PELAKSANAAN</th>
+          </tr>
+          <tr style="background:#8b0000;color:#ffffff;">
+            <td colspan="8" style="padding:8px 10px;border:1px solid #000;font-weight:900;font-size:13px;letter-spacing:0.5px;">
+              G. KEGIATAN MUDA MUDI (2026)
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr style="background:#ffffff;font-weight:bold;border-top:2px solid #000;border-bottom:2px solid #000;height:28px;">
+            <td colspan="6" style="text-align:right;padding:7px 10px;border:1px solid #000;font-weight:900;font-size:11.5px;letter-spacing:0.5px;">
+              SUB TOTAL
+            </td>
+            <td style="text-align:right;padding:7px 8px;border:1px solid #000;font-weight:900;font-size:12px;white-space:nowrap;">
+              Rp ${totalKmmEst.toLocaleString('id-ID')}
+            </td>
+            <td style="border:1px solid #000;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function generatePrintRows(items, isKmm) {
   const grouped = items.reduce((acc, curr) => {
     let pic = isKmm
@@ -237,6 +324,7 @@ export async function printProkerTable(kategori = currentActiveKategori) {
   if (!printWindow) return;
 
   const { rowsHtml, catTotalEst, catTotalReal } = generatePrintRows(prokerList, isKmm);
+  const rekapanUmumHtml = isKmm ? generateKmmRekapanUmumTableHtml(prokerList) : '';
 
   const titleText = isKmm
     ? 'PROGRAM KERJA & LAPORAN REALISASI ANGGARAN BIDANG KEGIATAN MUDA-MUDI (KMM)'
@@ -254,6 +342,7 @@ export async function printProkerTable(kategori = currentActiveKategori) {
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 16px; color:#1e293b; }
         h2 { margin: 0 0 2px 0; color: #0b386b; font-size: 16px; font-weight: 800; }
+        h3 { margin: 16px 0 6px 0; color: #1e40af; font-size: 13px; font-weight: 800; border-bottom: 1.5px solid #94a3b8; padding-bottom: 4px; }
         p { margin: 2px 0 12px 0; font-size: 11px; color:#64748b; }
         table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
         th { background: #f1f5f9; padding: 7px 5px; border:1px solid #94a3b8; text-align: left; font-size: 9.5px; font-weight: 800; color:#334155; }
@@ -262,6 +351,7 @@ export async function printProkerTable(kategori = currentActiveKategori) {
           button { display: none; }
           body { margin: 8px; }
           @page { size: landscape; margin: 8mm; }
+          .page-break { page-break-before: always; }
         }
       </style>
     </head>
@@ -275,6 +365,13 @@ export async function printProkerTable(kategori = currentActiveKategori) {
         <div><strong>Penyerapan:</strong> ${stats.persenRealisasiDana}%</div>
         <div><strong>Ketercapaian:</strong> ${stats.totalTerlaksana} Terlaksana &bull; ${stats.totalBelumTerlaksana} Belum</div>
       </div>
+
+      ${isKmm ? `
+        <h3 style="margin:16px 0 6px 0; color:#8b0000; font-size:13.5px; font-weight:900;">I. REKAPAN UMUM BIDANG KEGIATAN MUDA MUDI (9 SUB-BIDANG)</h3>
+        ${rekapanUmumHtml}
+        <h3 style="margin:22px 0 6px 0; color:#0b386b; font-size:13px; font-weight:800;">II. LAMPIRAN: RINCIAN PROGRAM KERJA &amp; REALISASI LPJ KMM PER SUB-BIDANG</h3>
+      ` : ''}
+
       <table>
         <thead>
           <tr>
@@ -399,6 +496,10 @@ export async function printProkerBukuPlenoLengkap() {
       <div class="page-break"></div>
 
       <h3>BAGIAN II: PROGRAM KERJA 9 DIVISI BIDANG KEGIATAN MUDA-MUDI (KMM)</h3>
+      <h4 style="margin:12px 0 6px 0; color:#8b0000; font-size:12.5px; font-weight:800;">A. REKAPAN UMUM BIDANG KMM (9 DIVISI)</h4>
+      ${generateKmmRekapanUmumTableHtml(kmmList)}
+
+      <h4 style="margin:20px 0 6px 0; color:#0b386b; font-size:12.5px; font-weight:800;">B. LAMPIRAN: RINCIAN PROGRAM KERJA &amp; REALISASI LPJ KMM PER SUB-BIDANG</h4>
       <table>
         <thead>
           <tr>
