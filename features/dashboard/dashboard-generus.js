@@ -442,16 +442,9 @@ export function renderSiswaModal() {
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:14px;">
 
-      <!-- BANNER HEADER UTAMA DENGAN TOMBOL TAMBAH GENERUS (MIRIP PROKER) -->
-      <div class="generus-banner-header">
-        <div class="generus-banner-header-content">
-          <div class="generus-banner-header-title">
-            <span class="material-symbols-outlined" style="font-size:20px;color:#2563eb;">groups</span>
-            Database Generus PPG Solo Selatan
-          </div>
-          <div class="generus-banner-header-sub">Kelola biodata santri, penjenjangan kelas, serta administrasi data generus.</div>
-        </div>
-        <button type="button" id="btnTambahSiswaBaru" class="btn-generus-banner-add" title="Tambah Data Generus Baru">
+      <!-- BANNER HEADER DENGAN TOMBOL TAMBAH GENERUS (FULL WIDTH FRAME) -->
+      <div class="banner-action-frame generus-banner-header">
+        <button type="button" id="btnTambahSiswaBaru" class="btn-banner-action-blue btn-generus-banner-add" title="Tambah Data Generus Baru">
           <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
           <span>Tambah Generus</span>
         </button>
@@ -1662,7 +1655,7 @@ export function renderAutoPromoteModal() {
         <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;">
           <div style="max-height:280px;overflow-y:auto;font-size:11.5px;">
             ${activeTab === 'eligible' ? (
-              filteredEligible.length === 0 ? `
+        filteredEligible.length === 0 ? `
                 <div style="padding:36px;text-align:center;color:var(--text-muted);">
                   <span class="material-symbols-outlined" style="font-size:36px;color:#10b981;display:block;margin-bottom:6px;">check_circle</span>
                   <strong style="color:var(--text);">Tidak ada generus yang perlu dinaikkan saat ini</strong>
@@ -1694,8 +1687,8 @@ export function renderAutoPromoteModal() {
                   </tbody>
                 </table>
               `
-            ) : (
-              filteredSkipped.length === 0 ? `
+      ) : (
+        filteredSkipped.length === 0 ? `
                 <div style="padding:32px;text-align:center;color:var(--text-muted);">Tidak ada data yang dilewati.</div>
               ` : `
                 <table style="width:100%;border-collapse:collapse;text-align:left;">
@@ -1722,7 +1715,7 @@ export function renderAutoPromoteModal() {
                   </tbody>
                 </table>
               `
-            )}
+      )}
           </div>
         </div>
 

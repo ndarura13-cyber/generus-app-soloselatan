@@ -20,7 +20,9 @@ import {
   openModal,
   showToast,
   showConfirmModal,
-  modalBody
+  modalBody,
+  showDatabaseLoading,
+  hideDatabaseLoading
 } from './dashboard-common.js';
 
 let appHooks = {
@@ -494,10 +496,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
   // Synchronize with Supabase if requested (e.g. on initial modal open)
   if (shouldSync) {
+    showDatabaseLoading('Loading Database', 'Mengambil data program kerja...');
     try {
       await syncProkerFromSupabase();
     } catch (err) {
       console.warn('Sync Supabase Proker warning:', err);
+    } finally {
+      hideDatabaseLoading();
     }
   }
 
@@ -565,33 +570,20 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     </div>
   `;
 
-  // Role Header Banner
+  // Role Header Banner (Model Banner Action Frame Sesuai Generus)
   let bannerNoticeHtml = '';
   if (isSuper) {
-    const bannerTitle = isKmmActive ? 'Wewenang Manajemen Bidang KMM' : 'Wewenang Superadmin Daerah';
-    const bannerSub = isKmmActive
-      ? 'Kelola program kerja untuk 9 sub-bidang KMM (Umum, Sekretaris, Bendahara, Keilmuan, Kemandirian, Keputrian, Olahraga, Kemahasiswaan, Taman Media).'
-      : 'Tombol fungsi ini hanya tampil pada halaman Superadmin, desa kelompok hanya dapat melihat 👁️ .';
-    const btnAddText = isKmmActive ? 'Tambah Proker KMM' : 'Tambah Program Kerja';
-
+    const btnAddText = isKmmActive ? 'Tambah Program Kerja (KMM)' : 'Tambah Program Kerja';
     bannerNoticeHtml = `
-      <div class="proker-banner-gold">
-        <div class="proker-banner-gold-content">
-          <div class="proker-banner-gold-title">${bannerTitle}</div>
-          <div class="proker-banner-gold-sub">${bannerSub}</div>
-        </div>
-        <button type="button" id="btnTambahProkerBaru" class="btn-proker-banner-gold">
-          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span> ${btnAddText}
+      <div class="banner-action-frame proker-banner-gold">
+        <button type="button" id="btnTambahProkerBaru" class="btn-banner-action-blue btn-proker-banner-gold" title="${btnAddText}">
+          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+          <span>${btnAddText}</span>
         </button>
       </div>
     `;
   } else {
-    bannerNoticeHtml = `
-      <div class="proker-banner-wilayah">
-        <strong>Mode Koordinasi Wilayah (${currentUser.tingkatan === 'desa' ? 'Tingkat Desa ' + (currentUser.desaNama || '') : 'Pamong Kelompok ' + (currentUser.kelompokNama || '')}):</strong><br/>
-        Berikut adalah agenda resmi Program Kerja ${isKmmActive ? 'Bidang KMM (9 Divisi)' : 'PPG Solo Selatan'} beserta rincian sasaran, tujuan, waktu, dan tempat pelaksanaan kegiatan.
-      </div>
-    `;
+    bannerNoticeHtml = '';
   }
 
   // Summary Stat Strip (Realisasi & LPJ Integrated)

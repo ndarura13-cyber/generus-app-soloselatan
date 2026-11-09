@@ -130,6 +130,46 @@ if (typeof window !== 'undefined') {
   window.showToast = showToast;
 }
 
+/* ── 2.5. Database Loading Overlay (Visual Feedback Spinner) ─── */
+let dbLoadingTimer = null;
+
+export function showDatabaseLoading(title = 'Loading Database', subtitle = 'Menyinkronkan data dengan server...') {
+  const backdrop = document.getElementById('dbLoadingBackdrop');
+  if (!backdrop) return;
+  const titleEl = document.getElementById('dbLoadingTitle');
+  const subEl = document.getElementById('dbLoadingSubtitle');
+  if (titleEl) titleEl.textContent = title;
+  if (subEl) subEl.textContent = subtitle;
+
+  backdrop.style.display = 'flex';
+  requestAnimationFrame(() => {
+    backdrop.classList.add('show');
+  });
+
+  // Safety fallback: auto-hide after 12 seconds in case of extreme connection hang
+  clearTimeout(dbLoadingTimer);
+  dbLoadingTimer = setTimeout(() => {
+    hideDatabaseLoading();
+  }, 12000);
+}
+
+export function hideDatabaseLoading() {
+  clearTimeout(dbLoadingTimer);
+  const backdrop = document.getElementById('dbLoadingBackdrop');
+  if (!backdrop) return;
+  backdrop.classList.remove('show');
+  setTimeout(() => {
+    if (!backdrop.classList.contains('show')) {
+      backdrop.style.display = 'none';
+    }
+  }, 260);
+}
+
+if (typeof window !== 'undefined') {
+  window.showDatabaseLoading = showDatabaseLoading;
+  window.hideDatabaseLoading = hideDatabaseLoading;
+}
+
 /* ── 3. General Modal Dialog Helpers ───────────────────────── */
 export const modalBackdrop = document.getElementById('modalBackdrop');
 export const modalTitle = document.getElementById('modalTitle');

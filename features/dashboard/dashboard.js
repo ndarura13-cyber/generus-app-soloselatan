@@ -24,6 +24,8 @@ import {
   currentUser,
   setCurrentUser,
   showToast,
+  showDatabaseLoading,
+  hideDatabaseLoading,
   openModal,
   closeModal,
   showConfirmModal,
@@ -547,29 +549,74 @@ btnKontakDesa?.addEventListener('click', () => {
   renderKontakModal(activeDesaId, null);
 });
 
+/* ── 5. Centralized Database-Aware Menu Openers with Visual Loading Feedback ── */
+const openMenuSiswa = async () => {
+  showDatabaseLoading('Loading Database', 'Mengambil data generus terbaru...');
+  try {
+    if (isSupabaseConfigured()) await syncSiswaFromSupabase();
+  } catch (err) {
+    console.warn('Sync Siswa error:', err);
+  } finally {
+    hideDatabaseLoading();
+    renderSiswaModal();
+  }
+};
+
+const openMenuProker = async () => {
+  showDatabaseLoading('Loading Database', 'Mengambil program kerja terbaru...');
+  try {
+    if (isSupabaseConfigured()) await syncProkerFromSupabase();
+  } catch (err) {
+    console.warn('Sync Proker error:', err);
+  } finally {
+    hideDatabaseLoading();
+    renderProkerModal('all', 'all', '', 'timeline', 1, false);
+  }
+};
+
+const openMenuPembiasaan = async () => {
+  showDatabaseLoading('Loading Database', 'Mengambil data pembiasaan karakter...');
+  try {
+    if (isSupabaseConfigured()) await syncPembiasaanFromSupabase();
+  } catch (err) {
+    console.warn('Sync Pembiasaan error:', err);
+  } finally {
+    hideDatabaseLoading();
+    renderEventPembiasaanModal();
+  }
+};
+
+const openMenuAbsensi = async () => {
+  showDatabaseLoading('Loading Database', 'Mengambil agenda KBM & presensi...');
+  try {
+    if (isSupabaseConfigured()) await syncKbmFromSupabase();
+  } catch (err) {
+    console.warn('Sync KBM error:', err);
+  } finally {
+    hideDatabaseLoading();
+    renderCetakAbsensiModal();
+  }
+};
+
+const openMenuPengurus = async (filterMode = 'all') => {
+  showDatabaseLoading('Loading Database', 'Mengambil data hak akses & pengurus...');
+  try {
+    if (isSupabaseConfigured()) await syncPengurusFromSupabase();
+  } catch (err) {
+    console.warn('Sync Pengurus error:', err);
+  } finally {
+    hideDatabaseLoading();
+    renderManagePengurusModal(filterMode);
+  }
+};
+
 /* ── 5. Action Cards Listeners ─────────────────────────────────────────────────── */
-btnMenuSiswa?.addEventListener('click', async () => {
-  showToast("Mengambil data terbaru dari server...");
-  if (isSupabaseConfigured()) await syncSiswaFromSupabase();
-  renderSiswaModal();
-});
-btnMenuProker?.addEventListener('click', () => renderProkerModal());
-btnMenuPembiasaan?.addEventListener('click', async () => {
-  showToast("Mengambil data terbaru dari server...");
-  if (isSupabaseConfigured()) await syncPembiasaanFromSupabase();
-  renderEventPembiasaanModal();
-});
-btnMenuAbsensi?.addEventListener('click', async () => {
-  showToast("Mengambil data terbaru dari server...");
-  if (isSupabaseConfigured()) await syncKbmFromSupabase();
-  renderCetakAbsensiModal();
-});
+btnMenuSiswa?.addEventListener('click', openMenuSiswa);
+btnMenuProker?.addEventListener('click', openMenuProker);
+btnMenuPembiasaan?.addEventListener('click', openMenuPembiasaan);
+btnMenuAbsensi?.addEventListener('click', openMenuAbsensi);
 btnMenuStrukturDaerah?.addEventListener('click', () => renderStrukturDaerahModal());
-btnMenuPengurus?.addEventListener('click', async () => {
-  showToast("Mengambil data terbaru dari server...");
-  if (isSupabaseConfigured()) await syncPengurusFromSupabase();
-  renderManagePengurusModal('all');
-});
+btnMenuPengurus?.addEventListener('click', () => openMenuPengurus('all'));
 btnApprovalList?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnOpenApprovalModal')?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnSupabaseStatus')?.addEventListener('click', () => renderSupabaseModal(updateDashboardStats));
@@ -584,12 +631,12 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
 (function setupNavigation() {
   // Desktop Sidebar Listeners
   document.getElementById('sideBtnLogout')?.addEventListener('click', doLogout);
-  document.getElementById('sideBtnSiswa')?.addEventListener('click', () => { renderSiswaModal(); });
-  document.getElementById('sideBtnPembiasaan')?.addEventListener('click', () => { renderEventPembiasaanModal(); });
-  document.getElementById('sideBtnAbsensi')?.addEventListener('click', () => { renderCetakAbsensiModal(); });
-  document.getElementById('sideBtnProker')?.addEventListener('click', () => { renderProkerModal(); });
+  document.getElementById('sideBtnSiswa')?.addEventListener('click', openMenuSiswa);
+  document.getElementById('sideBtnPembiasaan')?.addEventListener('click', openMenuPembiasaan);
+  document.getElementById('sideBtnAbsensi')?.addEventListener('click', openMenuAbsensi);
+  document.getElementById('sideBtnProker')?.addEventListener('click', openMenuProker);
   document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
-  document.getElementById('sideBtnPengurus')?.addEventListener('click', () => { renderManagePengurusModal(); });
+  document.getElementById('sideBtnPengurus')?.addEventListener('click', () => openMenuPengurus('all'));
   document.getElementById('sideBtnProfil')?.addEventListener('click', () => { renderSelfProfileModal(); });
 
   // Mobile Bottom Nav Listeners
@@ -603,16 +650,10 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   const mobNavLogout = document.getElementById('mobNavLogout');
 
   // Kelola Hak Akses Pengurus Handler (Superadmin Only)
-  const handleOpenKelolaPengurus = async () => {
-    showToast("Mengambil data pengurus terbaru dari server...");
-    if (isSupabaseConfigured()) await syncPengurusFromSupabase();
-    renderManagePengurusModal('all');
-  };
-
-  document.getElementById('sideBtnKelolaPengurus')?.addEventListener('click', handleOpenKelolaPengurus);
+  document.getElementById('sideBtnKelolaPengurus')?.addEventListener('click', () => openMenuPengurus('all'));
   document.getElementById('mobBtnKelolaPengurus')?.addEventListener('click', () => {
     toggleDropUp();
-    handleOpenKelolaPengurus();
+    openMenuPengurus('all');
   });
 
   mobNavHome?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
@@ -637,10 +678,10 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   mobNavFitur?.addEventListener('click', toggleDropUp);
   mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
 
-  document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); renderSiswaModal(); });
-  document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { toggleDropUp(); renderEventPembiasaanModal(); });
-  document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); renderCetakAbsensiModal(); });
-  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); renderProkerModal(); });
+  document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); openMenuSiswa(); });
+  document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { toggleDropUp(); openMenuPembiasaan(); });
+  document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); openMenuAbsensi(); });
+  document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); openMenuProker(); });
 
   const btnToggleSidebar = document.getElementById('btnToggleSidebar');
   const sideFiturFlyout = document.getElementById('sideFiturFlyout');
@@ -675,19 +716,19 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   // Action listeners untuk menu flyout saat sidebar collapsed
   document.getElementById('flyBtnSiswa')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
-    renderSiswaModal();
+    openMenuSiswa();
   });
   document.getElementById('flyBtnPembiasaan')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
-    renderEventPembiasaanModal();
+    openMenuPembiasaan();
   });
   document.getElementById('flyBtnAbsensi')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
-    renderCetakAbsensiModal();
+    openMenuAbsensi();
   });
   document.getElementById('flyBtnProker')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
-    renderProkerModal();
+    openMenuProker();
   });
   document.getElementById('flyBtnStruktur')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
@@ -695,12 +736,12 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   });
   document.getElementById('flyBtnKelolaPengurus')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
-    handleOpenKelolaPengurus();
+    openMenuPengurus('all');
   });
 
   // Backup listener for Kelola Program in Dashboard widget
   document.getElementById('btnKelolaProkerDashboard')?.addEventListener('click', () => {
-    renderProkerModal();
+    openMenuProker();
   });
 
   window.addEventListener('keydown', (e) => {

@@ -116,12 +116,22 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   // ══════════════════════════════════════════════════════════════
   let agendaContentHtml = '';
 
-  // Toolbar Filter & Buat Event Baru
+  // ── Action Banner Buat Event (KBM) Model Mirip Generus ──
+  const bannerActionKbmHtml = `
+    <div class="banner-action-frame">
+      <button type="button" id="btnBukaCreateEvent" class="btn-banner-action-blue" title="Buat Event KBM Baru">
+        <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+        <span>Buat Event (KBM)</span>
+      </button>
+    </div>
+  `;
+
+  // Toolbar Filter
   let filterBarHtml = '';
   if (isDaerah) {
     filterBarHtml = `
       <div class="kbm-filter-bar">
-        <div class="kbm-filter-group">
+        <div class="kbm-filter-group" style="width:100%;">
           <select id="kbmFilterDesa" class="kbm-select" title="Filter Desa">
             ${buildDesaOptions(filterDesa)}
           </select>
@@ -135,16 +145,12 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
             <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
           </select>
         </div>
-        <button type="button" id="btnBukaCreateEvent" style="padding:7px 14px;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(34,197,94,0.25);">
-          <span class="material-symbols-outlined" style="font-size:17px;">add</span>
-          <span>Buat Event KBM</span>
-        </button>
       </div>
     `;
   } else if (isDesa) {
     filterBarHtml = `
       <div class="kbm-filter-bar">
-        <div class="kbm-filter-group">
+        <div class="kbm-filter-group" style="width:100%;">
           <span style="font-size:12px;font-weight:700;background:var(--blue-light);color:var(--blue-dark);padding:4px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-outlined" style="font-size:16px;">domain</span>
             Desa ${desaObj.nama}
@@ -159,17 +165,13 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
             <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
           </select>
         </div>
-        <button type="button" id="btnBukaCreateEvent" style="padding:7px 14px;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(34,197,94,0.25);">
-          <span class="material-symbols-outlined" style="font-size:17px;">add</span>
-          <span>Buat Event KBM</span>
-        </button>
       </div>
     `;
   } else {
     // Pamong Kelompok
     filterBarHtml = `
       <div class="kbm-filter-bar">
-        <div class="kbm-filter-group">
+        <div class="kbm-filter-group" style="width:100%;">
           <span style="font-size:11.5px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-outlined" style="font-size:15px;">location_on</span>
             Kel. ${currentKelObj ? currentKelObj.nama : 'Kelompok Saya'}
@@ -189,10 +191,6 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
             <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
           </select>
         </div>
-        <button type="button" id="btnBukaCreateEvent" style="padding:6px 12px;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(34,197,94,0.25);">
-          <span class="material-symbols-outlined" style="font-size:16px;">add</span>
-          <span>Buat Event</span>
-        </button>
       </div>
     `;
   }
@@ -210,6 +208,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
 
   if (totalEvents === 0) {
     agendaContentHtml = `
+      ${bannerActionKbmHtml}
       ${filterBarHtml}
       <div style="text-align:center;padding:40px 20px;background:var(--bg);border-radius:12px;border:1.5px dashed var(--border);">
         <span class="material-symbols-outlined" style="font-size:48px;color:#94a3b8;margin-bottom:8px;">event_busy</span>
@@ -217,8 +216,9 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         <p style="margin:4px 0 16px;font-size:12px;color:var(--text-muted);">
           Silakan sesuaikan filter wilayah di atas atau buat event KBM baru untuk mencetak lembar absensi.
         </p>
-        <button type="button" id="btnEmptyCreateEvent" style="padding:8px 16px;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
-          <span class="material-symbols-outlined" style="font-size:16px;">add</span> Buat Event KBM Baru
+        <button type="button" id="btnEmptyCreateEvent" class="btn-banner-action-blue" style="max-width:280px;margin:0 auto;" title="Buat Event KBM Baru">
+          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+          <span>Buat Event (KBM)</span>
         </button>
       </div>
     `;
@@ -437,6 +437,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     }).join('');
 
     agendaContentHtml = `
+      ${bannerActionKbmHtml}
       ${filterBarHtml}
 
       <!-- TAMPILAN DESKTOP TABLE -->

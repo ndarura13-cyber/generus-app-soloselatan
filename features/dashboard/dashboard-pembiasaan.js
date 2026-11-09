@@ -209,20 +209,21 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
 
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div>
-          <h3 style="margin:0;font-size:14px;color:var(--text-main);">Daftar Periode Lembar Pembiasaan</h3>
-          <p style="margin:4px 0 0;font-size:12px;color:var(--text-muted);">
-            ${isSuperadminOrDaerah
-              ? 'Kelola target pembiasaan karakter dengan bobot nilai: Penting (maks 30 poin) dan Additional (maks 10 poin).'
-              : 'Pilih periode pembiasaan yang sedang berjalan untuk mengisikan nilai harian generus caberawit di wilayah Anda.'}
-          </p>
-        </div>
-        ${isSuperadminOrDaerah ? `
-          <button id="btnCreateEvent" style="padding:8px 12px;background:var(--gold);color:#1a1d2e;border:none;border-radius:8px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:12px;">
-            <span class="material-symbols-outlined" style="font-size:16px;">add_circle</span> Buat Event Baru
+      <!-- BANNER TOMBOL BUAT EVENT BARU (PEMBIASAAN) -->
+      ${isSuperadminOrDaerah ? `
+        <div class="banner-action-frame">
+          <button type="button" id="btnCreateEvent" class="btn-banner-action-blue" title="Buat Event Baru">
+            <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+            <span>Buat Event Baru</span>
           </button>
-        ` : ''}
+        </div>
+      ` : ''}
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">
+          <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">calendar_month</span>
+          Daftar Periode Lembar Pembiasaan
+        </div>
       </div>
 
       <!-- 1. DESKTOP VIEW (Table) -->

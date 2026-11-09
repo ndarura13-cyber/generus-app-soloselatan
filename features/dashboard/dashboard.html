@@ -46,7 +46,7 @@
     rel="stylesheet" />
 
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=7.2" />
+  <link rel="stylesheet" href="dashboard.css?v=7.3" />
 
   <!-- SheetJS Pustaka Excel (.xlsx / .xls) Asli (Client-side) -->
   <script src="../../src/vendor/xlsx.full.min.js"></script>
@@ -854,6 +854,20 @@
     </div>
   </div>
 
+  <!-- DATABASE LOADING OVERLAY -->
+  <div id="dbLoadingBackdrop" class="db-loading-backdrop" style="display: none;">
+    <div class="db-loading-card">
+      <div class="db-loading-spinner-wrap">
+        <div class="db-loading-spinner"></div>
+        <span class="material-symbols-outlined db-loading-icon">database</span>
+      </div>
+      <div class="db-loading-text-wrap">
+        <h4 id="dbLoadingTitle" class="db-loading-title">Loading Database</h4>
+        <p id="dbLoadingSubtitle" class="db-loading-subtitle">Menghubungkan &amp; menyinkronkan data...</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Theme logic and cache busting
     (function forceCacheClear() {
@@ -948,7 +962,7 @@
     class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
-  <script type="module" src="dashboard.js?v=7.2"></script>
+  <script type="module" src="dashboard.js?v=7.3"></script>
 </body>
 
 </html>
