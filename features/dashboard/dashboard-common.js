@@ -428,3 +428,157 @@ export function renderKontakModal(desaId, kelompokId = null) {
   }, true);
 })();
 
+/* ── 8. Standard Default Reusable Pagination Component ─────────── */
+/**
+ * Komponen Pagination Resmi & Terpaten PPG Solo Selatan
+ * Mengadopsi arsitektur pagination Database Generus:
+ * - Menampilkan info range item & total item ("Menampilkan 1 - 25 dari 133 program")
+ * - Dropdown pilihan jumlah item per halaman (Per halaman: 10, 25, 50, 100)
+ * - Kontrol navigasi: « (Pertama), ‹ (Sebelumnya), sliding window tombol nomor halaman (max 5), › (Berikutnya), » (Terakhir)
+ * - Responsif mobile: tidak membuat celah kosong/wrap panjang, rapi di layar kecil
+ * - Tema konsisten: mendukung Dark Mode & Light Mode
+ */
+export function renderPaginationBar({
+  container,
+  currentPage = 1,
+  totalItems = 0,
+  pageSize = 10,
+  pageSizeOptions = [10, 25, 50, 100],
+  itemName = 'data',
+  maxVisiblePages = 5,
+  showPageSize = true,
+  showInfo = true,
+  compact = false,
+  onPageChange,
+  onPageSizeChange
+}) {
+  const targetEl = typeof container === 'string' ? document.getElementById(container) : container;
+  if (!targetEl) return;
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  let safePage = currentPage;
+  if (safePage > totalPages) safePage = totalPages;
+  if (safePage < 1) safePage = 1;
+
+  if (totalItems === 0) {
+    targetEl.innerHTML = '';
+    return;
+  }
+
+  const startIndex = (safePage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+
+  // Sliding window nomor halaman
+  let visiblePages = maxVisiblePages;
+  if (typeof window !== 'undefined' && window.innerWidth < 480 && visiblePages > 3) {
+    visiblePages = 3;
+  }
+
+  let startPage = Math.max(1, safePage - Math.floor(visiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + visiblePages - 1);
+  if (endPage - startPage < visiblePages - 1) {
+    startPage = Math.max(1, endPage - visiblePages + 1);
+  }
+
+  let pagesButtonsHtml = '';
+  for (let p = startPage; p <= endPage; p++) {
+    pagesButtonsHtml += `
+      <button type="button" class="pagination-btn ${p === safePage ? 'active' : ''}" data-page="${p}" aria-label="Halaman ${p}">
+        ${p}
+      </button>
+    `;
+  }
+
+  // Pilihan ukuran per halaman
+  let pageSizeHtml = '';
+  if (showPageSize && Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0) {
+    const optionsHtml = pageSizeOptions.map(opt => `
+      <option value="${opt}" ${opt === pageSize ? 'selected' : ''}>${opt}</option>
+    `).join('');
+
+    pageSizeHtml = `
+      <label class="pagination-page-size-label">
+        <span>Per halaman:</span>
+        <select class="pagination-page-size-select" aria-label="Jumlah item per halaman">
+          ${optionsHtml}
+        </select>
+      </label>
+    `;
+  }
+
+  // Info label
+  const infoHtml = showInfo ? `
+    <div class="pagination-info-group">
+      <span>Menampilkan <strong>${totalItems > 0 ? startIndex + 1 : 0} – ${endIndex}</strong> dari <strong>${totalItems}</strong> ${itemName}</span>
+      ${pageSizeHtml}
+    </div>
+  ` : (pageSizeHtml ? `<div class="pagination-info-group">${pageSizeHtml}</div>` : '');
+
+  targetEl.innerHTML = `
+    <div class="pagination-wrap ${compact ? 'pagination-compact' : ''}">
+      ${infoHtml}
+      <div class="pagination-controls">
+        <button type="button" class="pagination-btn btn-first" ${safePage === 1 ? 'disabled' : ''} title="Halaman Pertama" aria-label="Halaman Pertama">«</button>
+        <button type="button" class="pagination-btn btn-prev" ${safePage === 1 ? 'disabled' : ''} title="Halaman Sebelumnya" aria-label="Halaman Sebelumnya">‹</button>
+        ${pagesButtonsHtml}
+        <button type="button" class="pagination-btn btn-next" ${safePage === totalPages ? 'disabled' : ''} title="Halaman Berikutnya" aria-label="Halaman Berikutnya">›</button>
+        <button type="button" class="pagination-btn btn-last" ${safePage === totalPages ? 'disabled' : ''} title="Halaman Terakhir" aria-label="Halaman Terakhir">»</button>
+      </div>
+    </div>
+  `;
+
+  // Pasang Event Listeners
+  const btnFirst = targetEl.querySelector('.btn-first');
+  const btnPrev = targetEl.querySelector('.btn-prev');
+  const btnNext = targetEl.querySelector('.btn-next');
+  const btnLast = targetEl.querySelector('.btn-last');
+  const sizeSelect = targetEl.querySelector('.pagination-page-size-select');
+
+  btnFirst?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (safePage !== 1 && typeof onPageChange === 'function') {
+      onPageChange(1);
+    }
+  });
+
+  btnPrev?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (safePage > 1 && typeof onPageChange === 'function') {
+      onPageChange(safePage - 1);
+    }
+  });
+
+  btnNext?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (safePage < totalPages && typeof onPageChange === 'function') {
+      onPageChange(safePage + 1);
+    }
+  });
+
+  btnLast?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (safePage !== totalPages && typeof onPageChange === 'function') {
+      onPageChange(totalPages);
+    }
+  });
+
+  targetEl.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const p = parseInt(btn.dataset.page, 10);
+      if (p && p !== safePage && typeof onPageChange === 'function') {
+        onPageChange(p);
+      }
+    });
+  });
+
+  sizeSelect?.addEventListener('change', (e) => {
+    e.stopPropagation();
+    const newSize = parseInt(e.target.value, 10);
+    if (newSize && typeof onPageSizeChange === 'function') {
+      onPageSizeChange(newSize);
+    }
+  });
+}
+
+

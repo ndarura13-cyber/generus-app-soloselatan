@@ -26,7 +26,8 @@ import {
   closeModal,
   showToast,
   showConfirmModal,
-  modalBody
+  modalBody,
+  renderPaginationBar
 } from './dashboard-common.js';
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1995,73 +1996,27 @@ export function renderSiswaTableRows() {
     }).join('');
   }
 
-  // Render Pagination HTML
+  // Render Pagination Bar (Standard Reusable Architecture)
   if (paginWrap) {
-    let pagesHtml = '';
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, siswaCurrentPage - 2);
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    if (endPage - startPage < maxVisiblePages - 1) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let p = startPage; p <= endPage; p++) {
-      pagesHtml += `
-        <button type="button" class="pagination-btn ${p === siswaCurrentPage ? 'active' : ''}" data-page="${p}">${p}</button>
-      `;
-    }
-
-    paginWrap.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;color:var(--text-muted);flex-wrap:wrap;">
-        <span>Menampilkan <strong>${startIndex + 1} - ${endIndex}</strong> dari <strong>${totalFiltered}</strong> generus</span>
-        <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;">
-          Per halaman:
-          <select id="selSiswaPageSize" style="padding:3px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:11.5px;font-weight:700;">
-            <option value="25" ${siswaPageSize === 25 ? 'selected' : ''}>25</option>
-            <option value="50" ${siswaPageSize === 50 ? 'selected' : ''}>50</option>
-            <option value="100" ${siswaPageSize === 100 ? 'selected' : ''}>100</option>
-          </select>
-        </label>
-      </div>
-      <div class="pagination-controls">
-        <button type="button" class="pagination-btn" id="btnPageFirst" ${siswaCurrentPage === 1 ? 'disabled' : ''} title="Halaman Pertama">«</button>
-        <button type="button" class="pagination-btn" id="btnPagePrev" ${siswaCurrentPage === 1 ? 'disabled' : ''} title="Sebelumnya">‹</button>
-        ${pagesHtml}
-        <button type="button" class="pagination-btn" id="btnPageNext" ${siswaCurrentPage === totalPages ? 'disabled' : ''} title="Berikutnya">›</button>
-        <button type="button" class="pagination-btn" id="btnPageLast" ${siswaCurrentPage === totalPages ? 'disabled' : ''} title="Halaman Terakhir">»</button>
-      </div>
-    `;
-
-    document.getElementById('selSiswaPageSize')?.addEventListener('change', (e) => {
-      siswaPageSize = parseInt(e.target.value) || 50;
-      siswaCurrentPage = 1;
-      renderSiswaTableRows();
-    });
-    document.getElementById('btnPageFirst')?.addEventListener('click', () => {
-      siswaCurrentPage = 1;
-      renderSiswaTableRows();
-    });
-    document.getElementById('btnPagePrev')?.addEventListener('click', () => {
-      if (siswaCurrentPage > 1) {
-        siswaCurrentPage--;
+    renderPaginationBar({
+      container: paginWrap,
+      currentPage: siswaCurrentPage,
+      totalItems: totalFiltered,
+      pageSize: siswaPageSize,
+      pageSizeOptions: [25, 50, 100],
+      itemName: 'generus',
+      maxVisiblePages: 5,
+      showPageSize: true,
+      showInfo: true,
+      onPageChange: (newPage) => {
+        siswaCurrentPage = newPage;
+        renderSiswaTableRows();
+      },
+      onPageSizeChange: (newSize) => {
+        siswaPageSize = newSize;
+        siswaCurrentPage = 1;
         renderSiswaTableRows();
       }
-    });
-    document.getElementById('btnPageNext')?.addEventListener('click', () => {
-      if (siswaCurrentPage < totalPages) {
-        siswaCurrentPage++;
-        renderSiswaTableRows();
-      }
-    });
-    document.getElementById('btnPageLast')?.addEventListener('click', () => {
-      siswaCurrentPage = totalPages;
-      renderSiswaTableRows();
-    });
-    paginWrap.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        siswaCurrentPage = parseInt(btn.dataset.page);
-        renderSiswaTableRows();
-      });
     });
   }
 

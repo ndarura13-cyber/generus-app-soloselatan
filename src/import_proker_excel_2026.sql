@@ -18,7 +18,7 @@ ALTER TABLE IF EXISTS program_kerja DROP CONSTRAINT IF EXISTS program_kerja_pena
 ALTER TABLE IF EXISTS program_kerja ALTER COLUMN penanggung_jawab_id TYPE VARCHAR(255) USING penanggung_jawab_id::text;
 
 -- Opsional: Hapus data proker lama jika ingin fresh-import bersih:
--- TRUNCATE TABLE program_kerja CASCADE;
+TRUNCATE TABLE program_kerja CASCADE;
 
 
 -- ═══════════════════════════════════════════════════════════════════════════

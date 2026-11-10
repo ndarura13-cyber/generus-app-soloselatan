@@ -469,17 +469,29 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         </span>
 
         ${totalPages > 1 ? `
-          <div class="kbm-pagination">
-            <button type="button" class="kbm-page-btn btn-page-nav" data-page="${currentPage - 1}" ${currentPage <= 1 ? 'disabled' : ''} title="Halaman Sebelumnya">
-              <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
+          <div class="kbm-pagination" style="display:flex;align-items:center;gap:4px;">
+            <button type="button" class="kbm-page-btn btn-page-nav" data-page="1" ${currentPage <= 1 ? 'disabled' : ''} title="Halaman Pertama">
+              «
             </button>
-            ${Array.from({ length: totalPages }, (_, i) => i + 1).map(p => `
-              <button type="button" class="kbm-page-btn btn-page-nav ${p === currentPage ? 'active' : ''}" data-page="${p}">
-                ${p}
-              </button>
-            `).join('')}
+            <button type="button" class="kbm-page-btn btn-page-nav" data-page="${currentPage - 1}" ${currentPage <= 1 ? 'disabled' : ''} title="Halaman Sebelumnya">
+              ‹
+            </button>
+            ${(() => {
+              const maxV = 5;
+              let sP = Math.max(1, currentPage - Math.floor(maxV / 2));
+              let eP = Math.min(totalPages, sP + maxV - 1);
+              if (eP - sP < maxV - 1) sP = Math.max(1, eP - maxV + 1);
+              let h = '';
+              for (let p = sP; p <= eP; p++) {
+                h += `<button type="button" class="kbm-page-btn btn-page-nav ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+              }
+              return h;
+            })()}
             <button type="button" class="kbm-page-btn btn-page-nav" data-page="${currentPage + 1}" ${currentPage >= totalPages ? 'disabled' : ''} title="Halaman Selanjutnya">
-              <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
+              ›
+            </button>
+            <button type="button" class="kbm-page-btn btn-page-nav" data-page="${totalPages}" ${currentPage >= totalPages ? 'disabled' : ''} title="Halaman Terakhir">
+              »
             </button>
           </div>
         ` : ''}

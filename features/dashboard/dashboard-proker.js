@@ -22,7 +22,8 @@ import {
   showConfirmModal,
   modalBody,
   showDatabaseLoading,
-  hideDatabaseLoading
+  hideDatabaseLoading,
+  renderPaginationBar
 } from './dashboard-common.js';
 
 let appHooks = {
@@ -590,6 +591,8 @@ export function formatDateRange(startDateStr, endDateStr) {
   return `${s.getDate()} ${monthNames[s.getMonth()]} ${s.getFullYear()} – ${e.getDate()} ${monthNames[e.getMonth()]} ${e.getFullYear()}`;
 }
 
+let prokerModalPageSize = 10;
+
 export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true, activeKategori = currentActiveKategori) {
   // Update state kategori aktif
   currentActiveKategori = activeKategori === 'KMM' ? 'KMM' : 'PPG';
@@ -838,7 +841,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   `;
 
   // Pagination Calculation
-  const itemsPerPage = 5;
+  const itemsPerPage = prokerModalPageSize;
   const totalItems = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   if (currentPage > totalPages) currentPage = totalPages;
@@ -846,35 +849,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedItems = filtered.slice(startIndex, startIndex + itemsPerPage);
 
-  // Pagination HTML Builder
-  let paginationHtml = '';
-  if (totalItems > 0) {
-    let pageButtonsHtml = '';
-    for (let pNum = 1; pNum <= totalPages; pNum++) {
-      pageButtonsHtml += `
-        <button type="button" class="proker-page-btn ${pNum === currentPage ? 'active' : ''}" data-page="${pNum}">
-          ${pNum}
-        </button>
-      `;
-    }
-
-    paginationHtml = `
-      <div class="proker-pagination">
-        <div class="proker-pagination-info">
-          Menampilkan <strong>${startIndex + 1} – ${Math.min(startIndex + itemsPerPage, totalItems)}</strong> dari <strong>${totalItems}</strong> program
-        </div>
-        <div class="proker-pagination-btns">
-          <button type="button" class="proker-page-btn btn-prev" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">
-            <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span> Sebelumnya
-          </button>
-          ${pageButtonsHtml}
-          <button type="button" class="proker-page-btn btn-next" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">
-            Selanjutnya <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
-          </button>
-        </div>
-      </div>
-    `;
-  }
+  // Standar Default Reusable Pagination Container
+  const paginationHtml = totalItems > 0 ? `<div id="prokerModalPaginationWrap" style="margin-top:14px;"></div>` : '';
 
   // Content rendering based on activeTab
   let contentHtml = '';
@@ -1240,15 +1216,28 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline', currentPage, false, currentActiveKategori);
   });
 
-  // 5. Pagination
-  modalBody.querySelectorAll('.proker-page-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pNum = parseInt(btn.dataset.page);
-      if (pNum && pNum >= 1 && pNum <= totalPages && pNum !== currentPage) {
-        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, pNum, false, currentActiveKategori);
+  // 5. Standar Default Pagination Bar
+  const modalPaginWrap = modalBody.querySelector('#prokerModalPaginationWrap');
+  if (modalPaginWrap) {
+    renderPaginationBar({
+      container: modalPaginWrap,
+      currentPage: currentPage,
+      totalItems: totalItems,
+      pageSize: prokerModalPageSize,
+      pageSizeOptions: [10, 25, 50, 100],
+      itemName: 'program',
+      maxVisiblePages: 5,
+      showPageSize: true,
+      showInfo: true,
+      onPageChange: (newPage) => {
+        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, newPage, false, currentActiveKategori);
+      },
+      onPageSizeChange: (newSize) => {
+        prokerModalPageSize = newSize;
+        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori);
       }
     });
-  });
+  }
 
   // 6. Tambah Program Kerja Baru
   document.getElementById('btnTambahProkerBaru')?.addEventListener('click', () => {
@@ -2182,7 +2171,7 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
 
 let currentDashProkerFilter = 'ongoing'; // Default: Program Kerja Berjalan
 let currentDashProkerPage = 1;
-const dashProkerItemsPerPage = 5;
+let dashProkerItemsPerPage = 5;
 
 const dashShortMonthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
 const dashFullMonthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -2355,41 +2344,28 @@ export function renderInlineProkerWidget() {
   }).join('');
 
   if (paginationContainer) {
-    if (totalPages > 1) {
-      let dotsHtml = '';
-      for (let i = 1; i <= totalPages; i++) {
-        dotsHtml += `<button type="button" class="px-3 py-1 text-xs font-bold rounded-lg transition-all dash-page-dot ${i === currentDashProkerPage ? 'bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}" data-page="${i}" aria-label="Halaman ${i}">${i}</button>`;
-      }
-      paginationContainer.innerHTML = `
-        <button type="button" class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center dash-page-nav prev" ${currentDashProkerPage === 1 ? 'disabled' : ''} aria-label="Sebelumnya"><span class="material-symbols-outlined">chevron_left</span></button>
-        <div class="page-dots flex items-center gap-1.5">${dotsHtml}</div>
-        <button type="button" class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center dash-page-nav next" ${currentDashProkerPage === totalPages ? 'disabled' : ''} aria-label="Berikutnya"><span class="material-symbols-outlined">chevron_right</span></button>
-      `;
-
-      paginationContainer.querySelectorAll('.dash-page-dot').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          currentDashProkerPage = parseInt(e.target.dataset.page);
+    if (totalPages > 1 || filteredData.length > 5) {
+      renderPaginationBar({
+        container: paginationContainer,
+        currentPage: currentDashProkerPage,
+        totalItems: filteredData.length,
+        pageSize: dashProkerItemsPerPage,
+        pageSizeOptions: [5, 10, 25],
+        itemName: 'program',
+        maxVisiblePages: 5,
+        showPageSize: true,
+        showInfo: true,
+        compact: true,
+        onPageChange: (newPage) => {
+          currentDashProkerPage = newPage;
           renderInlineProkerWidget();
-        });
+        },
+        onPageSizeChange: (newSize) => {
+          dashProkerItemsPerPage = newSize;
+          currentDashProkerPage = 1;
+          renderInlineProkerWidget();
+        }
       });
-      const prevBtn = paginationContainer.querySelector('.prev');
-      if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-          if (currentDashProkerPage > 1) {
-            currentDashProkerPage--;
-            renderInlineProkerWidget();
-          }
-        });
-      }
-      const nextBtn = paginationContainer.querySelector('.next');
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-          if (currentDashProkerPage < totalPages) {
-            currentDashProkerPage++;
-            renderInlineProkerWidget();
-          }
-        });
-      }
     } else {
       paginationContainer.innerHTML = '';
     }
