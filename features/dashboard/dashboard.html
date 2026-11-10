@@ -46,7 +46,7 @@
     rel="stylesheet" />
 
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=7.6" />
+  <link rel="stylesheet" href="dashboard.css?v=7.7" />
 
   <!-- SheetJS Pustaka Excel (.xlsx / .xls) Asli (Client-side) -->
   <script src="../../src/vendor/xlsx.full.min.js"></script>
@@ -780,6 +780,28 @@
           </div>
         </div>
 
+        <!-- Sub-Tab Segment: Event Utama vs Kegiatan Rutin Bulanan -->
+        <div class="px-5 md:px-8 pt-4 pb-0 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-700/60 gap-3">
+          <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl text-xs font-bold" id="dashProkerSegmentBar">
+            <button type="button"
+              class="dash-proker-segment-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-sm cursor-pointer"
+              data-segment="event" title="Tampilkan Program Kerja Event / Insidental">
+              <span class="material-symbols-outlined text-[16px]">event_available</span>
+              <span>Event &amp; Agenda Utama</span>
+            </button>
+            <button type="button"
+              class="dash-proker-segment-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer"
+              data-segment="routine" title="Tampilkan Kegiatan Rutin Bulanan">
+              <span class="material-symbols-outlined text-[16px]">autorenew</span>
+              <span>Kegiatan Rutin Bulanan</span>
+              <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold ml-1" id="dashProkerRoutineCount">0</span>
+            </button>
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 font-medium" id="dashProkerSegmentDesc">
+            Menampilkan agenda event &amp; milestone terjadwal
+          </div>
+        </div>
+
         <!-- List Konten -->
         <div class="proker-list p-5 md:p-8" id="dashProkerList" style="min-height: 180px;"></div>
 
@@ -962,7 +984,7 @@
     class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
-  <script type="module" src="dashboard.js?v=7.6"></script>
+  <script type="module" src="dashboard.js?v=7.7"></script>
 </body>
 
 </html>
