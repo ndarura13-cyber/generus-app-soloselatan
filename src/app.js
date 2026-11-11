@@ -175,7 +175,43 @@ function getStatusClass(status) {
   return 'planned';
 }
 
-let currentProkerFilter = 'ongoing'; // Default filter: Berjalan (yang sedang berjalan di bulan tersebut)
+function isProkerRoutine(item) {
+  if (!item) return false;
+  const waktu = String(item.waktu || item.waktuPelaksanaan || '').toLowerCase();
+  const kegiatan = String(item.kegiatan || item.judulProgram || '').toLowerCase();
+  const routinePatterns = [
+    'tiap bulan', 'setiap bulan', '1x / bulan', '1x/bulan', '1x /bln',
+    '1 bulan 1 kali', '1 bln 1 kali', 'per bulan', 'perbulan', 'bulanan',
+    'tiap kegiatan', 'setiap kegiatan', 'rutin', 'tiap minggu', 'setiap minggu'
+  ];
+  return routinePatterns.some(pattern => waktu.includes(pattern) || kegiatan.includes(pattern));
+}
+
+const DASH_MONTH_KEYWORDS = [
+  ['jan', 'januari'],
+  ['feb', 'februari'],
+  ['mar', 'maret', 'romadhon', 'ramadhan'],
+  ['apr', 'april', 'romadhon', 'ramadhan'],
+  ['mei', 'may'],
+  ['jun', 'juni'],
+  ['jul', 'juli'],
+  ['agu', 'agust', 'agustus'],
+  ['sep', 'sept', 'september'],
+  ['okt', 'oktober'],
+  ['nov', 'november'],
+  ['des', 'desember']
+];
+
+function isProkerMatchingCurrentMonth(item, monthIdx, yearVal) {
+  if (!item) return false;
+  if (isProkerRoutine(item)) return true;
+  const waktu = String(item.waktu || item.waktuPelaksanaan || '').toLowerCase();
+  const keywords = DASH_MONTH_KEYWORDS[monthIdx] || [];
+  return keywords.some(kw => waktu.includes(kw));
+}
+
+let currentProkerFilter = 'ongoing'; // Default filter: Berjalan
+let currentProkerSegment = 'event'; // 'event' (Agenda Utama) atau 'routine' (Rutin Bulanan)
 let currentProkerPage = 1;
 const prokerItemsPerPage = 5;
 
@@ -183,22 +219,28 @@ function updateFilterButtonsUI() {
   const filterBtns = document.querySelectorAll('.proker-filter-btn');
   filterBtns.forEach(btn => {
     const f = btn.dataset.filter;
+    btn.classList.remove('active-ongoing', 'active-upcoming', 'active-planned', 'active-done', 'active-all');
     if (f === currentProkerFilter) {
-      if (f === 'ongoing') {
-        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-emerald-300 bg-emerald-500 text-white font-bold shadow-md ring-2 ring-emerald-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'upcoming') {
-        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-amber-300 bg-amber-500 text-white font-bold shadow-md ring-2 ring-amber-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'planned') {
-        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-blue-300 bg-blue-500 text-white font-bold shadow-md ring-2 ring-blue-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'done') {
-        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-slate-300 bg-slate-500 text-white font-bold shadow-md ring-2 ring-slate-300/40 cursor-pointer transition-all duration-200';
-      } else {
-        btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-white bg-white text-brandBlue font-bold shadow-md ring-2 ring-white/40 cursor-pointer transition-all duration-200';
-      }
-    } else {
-      btn.className = 'proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white/90 font-medium cursor-pointer transition-all duration-200';
+      btn.classList.add(`active-${f}`);
     }
   });
+
+  const segmentBtns = document.querySelectorAll('.proker-segment-btn');
+  segmentBtns.forEach(btn => {
+    const s = btn.dataset.segment;
+    if (s === currentProkerSegment) {
+      btn.className = 'proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-sm font-bold cursor-pointer';
+    } else {
+      btn.className = 'proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-medium cursor-pointer';
+    }
+  });
+
+  const segmentDescEl = document.getElementById('prokerSegmentDesc');
+  if (segmentDescEl) {
+    segmentDescEl.textContent = currentProkerSegment === 'event'
+      ? 'Menampilkan agenda event & milestone terjadwal'
+      : 'Menampilkan kegiatan berkala bulanan (musyawarah, operasional pokja, shadaqoh)';
+  }
 }
 
 function renderProker() {
@@ -209,24 +251,53 @@ function renderProker() {
   updateFilterButtonsUI();
 
   const allProker = getProkerList();
+  const routineList = allProker.filter(isProkerRoutine);
+  const eventList = allProker.filter(p => !isProkerRoutine(p));
 
-  // Filter program kerja sesuai status
-  let filteredData = allProker;
+  const routineCountEl = document.getElementById('prokerRoutineCount');
+  if (routineCountEl) routineCountEl.textContent = routineList.length;
+
+  const baseList = currentProkerSegment === 'routine' ? routineList : eventList;
+
+  // Otomatis aktifkan status Berjalan (Ongoing Reminder) jika terjadwal di bulan kalender saat ini
+  const enrichedList = baseList.map(item => {
+    const isDone = item.status === 'done' || item.status === 'selesai' || item.realisasiStatus === 'terlaksana';
+    const isMatchedMonth = isProkerMatchingCurrentMonth(item, currentMonthIdx, currentYearVal);
+    let effectiveStatus = item.status || 'planned';
+
+    if (isDone) {
+      effectiveStatus = 'done';
+    } else if (isMatchedMonth || item.status === 'ongoing' || item.status === 'berjalan' || item.status === 'sedang_berlangsung') {
+      effectiveStatus = 'ongoing';
+    } else if (item.status === 'upcoming' || item.status === 'akan_datang') {
+      effectiveStatus = 'upcoming';
+    } else {
+      effectiveStatus = 'planned';
+    }
+
+    return {
+      ...item,
+      effectiveStatus,
+      isAutoCurrentMonth: !isDone && isMatchedMonth
+    };
+  });
+
+  let filteredData = enrichedList;
   if (currentProkerFilter === 'ongoing') {
-    filteredData = allProker.filter(p => p.status === 'ongoing' || p.status === 'berjalan' || p.status === 'sedang_berlangsung');
+    filteredData = enrichedList.filter(p => p.effectiveStatus === 'ongoing');
   } else if (currentProkerFilter === 'upcoming') {
-    filteredData = allProker.filter(p => p.status === 'upcoming' || p.status === 'akan_datang');
+    filteredData = enrichedList.filter(p => p.effectiveStatus === 'upcoming');
   } else if (currentProkerFilter === 'planned') {
-    filteredData = allProker.filter(p => p.status === 'planned' || p.status === 'direncanakan');
+    filteredData = enrichedList.filter(p => p.effectiveStatus === 'planned');
   } else if (currentProkerFilter === 'done') {
-    filteredData = allProker.filter(p => p.status === 'done' || p.status === 'selesai');
+    filteredData = enrichedList.filter(p => p.effectiveStatus === 'done');
   }
 
   if (filteredData.length === 0) {
     list.innerHTML = `
       <div class="text-center py-12 text-slate-500 dark:text-slate-400">
         <span class="material-symbols-outlined text-4xl mb-2 text-slate-400">event_busy</span>
-        <p class="font-medium text-sm">Tidak ada program kerja dengan status ini.</p>
+        <p class="font-medium text-sm">Tidak ada program kerja pada kategori/status ini.</p>
       </div>
     `;
     if (paginationContainer) paginationContainer.innerHTML = '';
@@ -242,10 +313,15 @@ function renderProker() {
   const currentData = filteredData.slice(startIndex, endIndex);
 
   list.innerHTML = currentData.map((item, index) => {
-    const globalIndex = startIndex + index + 1;
-    const rawStatus = item.status || 'planned';
+    const rawStatus = item.effectiveStatus || item.status || 'planned';
     const statusClass = getStatusClass(rawStatus);
     const statusLabel = getStatusLabel(rawStatus);
+    const isTerlaksana = item.realisasiStatus === 'terlaksana';
+    const realisasiBadge = isTerlaksana ? `
+      <span class="proker-realisasi-badge terlaksana" style="font-size:10px;padding:2px 7px;background:#dcfce7;color:#15803d;border-radius:4px;font-weight:700;">
+        Terlaksana
+      </span>
+    ` : '';
     const tempatHtml = item.tempat ? `
       <span class="proker-meta-sep">&bull;</span>
       <span class="proker-meta-item">
@@ -259,15 +335,31 @@ function renderProker() {
       </div>
     ` : '';
 
+    const isRoutine = isProkerRoutine(item);
+    const routinePill = isRoutine ? `
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" title="Kegiatan Rutin Bulanan">
+        <span class="material-symbols-outlined text-[13px]">autorenew</span> Rutin
+      </span>
+      <span class="proker-meta-sep">&bull;</span>
+    ` : (item.isAutoCurrentMonth ? `
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" title="Terjadwal di Bulan Berjalan">
+        <span class="material-symbols-outlined text-[13px]">alarm</span> Bulan Ini
+      </span>
+      <span class="proker-meta-sep">&bull;</span>
+    ` : '');
+
     return `
       <div class="proker-item group/proker" data-expanded="false">
-        <div class="proker-dot ${statusClass}"></div>
+        <div class="proker-dot-badge ${statusClass}">
+          <div class="proker-dot-inner ${statusClass}"></div>
+        </div>
         <div class="proker-content">
           <div class="proker-row-header cursor-pointer md:cursor-default flex items-center justify-between" onclick="if(window.innerWidth < 768) { this.closest('.proker-item').dataset.expanded = this.closest('.proker-item').dataset.expanded === 'true' ? 'false' : 'true'; }">
             <div class="proker-title flex-1 pr-2">
-              <span style="color:var(--blue);margin-right:4px;">${item.no || globalIndex}.</span> ${item.kegiatan}
+              ${item.kegiatan}
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0">
+              ${realisasiBadge}
               <span class="proker-status-badge ${statusClass}">
                 <span class="dot ${statusClass}"></span>
                 <span>${statusLabel}</span>
@@ -281,6 +373,19 @@ function renderProker() {
           <!-- Details (hidden on mobile unless expanded) -->
           <div class="proker-details hidden md:block mt-3 md:mt-0">
             <div class="proker-meta">
+              ${routinePill}
+              ${item.kategori === 'KMM' ? `
+                <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                  <span class="material-symbols-outlined text-[12px]">diversity_3</span>
+                  Divisi ${item.subBidang || 'Umum'}
+                </span>
+                <span class="proker-meta-sep">&bull;</span>
+              ` : `
+                <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  ${item.penanggungJawab || 'PPG'}
+                </span>
+                <span class="proker-meta-sep">&bull;</span>
+              `}
               <span class="proker-meta-item">
                 <span class="material-symbols-outlined ms-proker-ic">calendar_today</span>
                 <span>${item.waktu}</span>
@@ -289,8 +394,15 @@ function renderProker() {
               <span class="proker-meta-sep">&bull;</span>
               <span class="proker-meta-item">
                 <span class="material-symbols-outlined ms-proker-ic">group</span>
-                <span>${item.sasaran}</span>
+                <span>${item.sasaran || '-'}</span>
               </span>
+              ${(item.estBiaya || 0) > 0 ? `
+                <span class="proker-meta-sep">&bull;</span>
+                <span class="proker-meta-item" style="color:#057a55;font-weight:700;">
+                  <span class="material-symbols-outlined ms-proker-ic" style="color:#057a55;">payments</span>
+                  <span>RAB: Rp ${(item.estBiaya || 0).toLocaleString('id-ID')}</span>
+                </span>
+              ` : ''}
             </div>
             ${tujuanHtml}
           </div>
@@ -352,6 +464,21 @@ if (filterBarContainer) {
     currentProkerFilter = (currentProkerFilter === filterVal) ? 'all' : filterVal;
     currentProkerPage = 1;
     renderProker();
+  });
+}
+
+// Bind event listener sub-tab segment proker (Event vs Rutin)
+const segmentBarContainer = document.getElementById('prokerSegmentBar');
+if (segmentBarContainer) {
+  segmentBarContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('.proker-segment-btn');
+    if (!btn) return;
+    const seg = btn.dataset.segment;
+    if (seg && seg !== currentProkerSegment) {
+      currentProkerSegment = seg;
+      currentProkerPage = 1;
+      renderProker();
+    }
   });
 }
 

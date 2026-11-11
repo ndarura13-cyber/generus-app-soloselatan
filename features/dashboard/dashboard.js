@@ -656,7 +656,10 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     openMenuPengurus('all');
   });
 
-  mobNavHome?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  mobNavHome?.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+  });
   mobNavPengurus?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   mobNavProfil?.addEventListener('click', () => { renderSelfProfileModal(); });
   mobNavLogout?.addEventListener('click', doLogout);

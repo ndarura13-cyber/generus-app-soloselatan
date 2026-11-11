@@ -46,7 +46,7 @@
     rel="stylesheet" />
 
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=7.8" />
+  <link rel="stylesheet" href="dashboard.css?v=7.9" />
 
   <!-- SheetJS Pustaka Excel (.xlsx / .xls) Asli (Client-side) -->
   <script src="../../src/vendor/xlsx.full.min.js"></script>
@@ -750,30 +750,29 @@
           </div>
 
           <!-- Status Filter Bar -->
-          <div class="flex items-center gap-2 text-xs font-semibold w-full md:w-auto overflow-x-auto no-scrollbar py-1"
-            id="dashProkerFilterBar">
+          <div class="dash-proker-filter-scroll" id="dashProkerFilterBar">
             <button type="button"
-              class="dash-proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold shrink-0"
+              class="dash-proker-filter-btn"
               data-filter="all" title="Tampilkan Semua Program Kerja">
-              <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Semua
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Semua
             </button>
             <button type="button"
-              class="dash-proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold shrink-0"
+              class="dash-proker-filter-btn"
               data-filter="ongoing" title="Filter Program Kerja Berjalan">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Berjalan
             </button>
             <button type="button"
-              class="dash-proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold shrink-0"
+              class="dash-proker-filter-btn"
               data-filter="upcoming" title="Filter Program Kerja Akan Datang">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Akan Datang
             </button>
             <button type="button"
-              class="dash-proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold shrink-0"
+              class="dash-proker-filter-btn"
               data-filter="planned" title="Filter Program Kerja Direncanakan">
               <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> Direncanakan
             </button>
             <button type="button"
-              class="dash-proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold shrink-0"
+              class="dash-proker-filter-btn"
               data-filter="done" title="Filter Program Kerja Selesai">
               <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Selesai
             </button>
@@ -911,12 +910,12 @@
   <div id="mobileBottomNav"
     class="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50 flex items-center justify-around pb-safe pt-1 shadow-[0_-4px_16px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.4)]">
 
-    <!-- Beranda -->
-    <button id="mobNavHome"
-      class="flex flex-col items-center justify-center p-2 w-16 text-brandBlue dark:text-blue-400">
+    <!-- Beranda (Mengarah ke Landing Page / Home Page) -->
+    <a href="../../index.html" id="mobNavHome"
+      class="flex flex-col items-center justify-center p-2 w-16 text-slate-500 hover:text-brandBlue dark:hover:text-blue-400 transition-colors" title="Ke Beranda Utama (Landing Page)">
       <span class="material-symbols-outlined text-[24px]">home</span>
       <span class="text-[10px] font-bold mt-1">Beranda</span>
-    </button>
+    </a>
 
     <!-- Struktur Pengurus -->
     <button id="mobNavPengurus"
@@ -984,7 +983,7 @@
     class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
-  <script type="module" src="dashboard.js?v=7.8"></script>
+  <script type="module" src="dashboard.js?v=7.9"></script>
 </body>
 
 </html>

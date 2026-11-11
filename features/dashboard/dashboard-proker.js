@@ -2372,24 +2372,13 @@ export function renderInlineProkerWidget() {
       : 'Menampilkan kegiatan berkala bulanan (musyawarah, shadaqoh, operasional pokja, dll.)';
   }
 
-  // Update visual state tombol filter status
+  // Update visual state tombol filter status (Kelas seragam, zero height discrepancy)
   const filterBtns = document.querySelectorAll('.dash-proker-filter-btn');
   filterBtns.forEach(btn => {
     const f = btn.dataset.filter;
+    btn.classList.remove('active-ongoing', 'active-upcoming', 'active-planned', 'active-done', 'active-all');
     if (f === currentDashProkerFilter) {
-      if (f === 'ongoing') {
-        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-emerald-300 bg-emerald-500 text-white font-bold shadow-md ring-2 ring-emerald-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'upcoming') {
-        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-amber-300 bg-amber-500 text-white font-bold shadow-md ring-2 ring-amber-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'planned') {
-        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-blue-300 bg-blue-500 text-white font-bold shadow-md ring-2 ring-blue-300/40 cursor-pointer transition-all duration-200';
-      } else if (f === 'done') {
-        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-slate-300 bg-slate-500 text-white font-bold shadow-md ring-2 ring-slate-300/40 cursor-pointer transition-all duration-200';
-      } else {
-        btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-white bg-white text-brandBlue font-bold shadow-md ring-2 ring-white/40 cursor-pointer transition-all duration-200';
-      }
-    } else {
-      btn.className = 'dash-proker-filter-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white/90 font-medium cursor-pointer transition-all duration-200';
+      btn.classList.add(`active-${f}`);
     }
   });
 
@@ -2502,14 +2491,12 @@ export function renderInlineProkerWidget() {
             <div class="proker-title flex-1 pr-2">
               ${item.kegiatan}
             </div>
-            <div class="flex items-center gap-2">
-              <div class="hidden md:flex items-center gap-2">
-                ${realisasiBadge}
-                <span class="proker-status-badge ${statusClass}">
-                  <span class="dot ${statusClass}"></span>
-                  <span>${statusLabel}</span>
-                </span>
-              </div>
+            <div class="flex items-center gap-2 shrink-0">
+              ${realisasiBadge}
+              <span class="proker-status-badge ${statusClass}">
+                <span class="dot ${statusClass}"></span>
+                <span>${statusLabel}</span>
+              </span>
               <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 20px;">
                 chevron_right
               </span>

@@ -91,7 +91,7 @@
     }
   </script>
   <!-- Optional: Keep original stylesheet just in case for some complex animations/overrides not covered here -->
-  <link rel="stylesheet" href="src/style.css" />
+  <link rel="stylesheet" href="src/style.css?v=4.7" />
 
   <style type="text/tailwindcss">
     /* Tailwind utilities specifically needed for smooth glassmorphism overriding style.css defaults */
@@ -606,22 +606,44 @@
             </div>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2 text-xs font-semibold" id="prokerStatusFilterBar">
-            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="all" title="Tampilkan Semua Program Kerja">
-              <span class="w-2.5 h-2.5 rounded-full bg-white/80"></span> Semua
+          <div class="proker-filter-scroll" id="prokerStatusFilterBar">
+            <button type="button" class="proker-filter-btn" data-filter="all" title="Tampilkan Semua Program Kerja">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Semua
             </button>
-            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="ongoing" title="Filter Program Kerja Berjalan">
+            <button type="button" class="proker-filter-btn" data-filter="ongoing" title="Filter Program Kerja Berjalan">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Berjalan
             </button>
-            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="upcoming" title="Filter Program Kerja Akan Datang">
+            <button type="button" class="proker-filter-btn" data-filter="upcoming" title="Filter Program Kerja Akan Datang">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Akan Datang
             </button>
-            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="planned" title="Filter Program Kerja Direncanakan">
+            <button type="button" class="proker-filter-btn" data-filter="planned" title="Filter Program Kerja Direncanakan">
               <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> Direncanakan
             </button>
-            <button type="button" class="proker-filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-semibold" data-filter="done" title="Filter Program Kerja Selesai">
+            <button type="button" class="proker-filter-btn" data-filter="done" title="Filter Program Kerja Selesai">
               <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Selesai
             </button>
+          </div>
+        </div>
+
+        <!-- Sub-Tab Segment: Event Utama vs Kegiatan Rutin Bulanan -->
+        <div class="px-4 sm:px-5 md:px-8 pt-3 sm:pt-4 pb-2 sm:pb-0 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-700/60 gap-2 sm:gap-3">
+          <div class="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl text-xs font-bold gap-1 sm:gap-0" id="prokerSegmentBar">
+            <button type="button"
+              class="proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-sm font-bold cursor-pointer"
+              data-segment="event" title="Tampilkan Program Kerja Event / Insidental">
+              <span class="material-symbols-outlined text-[16px]">event_available</span>
+              <span>Event &amp; Agenda Utama</span>
+            </button>
+            <button type="button"
+              class="proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-medium cursor-pointer"
+              data-segment="routine" title="Tampilkan Kegiatan Rutin Bulanan">
+              <span class="material-symbols-outlined text-[16px]">autorenew</span>
+              <span>Kegiatan Rutin Bulanan</span>
+              <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold ml-1" id="prokerRoutineCount">0</span>
+            </button>
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:block" id="prokerSegmentDesc">
+            Menampilkan agenda event &amp; milestone terjadwal
           </div>
         </div>
 
@@ -938,8 +960,8 @@
     }
   </script>
 
-  <script type="module" src="src/popup-jenjang.js?v=4.6"></script>
-  <script type="module" src="src/app.js?v=4.6"></script>
+  <script type="module" src="src/popup-jenjang.js?v=4.7"></script>
+  <script type="module" src="src/app.js?v=4.7"></script>
 </body>
 
 </html>

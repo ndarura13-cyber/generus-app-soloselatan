@@ -1032,6 +1032,161 @@ img {
   background: #3b82f6;
 }
 
+/* ── Filter Bar Status Scrollable & Seragam (Zero Height Discrepancy) ── */
+.proker-filter-scroll {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding: 4px 2px !important;
+  width: 100% !important;
+  flex-wrap: nowrap !important;
+}
+
+.proker-filter-scroll::-webkit-scrollbar {
+  display: none !important;
+}
+
+.proker-filter-btn {
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 0 14px !important;
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.proker-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.proker-filter-btn.active-ongoing {
+  background: #10b981 !important;
+  border-color: #6ee7b7 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35) !important;
+}
+
+.proker-filter-btn.active-upcoming {
+  background: #f59e0b !important;
+  border-color: #fde68a !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35) !important;
+}
+
+.proker-filter-btn.active-planned {
+  background: #3b82f6 !important;
+  border-color: #93c5fd !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35) !important;
+}
+
+.proker-filter-btn.active-done {
+  background: #64748b !important;
+  border-color: #cbd5e1 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(100, 116, 139, 0.35) !important;
+}
+
+.proker-filter-btn.active-all {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #1e40af !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ── Proker Dot Circle Badge ── */
+.proker-dot-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.2s ease;
+}
+
+.proker-dot-badge.ongoing {
+  background: #d1fae5;
+}
+
+.proker-dot-badge.upcoming {
+  background: #fef3c7;
+}
+
+.proker-dot-badge.planned {
+  background: #dbeafe;
+}
+
+.proker-dot-badge.done {
+  background: #f1f5f9;
+}
+
+.dark .proker-dot-badge.ongoing {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.dark .proker-dot-badge.upcoming {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.dark .proker-dot-badge.planned {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.dark .proker-dot-badge.done {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.proker-dot-inner {
+  width: 11px;
+  height: 11px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.proker-dot-inner.ongoing {
+  background: #10b981;
+}
+
+.proker-dot-inner.upcoming {
+  background: #f59e0b;
+}
+
+.proker-dot-inner.planned {
+  background: #3b82f6;
+}
+
+.proker-dot-inner.done {
+  background: #94a3b8;
+}
+
 @keyframes pulse-dot {
 
   0%,
