@@ -35,21 +35,37 @@ export function setProkerHooks(hooks) {
 }
 
 export const DAFTAR_BIDANG_PPG = [
-  'Ketua',
-  'Wakil Ketua',
   'Sekretaris',
   'Bendahara',
   'Kurikulum',
   'Tenaga Pendidik',
   'Penggalang Dana',
-  'Sarana dan Prasarana',
-  'Kegiatan Muda Mudi',
+  'Sarana Prasarana',
+  'KMM',
   'Seni dan Olahraga',
   'Kemandirian',
   'Keputrian',
-  'Bimbingan Konseling',
+  'BK',
   'Tahfidz'
 ];
+
+export function getPpgBidangOrderIndex(name) {
+  if (!name) return 99;
+  const n = String(name).toLowerCase();
+  if (n.includes('sekretaris')) return 1;
+  if (n.includes('bendahara')) return 2;
+  if (n.includes('kurikulum')) return 3;
+  if (n.includes('tenaga pendidik') || n.includes('tendik') || n.includes('guru')) return 4;
+  if (n.includes('penggalang dana') || n.includes('dana') || n.includes('penggalangan')) return 5;
+  if (n.includes('sarana') || n.includes('prasarana') || n.includes('sarpras')) return 6;
+  if (n.includes('kmm') || n.includes('muda mudi') || n.includes('muda-mudi')) return 7;
+  if (n.includes('seni') || n.includes('olah raga') || n.includes('olahraga')) return 8;
+  if (n.includes('kemandirian')) return 9;
+  if (n.includes('keputrian')) return 10;
+  if (n.includes('bk') || n.includes('bimbingan') || n.includes('konseling')) return 11;
+  if (n.includes('tahfidz') || n.includes('tahfiz')) return 12;
+  return 90;
+}
 
 export { DAFTAR_SUB_BIDANG_KMM };
 
@@ -170,55 +186,55 @@ export function generateKmmRekapanUmumTableHtml(kmmItems = []) {
 
     // Rincian Biaya: Terlampir with rowspan=9 on the first row
     const rincianCell = (idx === 0)
-      ? `<td rowspan="9" style="text-align:center;vertical-align:middle;padding:10px 6px;border:1px solid #000;font-weight:bold;color:#0066cc;font-size:12px;letter-spacing:0.3px;">Terlampir</td>`
+      ? `<td rowspan="9" style="text-align:center;vertical-align:middle;padding:10px 6px;border:1px solid #94a3b8;font-weight:bold;color:#0b386b;font-size:12px;letter-spacing:0.3px;">Terlampir</td>`
       : '';
 
     return `
       <tr style="height:26px;">
-        <td style="text-align:center;padding:5px 4px;border:1px solid #000;font-weight:bold;font-size:11px;">${idx + 1}</td>
-        <td style="padding:5px 8px;border:1px solid #000;font-weight:bold;font-size:11px;letter-spacing:0.3px;">${item.label}</td>
-        <td style="border:1px solid #000;width:80px;"></td>
-        <td style="border:1px solid #000;width:110px;"></td>
-        <td style="border:1px solid #000;width:140px;"></td>
+        <td style="text-align:center;padding:5px 4px;border:1px solid #cbd5e1;font-weight:bold;font-size:11px;">${idx + 1}</td>
+        <td style="padding:5px 8px;border:1px solid #cbd5e1;font-weight:bold;font-size:11px;letter-spacing:0.3px;">${item.label}</td>
+        <td style="border:1px solid #cbd5e1;width:80px;"></td>
+        <td style="border:1px solid #cbd5e1;width:110px;"></td>
+        <td style="border:1px solid #cbd5e1;width:140px;"></td>
         ${rincianCell}
-        <td style="text-align:right;padding:5px 8px;border:1px solid #000;font-weight:bold;font-size:11px;white-space:nowrap;">
+        <td style="text-align:right;padding:5px 8px;border:1px solid #cbd5e1;font-weight:bold;font-size:11px;white-space:nowrap;color:#0e7039;">
           ${formattedEst}
         </td>
-        <td style="text-align:center;padding:5px 6px;border:1px solid #000;font-size:11px;font-weight:600;">Daerah</td>
+        <td style="text-align:center;padding:5px 6px;border:1px solid #cbd5e1;font-size:11px;font-weight:600;">Daerah</td>
       </tr>
     `;
   }).join('');
 
   return `
-    <div class="kmm-rekapan-section" style="margin-bottom:24px;">
-      <table style="width:100%;border-collapse:collapse;font-size:11px;border:1.5px solid #000;margin-top:6px;">
+    <div class="kmm-rekapan-section" style="margin-bottom:20px;">
+      <table style="width:100%;border-collapse:collapse;font-size:10.5px;border:1.5px solid #94a3b8;margin-top:6px;">
         <thead>
           <tr style="background:#f1f5f9;">
-            <th style="width:35px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">NO</th>
-            <th style="min-width:180px;text-align:center;border:1px solid #000;padding:6px 8px;font-weight:800;font-size:10px;">KEGIATAN</th>
-            <th style="width:80px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">WAKTU</th>
-            <th style="width:110px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">SASARAN/<br/>PESERTA</th>
-            <th style="width:140px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">TUJUAN KEGIATAN</th>
-            <th style="width:110px;text-align:center;border:1px solid #000;padding:6px 4px;font-weight:800;font-size:10px;">RINCIAN BIAYA</th>
-            <th style="width:125px;text-align:center;border:1px solid #000;padding:6px 8px;font-weight:800;font-size:10px;">EST. BIAYA</th>
-            <th style="width:100px;text-align:center;border:1px solid #000;padding:6px 6px;font-weight:800;font-size:10px;">TEMPAT<br/>PELAKSANAAN</th>
+            <th style="width:35px;text-align:center;border:1px solid #94a3b8;padding:6px 4px;font-weight:800;font-size:9.5px;color:#334155;">NO</th>
+            <th style="min-width:180px;text-align:center;border:1px solid #94a3b8;padding:6px 8px;font-weight:800;font-size:9.5px;color:#334155;">KEGIATAN</th>
+            <th style="width:80px;text-align:center;border:1px solid #94a3b8;padding:6px 4px;font-weight:800;font-size:9.5px;color:#334155;">WAKTU</th>
+            <th style="width:110px;text-align:center;border:1px solid #94a3b8;padding:6px 4px;font-weight:800;font-size:9.5px;color:#334155;">SASARAN/<br/>PESERTA</th>
+            <th style="width:140px;text-align:center;border:1px solid #94a3b8;padding:6px 4px;font-weight:800;font-size:9.5px;color:#334155;">TUJUAN KEGIATAN</th>
+            <th style="width:110px;text-align:center;border:1px solid #94a3b8;padding:6px 4px;font-weight:800;font-size:9.5px;color:#334155;">RINCIAN BIAYA</th>
+            <th style="width:125px;text-align:center;border:1px solid #94a3b8;padding:6px 8px;font-weight:800;font-size:9.5px;color:#334155;">EST. BIAYA</th>
+            <th style="width:100px;text-align:center;border:1px solid #94a3b8;padding:6px 6px;font-weight:800;font-size:9.5px;color:#334155;">TEMPAT<br/>PELAKSANAAN</th>
           </tr>
-          <tr style="background:#8b0000;color:#ffffff;">
-            <td colspan="8" style="padding:8px 10px;border:1px solid #000;font-weight:900;font-size:13px;letter-spacing:0.5px;">
+          <tr style="background:#cfe2f3;color:#0b386b;">
+            <td colspan="8" style="padding:7px 10px;border:1px solid #94a3b8;font-weight:900;font-size:12px;letter-spacing:0.5px;color:#0b386b;">
               G. KEGIATAN MUDA MUDI (2026)
             </td>
           </tr>
         </thead>
         <tbody>
           ${rows}
-          <tr style="background:#ffffff;font-weight:bold;border-top:2px solid #000;border-bottom:2px solid #000;height:28px;">
-            <td colspan="6" style="text-align:right;padding:7px 10px;border:1px solid #000;font-weight:900;font-size:11.5px;letter-spacing:0.5px;">
+          <tr style="background:#f8fafc;font-weight:bold;border-top:1.5px solid #64748b;border-bottom:1.5px solid #64748b;height:28px;">
+            <td colspan="6" style="text-align:right;padding:6px 8px;border:1px solid #94a3b8;font-weight:900;font-size:11px;letter-spacing:0.5px;color:#1e293b;">
               SUB TOTAL
             </td>
-            <td style="text-align:right;padding:7px 8px;border:1px solid #000;font-weight:900;font-size:12px;white-space:nowrap;">
+            <td style="text-align:right;padding:6px 8px;border:1px solid #94a3b8;font-weight:900;font-size:11.5px;white-space:nowrap;color:#0e7039;">
               Rp ${totalKmmEst.toLocaleString('id-ID')}
             </td>
-            <td style="border:1px solid #000;"></td>
+            <td style="border:1px solid #94a3b8;"></td>
           </tr>
         </tbody>
       </table>
@@ -248,7 +264,12 @@ function generatePrintRows(items, isKmm) {
       const idxB = DAFTAR_SUB_BIDANG_KMM.findIndex(sb => b.includes(sb.toUpperCase()));
       return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
     })
-    : Object.keys(grouped).sort();
+    : Object.keys(grouped).sort((a, b) => {
+      const orderA = getPpgBidangOrderIndex(a);
+      const orderB = getPpgBidangOrderIndex(b);
+      if (orderA !== orderB) return orderA - orderB;
+      return a.localeCompare(b);
+    });
 
   sortedKeys.forEach(pic => {
     const letter = alphabet[letterIdx % alphabet.length] || '';
@@ -319,13 +340,16 @@ function generatePrintRows(items, isKmm) {
 
 export async function printProkerTable(kategori = currentActiveKategori) {
   const isKmm = (kategori || currentActiveKategori) === 'KMM';
-  const prokerList = getProkerList().filter(p => isKmm ? p.kategori === 'KMM' : (p.kategori || 'PPG') === 'PPG');
+  const allProker = getProkerList();
+  const prokerList = allProker.filter(p => isKmm ? p.kategori === 'KMM' : (p.kategori || 'PPG') === 'PPG');
+  const kmmList = allProker.filter(p => p.kategori === 'KMM');
   const stats = getProkerStats(isKmm ? 'KMM' : 'PPG');
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
   const { rowsHtml, catTotalEst, catTotalReal } = generatePrintRows(prokerList, isKmm);
-  const rekapanUmumHtml = isKmm ? generateKmmRekapanUmumTableHtml(prokerList) : '';
+  const kmmTotalEst = kmmList.reduce((sum, p) => sum + (Number(p.estBiaya) || 0), 0);
+  const rekapanUmumHtml = generateKmmRekapanUmumTableHtml(kmmList);
 
   const titleText = isKmm
     ? 'PROGRAM KERJA & LAPORAN REALISASI ANGGARAN BIDANG KEGIATAN MUDA-MUDI (KMM)'
@@ -333,7 +357,7 @@ export async function printProkerTable(kategori = currentActiveKategori) {
   const subtitleText = isKmm
     ? '9 Sub-Bidang / Divisi Resmi KMM &bull; Tahun Anggaran 2026 &bull; Format Resmi LPJ'
     : 'Bidang-Bidang Pengurus Daerah &bull; Tahun Anggaran 2026 &bull; Format Resmi LPJ';
-  const totalLabel = isKmm ? 'TOTAL KESELURUHAN BIDANG KMM' : 'TOTAL KESELURUHAN (SEMUA BIDANG)';
+  const totalLabel = isKmm ? 'TOTAL KESELURUHAN BIDANG KMM' : 'SUB TOTAL PROGRAM BIDANG PPG';
 
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -343,7 +367,7 @@ export async function printProkerTable(kategori = currentActiveKategori) {
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 16px; color:#1e293b; }
         h2 { margin: 0 0 2px 0; color: #0b386b; font-size: 16px; font-weight: 800; }
-        h3 { margin: 16px 0 6px 0; color: #1e40af; font-size: 13px; font-weight: 800; border-bottom: 1.5px solid #94a3b8; padding-bottom: 4px; }
+        h3 { margin: 16px 0 6px 0; color: #0b386b; font-size: 13px; font-weight: 800; border-bottom: 1.5px solid #94a3b8; padding-bottom: 4px; }
         p { margin: 2px 0 12px 0; font-size: 11px; color:#64748b; }
         table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
         th { background: #f1f5f9; padding: 7px 5px; border:1px solid #94a3b8; text-align: left; font-size: 9.5px; font-weight: 800; color:#334155; }
@@ -360,18 +384,22 @@ export async function printProkerTable(kategori = currentActiveKategori) {
       <h2>${titleText}</h2>
       <p>${subtitleText} &bull; Dicetak: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
       <div class="summary-box">
-        <div><strong>Total Program:</strong> ${stats.total}</div>
+        <div><strong>Total Program ${isKmm ? 'KMM' : 'PPG'}:</strong> ${stats.total} Prog</div>
         <div><strong>Est. Anggaran (RAB):</strong> Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</div>
+        ${!isKmm ? `<div><strong>Alokasi KMM (9 Divisi):</strong> Rp ${kmmTotalEst.toLocaleString('id-ID')}</div>` : ''}
+        ${!isKmm ? `<div><strong>Total Konsolidasi:</strong> Rp ${(stats.totalAnggaran + kmmTotalEst).toLocaleString('id-ID')}</div>` : ''}
         <div><strong>Realisasi Dana:</strong> Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</div>
         <div><strong>Penyerapan:</strong> ${stats.persenRealisasiDana}%</div>
         <div><strong>Ketercapaian:</strong> ${stats.totalTerlaksana} Terlaksana &bull; ${stats.totalBelumTerlaksana} Belum</div>
       </div>
 
       ${isKmm ? `
-        <h3 style="margin:16px 0 6px 0; color:#8b0000; font-size:13.5px; font-weight:900;">I. REKAPAN UMUM BIDANG KEGIATAN MUDA MUDI (9 SUB-BIDANG)</h3>
+        <h3 style="margin:16px 0 6px 0; color:#0b386b; font-size:13.5px; font-weight:900;">I. REKAPAN UMUM BIDANG KEGIATAN MUDA MUDI (9 SUB-BIDANG)</h3>
         ${rekapanUmumHtml}
         <h3 style="margin:22px 0 6px 0; color:#0b386b; font-size:13px; font-weight:800;">II. LAMPIRAN: RINCIAN PROGRAM KERJA &amp; REALISASI LPJ KMM PER SUB-BIDANG</h3>
-      ` : ''}
+      ` : `
+        <h3 style="margin:16px 0 6px 0; color:#0b386b; font-size:13px; font-weight:800;">BAGIAN I: PROGRAM KERJA BIDANG-BIDANG PENGURUS PPG DAERAH</h3>
+      `}
 
       <table>
         <thead>
@@ -405,6 +433,23 @@ export async function printProkerTable(kategori = currentActiveKategori) {
           </tr>
         </tbody>
       </table>
+
+      ${!isKmm ? `
+        <div class="page-break"></div>
+        <h3 style="margin:24px 0 6px 0; color:#0b386b; font-size:13.5px; font-weight:800; border-bottom:1.5px solid #94a3b8; padding-bottom:4px;">
+          BAGIAN II: REKAPAN UMUM BIDANG KEGIATAN MUDA-MUDI (KMM - 9 DIVISI)
+        </h3>
+        <p style="margin:2px 0 8px 0; font-size:11px; color:#64748b;">
+          Rekapan pagu alokasi anggaran 9 divisi KMM Daerah Solo Selatan tahun 2026 (Detail rincian lampiran program kerja terlampir pada dokumen pleno tersendiri).
+        </p>
+        ${rekapanUmumHtml}
+
+        <div style="margin-top:16px; padding:10px 14px; background:#cfe2f3; border:2px solid #0b386b; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-weight:900; font-size:12px; color:#0b386b;">
+          <span>TOTAL ESTIMASI ANGGARAN KONSOLIDASI DAERAH (PPG + 9 DIVISI KMM)</span>
+          <span style="font-size:13.5px; color:#0e7039;">Rp ${(catTotalEst + kmmTotalEst).toLocaleString('id-ID')}</span>
+        </div>
+      ` : ''}
+
       <script>window.onload = function() { window.print(); };<\/script>
     </body>
     </html>
@@ -497,7 +542,7 @@ export async function printProkerBukuPlenoLengkap() {
       <div class="page-break"></div>
 
       <h3>BAGIAN II: PROGRAM KERJA 9 DIVISI BIDANG KEGIATAN MUDA-MUDI (KMM)</h3>
-      <h4 style="margin:12px 0 6px 0; color:#8b0000; font-size:12.5px; font-weight:800;">A. REKAPAN UMUM BIDANG KMM (9 DIVISI)</h4>
+      <h4 style="margin:12px 0 6px 0; color:#0b386b; font-size:12.5px; font-weight:800;">A. REKAPAN UMUM BIDANG KMM (9 DIVISI)</h4>
       ${generateKmmRekapanUmumTableHtml(kmmList)}
 
       <h4 style="margin:20px 0 6px 0; color:#0b386b; font-size:12.5px; font-weight:800;">B. LAMPIRAN: RINCIAN PROGRAM KERJA &amp; REALISASI LPJ KMM PER SUB-BIDANG</h4>
@@ -782,7 +827,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       `<option value="${b}" ${filterBidang === b ? 'selected' : ''}>Bidang ${b}</option>`
     ).join('');
 
-  const bidangAllLabel = isKmmActive ? 'Semua Sub-Bidang KMM (9 Divisi)' : 'Semua Bidang PPG (14 Bidang)';
+  const bidangAllLabel = isKmmActive ? 'Semua Sub-Bidang KMM (9 Divisi)' : 'Semua Bidang PPG (12 Bidang)';
 
   const filterHtml = `
     <div class="proker-filter-bar">
@@ -814,27 +859,47 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </div>
       </div>
 
-      <!-- BARIS 3: AKSI EKSPOR & TABS TAMPILAN -->
+      <!-- BARIS 3: AKSI TABS & DROPDOWN DOWNLOAD (RESPONSIVE FULL-WIDTH PADA MOBILE) -->
       <div class="proker-filter-row-3">
-        <div class="proker-export-btns">
-          <button type="button" id="btnExportCsv" class="proker-btn-csv" title="Download data dalam format Excel CSV">
-            <span class="material-symbols-outlined" style="font-size:16px;">file_download</span> CSV ${isKmmActive ? 'KMM' : 'PPG'}
+        <div class="proker-view-controls-bar">
+          <button type="button" id="tabViewTimeline" class="proker-control-tab ${activeTab === 'timeline' ? 'active' : ''}">
+            <span class="material-symbols-outlined" style="font-size:16px;">view_timeline</span>
+            <span>Timeline</span>
           </button>
-          <button type="button" id="btnPrintTable" class="proker-btn-print" title="Cetak dokumen resmi tab ini">
-            <span class="material-symbols-outlined" style="font-size:16px;">print</span> Cetak
+          <button type="button" id="tabViewTable" class="proker-control-tab ${activeTab === 'table' ? 'active' : ''}">
+            <span class="material-symbols-outlined" style="font-size:16px;">table_chart</span>
+            <span>Tabel</span>
           </button>
-          <button type="button" id="btnPrintPlenoGabungan" class="proker-btn-gabungan" title="Cetak Buku Pleno Komprehensif Gabungan (PPG + 9 Divisi KMM)">
-            <span class="material-symbols-outlined" style="font-size:16px;">menu_book</span> Buku Gabungan
-          </button>
-        </div>
-
-        <div class="proker-tabs-wrap">
-          <button type="button" id="tabViewTimeline" class="proker-tab-pill ${activeTab === 'timeline' ? 'active' : ''}">
-            <span class="material-symbols-outlined" style="font-size:15px;">view_timeline</span> Timeline
-          </button>
-          <button type="button" id="tabViewTable" class="proker-tab-pill ${activeTab === 'table' ? 'active' : ''}">
-            <span class="material-symbols-outlined" style="font-size:15px;">table_chart</span> Tabel
-          </button>
+          <div class="proker-dropdown-container">
+            <button type="button" id="btnProkerDownloadDropdown" class="proker-control-tab proker-dropdown-trigger" aria-haspopup="true" aria-expanded="false" title="Download & Cetak Program Kerja">
+              <span class="material-symbols-outlined" style="font-size:16px;">file_download</span>
+              <span>Download</span>
+              <span class="material-symbols-outlined dropdown-arrow" style="font-size:16px;">expand_more</span>
+            </button>
+            <div id="prokerDownloadMenu" class="proker-dropdown-menu hidden">
+              <button type="button" id="btnExportCsv" class="proker-dropdown-item">
+                <span class="material-symbols-outlined" style="color:#057a55;font-size:18px;">table_view</span>
+                <div class="dropdown-item-text">
+                  <div class="item-title">Convert ke CSV</div>
+                  <div class="item-desc">Format Excel CSV (${isKmmActive ? 'KMM' : 'PPG'})</div>
+                </div>
+              </button>
+              <button type="button" id="btnPrintTable" class="proker-dropdown-item">
+                <span class="material-symbols-outlined" style="color:#1d4ed8;font-size:18px;">print</span>
+                <div class="dropdown-item-text">
+                  <div class="item-title">Cetak Proker ${isKmmActive ? 'KMM' : 'PPG'}</div>
+                  <div class="item-desc">${isKmmActive ? '9 Divisi Resmi KMM' : 'Bidang PPG + Rekapan Umum KMM'}</div>
+                </div>
+              </button>
+              <button type="button" id="btnPrintPlenoGabungan" class="proker-dropdown-item">
+                <span class="material-symbols-outlined" style="color:#7c3aed;font-size:18px;">menu_book</span>
+                <div class="dropdown-item-text">
+                  <div class="item-title">Cetak Gabungan</div>
+                  <div class="item-desc">Buku Pleno Lengkap PPG + Lampiran KMM</div>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1213,6 +1278,30 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   document.getElementById('selectFilterBidang')?.addEventListener('change', (e) => {
     renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori);
   });
+
+  // Dropdown Download & Ekspor
+  const btnDownloadDropdown = document.getElementById('btnProkerDownloadDropdown');
+  const prokerDownloadMenu = document.getElementById('prokerDownloadMenu');
+  if (btnDownloadDropdown && prokerDownloadMenu) {
+    btnDownloadDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isExpanded = btnDownloadDropdown.getAttribute('aria-expanded') === 'true';
+      btnDownloadDropdown.setAttribute('aria-expanded', !isExpanded);
+      prokerDownloadMenu.classList.toggle('hidden', isExpanded);
+    });
+
+    prokerDownloadMenu.addEventListener('click', () => {
+      prokerDownloadMenu.classList.add('hidden');
+      btnDownloadDropdown.setAttribute('aria-expanded', 'false');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!prokerDownloadMenu.contains(e.target) && e.target !== btnDownloadDropdown) {
+        prokerDownloadMenu.classList.add('hidden');
+        btnDownloadDropdown.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
 
   // 3. Tombol Ekspor CSV & Cetak Dokumen
   document.getElementById('btnExportCsv')?.addEventListener('click', () => {
@@ -2270,9 +2359,9 @@ export function renderInlineProkerWidget() {
   segmentBtns.forEach(btn => {
     const s = btn.dataset.segment;
     if (s === currentDashProkerSegment) {
-      btn.className = 'dash-proker-segment-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-sm font-bold cursor-pointer';
+      btn.className = 'dash-proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-sm font-bold cursor-pointer';
     } else {
-      btn.className = 'dash-proker-segment-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-medium cursor-pointer';
+      btn.className = 'dash-proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-medium cursor-pointer';
     }
   });
 
@@ -2405,18 +2494,22 @@ export function renderInlineProkerWidget() {
 
     return `
       <div class="proker-item group/proker" data-expanded="false">
-        <div class="proker-dot ${statusClass}"></div>
+        <div class="proker-dot-badge ${statusClass}">
+          <div class="proker-dot-inner ${statusClass}"></div>
+        </div>
         <div class="proker-content">
           <div class="proker-row-header cursor-pointer md:cursor-default flex items-center justify-between" onclick="if(window.innerWidth < 768) { this.closest('.proker-item').dataset.expanded = this.closest('.proker-item').dataset.expanded === 'true' ? 'false' : 'true'; }">
             <div class="proker-title flex-1 pr-2">
-              <span class="proker-num">${item.no || globalIndex}.</span> ${item.kegiatan}
+              ${item.kegiatan}
             </div>
             <div class="flex items-center gap-2">
-              ${realisasiBadge}
-              <span class="proker-status-badge ${statusClass}">
-                <span class="dot ${statusClass}"></span>
-                <span>${statusLabel}</span>
-              </span>
+              <div class="hidden md:flex items-center gap-2">
+                ${realisasiBadge}
+                <span class="proker-status-badge ${statusClass}">
+                  <span class="dot ${statusClass}"></span>
+                  <span>${statusLabel}</span>
+                </span>
+              </div>
               <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 20px;">
                 chevron_right
               </span>
