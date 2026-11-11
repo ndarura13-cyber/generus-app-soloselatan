@@ -202,12 +202,17 @@ const DASH_MONTH_KEYWORDS = [
   ['des', 'desember']
 ];
 
-function isProkerMatchingCurrentMonth(item, monthIdx, yearVal) {
+function isProkerMatchingMonth(item, monthIdx) {
   if (!item) return false;
-  if (isProkerRoutine(item)) return true;
   const waktu = String(item.waktu || item.waktuPelaksanaan || '').toLowerCase();
   const keywords = DASH_MONTH_KEYWORDS[monthIdx] || [];
   return keywords.some(kw => waktu.includes(kw));
+}
+
+function isProkerMatchingCurrentMonth(item, monthIdx, yearVal) {
+  if (!item) return false;
+  if (isProkerRoutine(item)) return true;
+  return isProkerMatchingMonth(item, monthIdx);
 }
 
 let currentProkerFilter = 'ongoing'; // Default filter: Berjalan
@@ -259,17 +264,20 @@ function renderProker() {
 
   const baseList = currentProkerSegment === 'routine' ? routineList : eventList;
 
-  // Otomatis aktifkan status Berjalan (Ongoing Reminder) jika terjadwal di bulan kalender saat ini
+  // Otomatis aktifkan status Berjalan (bulan kalender saat ini) atau Akan Datang (1 bulan di depannya)
+  const nextMonthIdx = (currentMonthIdx + 1) % 12;
+
   const enrichedList = baseList.map(item => {
     const isDone = item.status === 'done' || item.status === 'selesai' || item.realisasiStatus === 'terlaksana';
     const isMatchedMonth = isProkerMatchingCurrentMonth(item, currentMonthIdx, currentYearVal);
+    const isNextMonth = !isMatchedMonth && isProkerMatchingMonth(item, nextMonthIdx);
     let effectiveStatus = item.status || 'planned';
 
     if (isDone) {
       effectiveStatus = 'done';
     } else if (isMatchedMonth || item.status === 'ongoing' || item.status === 'berjalan' || item.status === 'sedang_berlangsung') {
       effectiveStatus = 'ongoing';
-    } else if (item.status === 'upcoming' || item.status === 'akan_datang') {
+    } else if (isNextMonth || item.status === 'upcoming' || item.status === 'akan_datang') {
       effectiveStatus = 'upcoming';
     } else {
       effectiveStatus = 'planned';
@@ -278,7 +286,8 @@ function renderProker() {
     return {
       ...item,
       effectiveStatus,
-      isAutoCurrentMonth: !isDone && isMatchedMonth
+      isAutoCurrentMonth: !isDone && isMatchedMonth,
+      isAutoNextMonth: !isDone && !isMatchedMonth && isNextMonth
     };
   });
 
@@ -346,7 +355,12 @@ function renderProker() {
         <span class="material-symbols-outlined text-[13px]">alarm</span> Bulan Ini
       </span>
       <span class="proker-meta-sep">&bull;</span>
-    ` : '');
+    ` : (item.isAutoNextMonth ? `
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800" title="Terjadwal di 1 Bulan Mendatang">
+        <span class="material-symbols-outlined text-[13px]">upcoming</span> Bulan Depan
+      </span>
+      <span class="proker-meta-sep">&bull;</span>
+    ` : ''));
 
     return `
       <div class="proker-item group/proker" data-expanded="false">
@@ -355,23 +369,42 @@ function renderProker() {
         </div>
         <div class="proker-content">
           <div class="proker-row-header cursor-pointer md:cursor-default flex items-center justify-between" onclick="if(window.innerWidth < 768) { this.closest('.proker-item').dataset.expanded = this.closest('.proker-item').dataset.expanded === 'true' ? 'false' : 'true'; }">
-            <div class="proker-title flex-1 pr-2">
+            <div class="proker-title flex-1 min-w-0 pr-2">
               ${item.kegiatan}
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              ${realisasiBadge}
-              <span class="proker-status-badge ${statusClass}">
-                <span class="dot ${statusClass}"></span>
-                <span>${statusLabel}</span>
-              </span>
-              <!-- Chevron arrow for mobile accordion -->
-              <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 20px;">
+              <!-- Desktop Header Badges -->
+              <div class="hidden md:inline-flex items-center gap-2">
+                ${realisasiBadge}
+                <span class="proker-status-badge ${statusClass}">
+                  <span class="dot ${statusClass}"></span>
+                  <span>${statusLabel}</span>
+                </span>
+              </div>
+              <!-- Chevron arrow for mobile accordion (Preview Bersih) -->
+              <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 22px;">
                 chevron_right
               </span>
             </div>
           </div>
           <!-- Details (hidden on mobile unless expanded) -->
-          <div class="proker-details hidden md:block mt-3 md:mt-0">
+          <div class="proker-details hidden md:block mt-2.5">
+            <!-- Mobile Status Row Inside Dropdown -->
+            <div class="flex md:hidden items-center flex-wrap gap-2 mb-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span class="proker-status-badge ${statusClass}">
+                <span class="dot ${statusClass}"></span>
+                <span>${statusLabel}</span>
+              </span>
+              ${isTerlaksana ? `
+                <span class="proker-realisasi-badge terlaksana" style="font-size:10px;padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-weight:700;">
+                  <span class="material-symbols-outlined" style="font-size:12px;">check_circle</span> Terlaksana
+                </span>
+              ` : `
+                <span class="proker-realisasi-badge belum_terlaksana" style="font-size:10px;padding:2px 8px;background:#fef3c7;color:#b45309;border-radius:4px;font-weight:700;">
+                  <span class="material-symbols-outlined" style="font-size:12px;">schedule</span> Belum Terlaksana
+                </span>
+              `}
+            </div>
             <div class="proker-meta">
               ${routinePill}
               ${item.kategori === 'KMM' ? `

@@ -678,7 +678,23 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         if (!picText.includes(filterBidang.toLowerCase())) return false;
       }
     }
-    if (filterStatus !== 'all' && p.status !== filterStatus) return false;
+    if (filterStatus !== 'all') {
+      const isDone = p.status === 'done' || p.status === 'selesai' || p.realisasiStatus === 'terlaksana';
+      const now = new Date();
+      const curM = now.getMonth();
+      const nxtM = (curM + 1) % 12;
+      let eff = p.status || 'planned';
+      if (isDone) {
+        eff = 'done';
+      } else if (isProkerMatchingCurrentMonth(p, curM, now.getFullYear()) || p.status === 'ongoing' || p.status === 'berjalan' || p.status === 'sedang_berlangsung') {
+        eff = 'ongoing';
+      } else if (isProkerMatchingMonth(p, nxtM) || p.status === 'upcoming' || p.status === 'akan_datang') {
+        eff = 'upcoming';
+      } else {
+        eff = 'planned';
+      }
+      if (eff !== filterStatus && p.status !== filterStatus) return false;
+    }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchKegiatan = (p.kegiatan || '').toLowerCase().includes(q);
@@ -941,15 +957,10 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       let actionsCell = `
         <td style="white-space:nowrap;text-align:right;">
           <div style="display:inline-flex;gap:5px;align-items:center;justify-content:flex-end;">
-            <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Tampilkan Mode Presentasi / Pleno">
-              <span class="material-symbols-outlined" style="font-size:15px;color:var(--blue);">visibility</span>
-              <span>Pleno</span>
+            <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Tampilkan Detail Lengkap & Mode Pleno">
+              <span class="material-symbols-outlined">visibility</span>
+              <span>Detail</span>
             </button>
-            ${isSuper ? `
-              <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Penggunaan Dana">
-                <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
-              </button>
-            ` : ''}
           </div>
         </td>
       `;
@@ -1142,35 +1153,49 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       let cardActions = `
         <div style="display:inline-flex;gap:5px;align-items:center;">
-          <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Mode Presentasi / Pleno">
-            <span class="material-symbols-outlined" style="font-size:15px;color:var(--blue);">visibility</span> Pleno
+          <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Lihat Detail & Mode Pleno">
+            <span class="material-symbols-outlined">visibility</span> Detail
           </button>
-          ${isSuper ? `
-            <button type="button" class="btn-proker-lpj" data-id="${p.id}" title="Lapor LPJ & Realisasi Dana">
-              <span class="material-symbols-outlined" style="font-size:14px;">assignment_turned_in</span> LPJ
-            </button>
-          ` : ''}
         </div>
       `;
 
       return `
               <div class="proker-card-item" data-id="${p.id}">
-                <!-- HEADER: NOMOR, PROGRAM, STATUS, DAN CHEVRON TOGGLE -->
-                <div class="proker-card-header" role="button" tabindex="0" aria-expanded="false" title="Klik untuk menampilkan / menyembunyikan detail program">
+                <!-- MOBILE VIEW: NOMOR, JUDUL MEMANJANG & TOMBOL LIHAT LANGSUNG MASUK PLENO -->
+                <div class="proker-card-mobile-row flex md:hidden items-center justify-between gap-3 w-full" data-id="${p.id}" role="button" tabindex="0" title="Ketuk untuk langsung membuka Mode Pleno">
+                  <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                    <span class="proker-card-num-badge shrink-0">
+                      ${p.no || (startIndex + idx + 1)}
+                    </span>
+                    <div class="flex-1 min-w-0 font-bold text-[13px] text-slate-800 dark:text-slate-100 leading-snug">
+                      ${p.kegiatan}
+                    </div>
+                  </div>
+                  <button type="button" class="btn-proker-preview shrink-0" data-id="${p.id}" title="Buka Detail Pleno">
+                    <span class="material-symbols-outlined">visibility</span>
+                    <span>Lihat</span>
+                  </button>
+                </div>
+
+                <!-- DESKTOP VIEW: HEADER LENGKAP DENGAN BADGE REALISASI & TOMBOL DETAIL -->
+                <div class="hidden md:flex proker-card-header" role="button" tabindex="0" aria-expanded="false" title="Klik untuk menampilkan / menyembunyikan detail program">
                   <div class="proker-card-title-wrap">
                     <span class="proker-card-num">${p.no || (startIndex + idx + 1)}.</span>
                     <strong class="proker-card-title">${p.kegiatan}</strong>
                   </div>
                   <div class="proker-card-actions">
                     ${realisasiBadge}
+                    <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Mode Detail / Pleno">
+                      <span class="material-symbols-outlined">visibility</span> Detail
+                    </button>
                     <button type="button" class="btn-toggle-proker-detail" aria-label="Toggle Detail Program" title="Tampilkan/Sembunyikan Detail">
                       <span class="material-symbols-outlined proker-chevron-icon">expand_more</span>
                     </button>
                   </div>
                 </div>
 
-                <!-- DETAIL PANEL: TERSEMBUNYI SECARA DEFAULT DI MOBILE VIEW -->
-                <div class="proker-card-detail-panel">
+                <!-- DETAIL PANEL: DESKTOP ONLY (DI MOBILE LANGSUNG DIBUKA VIA DETAIL PLENO) -->
+                <div class="proker-card-detail-panel hidden md:block">
                   <div class="proker-card-meta">
                     ${isProkerRoutine(p) ? `
                       <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" title="Kegiatan Rutin Bulanan">
@@ -1366,7 +1391,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     });
   });
 
-  // Tombol Mode Pleno (Menayangkan Agenda Terpilih)
+  // Tombol Detail / Mode Pleno (Menayangkan Agenda Terpilih)
   modalBody.querySelectorAll('.btn-proker-preview').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1385,19 +1410,47 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     });
   });
 
-  // Accordion Dropdown: Tampilkan / Sembunyikan Detil Program Kerja
+  // Mobile View: Menjadikan seluruh baris proker tombol nyaman di jari yang langsung masuk ke mode pleno
+  modalBody.querySelectorAll('.proker-card-item').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del')) {
+          return;
+        }
+        const pId = card.dataset.id;
+        if (pId) {
+          renderProkerPresentationModal(pId, filtered);
+        }
+      }
+    });
+  });
+
+  // Accordion Toggle di Desktop: Tampilkan / Sembunyikan Detil Program Kerja
+  modalBody.querySelectorAll('.btn-toggle-proker-detail').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.proker-card-item');
+      if (card) {
+        card.classList.toggle('is-collapsed');
+        const isCol = card.classList.contains('is-collapsed');
+        btn.closest('.proker-card-header')?.setAttribute('aria-expanded', isCol ? 'false' : 'true');
+      }
+    });
+  });
+
   modalBody.querySelectorAll('.proker-card-header').forEach(header => {
     header.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del') || e.target.closest('.btn-proker-lpj') || e.target.closest('.btn-proker-preview')) {
+      if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del') || e.target.closest('.btn-proker-lpj') || e.target.closest('.btn-proker-preview') || e.target.closest('.btn-toggle-proker-detail')) {
         return;
       }
       const card = header.closest('.proker-card-item');
       if (!card) return;
 
       if (window.innerWidth <= 768) {
-        card.classList.toggle('is-expanded');
-        const isExp = card.classList.contains('is-expanded');
-        header.setAttribute('aria-expanded', isExp ? 'true' : 'false');
+        const pId = card.dataset.id;
+        if (pId) {
+          renderProkerPresentationModal(pId, filtered);
+        }
       } else {
         card.classList.toggle('is-collapsed');
         const isCol = card.classList.contains('is-collapsed');
@@ -2313,12 +2366,17 @@ const DASH_MONTH_KEYWORDS = [
   ['des', 'desember']
 ];
 
-export function isProkerMatchingCurrentMonth(item, monthIdx, yearVal) {
+export function isProkerMatchingMonth(item, monthIdx) {
   if (!item) return false;
-  if (isProkerRoutine(item)) return true; // Routine prokers run every month
   const waktu = String(item.waktu || item.waktuPelaksanaan || '').toLowerCase();
   const keywords = DASH_MONTH_KEYWORDS[monthIdx] || [];
   return keywords.some(kw => waktu.includes(kw));
+}
+
+export function isProkerMatchingCurrentMonth(item, monthIdx, yearVal) {
+  if (!item) return false;
+  if (isProkerRoutine(item)) return true; // Routine prokers run every month
+  return isProkerMatchingMonth(item, monthIdx);
 }
 
 function getProkerStatusLabel(status) {
@@ -2391,17 +2449,20 @@ export function renderInlineProkerWidget() {
 
   const baseList = currentDashProkerSegment === 'routine' ? routineList : eventList;
 
-  // Otomatis aktifkan status Berjalan (Ongoing Reminder) jika terjadwal di bulan kalender saat ini
+  // Otomatis aktifkan status Berjalan (bulan kalender saat ini) atau Akan Datang (1 bulan di depannya)
+  const nextMonthIdx = (currentMonthIdx + 1) % 12;
+
   const enrichedList = baseList.map(item => {
     const isDone = item.status === 'done' || item.status === 'selesai' || item.realisasiStatus === 'terlaksana';
     const isMatchedMonth = isProkerMatchingCurrentMonth(item, currentMonthIdx, currentYearVal);
+    const isNextMonth = !isMatchedMonth && isProkerMatchingMonth(item, nextMonthIdx);
     let effectiveStatus = item.status || 'planned';
 
     if (isDone) {
       effectiveStatus = 'done';
     } else if (isMatchedMonth || item.status === 'ongoing' || item.status === 'berjalan' || item.status === 'sedang_berlangsung') {
       effectiveStatus = 'ongoing';
-    } else if (item.status === 'upcoming' || item.status === 'akan_datang') {
+    } else if (isNextMonth || item.status === 'upcoming' || item.status === 'akan_datang') {
       effectiveStatus = 'upcoming';
     } else {
       effectiveStatus = 'planned';
@@ -2410,7 +2471,8 @@ export function renderInlineProkerWidget() {
     return {
       ...item,
       effectiveStatus,
-      isAutoCurrentMonth: !isDone && isMatchedMonth
+      isAutoCurrentMonth: !isDone && isMatchedMonth,
+      isAutoNextMonth: !isDone && !isMatchedMonth && isNextMonth
     };
   });
 
@@ -2479,7 +2541,12 @@ export function renderInlineProkerWidget() {
         <span class="material-symbols-outlined text-[13px]">alarm</span> Bulan Ini
       </span>
       <span class="proker-meta-sep">&bull;</span>
-    ` : '');
+    ` : (item.isAutoNextMonth ? `
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800" title="Terjadwal di 1 Bulan Mendatang">
+        <span class="material-symbols-outlined text-[13px]">upcoming</span> Bulan Depan
+      </span>
+      <span class="proker-meta-sep">&bull;</span>
+    ` : ''));
 
     return `
       <div class="proker-item group/proker" data-expanded="false">
@@ -2488,21 +2555,41 @@ export function renderInlineProkerWidget() {
         </div>
         <div class="proker-content">
           <div class="proker-row-header cursor-pointer md:cursor-default flex items-center justify-between" onclick="if(window.innerWidth < 768) { this.closest('.proker-item').dataset.expanded = this.closest('.proker-item').dataset.expanded === 'true' ? 'false' : 'true'; }">
-            <div class="proker-title flex-1 pr-2">
+            <div class="proker-title flex-1 min-w-0 pr-2">
               ${item.kegiatan}
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              ${realisasiBadge}
-              <span class="proker-status-badge ${statusClass}">
-                <span class="dot ${statusClass}"></span>
-                <span>${statusLabel}</span>
-              </span>
-              <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 20px;">
+              <!-- Desktop Header Badges -->
+              <div class="hidden md:inline-flex items-center gap-2">
+                ${realisasiBadge}
+                <span class="proker-status-badge ${statusClass}">
+                  <span class="dot ${statusClass}"></span>
+                  <span>${statusLabel}</span>
+                </span>
+              </div>
+              <!-- Mobile Dropdown Chevron (Preview Bersih) -->
+              <span class="material-symbols-outlined text-slate-400 md:hidden transition-transform duration-200 chevron-icon" style="font-size: 22px;">
                 chevron_right
               </span>
             </div>
           </div>
           <div class="proker-details hidden md:block mt-2.5">
+            <!-- Status Proker Khusus Mobile di dalam Menu Dropdown -->
+            <div class="flex md:hidden items-center flex-wrap gap-2 mb-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <span class="proker-status-badge ${statusClass}">
+                <span class="dot ${statusClass}"></span>
+                <span>${statusLabel}</span>
+              </span>
+              ${isTerlaksana ? `
+                <span class="proker-realisasi-badge terlaksana" style="font-size:10px;padding:2px 8px;">
+                  <span class="material-symbols-outlined" style="font-size:12px;">check_circle</span> Terlaksana
+                </span>
+              ` : `
+                <span class="proker-realisasi-badge belum_terlaksana" style="font-size:10px;padding:2px 8px;">
+                  <span class="material-symbols-outlined" style="font-size:12px;">schedule</span> Belum Terlaksana
+                </span>
+              `}
+            </div>
             <div class="proker-meta">
               ${routinePill}
               ${item.kategori === 'KMM' ? `

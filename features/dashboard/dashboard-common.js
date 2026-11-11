@@ -226,16 +226,67 @@ export function closeModal() {
 
 btnCloseModal?.addEventListener('click', closeModal);
 
-// Backdrop tap-outside dismissal (intuitive on mobile sheet & desktop)
+/**
+ * Deteksi apakah modal saat ini merupakan form pembuatan / pengeditan data
+ * yang melibatkan input dari pengguna. Jika ya, blokir penutupan tidak sengaja
+ * via backdrop click atau tombol escape, sehingga hanya bisa ditutup via tombol silang (btnCloseModal)
+ * atau tombol batal/simpan eksplisit.
+ */
+export function isInputFormModalActive() {
+  if (!modalBackdrop || !modalBackdrop.classList.contains('show')) return false;
+
+  // Jika ada penanda eksplisit
+  if (modalBackdrop.dataset.keepOpenOnBackdrop === 'true') return true;
+
+  // 1. Deteksi dari judul modal (tambah, edit, buat, lapor, lpj, input, dsb.)
+  const title = (modalTitle?.textContent || '').toLowerCase();
+  const isFormTitle = /tambah|edit|buat|input|isi nilai|lapor|lpj|import|kenaikan jenjang|profil|keamanan/i.test(title);
+  if (isFormTitle) return true;
+
+  // 2. Deteksi dari elemen form atau input yang dapat diedit di dalam modalBody
+  if (modalBody) {
+    if (modalBody.querySelector('form')) return true;
+    const editableInputs = modalBody.querySelectorAll(
+      'input:not([id*="Search"]):not([id*="search"]):not([type="search"]):not([type="hidden"]), textarea, select:not([id*="Filter"]):not([id*="filter"]):not([id*="Search"]):not([id*="search"])'
+    );
+    if (editableInputs.length > 0) return true;
+  }
+
+  return false;
+}
+
+function triggerFormModalLockFeedback() {
+  if (modalBox) {
+    modalBox.classList.remove('modal-shake');
+    void modalBox.offsetWidth; // trigger reflow
+    modalBox.classList.add('modal-shake');
+  }
+  if (btnCloseModal) {
+    btnCloseModal.classList.add('ring-2', 'ring-red-500', 'scale-110');
+    setTimeout(() => {
+      btnCloseModal.classList.remove('ring-2', 'ring-red-500', 'scale-110');
+    }, 600);
+  }
+}
+
+// Backdrop tap-outside dismissal (Ditolak pada form input data)
 modalBackdrop?.addEventListener('click', (e) => {
   if (e.target === modalBackdrop) {
+    if (isInputFormModalActive()) {
+      triggerFormModalLockFeedback();
+      return;
+    }
     closeModal();
   }
 });
 
-// Escape key dismissal
+// Escape key dismissal (Ditolak pada form input data)
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalBackdrop?.classList.contains('show')) {
+    if (isInputFormModalActive()) {
+      triggerFormModalLockFeedback();
+      return;
+    }
     closeModal();
   }
 });

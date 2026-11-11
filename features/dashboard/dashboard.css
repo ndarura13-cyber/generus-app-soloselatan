@@ -1342,6 +1342,22 @@ body {
   }
 }
 
+@keyframes modalShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-8px);
+  }
+  40%, 80% {
+    transform: translateX(8px);
+  }
+}
+
+.modal-shake {
+  animation: modalShake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+}
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -2579,34 +2595,93 @@ body {
 
 /* ── Proker Presentation / Mode Pleno Workshop ────────────────── */
 .btn-proker-preview {
-  padding: 5px 8px;
-  border: 1px solid #cbd5e1;
-  background: var(--surface);
-  color: #1e40af;
-  border-radius: 6px;
-  font-size: 11px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  color: #ffffff !important;
+  border-radius: 9px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  transition: all 0.2s ease;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.28);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn-proker-preview .material-symbols-outlined {
+  color: #ffffff !important;
+  font-size: 15px !important;
 }
 .btn-proker-preview:hover {
-  background: #eff6ff;
-  border-color: #3b82f6;
-  color: #1d4ed8;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.42);
+  transform: translateY(-1.5px);
+  filter: brightness(1.05);
+}
+.btn-proker-preview:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(29, 78, 216, 0.3);
 }
 .dark .btn-proker-preview {
-  background: rgba(30, 58, 138, 0.2);
-  border-color: #334155;
-  color: #93c5fd;
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
 }
 .dark .btn-proker-preview:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.65);
+}
+
+/* ── Mobile Touch-Optimized Cards for Kelola Proker ── */
+.proker-card-num-badge {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #bfdbfe;
+  flex-shrink: 0;
+}
+
+.dark .proker-card-num-badge {
   background: rgba(30, 58, 138, 0.4);
-  border-color: #60a5fa;
-  color: #bfdbfe;
+  color: #93c5fd;
+  border-color: #1e3a8a;
+}
+
+.proker-card-mobile-row {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .proker-card-item {
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .proker-card-item:active {
+    transform: scale(0.985);
+    background: #f1f5f9;
+  }
+  .dark .proker-card-item:active {
+    background: #1e293b !important;
+  }
 }
 
 .proker-presentation-backdrop {
