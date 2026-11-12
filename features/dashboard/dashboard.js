@@ -118,13 +118,10 @@ export function renderUserProfile() {
   renderInlineProkerWidget();
 
   const prokerCardDesc = document.getElementById('prokerCardDesc');
-  const prokerActionText = document.getElementById('prokerActionText');
-  const badgeProkerStatus = document.getElementById('badgeProkerStatus');
-
   const strukturPpgDesc = document.getElementById('strukturCardDesc') || document.getElementById('strukturPpgDesc');
   if (strukturPpgDesc) {
     const totalPpgDaerah = getPengurusDaerahList().length;
-    strukturPpgDesc.textContent = `Susunan 14 Bidang & ${totalPpgDaerah} Pengurus PPG Daerah Solo Selatan.`;
+    strukturPpgDesc.textContent = `14 Bidang & ${totalPpgDaerah} Pengurus PPG`;
   }
 
   if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
@@ -145,23 +142,8 @@ export function renderUserProfile() {
 
     const pStats = getProkerStats();
     if (prokerCardDesc) {
-      prokerCardDesc.textContent = `${pStats.total} Agenda Program Kerja (${pStats.ongoing} Berlangsung, Total Est. Rp ${pStats.totalAnggaran.toLocaleString('id-ID')}).`;
+      prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
     }
-    if (prokerActionText) prokerActionText.textContent = 'Kelola Program';
-    if (badgeProkerStatus) {
-      badgeProkerStatus.textContent = 'Kelola Daerah';
-      badgeProkerStatus.className = 'action-badge-top gold';
-    }
-
-    const pembiasaanActionText = document.getElementById('pembiasaanActionText');
-    const badgePembiasaanStatus = document.getElementById('badgePembiasaanStatus');
-    const pembiasaanCardDesc = document.getElementById('pembiasaanCardDesc');
-    if (pembiasaanActionText) pembiasaanActionText.textContent = 'Kelola Pembiasaan';
-    if (badgePembiasaanStatus) {
-      badgePembiasaanStatus.textContent = 'Kelola Daerah';
-      badgePembiasaanStatus.className = 'action-badge-top gold';
-    }
-    if (pembiasaanCardDesc) pembiasaanCardDesc.textContent = 'Kelola periode, target pembiasaan karakter, dan rekam nilai generus caberawit.';
 
   } else if (currentUser.tingkatan === 'desa') {
     userBadgeEl.textContent = `🏛️ Koordinator Desa ${currentUser.desaNama || ''}`;
@@ -177,12 +159,7 @@ export function renderUserProfile() {
 
     const pStats = getProkerStats();
     if (prokerCardDesc) {
-      prokerCardDesc.textContent = `${pStats.total} Agenda Program Daerah (${pStats.ongoing} Berjalan, ${pStats.upcoming} Akan Datang).`;
-    }
-    if (prokerActionText) prokerActionText.textContent = 'Lihat Program';
-    if (badgeProkerStatus) {
-      badgeProkerStatus.textContent = 'Agenda Aktif';
-      badgeProkerStatus.className = 'action-badge-top default';
+      prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
     }
 
   } else {
@@ -199,12 +176,7 @@ export function renderUserProfile() {
 
     const pStats = getProkerStats();
     if (prokerCardDesc) {
-      prokerCardDesc.textContent = `Ikuti & pantau ${pStats.total} program kerja pembinaan generasi penerus PPG.`;
-    }
-    if (prokerActionText) prokerActionText.textContent = 'Lihat Program';
-    if (badgeProkerStatus) {
-      badgeProkerStatus.textContent = 'Program Kerja';
-      badgeProkerStatus.className = 'action-badge-top default';
+      prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
     }
   }
 }

@@ -10,6 +10,8 @@ import {
   getPengurusById
 } from '../../src/db-master.js';
 
+export { MASTER_WILAYAH };
+
 /* ── 1. Initial User Session & Strict Security Verification ── */
 export let currentUser = null;
 
