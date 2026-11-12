@@ -1151,14 +1151,6 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </span>
       `;
 
-      let cardActions = `
-        <div style="display:inline-flex;gap:5px;align-items:center;">
-          <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Lihat Detail & Mode Pleno">
-            <span class="material-symbols-outlined">visibility</span> Detail
-          </button>
-        </div>
-      `;
-
       return `
               <div class="proker-card-item" data-id="${p.id}">
                 <!-- MOBILE VIEW: NOMOR, JUDUL MEMANJANG & TOMBOL LIHAT LANGSUNG MASUK PLENO -->
@@ -1249,7 +1241,6 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                         Est. RAB: Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}
                         ${p.realisasiBiaya ? ` &bull; <span style="color:#1e40af;">Realisasi: Rp ${(p.realisasiBiaya || 0).toLocaleString('id-ID')}</span>` : ''}
                       </div>
-                      <div class="proker-admin-actions">${cardActions}</div>
                     </div>
                   </div>
                 </div>

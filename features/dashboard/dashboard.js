@@ -68,6 +68,11 @@ import {
   renderFormRekapKehadiranModal
 } from './dashboard-kbm.js';
 
+import {
+  showJurnalKbmPage,
+  showDashboardHomePage
+} from './dashboard-jurnal-hub.js';
+
 // DOM Elements
 const userNameEl = document.getElementById('userName');
 const headingUserNameEl = document.getElementById('headingUserName');
@@ -81,11 +86,10 @@ const kelompokGridContainer = document.getElementById('kelompokGrid');
 const btnKontakDesa = document.getElementById('btnKontakDesa');
 const btnKontakDesaText = document.getElementById('btnKontakDesaText');
 
-// Action Cards & Menu Modals
+// Action Cards & Menu Modals (4 Komponen Utama)
 const btnMenuSiswa = document.getElementById('btnMenuSiswa');
 const btnMenuProker = document.getElementById('btnMenuProker');
-const btnMenuPembiasaan = document.getElementById('btnMenuPembiasaan');
-const btnMenuAbsensi = document.getElementById('btnMenuAbsensi');
+const btnMenuJurnalKbm = document.getElementById('btnMenuJurnalKbm');
 const btnMenuStrukturDaerah = document.getElementById('btnMenuStrukturDaerah');
 const btnMenuPengurus = document.getElementById('btnMenuPengurus');
 const btnApprovalList = document.getElementById('btnApprovalList');
@@ -598,6 +602,24 @@ const openMenuAbsensi = async () => {
   }
 };
 
+export const openMenuJurnalKbm = async (preferredJenjang = null) => {
+  showDatabaseLoading('Loading Database', 'Menyiapkan Jurnal & Pembinaan KBM...');
+  try {
+    if (isSupabaseConfigured()) {
+      await Promise.allSettled([
+        syncKbmFromSupabase(),
+        syncPembiasaanFromSupabase(),
+        syncSiswaFromSupabase()
+      ]);
+    }
+  } catch (err) {
+    console.warn('Sync Jurnal KBM error:', err);
+  } finally {
+    hideDatabaseLoading();
+    showJurnalKbmPage(preferredJenjang);
+  }
+};
+
 const openMenuPengurus = async (filterMode = 'all') => {
   showDatabaseLoading('Loading Database', 'Mengambil data hak akses & pengurus...');
   try {
@@ -613,8 +635,7 @@ const openMenuPengurus = async (filterMode = 'all') => {
 /* ── 5. Action Cards Listeners ─────────────────────────────────────────────────── */
 btnMenuSiswa?.addEventListener('click', openMenuSiswa);
 btnMenuProker?.addEventListener('click', openMenuProker);
-btnMenuPembiasaan?.addEventListener('click', openMenuPembiasaan);
-btnMenuAbsensi?.addEventListener('click', openMenuAbsensi);
+btnMenuJurnalKbm?.addEventListener('click', () => openMenuJurnalKbm());
 btnMenuStrukturDaerah?.addEventListener('click', () => renderStrukturDaerahModal());
 btnMenuPengurus?.addEventListener('click', () => openMenuPengurus('all'));
 btnApprovalList?.addEventListener('click', () => renderApprovalListModal());
@@ -632,15 +653,15 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   // Desktop Sidebar Listeners
   document.getElementById('sideBtnLogout')?.addEventListener('click', doLogout);
   document.getElementById('sideBtnSiswa')?.addEventListener('click', openMenuSiswa);
-  document.getElementById('sideBtnPembiasaan')?.addEventListener('click', openMenuPembiasaan);
-  document.getElementById('sideBtnAbsensi')?.addEventListener('click', openMenuAbsensi);
   document.getElementById('sideBtnProker')?.addEventListener('click', openMenuProker);
+  document.getElementById('sideBtnJurnalKbm')?.addEventListener('click', () => openMenuJurnalKbm());
   document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   document.getElementById('sideBtnPengurus')?.addEventListener('click', () => openMenuPengurus('all'));
   document.getElementById('sideBtnProfil')?.addEventListener('click', () => { renderSelfProfileModal(); });
 
   // Mobile Bottom Nav Listeners
   const mobNavHome = document.getElementById('mobNavHome');
+  const mobNavJurnalKbm = document.getElementById('mobNavJurnalKbm');
   const mobNavPengurus = document.getElementById('mobNavPengurus');
   const mobNavFitur = document.getElementById('mobNavFitur');
   const mobNavFiturIcon = document.getElementById('mobNavFiturIcon');
@@ -660,6 +681,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     e.preventDefault();
     window.location.href = '../../index.html';
   });
+  mobNavJurnalKbm?.addEventListener('click', () => { openMenuJurnalKbm(); });
   mobNavPengurus?.addEventListener('click', () => { renderStrukturDaerahModal(); });
   mobNavProfil?.addEventListener('click', () => { renderSelfProfileModal(); });
   mobNavLogout?.addEventListener('click', doLogout);
@@ -681,10 +703,12 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   mobNavFitur?.addEventListener('click', toggleDropUp);
   mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
 
+  // Mobile Drop-Up Actions (4 Komponen Utama & Profil)
   document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); openMenuSiswa(); });
-  document.getElementById('mobBtnPembiasaan')?.addEventListener('click', () => { toggleDropUp(); openMenuPembiasaan(); });
-  document.getElementById('mobBtnAbsensi')?.addEventListener('click', () => { toggleDropUp(); openMenuAbsensi(); });
   document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); openMenuProker(); });
+  document.getElementById('mobBtnJurnalKbm')?.addEventListener('click', () => { toggleDropUp(); openMenuJurnalKbm(); });
+  document.getElementById('mobBtnStruktur')?.addEventListener('click', () => { toggleDropUp(); renderStrukturDaerahModal(); });
+  document.getElementById('mobBtnProfilMenu')?.addEventListener('click', () => { toggleDropUp(); renderSelfProfileModal(); });
 
   const btnToggleSidebar = document.getElementById('btnToggleSidebar');
   const sideFiturFlyout = document.getElementById('sideFiturFlyout');
@@ -716,22 +740,18 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     }
   });
 
-  // Action listeners untuk menu flyout saat sidebar collapsed
+  // Action listeners untuk menu flyout saat sidebar collapsed (4 Komponen Utama)
   document.getElementById('flyBtnSiswa')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
     openMenuSiswa();
   });
-  document.getElementById('flyBtnPembiasaan')?.addEventListener('click', () => {
-    sideFiturFlyout?.classList.add('hidden');
-    openMenuPembiasaan();
-  });
-  document.getElementById('flyBtnAbsensi')?.addEventListener('click', () => {
-    sideFiturFlyout?.classList.add('hidden');
-    openMenuAbsensi();
-  });
   document.getElementById('flyBtnProker')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
     openMenuProker();
+  });
+  document.getElementById('flyBtnJurnalKbm')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    openMenuJurnalKbm();
   });
   document.getElementById('flyBtnStruktur')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
