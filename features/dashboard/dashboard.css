@@ -2311,11 +2311,29 @@ body {
 
 @media (max-width: 640px) {
   .proker-category-tabs {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
   }
   .proker-cat-btn {
-    padding: 10px 12px;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+  .proker-cat-btn .proker-cat-icon {
+    font-size: 20px !important;
+    padding: 6px !important;
+  }
+  .proker-cat-title {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .proker-cat-subtitle {
+    display: none !important;
+  }
+  .proker-cat-badge {
+    display: none !important;
   }
 }
 

@@ -341,12 +341,14 @@ export function bukaModal(key) {
   }
 
 
-  // Tampilkan Modal dengan animasi Tailwind halus
+  // Tampilkan Modal dengan animasi Tailwind halus ala bottom sheet
   modal.style.display = "flex";
   const card = document.getElementById("mjCard");
   setTimeout(() => {
     modal.classList.remove("opacity-0", "pointer-events-none");
-    if (card) card.classList.remove("scale-95");
+    if (card) {
+      card.classList.remove("scale-95", "max-sm:translate-y-4");
+    }
   }, 10);
   document.body.style.overflow = "hidden";
 }
@@ -356,7 +358,9 @@ export function tutupModal() {
   if (modal) {
     const card = document.getElementById("mjCard");
     modal.classList.add("opacity-0", "pointer-events-none");
-    if (card) card.classList.add("scale-95");
+    if (card) {
+      card.classList.add("scale-95", "max-sm:translate-y-4");
+    }
     setTimeout(() => {
       modal.style.display = "none";
     }, 250);

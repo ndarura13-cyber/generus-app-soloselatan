@@ -1153,12 +1153,9 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       return `
               <div class="proker-card-item" data-id="${p.id}">
-                <!-- MOBILE VIEW: NOMOR, JUDUL MEMANJANG & TOMBOL LIHAT LANGSUNG MASUK PLENO -->
+                <!-- MOBILE VIEW: JUDUL MEMANJANG & TOMBOL LIHAT LANGSUNG MASUK PLENO -->
                 <div class="proker-card-mobile-row flex md:hidden items-center justify-between gap-3 w-full" data-id="${p.id}" role="button" tabindex="0" title="Ketuk untuk langsung membuka Mode Pleno">
                   <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                    <span class="proker-card-num-badge shrink-0">
-                      ${p.no || (startIndex + idx + 1)}
-                    </span>
                     <div class="flex-1 min-w-0 font-bold text-[13px] text-slate-800 dark:text-slate-100 leading-snug">
                       ${p.kegiatan}
                     </div>
@@ -1172,7 +1169,6 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 <!-- DESKTOP VIEW: HEADER LENGKAP DENGAN BADGE REALISASI & TOMBOL DETAIL -->
                 <div class="hidden md:flex proker-card-header" role="button" tabindex="0" aria-expanded="false" title="Klik untuk menampilkan / menyembunyikan detail program">
                   <div class="proker-card-title-wrap">
-                    <span class="proker-card-num">${p.no || (startIndex + idx + 1)}.</span>
                     <strong class="proker-card-title">${p.kegiatan}</strong>
                   </div>
                   <div class="proker-card-actions">
@@ -1275,13 +1271,15 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     renderProkerModal('all', 'all', '', activeTab, 1, false, 'KMM');
   });
 
-  // 2. Pencarian & Filter
+  // 2. Pencarian & Filter (Jangan auto-focus agar keyboard virtual mobile tidak terbuka otomatis)
   const searchInput = document.getElementById('inputProkerSearch');
   if (searchInput) {
-    searchInput.focus();
-    const val = searchInput.value;
-    searchInput.value = '';
-    searchInput.value = val;
+    if (searchQuery && window.innerWidth >= 768) {
+      searchInput.focus();
+      const val = searchInput.value;
+      searchInput.value = '';
+      searchInput.value = val;
+    }
     searchInput.addEventListener('input', (e) => {
       renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori);
     });
@@ -1866,7 +1864,7 @@ export function renderLaporRealisasiModal(p) {
             <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">
               REALISASI PENGGUNAAN DANA (RP) *
             </label>
-            <input type="number" id="lpjInputBiaya" value="${initialRealBiaya}" min="0" step="1" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:800;color:var(--blue-dark);background:var(--surface);" />
+            <input type="number" id="lpjInputBiaya" value="${initialRealBiaya}" min="0" step="any" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:800;color:var(--blue-dark);background:var(--surface);" />
             <div id="lpjDiffCalc" style="font-size:11.5px;margin-top:4px;font-weight:700;"></div>
           </div>
           <div class="form-group">
@@ -2106,7 +2104,7 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
         </div>
         <div class="form-group">
           <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">EST. TOTAL BIAYA (RP) *</label>
-          <input type="number" id="prokerInputEstBiaya" value="${isEdit ? (p.estBiaya || 0) : ''}" placeholder="0" min="0" step="1" required style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:800;color:var(--green-dark);" />
+          <input type="number" id="prokerInputEstBiaya" value="${isEdit ? (p.estBiaya || 0) : ''}" placeholder="0" min="0" step="any" required style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:800;color:var(--green-dark);" />
         </div>
       </div>
 
@@ -2138,7 +2136,7 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
           </div>
           <div class="form-group">
             <label style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;display:block;">REALISASI PENGGUNAAN DANA (RP)</label>
-            <input type="number" id="prokerInputRealisasiBiaya" value="${isEdit && p.realisasiBiaya !== undefined ? p.realisasiBiaya : ''}" placeholder="0" min="0" step="1" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:800;color:#0e7039;background:var(--surface);" />
+            <input type="number" id="prokerInputRealisasiBiaya" value="${isEdit && p.realisasiBiaya !== undefined ? p.realisasiBiaya : ''}" placeholder="0" min="0" step="any" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:800;color:#0e7039;background:var(--surface);" />
           </div>
         </div>
         <div class="form-group" style="margin-bottom:10px;">

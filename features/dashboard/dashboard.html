@@ -851,7 +851,7 @@
   <script>
     // Theme logic and cache busting
     (function forceCacheClear() {
-      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v8.3';
+      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v8.4';
       if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(r => r.forEach(x => x.unregister()));

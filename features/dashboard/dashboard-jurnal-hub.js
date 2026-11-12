@@ -238,119 +238,103 @@ export function renderJurnalKbmPageView() {
       </div>
     </div>
 
-    <!-- BAGIAN 1: JENJANG GENERUS (PRESENSI & MATERI KBM) -->
-    <section class="space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="text-base md:text-lg font-extrabold text-slate-900 dark:text-white">Pilih Jenjang</h2>
-      </div>
-
-      <!-- 3 Kartu Pilihan Jenjang di Awal (Grid 3 Kolom) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <!-- 1. Caberawit -->
-        <div class="btn-select-jenjang p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${activeJenjang === 'caberawit' ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 shadow-sm ring-2 ring-amber-400/30' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-300'}" data-jenjang="caberawit">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 flex items-center justify-center font-bold">
-                <span class="material-symbols-outlined text-xl">child_care</span>
-              </div>
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${activeJenjang === 'caberawit' ? 'bg-amber-500 text-white' : 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'}">PAUD - SD</span>
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Caberawit</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Usia dini &amp; sekolah dasar (PAUD - SD).</p>
-          </div>
-          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-amber-600">
-            <span>${activeJenjang === 'caberawit' ? '● Terpilih' : 'Pilih'}</span>
-            <span class="material-symbols-outlined text-base">${activeJenjang === 'caberawit' ? 'check_circle' : 'radio_button_unchecked'}</span>
-          </div>
+    <!-- BAGIAN 1: PILIH JENJANG & 2 KARTU MODUL (SATU DIV BORDERED & KOMPAK) -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-4">
+      <!-- Title & Jenjang Selector Header -->
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base text-emerald-600">category</span>
+            <span>Pilih Jenjang Generus</span>
+          </h2>
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" style="background:${meta.bgLight};color:${meta.color};">
+            ${meta.nama}
+          </span>
         </div>
 
-        <!-- 2. Pra-Remaja (GP) -->
-        <div class="btn-select-jenjang p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${activeJenjang === 'gp_reguler' ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 shadow-sm ring-2 ring-blue-400/30' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-300'}" data-jenjang="gp_reguler">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-brandBlue flex items-center justify-center font-bold">
-                <span class="material-symbols-outlined text-xl">school</span>
+        <!-- 3 Pilihan Jenjang: Compact (Icon, Usia, Checkbox) & Mobile Horizontal Scroll Tab -->
+        <div class="flex md:grid md:grid-cols-3 gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1">
+          <!-- 1. Caberawit -->
+          <div class="btn-select-jenjang shrink-0 min-w-[210px] md:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${activeJenjang === 'caberawit' ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 ring-1 ring-amber-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-amber-300'}" data-jenjang="caberawit">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-lg">child_care</span>
               </div>
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${activeJenjang === 'gp_reguler' ? 'bg-brandBlue text-white' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}">SMP</span>
-            </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Pra-Remaja (GP)</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Generus pendampingan reguler (SMP).</p>
-          </div>
-          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-brandBlue">
-            <span>${activeJenjang === 'gp_reguler' ? '● Terpilih' : 'Pilih'}</span>
-            <span class="material-symbols-outlined text-base">${activeJenjang === 'gp_reguler' ? 'check_circle' : 'radio_button_unchecked'}</span>
-          </div>
-        </div>
-
-        <!-- 3. Remaja & Muda-Mudi -->
-        <div class="btn-select-jenjang p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${activeJenjang === 'remaja' ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 shadow-sm ring-2 ring-purple-400/30' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-purple-300'}" data-jenjang="remaja">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 flex items-center justify-center font-bold">
-                <span class="material-symbols-outlined text-xl">diversity_3</span>
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Caberawit</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">PAUD - SD</div>
               </div>
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${activeJenjang === 'remaja' ? 'bg-purple-600 text-white' : 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'}">SMA - Nikah</span>
             </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Remaja &amp; Dewasa</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Muda-mudi &amp; usia pra-nikah.</p>
-          </div>
-          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-purple-600">
-            <span>${activeJenjang === 'remaja' ? '● Terpilih' : 'Pilih'}</span>
-            <span class="material-symbols-outlined text-base">${activeJenjang === 'remaja' ? 'check_circle' : 'radio_button_unchecked'}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2 Kartu Aksi Modul Sesuai Jenjang Terpilih -->
-      <div class="bg-slate-100/70 dark:bg-slate-800/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full" style="background:${meta.color};"></span>
-          <h3 class="text-xs md:text-sm font-bold text-slate-900 dark:text-white">
-            Modul KBM: <span style="color:${meta.color};">${meta.nama}</span>
-          </h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <!-- Modul 1: Presensi Kehadiran -->
-          <div id="btnCardHubAbsensi" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors mb-2.5">
-                <span class="material-symbols-outlined text-xl">co_present</span>
-              </div>
-              <h4 class="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors">
-                Presensi Kehadiran
-              </h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                Cetak lembar presensi A4 &amp; input kehadiran santri.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-              <span>Buka Presensi</span>
-              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
-            </div>
+            <span class="material-symbols-outlined text-base ${activeJenjang === 'caberawit' ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'} shrink-0">
+              ${activeJenjang === 'caberawit' ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
           </div>
 
-          <!-- Modul 2: Materi & Kurikulum -->
-          <div id="btnCardHubJurnal" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue flex items-center justify-center group-hover:bg-brandBlue group-hover:text-white transition-colors mb-2.5">
-                <span class="material-symbols-outlined text-xl">menu_book</span>
+          <!-- 2. Pra-Remaja -->
+          <div class="btn-select-jenjang shrink-0 min-w-[210px] md:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${activeJenjang === 'gp_reguler' ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-1 ring-blue-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-blue-300'}" data-jenjang="gp_reguler">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-brandBlue flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-lg">school</span>
               </div>
-              <h4 class="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-brandBlue transition-colors">
-                Materi &amp; Kurikulum
-              </h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                Agenda KBM, capaian materi pembelajaran &amp; hafalan.
-              </p>
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Pra-Remaja</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">SMP</div>
+              </div>
             </div>
-            <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-brandBlue dark:text-blue-400">
-              <span>Buka Materi</span>
-              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            <span class="material-symbols-outlined text-base ${activeJenjang === 'gp_reguler' ? 'text-brandBlue' : 'text-slate-300 dark:text-slate-600'} shrink-0">
+              ${activeJenjang === 'gp_reguler' ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
+          </div>
+
+          <!-- 3. Remaja -->
+          <div class="btn-select-jenjang shrink-0 min-w-[210px] md:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${activeJenjang === 'remaja' ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 ring-1 ring-purple-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-purple-300'}" data-jenjang="remaja">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-lg">diversity_3</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Remaja</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">SMA - Dewasa</div>
+              </div>
             </div>
+            <span class="material-symbols-outlined text-base ${activeJenjang === 'remaja' ? 'text-purple-600' : 'text-slate-300 dark:text-slate-600'} shrink-0">
+              ${activeJenjang === 'remaja' ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
           </div>
         </div>
       </div>
-    </section>
+
+      <!-- 2 Kartu Aksi Modul Sesuai Jenjang Terpilih (Di Bawah Pilihan Jenjang Dalam 1 Div) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+        <!-- Modul 1: Presensi Kehadiran -->
+        <div id="btnCardHubAbsensi" class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/80 hover:border-emerald-500 hover:shadow-sm transition-all cursor-pointer group flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-xl">co_present</span>
+            </div>
+            <div class="min-w-0">
+              <div class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">Presensi Kehadiran</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400">Lembar cetak &amp; input presensi santri</div>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all shrink-0">arrow_forward</span>
+        </div>
+
+        <!-- Modul 2: Materi & Kurikulum -->
+        <div id="btnCardHubJurnal" class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/80 hover:border-blue-500 hover:shadow-sm transition-all cursor-pointer group flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-brandBlue flex items-center justify-center shrink-0 group-hover:bg-brandBlue group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-xl">menu_book</span>
+            </div>
+            <div class="min-w-0">
+              <div class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-brandBlue transition-colors">Materi &amp; Kurikulum</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400">Target silabus &amp; rekaman KBM</div>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 group-hover:text-brandBlue group-hover:translate-x-1 transition-all shrink-0">arrow_forward</span>
+        </div>
+      </div>
+    </div>
 
     <!-- BAGIAN 2: PEMBIASAAN CABERAWIT -->
     <section class="space-y-3">
@@ -384,58 +368,6 @@ export function renderJurnalKbmPageView() {
     <section class="space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="text-base md:text-lg font-extrabold text-slate-900 dark:text-white">Musyawarah 5 Unsur</h2>
-        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold border border-indigo-200 dark:border-indigo-800">
-          <span class="material-symbols-outlined text-[13px]">schedule</span> Tahap Selanjutnya
-        </span>
-      </div>
-
-      <div id="btnCardHubMusyawarah" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-3.5">
-          <div class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-2xl">handshake</span>
-          </div>
-          <div>
-            <h3 class="text-sm md:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors mb-0.5">
-              Sinergi 5 Unsur Desa &amp; Kelompok
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              Koordinasi PPG, Muballigh, Pinisepuh, Orang Tua, &amp; KMM.
-            </p>
-          </div>
-        </div>
-        <button type="button" class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer">
-          <span class="material-symbols-outlined text-base">visibility</span>
-          <span>Pratinjau</span>
-        </button>
-      </div>
-    </section>
-        <div class="flex items-center gap-3.5">
-          <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-2xl">checklist</span>
-          </div>
-          <div>
-            <div class="flex items-center gap-2 mb-0.5">
-              <h3 class="text-sm md:text-base font-bold text-slate-900 dark:text-white group-hover:text-amber-600 transition-colors">
-                Lembar Pembiasaan 29 Karakter Luhur
-              </h3>
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300">Caberawit</span>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              Target ibadah harian &amp; evaluasi karakter santri.
-            </p>
-          </div>
-        </div>
-        <button type="button" class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer">
-          <span>Buka Pembiasaan</span>
-          <span class="material-symbols-outlined text-base">arrow_forward</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- BAGIAN 3: LAPORAN MUSYAWARAH 5 UNSUR -->
-    <section class="space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white">Musyawarah 5 Unsur</h2>
         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold border border-indigo-200 dark:border-indigo-800">
           <span class="material-symbols-outlined text-[13px]">schedule</span> Tahap Selanjutnya
         </span>
@@ -574,19 +506,32 @@ export function openPresensiOpsiModal(jenjang = 'caberawit', desaId = 'all', kel
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Wilayah Desa</label>
-          <select id="modalPresensiDesa" ${tingkatan !== 'daerah' && !currentUser?.isSuperadmin ? 'disabled' : ''} class="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100">
-            <option value="all">Semua Desa</option>
-            ${MASTER_WILAYAH.desa.map(d => `<option value="${d.id}" ${effectiveDesa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kelompok Sambung</label>
-          <select id="modalPresensiKelompok" ${tingkatan === 'kelompok' ? 'disabled' : ''} class="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100">
-            <option value="all">Semua Kelompok</option>
-            ${MASTER_WILAYAH.desa.flatMap(d => d.kelompok).map(k => `<option value="${k.id}" ${effectiveKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px] text-emerald-600">domain</span>
+            <span>Wilayah (Desa &amp; Kelompok)</span>
+          </label>
+          <select id="modalPresensiWilayahSelect" class="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100">
+            ${tingkatan === 'daerah' || currentUser?.isSuperadmin ? `
+              <option value="all:all" ${effectiveDesa === 'all' && effectiveKel === 'all' ? 'selected' : ''}>Seluruh Wilayah (Se-Daerah Solo Selatan)</option>
+            ` : ''}
+            ${MASTER_WILAYAH.desa.filter(d => {
+              if (tingkatan === 'desa') return d.id === currentUser?.desaId;
+              if (tingkatan === 'kelompok') return d.id === currentUser?.desaId;
+              return true;
+            }).map(d => `
+              <optgroup label="Desa ${d.nama}">
+                ${tingkatan !== 'kelompok' ? `
+                  <option value="${d.id}:all" ${effectiveDesa === d.id && effectiveKel === 'all' ? 'selected' : ''}>Seluruh Desa ${d.nama}</option>
+                ` : ''}
+                ${d.kelompok.filter(k => {
+                  if (tingkatan === 'kelompok') return k.id === currentUser?.kelompokId;
+                  return true;
+                }).map(k => `
+                  <option value="${d.id}:${k.id}" ${effectiveKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>
+                `).join('')}
+              </optgroup>
+            `).join('')}
           </select>
         </div>
       </div>
@@ -612,8 +557,8 @@ export function openPresensiOpsiModal(jenjang = 'caberawit', desaId = 'all', kel
   document.getElementById('btnCetakLembarPresensiA4')?.addEventListener('click', () => {
     const b = document.getElementById('modalPresensiBulan')?.value || currentMonth;
     const t = document.getElementById('modalPresensiTahun')?.value || currentYear;
-    const d = document.getElementById('modalPresensiDesa')?.value || effectiveDesa;
-    const k = document.getElementById('modalPresensiKelompok')?.value || effectiveKel;
+    const wilayahVal = document.getElementById('modalPresensiWilayahSelect')?.value || 'all:all';
+    const [d, k] = wilayahVal.split(':');
 
     const printUrl = `../laporan/cetak-absensi.html?jenjang=${encodeURIComponent(jenjang)}&bulan=${encodeURIComponent(b)}&tahun=${encodeURIComponent(t)}&desa=${encodeURIComponent(d)}&kelompok=${encodeURIComponent(k)}`;
     window.open(printUrl, '_blank');

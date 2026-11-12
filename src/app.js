@@ -446,14 +446,34 @@ function renderProker() {
 
   if (paginationContainer) {
     if (totalPages > 1) {
-      let dotsHtml = '';
-      for (let i = 1; i <= totalPages; i++) {
-        dotsHtml += `<button class="px-3 py-1 text-xs font-bold rounded-lg transition-all page-dot ${i === currentProkerPage ? 'bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}" data-page="${i}" aria-label="Page ${i}">${i}</button>`;
+      let pages = [];
+      const maxVisible = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : 5;
+      let startP = Math.max(1, currentProkerPage - Math.floor(maxVisible / 2));
+      let endP = Math.min(totalPages, startP + maxVisible - 1);
+      if (endP - startP < maxVisible - 1) {
+        startP = Math.max(1, endP - maxVisible + 1);
       }
+      for (let i = startP; i <= endP; i++) {
+        pages.push(i);
+      }
+
+      let dotsHtml = '';
+      if (startP > 1) {
+        dotsHtml += `<button class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all page-dot text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" data-page="1">1</button>`;
+        if (startP > 2) dotsHtml += `<span class="px-1 text-xs text-slate-400 select-none">&hellip;</span>`;
+      }
+      pages.forEach(p => {
+        dotsHtml += `<button class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all page-dot ${p === currentProkerPage ? 'bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}" data-page="${p}" aria-label="Halaman ${p}">${p}</button>`;
+      });
+      if (endP < totalPages) {
+        if (endP < totalPages - 1) dotsHtml += `<span class="px-1 text-xs text-slate-400 select-none">&hellip;</span>`;
+        dotsHtml += `<button class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all page-dot text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" data-page="${totalPages}">${totalPages}</button>`;
+      }
+
       paginationContainer.innerHTML = `
-        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav prev" ${currentProkerPage === 1 ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_left</span></button>
-        <div class="page-dots flex items-center gap-1.5">${dotsHtml}</div>
-        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav next" ${currentProkerPage === totalPages ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_right</span></button>
+        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav prev" ${currentProkerPage === 1 ? 'disabled' : ''} title="Halaman Sebelumnya"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
+        <div class="page-dots flex items-center gap-1">${dotsHtml}</div>
+        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav next" ${currentProkerPage === totalPages ? 'disabled' : ''} title="Halaman Berikutnya"><span class="material-symbols-outlined text-lg">chevron_right</span></button>
       `;
 
       // Bind events
