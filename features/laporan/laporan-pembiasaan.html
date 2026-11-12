@@ -740,7 +740,7 @@
         <tr>
           <td style="text-align:center;">${i + 1}</td>
           <td style="text-align:left;font-weight:600;">${e.judul_periode}</td>
-          <td style="text-align:center;"><span class="${e.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${e.status === 'berjalan' ? '🟢 Berjalan' : '🔒 Selesai'}</span></td>
+          <td style="text-align:center;"><span class="${e.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${e.status === 'berjalan' ? 'Berjalan' : 'Selesai'}</span></td>
           <td class="col-date">${new Date(e.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
           <td style="text-align:center;"><a href="?event=${e.id}" style="padding:7px 12px;background:var(--primary);color:#fff;text-decoration:none;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">Lihat →</a></td>
         </tr>
@@ -749,7 +749,7 @@
       mainContent.innerHTML = `
         <div class="event-list-card">
           <div class="event-list-header">
-            <h2>📋 Daftar Laporan Pembiasaan</h2>
+            <h2>Daftar Laporan Pembiasaan</h2>
             <p>Pilih periode untuk melihat rekap nilai pembiasaan Generus Caberawit (PAUD – SD)</p>
           </div>
           <div style="padding:16px;">
@@ -781,7 +781,7 @@
 
       const headerBadge = document.getElementById('headerBadge');
       if (headerBadge) {
-        headerBadge.textContent = targetEvent.status === 'berjalan' ? '🟢 Aktif' : '🔒 Selesai';
+        headerBadge.textContent = targetEvent.status === 'berjalan' ? 'Aktif' : 'Selesai';
       }
 
       // Update breadcrumb trail dynamically
@@ -847,7 +847,7 @@
             </div>
             <div class="laporan-meta-item">
               <label>Status Event</label>
-              <strong><span class="${targetEvent.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${targetEvent.status === 'berjalan' ? '🟢 Berjalan' : '🔒 Selesai'}</span></strong>
+              <strong><span class="${targetEvent.status === 'berjalan' ? 'badge-berjalan' : 'badge-selesai'}">${targetEvent.status === 'berjalan' ? 'Berjalan' : 'Selesai'}</span></strong>
             </div>
             <div class="laporan-meta-item">
               <label>Total Bobot Poin</label>
@@ -963,7 +963,7 @@
           const nilais = targetEvent.habits.map((_, i) => (nilaiObj && Array.isArray(nilaiObj.nilai)) ? (parseInt(nilaiObj.nilai[i]) || 0) : 0);
           const total = nilais.reduce((a, b) => a + parseInt(b || 0), 0);
           const pct = totalMaxScore > 0 ? Math.round((total / totalMaxScore) * 1000) / 10 : 0;
-          const ket = pct >= 75 ? '✅ Baik' : (pct >= 50 ? '⚠️ Cukup' : '❌ Kurang');
+          const ket = pct >= 75 ? 'Baik' : (pct >= 50 ? 'Cukup' : 'Kurang');
 
           nilais.forEach((v, i) => habitTotals[i] += parseInt(v || 0));
           grandTotal += total;
@@ -985,7 +985,7 @@
         const avgPerHabit = habitTotals.map(sum => (sum / filtered.length).toFixed(1));
         const avgTotal = (grandTotal / filtered.length).toFixed(1);
         const avgPct = totalMaxScore > 0 ? ((grandTotal / (filtered.length * totalMaxScore)) * 100).toFixed(1) : 0;
-        const avgKet = avgPct >= 75 ? '✅ Baik' : (avgPct >= 50 ? '⚠️ Cukup' : '❌ Kurang');
+        const avgKet = avgPct >= 75 ? 'Baik' : (avgPct >= 50 ? 'Cukup' : 'Kurang');
 
         tfoot.innerHTML = `
           <tr style="background:#f1f5f9;font-weight:700;border-top:2px solid var(--primary);">

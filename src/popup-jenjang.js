@@ -248,7 +248,7 @@ export function bukaModal(key) {
           <div>
             <div class="flex items-center gap-3 mb-2">
               <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
-                <span class="text-xl">&#128102;</span>
+                <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-2xl">male</span>
               </div>
               <div>
                 <div class="text-xs text-slate-500 dark:text-slate-400">Putra</div>
@@ -266,7 +266,7 @@ export function bukaModal(key) {
           <div>
             <div class="flex items-center gap-3 mb-2">
               <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center shrink-0">
-                <span class="text-xl">&#128103;</span>
+                <span class="material-symbols-outlined text-pink-600 dark:text-pink-400 text-2xl">female</span>
               </div>
               <div>
                 <div class="text-xs text-slate-500 dark:text-slate-400">Putri</div>

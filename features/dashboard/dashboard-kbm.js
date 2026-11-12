@@ -544,9 +544,9 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           Format KBM <span style="color:red">*</span>
         </label>
         <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:#1e3a8a;font-size:12.5px;box-sizing:border-box;">
-          <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>🎓 Remaja (SMP - Dewasa)</option>
-          <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
-          <option value="caberawit" ${defaultFormat === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
+          <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>Remaja (SMP - Dewasa)</option>
+          <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler (SMP - SMA)</option>
+          <option value="caberawit" ${defaultFormat === 'caberawit' ? 'selected' : ''}>Caberawit (PAUD - SD)</option>
         </select>
       </div>
 
@@ -601,10 +601,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         <div style="min-width:0;">
           <label style="font-weight:700;display:block;margin-bottom:4px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Pemisahan Gender</label>
           <select id="modalSelGender" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:600;font-size:12px;box-sizing:border-box;">
-            <option value="pisah" ${defaultGender === 'pisah' ? 'selected' : ''}>🚻 Pisah Lembar (Pa &amp; Pi)</option>
-            <option value="L" ${defaultGender === 'L' ? 'selected' : ''}>👦 Khusus Putra Saja</option>
-            <option value="P" ${defaultGender === 'P' ? 'selected' : ''}>👧 Khusus Putri Saja</option>
-            <option value="gabung" ${defaultGender === 'gabung' ? 'selected' : ''}>👥 Gabung (Pa &amp; Pi)</option>
+            <option value="pisah" ${defaultGender === 'pisah' ? 'selected' : ''}>Pisah Lembar (Pa &amp; Pi)</option>
+            <option value="L" ${defaultGender === 'L' ? 'selected' : ''}>Khusus Putra Saja</option>
+            <option value="P" ${defaultGender === 'P' ? 'selected' : ''}>Khusus Putri Saja</option>
+            <option value="gabung" ${defaultGender === 'gabung' ? 'selected' : ''}>Gabung (Pa &amp; Pi)</option>
           </select>
         </div>
         <div style="min-width:0;">
@@ -1454,8 +1454,9 @@ export function renderSingleKelompokEditModal(event, kelId) {
         <div>
           <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;color:var(--text);">Catatan / Evaluasi</label>
           <textarea id="iptSingleCatatan" rows="3" placeholder="Materi Alqur'an dan Khadist ataupun Tema Nasehat Bisa di catat disini" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;resize:vertical;">${catatanVal}</textarea>
-          <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:3px;">
-            💡 <em>Materi Alqur'an dan Khadist ataupun Tema Nasehat Bisa di catat disini</em>
+          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;margin-top:3px;">
+            <span class="material-symbols-outlined" style="font-size:14px;">lightbulb</span>
+            <em>Materi Alqur'an dan Khadist ataupun Tema Nasehat Bisa di catat disini</em>
           </span>
         </div>
 

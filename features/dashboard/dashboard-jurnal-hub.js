@@ -150,7 +150,7 @@ export function renderJurnalKbmPageView() {
   if (isDaerah) {
     desaDropdownHtml = `
       <select id="hubSelDesa" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-sm cursor-pointer">
-        <option value="all" ${selectedDesaId === 'all' ? 'selected' : ''}>🌍 Semua Desa (${MASTER_WILAYAH.desa.length} Desa)</option>
+        <option value="all" ${selectedDesaId === 'all' ? 'selected' : ''}>Semua Desa (${MASTER_WILAYAH.desa.length} Desa)</option>
         ${MASTER_WILAYAH.desa.map(d => `<option value="${d.id}" ${selectedDesaId === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
       </select>
     `;
@@ -203,7 +203,7 @@ export function renderJurnalKbmPageView() {
         <span class="text-slate-300 dark:text-slate-600">/</span>
         <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
           <span class="material-symbols-outlined text-emerald-600 text-[18px]">menu_book</span>
-          Jurnal KBM &amp; Pembinaan Generus
+          Jurnal KBM
         </span>
       </div>
 
@@ -214,22 +214,21 @@ export function renderJurnalKbmPageView() {
     </div>
 
     <!-- Header Hero Banner with Auto-Tingkatan Indicator -->
-    <div class="bg-gradient-to-br from-emerald-600 via-teal-700 to-blue-800 rounded-3xl p-5 md:p-6 text-white shadow-lg relative overflow-hidden">
-      <div class="absolute -right-8 -bottom-10 opacity-10 pointer-events-none">
-        <span class="material-symbols-outlined text-[200px]">auto_stories</span>
-      </div>
-      <div class="relative z-10 space-y-2.5">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold border border-white/30">
-          <span class="material-symbols-outlined text-[15px]">verified_user</span>
-          <span>${tingkatanLabel}</span>
+    <div class="bg-gradient-to-r from-emerald-600 via-teal-700 to-blue-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
+            <span class="material-symbols-outlined text-[14px]">verified_user</span>
+            <span>${tingkatanLabel}</span>
+          </div>
+          <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Jurnal KBM &amp; Pembinaan Generus</h1>
+          <p class="text-xs text-emerald-100 mt-0.5 leading-relaxed">
+            Presensi kehadiran santri, monitoring materi KBM, dan lembar pembiasaan karakter.
+          </p>
         </div>
-        <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Jurnal KBM &amp; Pembinaan Generus</h1>
-        <p class="text-xs text-emerald-100 max-w-2xl leading-relaxed">
-          Presensi santri, jurnal materi KBM, dan lembar pembiasaan karakter.
-        </p>
 
         <!-- Bar Filter Wilayah -->
-        <div class="pt-1 flex items-center flex-wrap gap-2">
+        <div class="flex items-center flex-wrap gap-2 shrink-0 bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/15">
           <span class="text-xs font-bold text-emerald-100 flex items-center gap-1">
             <span class="material-symbols-outlined text-[15px]">filter_alt</span> Wilayah:
           </span>
@@ -239,10 +238,10 @@ export function renderJurnalKbmPageView() {
       </div>
     </div>
 
-    <!-- BAGIAN 1: JENJANG GENERUS (ABSENSI & JURNAL KBM) -->
+    <!-- BAGIAN 1: JENJANG GENERUS (PRESENSI & MATERI KBM) -->
     <section class="space-y-3">
       <div class="flex items-center justify-between">
-        <h2 class="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white">Pilih Jenjang</h2>
+        <h2 class="text-base md:text-lg font-extrabold text-slate-900 dark:text-white">Pilih Jenjang</h2>
       </div>
 
       <!-- 3 Kartu Pilihan Jenjang di Awal (Grid 3 Kolom) -->
@@ -256,7 +255,7 @@ export function renderJurnalKbmPageView() {
               </div>
               <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${activeJenjang === 'caberawit' ? 'bg-amber-500 text-white' : 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'}">PAUD - SD</span>
             </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">🌱 Caberawit</h3>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Caberawit</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400">Usia dini &amp; sekolah dasar (PAUD - SD).</p>
           </div>
           <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-amber-600">
@@ -274,7 +273,7 @@ export function renderJurnalKbmPageView() {
               </div>
               <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${activeJenjang === 'gp_reguler' ? 'bg-brandBlue text-white' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}">SMP</span>
             </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">📚 Pra-Remaja (GP)</h3>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Pra-Remaja (GP)</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400">Generus pendampingan reguler (SMP).</p>
           </div>
           <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-brandBlue">
@@ -292,7 +291,7 @@ export function renderJurnalKbmPageView() {
               </div>
               <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${activeJenjang === 'remaja' ? 'bg-purple-600 text-white' : 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'}">SMA - Nikah</span>
             </div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">🎓 Remaja &amp; Dewasa</h3>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Remaja &amp; Dewasa</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400">Muda-mudi &amp; usia pra-nikah.</p>
           </div>
           <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-purple-600">
@@ -303,26 +302,26 @@ export function renderJurnalKbmPageView() {
       </div>
 
       <!-- 2 Kartu Aksi Modul Sesuai Jenjang Terpilih -->
-      <div class="bg-slate-100/70 dark:bg-slate-800/50 p-4 md:p-5 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3">
+      <div class="bg-slate-100/70 dark:bg-slate-800/50 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full" style="background:${meta.color};"></span>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">
-            Layanan KBM: <span style="color:${meta.color};">${meta.nama}</span>
+          <h3 class="text-xs md:text-sm font-bold text-slate-900 dark:text-white">
+            Modul KBM: <span style="color:${meta.color};">${meta.nama}</span>
           </h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <!-- Modul 1: Absensi KBM -->
+          <!-- Modul 1: Presensi Kehadiran -->
           <div id="btnCardHubAbsensi" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors mb-2.5">
                 <span class="material-symbols-outlined text-xl">co_present</span>
               </div>
               <h4 class="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors">
-                Absensi KBM
+                Presensi Kehadiran
               </h4>
               <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                Cetak lembar fisik A4 &amp; input kehadiran santri.
+                Cetak lembar presensi A4 &amp; input kehadiran santri.
               </p>
             </div>
             <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
@@ -331,21 +330,21 @@ export function renderJurnalKbmPageView() {
             </div>
           </div>
 
-          <!-- Modul 2: Jurnal KBM -->
+          <!-- Modul 2: Materi & Kurikulum -->
           <div id="btnCardHubJurnal" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue flex items-center justify-center group-hover:bg-brandBlue group-hover:text-white transition-colors mb-2.5">
-                <span class="material-symbols-outlined text-xl">edit_note</span>
+                <span class="material-symbols-outlined text-xl">menu_book</span>
               </div>
               <h4 class="text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-brandBlue transition-colors">
-                Jurnal KBM
+                Materi &amp; Kurikulum
               </h4>
               <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                Kurikulum materi, hafalan, &amp; evaluasi belajar.
+                Agenda KBM, capaian materi pembelajaran &amp; hafalan.
               </p>
             </div>
             <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-bold text-brandBlue dark:text-blue-400">
-              <span>Buka Jurnal</span>
+              <span>Buka Materi</span>
               <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </div>
           </div>
@@ -355,9 +354,61 @@ export function renderJurnalKbmPageView() {
 
     <!-- BAGIAN 2: PEMBIASAAN CABERAWIT -->
     <section class="space-y-3">
-      <h2 class="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white">Pembiasaan Caberawit</h2>
+      <h2 class="text-base md:text-lg font-extrabold text-slate-900 dark:text-white">Pembiasaan Karakter Luhur</h2>
 
       <div id="btnCardHubPembiasaan" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-2xl">checklist</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-0.5">
+              <h3 class="text-sm md:text-base font-bold text-slate-900 dark:text-white group-hover:text-amber-600 transition-colors">
+                Lembar Pembiasaan 29 Karakter Luhur
+              </h3>
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300">Caberawit</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Target ibadah harian &amp; evaluasi karakter santri.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer">
+          <span>Buka Pembiasaan</span>
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- BAGIAN 3: LAPORAN MUSYAWARAH 5 UNSUR -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base md:text-lg font-extrabold text-slate-900 dark:text-white">Musyawarah 5 Unsur</h2>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold border border-indigo-200 dark:border-indigo-800">
+          <span class="material-symbols-outlined text-[13px]">schedule</span> Tahap Selanjutnya
+        </span>
+      </div>
+
+      <div id="btnCardHubMusyawarah" class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-2xl">handshake</span>
+          </div>
+          <div>
+            <h3 class="text-sm md:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors mb-0.5">
+              Sinergi 5 Unsur Desa &amp; Kelompok
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Koordinasi PPG, Muballigh, Pinisepuh, Orang Tua, &amp; KMM.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-base">visibility</span>
+          <span>Pratinjau</span>
+        </button>
+      </div>
+    </section>
         <div class="flex items-center gap-3.5">
           <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-white transition-colors">
             <span class="material-symbols-outlined text-2xl">checklist</span>

@@ -92,11 +92,11 @@ export function renderApprovalListModal() {
         <div>
           <strong style="font-size:14px;color:var(--text);">${p.nama}</strong>
           <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${p.peran || p.jabatan || 'Pamong'}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
-            📧 ${p.email} &bull; 📱 ${p.noWa || '-'}
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:13px;">mail</span> ${p.email} &bull; <span class="material-symbols-outlined" style="font-size:13px;">call</span> ${p.noWa || '-'}
           </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
-            📍 Asal: Kelompok <strong>${p.kelompokNama || '-'}</strong>, Desa <strong>${p.desaNama || '-'}</strong>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:13px;">location_on</span> Asal: Kelompok <strong>${p.kelompokNama || '-'}</strong>, Desa <strong>${p.desaNama || '-'}</strong>
           </div>
         </div>
         <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;">Pending</span>
@@ -674,8 +674,8 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
               <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};">${levelLabel}</span>
             </div>
             <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${p.peran || p.jabatan || 'Pengurus'}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">📍 Asal: <strong>${asalTxt}</strong></div>
-            <div style="font-size:11px;color:var(--text-muted);">📧 ${p.email} &bull; 📱 ${p.noWa || '-'}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:13px;">location_on</span> Asal: <strong>${asalTxt}</strong></div>
+            <div style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:13px;">mail</span> ${p.email} &bull; <span class="material-symbols-outlined" style="font-size:13px;">call</span> ${p.noWa || '-'}</div>
           </div>
           <div style="text-align:right;">
             ${statusChip}
@@ -984,7 +984,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
           <select id="editTingkatan" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);font-weight:700;">
             <option value="kelompok" ${currentTingkat === 'kelompok' ? 'selected' : ''}>Pamong Kelompok</option>
             <option value="desa" ${currentTingkat === 'desa' ? 'selected' : ''}>Koordinator Desa</option>
-            <option value="daerah" ${currentTingkat === 'daerah' ? 'selected' : ''}>🌟 Superadmin Daerah (Pengurus PPG)</option>
+            <option value="daerah" ${currentTingkat === 'daerah' ? 'selected' : ''}>Superadmin Daerah (Pengurus PPG)</option>
           </select>
         </div>
         <div>
@@ -1013,8 +1013,8 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       <div>
         <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Status Akun</label>
         <select id="editStatusActive" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
-          <option value="true" ${p.isActive !== false ? 'selected' : ''}>🟢 Aktif (Dapat Login)</option>
-          <option value="false" ${p.isActive === false ? 'selected' : ''}>🔴 Dinonaktifkan (Tidak Dapat Login)</option>
+          <option value="true" ${p.isActive !== false ? 'selected' : ''}>Aktif (Dapat Login)</option>
+          <option value="false" ${p.isActive === false ? 'selected' : ''}>Dinonaktifkan (Tidak Dapat Login)</option>
         </select>
       </div>
 

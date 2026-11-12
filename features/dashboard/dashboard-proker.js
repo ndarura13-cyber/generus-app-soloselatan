@@ -860,10 +860,10 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div class="proker-filter-col">
           <select id="selectFilterStatus" class="proker-select">
             <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
-            <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>🟢 Berlangsung</option>
-            <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>🟡 Akan Datang</option>
-            <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>🔵 Direncanakan</option>
-            <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>⚪ Selesai</option>
+            <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>Berlangsung</option>
+            <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>Akan Datang</option>
+            <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>Direncanakan</option>
+            <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>Selesai</option>
           </select>
         </div>
 
@@ -1058,7 +1058,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     contentHtml = `
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-muted);">
-          <span>👉 Geser tabel ke samping untuk melihat seluruh 11 kolom format resmi pelaporan LPJ & realisasi RAB 👈</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">swipe</span> Geser tabel ke samping untuk melihat seluruh 11 kolom format resmi pelaporan LPJ & realisasi RAB</span>
           <span style="font-weight:700;">Halaman ${currentPage} dari ${totalPages} (${totalItems} Total Program)</span>
         </div>
         <div class="proker-table-wrap">
@@ -1571,21 +1571,23 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
 
       <!-- BODY PRESENTASI PROKER -->
       <div class="proker-presentation-body">
-        <!-- BARIS TOMBOL AKSI TIGA KOLOM (LPJ Realisasi, Edit, Hapus - Sesuai Gambar 3) -->
+        ${isSuper ? `
+        <!-- BARIS TOMBOL AKSI TIGA KOLOM (LPJ Realisasi, Edit, Hapus) - KHUSUS SUPERADMIN -->
         <div class="proker-pleno-actions-bar">
           <button type="button" class="btn-pleno-action btn-pleno-lpj" id="btnPlenoLpj" title="Lapor LPJ & Realisasi Dana">
             <span class="material-symbols-outlined" style="font-size:16px;">assignment_turned_in</span>
             <span>LPJ Realisasi</span>
           </button>
-          <button type="button" class="btn-pleno-action btn-pleno-edit" id="btnPlenoEdit" ${!isSuper ? 'disabled title="Hanya Superadmin"' : 'title="Edit Program Kerja"'}>
+          <button type="button" class="btn-pleno-action btn-pleno-edit" id="btnPlenoEdit" title="Edit Program Kerja">
             <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
             <span>Edit</span>
           </button>
-          <button type="button" class="btn-pleno-action btn-pleno-del" id="btnPlenoDel" ${!isSuper ? 'disabled title="Hanya Superadmin"' : 'title="Hapus Program Kerja"'}>
+          <button type="button" class="btn-pleno-action btn-pleno-del" id="btnPlenoDel" title="Hapus Program Kerja">
             <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
             <span>Hapus</span>
           </button>
         </div>
+        ` : ''}
 
         <!-- HERO STATUS & JUDUL AGENDA -->
         <div style="display:flex;flex-direction:column;gap:6px;">
@@ -1694,8 +1696,9 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
               ${currentItem.deskripsiRealisasi}
             </div>
             ${currentItem.tglRealisasi ? `
-              <div style="font-size:11px;color:#047857;font-weight:700;margin-top:4px;">
-                📅 Tanggal Pelaporan LPJ: ${currentItem.tglRealisasi}
+              <div style="font-size:11px;color:#047857;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:4px;">
+                <span class="material-symbols-outlined" style="font-size:14px;">event_available</span>
+                <span>Tanggal Pelaporan LPJ: ${currentItem.tglRealisasi}</span>
               </div>
             ` : ''}
           </div>
@@ -1749,12 +1752,12 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
     }
   });
 
-  document.getElementById('btnPlenoLpj')?.addEventListener('click', () => {
-    closePlenoPresentation();
-    renderLaporRealisasiModal(currentItem);
-  });
-
   if (isSuper) {
+    document.getElementById('btnPlenoLpj')?.addEventListener('click', () => {
+      closePlenoPresentation();
+      renderLaporRealisasiModal(currentItem);
+    });
+
     document.getElementById('btnPlenoEdit')?.addEventListener('click', () => {
       closePlenoPresentation();
       renderAddEditProkerForm(currentItem, currentItem.kategori || currentActiveKategori);
@@ -1803,6 +1806,11 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
 
 export function renderLaporRealisasiModal(p) {
   if (!p) return;
+  const isSuper = Boolean(currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah'));
+  if (!isSuper) {
+    showToast('Akses ditolak: Hanya Superadmin Daerah yang memiliki izin melaporkan realisasi program kerja.', 'danger');
+    return;
+  }
   const isTerlaksana = p.realisasiStatus === 'terlaksana';
   const estBiaya = p.estBiaya || 0;
   const initialRealBiaya = p.realisasiBiaya !== undefined && p.realisasiBiaya !== null ? p.realisasiBiaya : (isTerlaksana ? estBiaya : 0);
@@ -1826,9 +1834,9 @@ export function renderLaporRealisasiModal(p) {
           </div>
         </div>
         <div style="font-size:12px;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
-          <span>📅 Waktu: <strong style="color:var(--text);">${p.waktu || '-'}</strong></span>
-          <span>📍 Tempat: <strong style="color:var(--text);">${p.tempat || '-'}</strong></span>
-          <span>👥 Sasaran: <strong style="color:var(--text);">${p.sasaran || '-'}</strong></span>
+          <span style="display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:15px;">calendar_month</span> Waktu: <strong style="color:var(--text);">${p.waktu || '-'}</strong></span>
+          <span style="display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:15px;">location_on</span> Tempat: <strong style="color:var(--text);">${p.tempat || '-'}</strong></span>
+          <span style="display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:15px;">group</span> Sasaran: <strong style="color:var(--text);">${p.sasaran || '-'}</strong></span>
         </div>
       </div>
 
@@ -1903,11 +1911,11 @@ export function renderLaporRealisasiModal(p) {
       if (val === 0 && estBiaya === 0) {
         lpjDiffCalc.innerHTML = '<span style="color:var(--text-muted);">Sesuai Estimasi Rp 0</span>';
       } else if (selisih > 0) {
-        lpjDiffCalc.innerHTML = `<span style="color:#057a55;">✓ Hemat Rp ${selisih.toLocaleString('id-ID')} dari RAB Awal</span>`;
+        lpjDiffCalc.innerHTML = `<span style="color:#057a55;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> Hemat Rp ${selisih.toLocaleString('id-ID')} dari RAB Awal</span>`;
       } else if (selisih < 0) {
-        lpjDiffCalc.innerHTML = `<span style="color:#c81e1e;">⚠ Over Budget Rp ${Math.abs(selisih).toLocaleString('id-ID')} dari RAB Awal</span>`;
+        lpjDiffCalc.innerHTML = `<span style="color:#c81e1e;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">warning</span> Over Budget Rp ${Math.abs(selisih).toLocaleString('id-ID')} dari RAB Awal</span>`;
       } else {
-        lpjDiffCalc.innerHTML = `<span style="color:#2563eb;">✓ Tepat 100% Sesuai Estimasi RAB</span>`;
+        lpjDiffCalc.innerHTML = `<span style="color:#2563eb;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">verified</span> Tepat 100% Sesuai Estimasi RAB</span>`;
       }
     }
   }
@@ -1953,6 +1961,11 @@ export function renderLaporRealisasiModal(p) {
 }
 
 export async function renderAddEditProkerForm(p = null, defaultKategori = currentActiveKategori) {
+  const isSuper = Boolean(currentUser && (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah'));
+  if (!isSuper) {
+    showToast('Akses ditolak: Hanya Superadmin Daerah yang memiliki izin mengedit program kerja.', 'danger');
+    return;
+  }
   const isEdit = !!p;
   let formKategori = p?.kategori || defaultKategori || currentActiveKategori || 'PPG';
   const prokerList = getProkerList();
@@ -2085,10 +2098,10 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
         <div class="form-group">
           <label style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:block;">STATUS KEGIATAN</label>
           <select id="prokerInputStatus" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);">
-            <option value="planned" ${isEdit && p.status === 'planned' ? 'selected' : ''}>🔵 Direncanakan</option>
-            <option value="upcoming" ${isEdit && p.status === 'upcoming' ? 'selected' : ''}>🟡 Akan Datang</option>
-            <option value="ongoing" ${isEdit && p.status === 'ongoing' ? 'selected' : ''}>🟢 Sedang Berlangsung</option>
-            <option value="done" ${isEdit && p.status === 'done' ? 'selected' : ''}>⚪ Selesai</option>
+            <option value="planned" ${isEdit && p.status === 'planned' ? 'selected' : ''}>Direncanakan</option>
+            <option value="upcoming" ${isEdit && p.status === 'upcoming' ? 'selected' : ''}>Akan Datang</option>
+            <option value="ongoing" ${isEdit && p.status === 'ongoing' ? 'selected' : ''}>Sedang Berlangsung</option>
+            <option value="done" ${isEdit && p.status === 'done' ? 'selected' : ''}>Selesai</option>
           </select>
         </div>
         <div class="form-group">
@@ -2119,8 +2132,8 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
           <div class="form-group">
             <label style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;display:block;">STATUS REALISASI</label>
             <select id="prokerInputRealisasiStatus" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);font-weight:700;">
-              <option value="belum_terlaksana" ${isEdit && p.realisasiStatus === 'belum_terlaksana' ? 'selected' : ''}>🔴 Belum Terlaksana</option>
-              <option value="terlaksana" ${isEdit && p.realisasiStatus === 'terlaksana' ? 'selected' : ''}>🟢 Terlaksana</option>
+              <option value="belum_terlaksana" ${isEdit && p.realisasiStatus === 'belum_terlaksana' ? 'selected' : ''}>Belum Terlaksana</option>
+              <option value="terlaksana" ${isEdit && p.realisasiStatus === 'terlaksana' ? 'selected' : ''}>Terlaksana</option>
             </select>
           </div>
           <div class="form-group">

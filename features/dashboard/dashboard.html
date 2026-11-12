@@ -851,7 +851,7 @@
   <script>
     // Theme logic and cache busting
     (function forceCacheClear() {
-      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v8.2';
+      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v8.3';
       if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(r => r.forEach(x => x.unregister()));
@@ -954,7 +954,7 @@
     class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
-  <script type="module" src="dashboard.js?v=8.2"></script>
+  <script type="module" src="dashboard.js?v=8.3"></script>
 </body>
 
 </html>

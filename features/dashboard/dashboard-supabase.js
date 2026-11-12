@@ -63,13 +63,13 @@ export function renderSupabaseModal(onDataSynced = null) {
         <div>
           <label class="sb-field-label">Project URL Supabase <span style="color:red">*</span></label>
           <input type="url" id="sbProjectUrl" class="sb-field-input" value="${cfg.url || ''}" placeholder="https://xyzcompany.supabase.co" required />
-          <div class="sb-field-hint">Ditemukan di dashboard Supabase: Project Settings ➔ API ➔ Project URL</div>
+          <div class="sb-field-hint">Ditemukan di dashboard Supabase: Project Settings &gt; API &gt; Project URL</div>
         </div>
 
         <div>
           <label class="sb-field-label">Project API Anon Key (Public Key) <span style="color:red">*</span></label>
           <textarea id="sbAnonKey" class="sb-field-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required style="font-family:monospace;font-size:11.5px;">${cfg.anonKey || ''}</textarea>
-          <div class="sb-field-hint">Ditemukan di dashboard Supabase: Project Settings ➔ API ➔ Project API Keys (anon public)</div>
+          <div class="sb-field-hint">Ditemukan di dashboard Supabase: Project Settings &gt; API &gt; Project API Keys (anon public)</div>
         </div>
 
         <div id="sbTestResult" class="sb-test-alert" style="display:none;"></div>
@@ -116,8 +116,9 @@ export function renderSupabaseModal(onDataSynced = null) {
         </div>
       ` : ''}
 
-      <div class="sb-tips-box">
-        💡 <strong>Tips Skema:</strong> File script SQL lengkap siap pakai tersimpan di <code class="sb-tips-code">src/database_schema.sql</code>. Anda hanya perlu menyalin dan menempelkannya di menu <strong>SQL Editor</strong> Supabase lalu klik tombol <strong>Run</strong>.
+      <div class="sb-tips-box" style="display:flex;align-items:flex-start;gap:6px;">
+        <span class="material-symbols-outlined" style="font-size:16px;color:#d97706;margin-top:1px;">lightbulb</span>
+        <div><strong>Tips Skema:</strong> File script SQL lengkap siap pakai tersimpan di <code class="sb-tips-code">src/database_schema.sql</code>. Anda hanya perlu menyalin dan menempelkannya di menu <strong>SQL Editor</strong> Supabase lalu klik tombol <strong>Run</strong>.</div>
       </div>
     </div>
   `;
@@ -145,12 +146,12 @@ export function renderSupabaseModal(onDataSynced = null) {
     const res = await testSupabaseConnection();
     if (res.success) {
       testRes.className = 'sb-test-alert alert-success';
-      testRes.textContent = `✅ ${res.message}`;
+      testRes.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">check_circle</span> ${res.message}`;
       showToast('Koneksi Supabase Berhasil!', 'success');
       updateSupabaseStatusUI();
     } else {
       testRes.className = 'sb-test-alert alert-error';
-      testRes.textContent = `❌ ${res.message}`;
+      testRes.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">cancel</span> ${res.message}`;
       showToast('Gagal menghubungi Supabase.', 'danger');
     }
   });

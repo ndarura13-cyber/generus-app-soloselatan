@@ -125,7 +125,7 @@ export function renderUserProfile() {
   }
 
   if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
-    userBadgeEl.textContent = '🌟 Superadmin Daerah';
+    userBadgeEl.textContent = 'Superadmin Daerah';
     userBadgeEl.style.background = 'linear-gradient(135deg, var(--gold), #d49b10)';
     userBadgeEl.style.color = '#1a1d2e';
 
@@ -146,7 +146,7 @@ export function renderUserProfile() {
     }
 
   } else if (currentUser.tingkatan === 'desa') {
-    userBadgeEl.textContent = `🏛️ Koordinator Desa ${currentUser.desaNama || ''}`;
+    userBadgeEl.textContent = `Koordinator Desa ${currentUser.desaNama || ''}`;
     userBadgeEl.style.background = 'var(--gold-light)';
     userBadgeEl.style.color = '#715700';
 
@@ -163,7 +163,7 @@ export function renderUserProfile() {
     }
 
   } else {
-    userBadgeEl.textContent = `👥 Pamong Kel. ${currentUser.kelompokNama || ''}`;
+    userBadgeEl.textContent = `Pamong Kel. ${currentUser.kelompokNama || ''}`;
     userBadgeEl.style.background = 'var(--blue-light)';
     userBadgeEl.style.color = 'var(--blue-dark)';
 
@@ -194,16 +194,16 @@ setProkerHooks({
 /* ── 2. Edit Profil Pengurus Sedang Bertugas ───────────────── */
 export function renderSelfProfileModal() {
   // Label & styling lencana tingkatan hak akses (Read-Only)
-  let levelBadgeLabel = '👥 Pamong Kelompok';
+  let levelBadgeLabel = 'Pamong Kelompok';
   let levelBadgeBg = '#dbeafe';
   let levelBadgeColor = '#1e40af';
 
   if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
-    levelBadgeLabel = '🌟 Superadmin Daerah';
+    levelBadgeLabel = 'Superadmin Daerah';
     levelBadgeBg = 'linear-gradient(135deg, #fef3c7, #fde68a)';
     levelBadgeColor = '#92400e';
   } else if (currentUser.tingkatan === 'desa') {
-    levelBadgeLabel = `🏛️ Koordinator Desa ${currentUser.desaNama || ''}`;
+    levelBadgeLabel = `Koordinator Desa ${currentUser.desaNama || ''}`;
     levelBadgeBg = '#dcfce7';
     levelBadgeColor = '#166534';
   }

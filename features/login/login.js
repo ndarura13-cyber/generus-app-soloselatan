@@ -168,7 +168,7 @@ document.getElementById('formRegister')?.addEventListener('submit', async (e) =>
   if (submitBtn) submitBtn.innerHTML = `Daftar Pengurus Baru`;
 
   if (!result.success) {
-    alert(`⚠️ ${result.message}`);
+    alert(result.message);
     return;
   }
 
@@ -180,7 +180,7 @@ document.getElementById('formRegister')?.addEventListener('submit', async (e) =>
   setTimeout(() => {
     closeRegisterModal();
     if (regSuccessMsg) regSuccessMsg.style.display = 'none';
-    showSuccess(`✅ Pendaftaran berhasil! Akun "${nama}" sedang menunggu persetujuan.`);
+    showSuccess(`Pendaftaran berhasil! Akun "${nama}" sedang menunggu persetujuan.`);
     emailEl.value = email;
   }, 2500);
 });
@@ -233,18 +233,18 @@ loginForm?.addEventListener('submit', (e) => {
 
   // 3. CEK STATUS APPROVAL SUPERADMIN (Syarat Mutlak)
   if (matchedUser.statusApproval === 'pending') {
-    showError(`⚠️ Akun Anda (${matchedUser.nama}) masih berstatus MENUNGGU PERSETUJUAN dari Superadmin Daerah Solo Selatan. Silakan hubungi admin yayasan untuk verifikasi.`);
+    showError(`Akun Anda (${matchedUser.nama}) masih berstatus MENUNGGU PERSETUJUAN dari Superadmin Daerah Solo Selatan. Silakan hubungi admin yayasan untuk verifikasi.`);
     return;
   }
 
   if (matchedUser.statusApproval === 'rejected') {
-    showError(`❌ Mohon maaf, pendaftaran akun Anda telah ditolak oleh Superadmin Daerah. Silakan hubungi sekretariat PPG Solo Selatan.`);
+    showError(`Mohon maaf, pendaftaran akun Anda telah ditolak oleh Superadmin Daerah. Silakan hubungi sekretariat PPG Solo Selatan.`);
     return;
   }
 
   // 4. CEK STATUS AKTIF AKUN (Superadmin deactivation)
   if (matchedUser.isActive === false) {
-    showError(`⚠️ Akun Anda (${matchedUser.nama}) saat ini DINONAKTIFKAN oleh Superadmin Daerah. Silakan hubungi pengurus daerah untuk pengaktifan kembali.`);
+    showError(`Akun Anda (${matchedUser.nama}) saat ini DINONAKTIFKAN oleh Superadmin Daerah. Silakan hubungi pengurus daerah untuk pengaktifan kembali.`);
     return;
   }
 

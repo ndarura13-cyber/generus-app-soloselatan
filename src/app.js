@@ -617,7 +617,7 @@ if ('serviceWorker' in navigator) {
           const newWorker = reg.installing;
           newWorker?.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              showToast('🔄 Versi baru tersedia! Refresh untuk memperbarui.');
+              showToast('Versi baru tersedia! Refresh untuk memperbarui.');
             }
           });
         });
@@ -657,7 +657,7 @@ pwaBtn?.addEventListener('click', async () => {
   deferredInstallPrompt.prompt();
   const { outcome } = await deferredInstallPrompt.userChoice;
   if (outcome === 'accepted') {
-    showToast('✅ Aplikasi berhasil diinstall! Cek layar utama HP Anda.');
+    showToast('Aplikasi berhasil diinstall! Cek layar utama HP Anda.');
   }
   deferredInstallPrompt = null;
   pwaBar?.classList.remove('visible');
@@ -670,7 +670,7 @@ pwaClose?.addEventListener('click', () => {
 
 // Show after app installed
 window.addEventListener('appinstalled', () => {
-  showToast('🎉 PPG berhasil diinstall sebagai aplikasi!');
+  showToast('PPG berhasil diinstall sebagai aplikasi!');
   pwaBar?.classList.remove('visible');
 });
 

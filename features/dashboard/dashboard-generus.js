@@ -37,7 +37,7 @@ import {
 export const JENJANG_CONFIG = {
   caberawit: {
     id: 'caberawit',
-    label: '🌱 Caberawit (Usia Dini / PAUD - SD)',
+    label: 'Caberawit (Usia Dini / PAUD - SD)',
     badge: 'Caberawit',
     color: '#d97706',
     bg: '#fef3c7',
@@ -45,7 +45,7 @@ export const JENJANG_CONFIG = {
   },
   gp_reguler: {
     id: 'gp_reguler',
-    label: '📚 GP Reguler (Remaja Awal / SMP - SMA)',
+    label: 'GP Reguler (Remaja Awal / SMP - SMA)',
     badge: 'GP Reguler',
     color: 'var(--blue)',
     bg: 'var(--blue-light)',
@@ -53,7 +53,7 @@ export const JENJANG_CONFIG = {
   },
   remaja: {
     id: 'remaja',
-    label: '🎓 Remaja & Dewasa (Muda-Mudi & Pra-Nikah)',
+    label: 'Remaja & Dewasa (Muda-Mudi & Pra-Nikah)',
     badge: 'Remaja',
     color: '#7c3aed',
     bg: '#f3e8ff',
@@ -108,230 +108,190 @@ export function updateDashboardStats() {
 
 export function renderDetailRingkasanModal(activeKat = 'all') {
   const allSiswa = getSiswaList();
-
   const activeSiswa = allSiswa.filter(isSiswaAktif);
-  const nonAktifCount = allSiswa.length - activeSiswa.length;
-  const caberawitSiswa = activeSiswa.filter(s => s.kategori_usia === 'caberawit');
-  const gpSiswa = activeSiswa.filter(s => s.kategori_usia === 'gp_reguler');
-  const remajaSiswa = activeSiswa.filter(s => s.kategori_usia === 'remaja');
 
-  function getStatsForList(list) {
-    const total = list.length;
-    const l = list.filter(s => s.jenis_kelamin === 'L').length;
-    const p = list.filter(s => s.jenis_kelamin === 'P').length;
-    return { total, l, p };
-  }
+  const cabList = activeSiswa.filter(s => (s.kategori_usia || '').toLowerCase() === 'caberawit');
+  const gpList = activeSiswa.filter(s => (s.kategori_usia || '').toLowerCase() === 'gp_reguler');
+  const remList = activeSiswa.filter(s => (s.kategori_usia || '').toLowerCase() === 'remaja');
 
-  // Categories config
-  const categories = [
-    {
+  const catMeta = {
+    all: {
       key: 'all',
       title: 'Semua Kategori Generus',
+      badge: 'Data Terpusat • Solo Selatan',
       icon: 'groups',
       color: '#1a56c4',
-      bg: '#e8f0fd',
-      list: activeSiswa,
-      desc: 'Ringkasan komprehensif seluruh generasi penerus aktif (status Sambung) PPG Solo Selatan'
+      list: activeSiswa
     },
-    {
+    caberawit: {
       key: 'caberawit',
-      title: 'Caberawit (PAUD - SD)',
+      title: 'Kategori Caberawit (PAUD – SD)',
+      badge: 'PAUD, TK & SD (3–12 Thn) • Solo Selatan',
       icon: 'child_care',
       color: '#d97706',
-      bg: '#fef3c7',
-      list: caberawitSiswa,
-      classes: JENJANG_CONFIG.caberawit.kelas,
-      desc: 'Pembiasaan karakter ibadah sejak usia dini'
+      list: cabList
     },
-    {
+    gp_reguler: {
       key: 'gp_reguler',
-      title: 'GP Reguler (SMP - SMA)',
+      title: 'Kategori GP Reguler (SMP – SMA)',
+      badge: '1 SMP – 3 SMA (13–18 Thn) • Solo Selatan',
       icon: 'school',
       color: '#1a56c4',
-      bg: '#e8f0fd',
-      list: gpSiswa,
-      classes: JENJANG_CONFIG.gp_reguler.kelas,
-      desc: 'Generasi penerus usia sekolah menengah & pembentukan karakter mandiri'
+      list: gpList
     },
-    {
+    remaja: {
       key: 'remaja',
-      title: 'Remaja & Pra-Nikah',
+      title: 'Kategori Usia Remaja & Pra-Nikah',
+      badge: '19 – 22+ Tahun • Solo Selatan',
       icon: 'diversity_3',
       color: '#7c3aed',
-      bg: '#f3e8ff',
-      list: remajaSiswa,
-      classes: JENJANG_CONFIG.remaja.kelas,
-      desc: 'Muda-mudi mandiri, mahasiswa, pekerja, dan pembekalan pra-nikah'
+      list: remList
     }
-  ];
+  };
 
-  const currentCat = categories.find(c => c.key === activeKat) || categories[0];
-  const catStats = getStatsForList(currentCat.list);
+  const currentCfg = catMeta[activeKat] || catMeta.all;
+  const currentList = currentCfg.list;
+  const total = currentList.length;
+  const lCount = currentList.filter(s => (s.jenis_kelamin || '').toUpperCase() === 'L').length;
+  const pCount = currentList.filter(s => (s.jenis_kelamin || '').toUpperCase() === 'P').length;
+  const lPct = total > 0 ? Math.round((lCount / total) * 100) : 0;
+  const pPct = total > 0 ? 100 - lPct : 0;
 
-  // Nav tabs inside modal
+  // Sebaran Desa & Kelompok
+  const desaStats = (MASTER_WILAYAH.desa || []).map(desa => {
+    const inDesa = currentList.filter(s => s.desa_id === desa.id || (s.desa_nama && desa.nama && s.desa_nama.toLowerCase() === desa.nama.toLowerCase()));
+    const kelompokStats = (desa.kelompok || []).map(kel => {
+      const siswaKel = inDesa.filter(s => s.kelompok_id === kel.id || (s.kelompok_nama && kel.nama && s.kelompok_nama.toLowerCase() === kel.nama.toLowerCase()));
+      return {
+        id: kel.id,
+        nama: kel.nama,
+        count: siswaKel.length
+      };
+    }).filter(k => k.count > 0);
+
+    return {
+      id: desa.id,
+      nama: desa.nama,
+      total: inDesa.length,
+      kelompokStats: kelompokStats
+    };
+  }).filter(d => d.total > 0 || activeKat === 'all');
+
+  // Tabs switcher
   const navTabsHtml = `
-    <div class="ringkasan-tabs-scroll">
-      ${categories.map(c => `
-        <button type="button" class="btn-tab-ringkasan ringkasan-tab-btn ${c.key === activeKat ? `active-${c.key}` : ''}" data-cat="${c.key}">
-          <span class="material-symbols-outlined" style="font-size:16px;">${c.icon}</span>
-          ${c.title.split('(')[0].trim()} (${c.list.length})
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+      ${[
+        { key: 'all', label: 'Semua Generus', count: activeSiswa.length, icon: 'groups' },
+        { key: 'caberawit', label: 'Caberawit', count: cabList.length, icon: 'child_care' },
+        { key: 'gp_reguler', label: 'GP Reguler', count: gpList.length, icon: 'school' },
+        { key: 'remaja', label: 'Remaja', count: remList.length, icon: 'diversity_3' }
+      ].map(tab => `
+        <button type="button" class="btn-tab-ringkasan px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${tab.key === activeKat ? 'bg-brandBlue text-white border-brandBlue shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'}" data-cat="${tab.key}">
+          <span class="material-symbols-outlined text-[16px]">${tab.icon}</span>
+          <span>${tab.label}</span>
+          <span class="text-[11px] opacity-80 font-normal">(${tab.count})</span>
         </button>
       `).join('')}
     </div>
   `;
 
-  // Overview banner
-  const overviewBannerHtml = `
-    <div class="ringkasan-banner-box banner-${currentCat.key}">
-      <div>
-        <div class="ringkasan-banner-tag ringkasan-color-${currentCat.key}">Ringkasan Data Generus Aktif (Sambung)</div>
-        <h3 class="ringkasan-banner-title">${currentCat.title}</h3>
-        <p class="ringkasan-banner-desc">${currentCat.desc}</p>
-      </div>
-      <div style="display:flex;gap:12px;align-items:center;">
-        <div style="text-align:right;">
-          <div class="ringkasan-banner-total ringkasan-color-${currentCat.key}">
-            ${catStats.total} <span class="ringkasan-banner-unit">Generus Aktif</span>
-          </div>
-          <div class="ringkasan-banner-gender">
-            <span class="text-putra">👦 ${catStats.l} Putra</span> &bull; <span class="text-putri">👧 ${catStats.p} Putri</span>
-          </div>
-          ${nonAktifCount > 0 && activeKat === 'all' ? `<div style="font-size:10px;color:#94a3b8;margin-top:2px;">(Tersimpan ${nonAktifCount} non-aktif: Pindah/Menikah)</div>` : ''}
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Detailed breakdowns
-  let detailContentHtml = '';
-
-  if (activeKat === 'all') {
-    // Show 3 Category Breakdown Cards
-    detailContentHtml = `
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:12px;">
-        ${categories.filter(c => c.key !== 'all').map(c => {
-      const s = getStatsForList(c.list);
-      const pct = activeSiswa.length > 0 ? ((c.list.length / activeSiswa.length) * 100).toFixed(1) : 0;
-      return `
-            <div class="ringkasan-card-item">
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                  <span class="ringkasan-tag-${c.key}">
-                    <span class="material-symbols-outlined" style="font-size:14px;">${c.icon}</span> ${c.title.split('(')[0]}
-                  </span>
-                  <span class="ringkasan-pct-${c.key}">${pct}%</span>
-                </div>
-                <div class="ringkasan-card-total">${s.total} Generus</div>
-                <div class="ringkasan-card-gender">
-                  <span class="text-putra">👦 ${s.l} Putra</span> &bull; <span class="text-putri">👧 ${s.p} Putri</span>
-                </div>
-                <div class="ringkasan-classes-wrap">
-                  ${c.classes.map(cls => {
-        const cnt = c.list.filter(item => item.jenjang_kelas === cls).length;
-        return `<span class="ringkasan-class-badge">${cls}: <strong>${cnt}</strong></span>`;
-      }).join('')}
-                </div>
-              </div>
-              <button type="button" class="btn-drildown-kat ringkasan-btn-drilldown-${c.key}" data-cat="${c.key}">
-                Lihat Rincian Lengkap Kelas
-                <span class="material-symbols-outlined" style="font-size:15px;">arrow_forward</span>
-              </button>
-            </div>
-          `;
-    }).join('')}
-      </div>
-    `;
-  } else {
-    // Show Classes Breakdown for specific Category
-    const classes = currentCat.classes || [];
-    detailContentHtml = `
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-          <h4 class="ringkasan-section-subtitle">Rincian Data Berdasarkan Jenjang / Kelas (${classes.length} Tingkat)</h4>
-          <span style="font-size:11px;color:var(--text-muted);">Klik tombol pada tiap kelas untuk melihat data di database</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
-          ${classes.map(cls => {
-      const inClass = currentCat.list.filter(s => s.jenjang_kelas === cls);
-      const inL = inClass.filter(s => s.jenis_kelamin === 'L').length;
-      const inP = inClass.filter(s => s.jenis_kelamin === 'P').length;
-
-      // Sebaran Desa
-      const desaCounts = MASTER_WILAYAH.desa.map(d => ({
-        nama: d.nama,
-        count: inClass.filter(s => s.desa_id === d.id).length
-      })).filter(x => x.count > 0);
-
-      return `
-              <div class="ringkasan-card-item">
-                <div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span class="ringkasan-card-title">${cls}</span>
-                    <span class="ringkasan-count-${currentCat.key}">${inClass.length} Generus</span>
-                  </div>
-                  <div class="ringkasan-card-gender" style="margin:2px 0 6px;">
-                    <span class="text-putra">👦 ${inL} L</span> &bull; <span class="text-putri">👧 ${inP} P</span>
-                  </div>
-                  <div class="ringkasan-subbox-desa">
-                    <span class="subbox-label">Sebaran Desa:</span>
-                    ${desaCounts.length > 0 ? desaCounts.map(dc => `${dc.nama}: <strong>${dc.count}</strong>`).join(', ') : 'Belum ada data'}
-                  </div>
-                </div>
-                <button type="button" class="btn-filter-ke-database ringkasan-btn-db" data-jenjang="${currentCat.key}" data-kelas="${cls}">
-                  <span class="material-symbols-outlined" style="font-size:14px;">filter_alt</span>
-                  Buka Data di Database
-                </button>
-              </div>
-            `;
-    }).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  // Distribution across 5 Desas
-  const desaDistHtml = `
-    <div class="ringkasan-desa-dist-wrapper">
-      <h4 class="ringkasan-desa-dist-title">
-        Sebaran Generus di 5 Desa Solo Selatan (${currentCat.title.split('(')[0].trim()})
-      </h4>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
-        ${MASTER_WILAYAH.desa.map(d => {
-    const inDesa = currentCat.list.filter(s => s.desa_id === d.id || (s.desa_nama && d.nama && s.desa_nama.toLowerCase() === d.nama.toLowerCase()));
-    return `
-            <div class="ringkasan-desa-pill">
-              <div class="desa-label">Desa ${d.nama}</div>
-              <div class="desa-count">${inDesa.length} <span class="desa-unit">Generus</span></div>
-              <div class="desa-sub">${d.kelompok.length} Kelompok</div>
-            </div>
-          `;
-  }).join('')}
-      </div>
-    </div>
-  `;
-
+  // Landing Page Layout (Solid Blue Hero, Gender Breakdown, Divide-y Desa/Kelompok List)
   const modalHtml = `
-    <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:12px;">
+    <div class="space-y-4">
       ${navTabsHtml}
-      ${overviewBannerHtml}
-      ${detailContentHtml}
-      ${desaDistHtml}
-      <div class="modal-sticky-footer" style="margin-top:8px;padding-top:14px;display:flex;justify-content:space-between;align-items:center;">
-        <button type="button" class="btn-cancel-modal px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+
+      <!-- 1. Summary Block (Solid Blue) -->
+      <div class="bg-brandBlue dark:bg-brandDarkBlue text-white p-6 pb-7 text-center relative overflow-hidden rounded-2xl shadow-sm">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+        <div class="relative z-10">
+          <h4 class="font-semibold text-xs tracking-wider uppercase opacity-90 mb-1">Ringkasan</h4>
+          <div class="text-4xl md:text-5xl font-extrabold mb-1 tracking-tight">${total.toLocaleString('id-ID')}</div>
+          <div class="text-xs md:text-sm opacity-80 font-medium">Total Generus Aktif</div>
+        </div>
+      </div>
+
+      <!-- 2. Gender Breakdown (Google Material Symbols) -->
+      <div class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <h4 class="text-sm font-bold text-slate-800 dark:text-white mb-3">Rincian Generus</h4>
+        <div class="grid grid-cols-2 gap-3 md:gap-4">
+          <!-- Putra -->
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400">
+                <span class="material-symbols-outlined text-2xl">male</span>
+              </div>
+              <div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Putra</div>
+                <div class="font-bold text-slate-800 dark:text-white text-sm">${lCount} Putra</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="h-2 flex-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full" style="width: ${lPct}%"></div>
+              </div>
+              <span class="text-[11px] font-bold text-blue-600 dark:text-blue-400 w-7 text-right">${lPct}%</span>
+            </div>
+          </div>
+
+          <!-- Putri -->
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center shrink-0 text-pink-600 dark:text-pink-400">
+                <span class="material-symbols-outlined text-2xl">female</span>
+              </div>
+              <div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Putri</div>
+                <div class="font-bold text-slate-800 dark:text-white text-sm">${pCount} Putri</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="h-2 flex-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full bg-pink-500 rounded-full" style="width: ${pPct}%"></div>
+              </div>
+              <span class="text-[11px] font-bold text-pink-600 dark:text-pink-400 w-7 text-right">${pPct}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Sebaran Desa / Kelompok (Divide-y List) -->
+      <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-2xl overflow-hidden divide-y divide-slate-200/60 dark:divide-slate-700/60">
+        ${desaStats.length > 0 ? desaStats.map(desa => {
+          const kDisplay = desa.kelompokStats.length > 0
+            ? desa.kelompokStats.map(k => `<span class="text-[11.5px] text-slate-600 dark:text-slate-400 mr-2 mb-1 inline-block">&bull; ${k.nama} <span class="opacity-60">(${k.count})</span></span>`).join('')
+            : '<span class="text-[11px] text-slate-400 italic">Belum ada data</span>';
+
+          return `
+            <div class="p-3.5 md:p-4 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-700/30 transition-colors">
+              <div class="font-bold text-slate-800 dark:text-slate-200 text-xs md:text-sm flex items-center justify-between mb-2">
+                <span class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">location_city</span>
+                  Desa ${desa.nama}
+                </span>
+                <span class="font-normal text-slate-500 text-xs">(${desa.total} Generus)</span>
+              </div>
+              <div class="pl-6 ml-2">${kDisplay}</div>
+            </div>
+          `;
+        }).join('') : '<div class="p-6 text-center text-xs text-slate-400">Belum ada data generus</div>'}
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+        <button type="button" class="btn-cancel-modal w-full sm:w-auto px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
           Tutup
         </button>
-        <button type="button" id="btnBukaSeluruhDatabase" style="padding:9px 18px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(26,86,196,0.25);">
-          <span class="material-symbols-outlined" style="font-size:16px;">database</span>
-          Buka Database Generus Lengkap
+        <button type="button" id="btnBukaSeluruhDatabase" class="w-full sm:w-auto px-5 py-2.5 bg-brandBlue hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[16px]">database</span>
+          <span>Buka Database Generus Lengkap</span>
         </button>
       </div>
     </div>
   `;
 
+  openModal(`Rincian Ringkasan: ${currentCfg.title}`, currentCfg.icon, modalHtml, 'large');
 
-  openModal(`Rincian Ringkasan: ${currentCat.title.split('(')[0]}`, currentCat.icon, modalHtml, 'large');
-
-  // Tab switchers
+  // Event Listeners
   document.querySelectorAll('.btn-tab-ringkasan').forEach(btn => {
     btn.addEventListener('click', () => {
       const cat = btn.dataset.cat;
@@ -339,31 +299,6 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
     });
   });
 
-  // Drilldown from all tab
-  document.querySelectorAll('.btn-drildown-kat').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.dataset.cat;
-      renderDetailRingkasanModal(cat);
-    });
-  });
-
-  // Filter ke database from class button
-  document.querySelectorAll('.btn-filter-ke-database').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const jenjang = btn.dataset.jenjang;
-      const kelas = btn.dataset.kelas;
-      currentSiswaFilter.jenjang = jenjang;
-      currentSiswaFilter.kelas = kelas;
-      currentSiswaFilter.desa = 'all';
-      currentSiswaFilter.kelompok = 'all';
-      currentSiswaFilter.search = '';
-      siswaCurrentPage = 1;
-      applyUserRegionFilter(true);
-      renderSiswaModal();
-    });
-  });
-
-  // Buka seluruh database
   document.getElementById('btnBukaSeluruhDatabase')?.addEventListener('click', () => {
     currentSiswaFilter.jenjang = activeKat === 'all' ? 'all' : activeKat;
     currentSiswaFilter.kelas = 'all';
@@ -469,10 +404,10 @@ export function renderSiswaModal() {
               1. Kategori Jenjang Usia:
             </label>
             <select id="filterSiswaJenjang" class="filter-jenjang-select">
-              <option value="all">🌟 Jenjang Usia</option>
-              <option value="caberawit" ${currentSiswaFilter.jenjang === 'caberawit' ? 'selected' : ''}>🌱 Caberawit</option>
-              <option value="gp_reguler" ${currentSiswaFilter.jenjang === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler</option>
-              <option value="remaja" ${currentSiswaFilter.jenjang === 'remaja' ? 'selected' : ''}>🎓 Remaja &amp; Dewasa</option>
+              <option value="all">Jenjang Usia</option>
+              <option value="caberawit" ${currentSiswaFilter.jenjang === 'caberawit' ? 'selected' : ''}>Caberawit</option>
+              <option value="gp_reguler" ${currentSiswaFilter.jenjang === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
+              <option value="remaja" ${currentSiswaFilter.jenjang === 'remaja' ? 'selected' : ''}>Remaja &amp; Dewasa</option>
             </select>
           </div>
 
@@ -508,7 +443,7 @@ export function renderSiswaModal() {
       <div class="filter-wilayah-box">
         <!-- BARIS 1: SEARCH BAR -->
         <div class="filter-wilayah-row-1">
-          <input type="text" id="inputSiswaSearch" class="filter-wilayah-input" value="${currentSiswaFilter.search}" placeholder="🔍 Cari nama / NIS..." />
+          <input type="text" id="inputSiswaSearch" class="filter-wilayah-input" value="${currentSiswaFilter.search}" placeholder="Cari nama / NIS..." />
           <span class="material-symbols-outlined filter-search-icon">search</span>
         </div>
 
@@ -529,9 +464,9 @@ export function renderSiswaModal() {
           <div class="filter-wilayah-col">
             <select id="filterSiswaStatus" class="filter-wilayah-select">
               <option value="all" ${currentSiswaFilter.status === 'all' ? 'selected' : ''}>Status (${totalCount})</option>
-              <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>🟢 Sambung (${activeCount})</option>
-              <option value="Pindah Sambung" ${currentSiswaFilter.status === 'Pindah Sambung' ? 'selected' : ''}>🚚 Pindah (${pindahCount})</option>
-              <option value="Menikah" ${currentSiswaFilter.status === 'Menikah' ? 'selected' : ''}>💍 Menikah (${nikahCount})</option>
+              <option value="Sambung" ${currentSiswaFilter.status === 'Sambung' ? 'selected' : ''}>Sambung (${activeCount})</option>
+              <option value="Pindah Sambung" ${currentSiswaFilter.status === 'Pindah Sambung' ? 'selected' : ''}>Pindah (${pindahCount})</option>
+              <option value="Menikah" ${currentSiswaFilter.status === 'Menikah' ? 'selected' : ''}>Menikah (${nikahCount})</option>
             </select>
           </div>
         </div>
@@ -1648,7 +1583,7 @@ export function renderAutoPromoteModal() {
             </button>
           </div>
           <div style="flex:1;max-width:260px;min-width:180px;">
-            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="🔍 Cari nama / desa..." style="width:100%;padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:8px;outline:none;" />
+            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="Cari nama / desa..." style="width:100%;padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:8px;outline:none;" />
           </div>
         </div>
 
@@ -1670,7 +1605,9 @@ export function renderAutoPromoteModal() {
                       <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Nama Generus</th>
                       <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Desa / Kelompok</th>
                       <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Kelas Asal</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">➔</th>
+                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">
+                        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">arrow_forward</span>
+                      </th>
                       <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Kelas Baru</th>
                     </tr>
                   </thead>
@@ -1681,7 +1618,9 @@ export function renderAutoPromoteModal() {
                         <td style="padding:8px 10px;font-weight:700;color:var(--text);">${item.siswa.nama_lengkap}</td>
                         <td style="padding:8px 10px;color:var(--text-muted);font-size:11px;">Desa ${item.siswa.desa_nama || '-'} (${item.siswa.kelompok_nama || '-'})</td>
                         <td style="padding:8px 10px;text-align:center;"><span style="background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.fromKelas}</span></td>
-                        <td style="padding:8px 10px;text-align:center;color:#64748b;font-weight:900;">➔</td>
+                        <td style="padding:8px 10px;text-align:center;color:#64748b;font-weight:900;">
+                          <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">arrow_forward</span>
+                        </td>
                         <td style="padding:8px 10px;text-align:center;"><span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.toKelas}</span></td>
                       </tr>
                     `).join('')}
@@ -1859,9 +1798,9 @@ export function renderSiswaTableRows() {
 
       let statusBadge = `<span style="background:var(--green-pastel);color:var(--green-dark);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;"></span> Sambung</span>`;
       if (s.status_sambung === 'Menikah') {
-        statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">💍 Menikah</span>`;
+        statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:12px;">favorite</span> Menikah</span>`;
       } else if (s.status_sambung === 'Pindah Sambung') {
-        statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">🚚 Pindah</span>`;
+        statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:12px;">local_shipping</span> Pindah</span>`;
       }
 
       const tglFormatted = s.tanggal_lahir ? new Date(s.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
@@ -1910,9 +1849,9 @@ export function renderSiswaTableRows() {
 
       let statusBadge = `<span style="background:var(--green-pastel);color:var(--green-dark);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;"></span> Sambung</span>`;
       if (s.status_sambung === 'Menikah') {
-        statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">💍 Menikah</span>`;
+        statusBadge = `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:12px;">favorite</span> Menikah</span>`;
       } else if (s.status_sambung === 'Pindah Sambung') {
-        statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">🚚 Pindah</span>`;
+        statusBadge = `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:12px;">local_shipping</span> Pindah</span>`;
       }
 
       const tglFormatted = s.tanggal_lahir ? new Date(s.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
@@ -2290,9 +2229,9 @@ export function renderSiswaFormModal(existingData = null) {
             <label class="filter-jenjang-label">Kategori Jenjang <span style="color:red">*</span></label>
             <select id="sKategoriJenjang" required class="filter-jenjang-select">
               <option value="">-- Pilih Kategori Jenjang --</option>
-              <option value="caberawit" ${currentKat === 'caberawit' ? 'selected' : ''}>🌱 Caberawit (PAUD - SD)</option>
-              <option value="gp_reguler" ${currentKat === 'gp_reguler' ? 'selected' : ''}>📚 GP Reguler (SMP - SMA)</option>
-              <option value="remaja" ${currentKat === 'remaja' ? 'selected' : ''}>🎓 Remaja &amp; Dewasa</option>
+              <option value="caberawit" ${currentKat === 'caberawit' ? 'selected' : ''}>Caberawit (PAUD - SD)</option>
+              <option value="gp_reguler" ${currentKat === 'gp_reguler' ? 'selected' : ''}>GP Reguler (SMP - SMA)</option>
+              <option value="remaja" ${currentKat === 'remaja' ? 'selected' : ''}>Remaja &amp; Dewasa</option>
             </select>
           </div>
           <div>

@@ -127,8 +127,9 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
           </div>
         </td>
         <td style="padding:10px;">
-          <span style="background:${e.status === 'berjalan' ? 'var(--green-pastel)' : '#e2e8f0'};color:${e.status === 'berjalan' ? 'var(--green-dark)' : '#475569'};padding:4px 8px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;">
-            ${e.status === 'berjalan' ? '🟢 BERJALAN' : '🔒 SELESAI'}
+          <span style="background:${e.status === 'berjalan' ? 'var(--green-pastel)' : '#e2e8f0'};color:${e.status === 'berjalan' ? 'var(--green-dark)' : '#475569'};padding:4px 8px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:13px;">${e.status === 'berjalan' ? 'check_circle' : 'lock'}</span>
+            ${e.status === 'berjalan' ? 'BERJALAN' : 'SELESAI'}
           </span>
         </td>
         <td style="padding:10px;">
@@ -136,11 +137,11 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
         </td>
         <td style="padding:10px;text-align:right;">
           <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
-            ${(isSuperadminOrDaerah && e.status === 'berjalan') ? `<button class="btn-edit-event" data-id="${e.id}" style="padding:6px 10px;background:#f0f9ff;color:var(--blue);border:1px solid #bae6fd;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">✏ Edit</button>` : ''}
+            ${(isSuperadminOrDaerah && e.status === 'berjalan') ? `<button class="btn-edit-event" data-id="${e.id}" style="padding:6px 10px;background:#f0f9ff;color:var(--blue);border:1px solid #bae6fd;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit</button>` : ''}
             <button class="btn-open-event" data-id="${e.id}" style="padding:6px 12px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
               <span class="material-symbols-outlined" style="font-size:15px;">edit_square</span> Isi Nilai
             </button>
-            ${isSuperadminOrDaerah ? `<button class="btn-delete-event" data-id="${e.id}" title="Hapus Event" style="padding:6px 10px;background:#fef2f2;color:var(--red);border:1px solid #fca5a5;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🗑</button>` : ''}
+            ${isSuperadminOrDaerah ? `<button class="btn-delete-event" data-id="${e.id}" title="Hapus Event" style="padding:6px 10px;background:#fef2f2;color:var(--red);border:1px solid #fca5a5;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;"><span class="material-symbols-outlined" style="font-size:15px;">delete</span></button>` : ''}
           </div>
         </td>
       </tr>
@@ -192,8 +193,9 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
         </div>
         <div class="event-mobile-detail">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-            <span style="background:${e.status === 'berjalan' ? 'var(--green-pastel)' : '#e2e8f0'};color:${e.status === 'berjalan' ? 'var(--green-dark)' : '#475569'};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;">
-              ${e.status === 'berjalan' ? '🟢 BERJALAN' : '🔒 SELESAI'}
+            <span style="background:${e.status === 'berjalan' ? 'var(--green-pastel)' : '#e2e8f0'};color:${e.status === 'berjalan' ? 'var(--green-dark)' : '#475569'};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:3px;">
+              <span class="material-symbols-outlined" style="font-size:13px;">${e.status === 'berjalan' ? 'check_circle' : 'lock'}</span>
+              ${e.status === 'berjalan' ? 'BERJALAN' : 'SELESAI'}
             </span>
             <span style="font-size:11px;color:var(--blue);font-weight:700;">
               Total: ${totalMax} Poin (${e.habits.length} Pembiasaan)
@@ -385,9 +387,9 @@ export function renderCreateEventForm(editEvent = null) {
         <div style="display:flex;align-items:center;gap:10px;padding-left:32px;flex-wrap:wrap;">
           <label style="font-size:11.5px;font-weight:700;color:var(--text-muted);">Jenis Bobot:</label>
           <select class="habit-type-select" data-idx="${i}" style="padding:5px 8px;border-radius:6px;border:1px solid var(--border);font-size:11.5px;font-weight:700;background:var(--surface);outline:none;cursor:pointer;">
-            <option value="penting" ${h.type === 'penting' ? 'selected' : ''}>⭐ Penting (Maks 30 Poin)</option>
-            <option value="additional" ${h.type === 'additional' ? 'selected' : ''}>➕ Additional (Maks 10 Poin)</option>
-            <option value="custom" ${h.type === 'custom' ? 'selected' : ''}>⚙️ Kustom Angka...</option>
+            <option value="penting" ${h.type === 'penting' ? 'selected' : ''}>Penting (Maks 30 Poin)</option>
+            <option value="additional" ${h.type === 'additional' ? 'selected' : ''}>Additional (Maks 10 Poin)</option>
+            <option value="custom" ${h.type === 'custom' ? 'selected' : ''}>Kustom Angka...</option>
           </select>
           <div style="display:inline-flex;align-items:center;gap:4px;">
             <span style="font-size:11px;color:var(--text-muted);">Poin Maks:</span>
@@ -435,8 +437,8 @@ export function renderCreateEventForm(editEvent = null) {
         <div>
           <label style="font-weight:700;display:block;margin-bottom:4px;">Status Periode</label>
           <select id="evtStatus" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;">
-            <option value="berjalan" ${editEvent.status === 'berjalan' ? 'selected' : ''}>🟢 Berjalan (Pamong dapat mengisi nilai)</option>
-            <option value="selesai" ${editEvent.status === 'selesai' ? 'selected' : ''}>🔒 Selesai (Diarsipkan / Nilai dikunci)</option>
+            <option value="berjalan" ${editEvent.status === 'berjalan' ? 'selected' : ''}>Berjalan (Pamong dapat mengisi nilai)</option>
+            <option value="selesai" ${editEvent.status === 'selesai' ? 'selected' : ''}>Selesai (Diarsipkan / Nilai dikunci)</option>
           </select>
         </div>
       ` : ''}
@@ -460,7 +462,7 @@ export function renderCreateEventForm(editEvent = null) {
       </div>
 
       <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">💡 Rekomendasi Target Pembiasaan (Klik untuk memasukkan):</label>
+        <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:flex;align-items:center;gap:4px;margin-bottom:6px;"><span class="material-symbols-outlined" style="font-size:14px;">lightbulb</span> Rekomendasi Target Pembiasaan (Klik untuk memasukkan):</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
           ${presetsHtml}
         </div>
@@ -708,8 +710,9 @@ export async function openEditableGridEvent(eventId, skipSync = false) {
         <div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <h4 style="margin:0;font-size:15px;font-weight:800;color:var(--text-main);">${event.judul_periode}</h4>
-            <span style="background:${event.status === 'berjalan' ? '#dcfce7' : '#e2e8f0'};color:${event.status === 'berjalan' ? 'var(--green-dark)' : '#475569'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800;">
-              ${event.status === 'berjalan' ? '🟢 BERJALAN' : '🔒 SELESAI'}
+            <span style="background:${event.status === 'berjalan' ? '#dcfce7' : '#e2e8f0'};color:${event.status === 'berjalan' ? 'var(--green-dark)' : '#475569'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:3px;">
+              <span class="material-symbols-outlined" style="font-size:13px;">${event.status === 'berjalan' ? 'check_circle' : 'lock'}</span>
+              ${event.status === 'berjalan' ? 'BERJALAN' : 'SELESAI'}
             </span>
             <span style="font-size:11px;font-weight:800;background:var(--blue-light);color:var(--blue);padding:2px 8px;border-radius:12px;">
               Total Bobot: ${totalMaxScore} Poin
@@ -732,7 +735,7 @@ export async function openEditableGridEvent(eventId, skipSync = false) {
 
       <!-- FILTER BAR -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;background:var(--bg);padding:12px;border-radius:10px;border:1px solid var(--border);">
-        <input type="text" id="gridFilterSearch" value="${gridFilter.search || ''}" placeholder="🔍 Cari nama anak..." style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;" />
+        <input type="text" id="gridFilterSearch" value="${gridFilter.search || ''}" placeholder="Cari nama anak..." style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;" />
         <select id="gridFilterDesa" style="padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;">
           <option value="all">-- Semua Desa --</option>
           ${desaOptions}
@@ -1167,7 +1170,7 @@ function updateGroupAverages(event, habitMax, totalMaxScore, filteredStudents = 
     mobSummary.innerHTML = `
       <div class="pembiasaan-mobile-summary-card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;font-weight:800;letter-spacing:0.3px;opacity:0.9;">📊 RATA-RATA KELOMPOK (${count} SISWA)</span>
+          <span style="font-size:12px;font-weight:800;letter-spacing:0.3px;opacity:0.9;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:15px;">analytics</span> RATA-RATA KELOMPOK (${count} SISWA)</span>
           <span style="background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:800;">
             ${avgPct}% Capaian
           </span>

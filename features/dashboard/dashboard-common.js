@@ -402,7 +402,7 @@ export function renderKontakModal(desaId, kelompokId = null) {
           <div class="kontak-info">
             <div class="kontak-name">${p.nama}</div>
             <div class="kontak-role">${p.peran || p.jabatan || 'Pamong'}</div>
-            <div class="kontak-asal">📍 Asal: ${asalTxt}</div>
+            <div class="kontak-asal"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:middle;">location_on</span> Asal: ${asalTxt}</div>
           </div>
         </div>
 
