@@ -45,7 +45,7 @@ const JENJANG_METADATA = {
   },
   gp_reguler: {
     id: 'gp_reguler',
-    nama: 'Pra-Remaja (GP)',
+    nama: 'GP (Pra-remaja)',
     sub: 'Remaja Awal / SMP (Kelas 1 s/d 3 SMP)',
     badge: 'SMP / GP',
     icon: 'school',
@@ -54,11 +54,22 @@ const JENJANG_METADATA = {
     bgLight: 'bg-blue-50 dark:bg-blue-950/40',
     textClass: 'text-blue-700 dark:text-blue-300'
   },
+  pra_nikah: {
+    id: 'pra_nikah',
+    nama: 'Pra Nikah',
+    sub: 'Remaja Usia 19 s/d 22 Tahun',
+    badge: '19 - 22 Th',
+    icon: 'favorite',
+    color: '#ec4899',
+    borderClass: 'border-pink-400',
+    bgLight: 'bg-pink-50 dark:bg-pink-950/40',
+    textClass: 'text-pink-700 dark:text-pink-300'
+  },
   remaja: {
     id: 'remaja',
-    nama: 'Remaja & Dewasa',
-    sub: 'Muda-Mudi / SMA - Usia Nikah',
-    badge: 'SMA - Usia Nikah',
+    nama: 'Remaja/Dewasa',
+    sub: 'Muda-Mudi & Usia Nikah (SMA - Dewasa)',
+    badge: 'SMA - Dewasa',
     icon: 'diversity_3',
     color: '#7c3aed',
     borderClass: 'border-purple-400',
@@ -193,8 +204,8 @@ export function renderJurnalKbmPageView() {
   const meta = JENJANG_METADATA[activeJenjang];
 
   container.innerHTML = `
-    <!-- Top Bar: Breadcrumb & Back Button -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+    <!-- Top Bar: Breadcrumb -->
+    <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
       <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
         <button type="button" id="btnBackToDashboardBreadcrumb" class="hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
           <span class="material-symbols-outlined text-[18px]">dashboard</span>
@@ -206,11 +217,6 @@ export function renderJurnalKbmPageView() {
           Jurnal KBM
         </span>
       </div>
-
-      <button type="button" id="btnBackToDashboardMain" class="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 text-xs font-bold shadow-sm cursor-pointer transition-all">
-        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span>Kembali ke Beranda</span>
-      </button>
     </div>
 
     <!-- Header Hero Banner with Auto-Tingkatan Indicator -->
@@ -252,11 +258,11 @@ export function renderJurnalKbmPageView() {
           </span>
         </div>
 
-        <!-- 3 Pilihan Jenjang: Compact (Icon, Usia, Checkbox) & Mobile Horizontal Scroll Tab -->
-        <div class="flex md:grid md:grid-cols-3 gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1">
+        <!-- 4 Pilihan Jenjang: Compact (Icon, Usia, Checkbox) & Mobile Horizontal Scroll Tab -->
+        <div class="flex lg:grid lg:grid-cols-4 gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar pb-1">
           <!-- 1. Caberawit -->
-          <div class="btn-select-jenjang shrink-0 min-w-[210px] md:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${activeJenjang === 'caberawit' ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 ring-1 ring-amber-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-amber-300'}" data-jenjang="caberawit">
-            <div class="flex items-center gap-2.5 min-w-0">
+          <div class="btn-select-jenjang shrink-0 min-w-[170px] lg:min-w-0 flex-1 p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${activeJenjang === 'caberawit' ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 ring-1 ring-amber-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-amber-300'}" data-jenjang="caberawit">
+            <div class="flex items-center gap-2 min-w-0">
               <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-lg">child_care</span>
               </div>
@@ -270,15 +276,15 @@ export function renderJurnalKbmPageView() {
             </span>
           </div>
 
-          <!-- 2. Pra-Remaja -->
-          <div class="btn-select-jenjang shrink-0 min-w-[210px] md:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${activeJenjang === 'gp_reguler' ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-1 ring-blue-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-blue-300'}" data-jenjang="gp_reguler">
-            <div class="flex items-center gap-2.5 min-w-0">
+          <!-- 2. GP (Pra-remaja) -->
+          <div class="btn-select-jenjang shrink-0 min-w-[170px] lg:min-w-0 flex-1 p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${activeJenjang === 'gp_reguler' ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-1 ring-blue-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-blue-300'}" data-jenjang="gp_reguler">
+            <div class="flex items-center gap-2 min-w-0">
               <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-brandBlue flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-lg">school</span>
               </div>
               <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Pra-Remaja</div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400">SMP</div>
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">GP (Pra-remaja)</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">SMP / GP</div>
               </div>
             </div>
             <span class="material-symbols-outlined text-base ${activeJenjang === 'gp_reguler' ? 'text-brandBlue' : 'text-slate-300 dark:text-slate-600'} shrink-0">
@@ -286,15 +292,31 @@ export function renderJurnalKbmPageView() {
             </span>
           </div>
 
-          <!-- 3. Remaja -->
-          <div class="btn-select-jenjang shrink-0 min-w-[210px] md:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${activeJenjang === 'remaja' ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 ring-1 ring-purple-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-purple-300'}" data-jenjang="remaja">
-            <div class="flex items-center gap-2.5 min-w-0">
+          <!-- 3. Pra Nikah -->
+          <div class="btn-select-jenjang shrink-0 min-w-[170px] lg:min-w-0 flex-1 p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${activeJenjang === 'pra_nikah' ? 'border-pink-500 bg-pink-50/70 dark:bg-pink-950/40 ring-1 ring-pink-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-pink-300'}" data-jenjang="pra_nikah">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900/40 text-pink-600 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-lg">favorite</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Pra Nikah</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">19 - 22 Th</div>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-base ${activeJenjang === 'pra_nikah' ? 'text-pink-600' : 'text-slate-300 dark:text-slate-600'} shrink-0">
+              ${activeJenjang === 'pra_nikah' ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
+          </div>
+
+          <!-- 4. Remaja/Dewasa -->
+          <div class="btn-select-jenjang shrink-0 min-w-[170px] lg:min-w-0 flex-1 p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${activeJenjang === 'remaja' ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 ring-1 ring-purple-400/40 shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-purple-300'}" data-jenjang="remaja">
+            <div class="flex items-center gap-2 min-w-0">
               <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-lg">diversity_3</span>
               </div>
               <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Remaja</div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400">SMA - Dewasa</div>
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">Remaja/Dewasa</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">SMA &amp; Dewasa</div>
               </div>
             </div>
             <span class="material-symbols-outlined text-base ${activeJenjang === 'remaja' ? 'text-purple-600' : 'text-slate-300 dark:text-slate-600'} shrink-0">
@@ -405,7 +427,6 @@ export function renderJurnalKbmPageView() {
 function attachJurnalKbmHubListeners() {
   // Tombol Kembali
   document.getElementById('btnBackToDashboardBreadcrumb')?.addEventListener('click', showDashboardHomePage);
-  document.getElementById('btnBackToDashboardMain')?.addEventListener('click', showDashboardHomePage);
 
   // Filter Dropdown Wilayah
   const selDesa = document.getElementById('hubSelDesa');
@@ -567,7 +588,11 @@ export function openPresensiOpsiModal(jenjang = 'caberawit', desaId = 'all', kel
 
   document.getElementById('btnBukaMatrixPresensiCepat')?.addEventListener('click', () => {
     closeModal();
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('agenda', {
+      filterDesa: effectiveDesa,
+      filterKel: effectiveKel,
+      filterFormat: jenjang
+    });
   });
 }
 
@@ -581,7 +606,8 @@ export function openJurnalKbmDialog(jenjang = 'caberawit', desaId = 'all', kelom
 
   renderCetakAbsensiModal('agenda', {
     filterDesa: dId,
-    filterKel: kId
+    filterKel: kId,
+    filterFormat: jenjang
   });
 }
 

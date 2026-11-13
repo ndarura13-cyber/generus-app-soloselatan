@@ -299,22 +299,32 @@
         </button>
 
         <!-- Submenu Accordion (Saat Sidebar Terbuka) -->
-        <div id="sideMenuFitur" class="pl-11 pr-2 py-1 space-y-1 menu-collapsible hidden">
+        <div id="sideMenuFitur" class="pl-3 pr-2 py-1 space-y-1 menu-collapsible hidden">
           <button id="sideBtnSiswa"
-            class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Database
-            Generus</button>
+            class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl font-medium transition-colors whitespace-nowrap text-left cursor-pointer">
+            <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[19px] shrink-0">database</span>
+            <span>Database Generus</span>
+          </button>
           <button id="sideBtnProker"
-            class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Program
-            Kerja</button>
+            class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl font-medium transition-colors whitespace-nowrap text-left cursor-pointer">
+            <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[19px] shrink-0">assignment</span>
+            <span>Proker PPG</span>
+          </button>
           <button id="sideBtnJurnalKbm"
-            class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Jurnal
-            KBM</button>
+            class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl font-medium transition-colors whitespace-nowrap text-left cursor-pointer">
+            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[19px] shrink-0">menu_book</span>
+            <span>Jurnal KBM</span>
+          </button>
           <button id="sideBtnStruktur"
-            class="w-full text-left py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 font-medium transition-colors whitespace-nowrap">Struktur
-            Pengurus</button>
+            class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brandBlue dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl font-medium transition-colors whitespace-nowrap text-left cursor-pointer">
+            <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[19px] shrink-0">diversity_2</span>
+            <span>Struktur Pengurus</span>
+          </button>
           <button id="sideBtnKelolaPengurus"
-            class="w-full text-left py-2 text-sm text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-semibold transition-colors whitespace-nowrap hidden">Kelola
-            Hak Akses</button>
+            class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl font-semibold transition-colors whitespace-nowrap text-left cursor-pointer hidden">
+            <span class="material-symbols-outlined text-rose-500 text-[19px] shrink-0">admin_panel_settings</span>
+            <span>Kelola Hak Akses</span>
+          </button>
         </div>
 
         <!-- Floating Flyout Dropdown (Saat Sidebar Ditutup/Collapsed) -->
@@ -864,7 +874,7 @@
   <script>
     // Theme logic and cache busting
     (function forceCacheClear() {
-      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v8.6';
+      const CACHE_CLEAR_FLAG = 'cache_cleared_dash_v8.8';
       if (!localStorage.getItem(CACHE_CLEAR_FLAG)) {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(r => r.forEach(x => x.unregister()));

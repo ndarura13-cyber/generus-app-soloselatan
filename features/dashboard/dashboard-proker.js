@@ -638,7 +638,20 @@ export function formatDateRange(startDateStr, endDateStr) {
 
 let prokerModalPageSize = 10;
 
-export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true, activeKategori = currentActiveKategori) {
+export function getProkerYear(p) {
+  if (p.tahun) return String(p.tahun);
+  if (p.waktu) {
+    const m = String(p.waktu).match(/\b(20\d\d)\b/);
+    if (m) return m[1];
+  }
+  if (p.tglRealisasi) {
+    const m = String(p.tglRealisasi).match(/\b(20\d\d)\b/);
+    if (m) return m[1];
+  }
+  return '2026';
+}
+
+export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true, activeKategori = currentActiveKategori, filterTahun = 'all') {
   // Update state kategori aktif
   currentActiveKategori = activeKategori === 'KMM' ? 'KMM' : 'PPG';
   const isKmmActive = currentActiveKategori === 'KMM';
@@ -662,11 +675,27 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   const ppgCount = prokerList.filter(p => (p.kategori || 'PPG') === 'PPG').length;
   const kmmCount = prokerList.filter(p => p.kategori === 'KMM').length;
 
+  // Daftar tahun unik yang tersedia dari proker
+  const availableYearsSet = new Set();
+  prokerList.forEach(p => {
+    availableYearsSet.add(getProkerYear(p));
+  });
+  if (!availableYearsSet.has('2026')) availableYearsSet.add('2026');
+  if (!availableYearsSet.has('2027')) availableYearsSet.add('2027');
+  const availableYears = Array.from(availableYearsSet).sort().reverse();
+
   // Filter proker berdasarkan kategori aktif (PPG vs KMM)
   const categoryItems = prokerList.filter(p => isKmmActive ? p.kategori === 'KMM' : (p.kategori || 'PPG') === 'PPG');
 
-  // Filter proker data: Status, Bidang Penanggung Jawab / Sub-bidang, Search
+  // Filter proker data: Tahun, Status, Bidang Penanggung Jawab / Sub-bidang, Search
   let filtered = categoryItems.filter(p => {
+    // 1. Filter Tahun
+    if (filterTahun !== 'all') {
+      const pYear = getProkerYear(p);
+      if (pYear !== String(filterTahun)) return false;
+    }
+
+    // 2. Filter Bidang / Sub-bidang
     if (filterBidang !== 'all') {
       if (isKmmActive) {
         const sub = (p.subBidang || '').toLowerCase();
@@ -678,23 +707,38 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         if (!picText.includes(filterBidang.toLowerCase())) return false;
       }
     }
+
+    // 3. Filter Status Proker Presisi
     if (filterStatus !== 'all') {
-      const isDone = p.status === 'done' || p.status === 'selesai' || p.realisasiStatus === 'terlaksana';
+      const rawStatus = (p.status || 'planned').toLowerCase();
+      const isDone = rawStatus === 'done' || rawStatus === 'selesai' || p.realisasiStatus === 'terlaksana';
+      const isOngoing = rawStatus === 'ongoing' || rawStatus === 'berjalan' || rawStatus === 'sedang_berlangsung';
+      const isUpcoming = rawStatus === 'upcoming' || rawStatus === 'akan_datang';
+      const isPlanned = rawStatus === 'planned' || rawStatus === 'direncanakan';
+
       const now = new Date();
       const curM = now.getMonth();
       const nxtM = (curM + 1) % 12;
-      let eff = p.status || 'planned';
-      if (isDone) {
-        eff = 'done';
-      } else if (isProkerMatchingCurrentMonth(p, curM, now.getFullYear()) || p.status === 'ongoing' || p.status === 'berjalan' || p.status === 'sedang_berlangsung') {
-        eff = 'ongoing';
-      } else if (isProkerMatchingMonth(p, nxtM) || p.status === 'upcoming' || p.status === 'akan_datang') {
-        eff = 'upcoming';
-      } else {
-        eff = 'planned';
+      const matchesCurMonth = isProkerMatchingCurrentMonth(p, curM, now.getFullYear());
+      const matchesNxtMonth = isProkerMatchingMonth(p, nxtM);
+
+      if (filterStatus === 'ongoing') {
+        if (!isOngoing && !(matchesCurMonth && !isDone)) return false;
+      } else if (filterStatus === 'upcoming') {
+        if (!isUpcoming && !(matchesNxtMonth && !isDone && !isOngoing)) return false;
+      } else if (filterStatus === 'planned') {
+        if (!isPlanned && rawStatus !== 'planned') return false;
+        if (isDone) return false;
+      } else if (filterStatus === 'done') {
+        if (!isDone) return false;
+      } else if (filterStatus === 'terlaksana') {
+        if (p.realisasiStatus !== 'terlaksana') return false;
+      } else if (filterStatus === 'belum_terlaksana') {
+        if (p.realisasiStatus === 'terlaksana') return false;
       }
-      if (eff !== filterStatus && p.status !== filterStatus) return false;
     }
+
+    // 4. Search Query
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchKegiatan = (p.kegiatan || '').toLowerCase().includes(q);
@@ -855,20 +899,29 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </div>
       </div>
 
-      <!-- BARIS 2: FILTER STATUS DAN BIDANG (BERDAMPINGAN) -->
+      <!-- BARIS 2: FILTER TAHUN, STATUS DAN BIDANG -->
       <div class="proker-filter-row-2">
         <div class="proker-filter-col">
-          <select id="selectFilterStatus" class="proker-select">
-            <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
-            <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>Berlangsung</option>
-            <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>Akan Datang</option>
-            <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>Direncanakan</option>
-            <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>Selesai</option>
+          <select id="selectFilterTahun" class="proker-select" title="Filter Tahun Proker">
+            <option value="all" ${filterTahun === 'all' ? 'selected' : ''}>Semua Tahun</option>
+            ${availableYears.map(y => `<option value="${y}" ${filterTahun === y ? 'selected' : ''}>Tahun ${y}</option>`).join('')}
           </select>
         </div>
 
         <div class="proker-filter-col">
-          <select id="selectFilterBidang" class="proker-select">
+          <select id="selectFilterStatus" class="proker-select" title="Filter Status Proker">
+            <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
+            <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>Sedang Berlangsung</option>
+            <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>Akan Datang</option>
+            <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>Direncanakan</option>
+            <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>Selesai</option>
+            <option value="terlaksana" ${filterStatus === 'terlaksana' ? 'selected' : ''}>Terlaksana (LPJ)</option>
+            <option value="belum_terlaksana" ${filterStatus === 'belum_terlaksana' ? 'selected' : ''}>Belum Terlaksana</option>
+          </select>
+        </div>
+
+        <div class="proker-filter-col">
+          <select id="selectFilterBidang" class="proker-select" title="Filter Bidang Proker">
             <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>${bidangAllLabel}</option>
             ${bidangOptions}
           </select>
@@ -1263,12 +1316,12 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   // 1. Kategori Switcher (PPG vs KMM)
   document.getElementById('catTabPpg')?.addEventListener('click', () => {
     currentActiveKategori = 'PPG';
-    renderProkerModal('all', 'all', '', activeTab, 1, false, 'PPG');
+    renderProkerModal('all', 'all', '', activeTab, 1, false, 'PPG', filterTahun);
   });
 
   document.getElementById('catTabKmm')?.addEventListener('click', () => {
     currentActiveKategori = 'KMM';
-    renderProkerModal('all', 'all', '', activeTab, 1, false, 'KMM');
+    renderProkerModal('all', 'all', '', activeTab, 1, false, 'KMM', filterTahun);
   });
 
   // Auto-scroll tab aktif ke posisi terlihat pada tampilan mobile
@@ -1276,7 +1329,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   if (activeCatBtn && typeof window !== 'undefined' && window.innerWidth <= 768) {
     try {
       activeCatBtn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // 2. Pencarian & Filter (Jangan auto-focus agar keyboard virtual mobile tidak terbuka otomatis)
@@ -1289,16 +1342,20 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       searchInput.value = val;
     }
     searchInput.addEventListener('input', (e) => {
-      renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori);
+      renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori, filterTahun);
     });
   }
 
+  document.getElementById('selectFilterTahun')?.addEventListener('change', (e) => {
+    renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori, e.target.value);
+  });
+
   document.getElementById('selectFilterStatus')?.addEventListener('change', (e) => {
-    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab, 1, false, currentActiveKategori);
+    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab, 1, false, currentActiveKategori, filterTahun);
   });
 
   document.getElementById('selectFilterBidang')?.addEventListener('change', (e) => {
-    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori);
+    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori, filterTahun);
   });
 
   // Dropdown Download & Ekspor
@@ -1340,11 +1397,11 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
   // 4. View Switcher (Tabel vs Timeline)
   document.getElementById('tabViewTable')?.addEventListener('click', () => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, 'table', currentPage, false, currentActiveKategori);
+    renderProkerModal(filterBidang, filterStatus, searchQuery, 'table', currentPage, false, currentActiveKategori, filterTahun);
   });
 
   document.getElementById('tabViewTimeline')?.addEventListener('click', () => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline', currentPage, false, currentActiveKategori);
+    renderProkerModal(filterBidang, filterStatus, searchQuery, 'timeline', currentPage, false, currentActiveKategori, filterTahun);
   });
 
   // 5. Standar Default Pagination Bar
@@ -1361,11 +1418,11 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       showPageSize: true,
       showInfo: true,
       onPageChange: (newPage) => {
-        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, newPage, false, currentActiveKategori);
+        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, newPage, false, currentActiveKategori, filterTahun);
       },
       onPageSizeChange: (newSize) => {
         prokerModalPageSize = newSize;
-        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori);
+        renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori, filterTahun);
       }
     });
   }
@@ -1382,7 +1439,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       const newStatus = select.value;
       await updateRealisasiProker(pId, { realisasiStatus: newStatus });
       showToast(`Realisasi program diubah menjadi "${newStatus === 'terlaksana' ? 'Terlaksana' : 'Belum Terlaksana'}"`, 'info');
-      renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori);
+      renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori, filterTahun);
       renderInlineProkerWidget();
       appHooks.renderUserProfile();
     });
@@ -1489,7 +1546,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         onConfirm: async () => {
           await deleteProker(pId);
           showToast(`Program kerja "${pTitle}" berhasil dihapus`, 'success');
-          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori);
+          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori, filterTahun);
           renderInlineProkerWidget();
           appHooks.renderUserProfile();
         }
@@ -1789,7 +1846,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
       <div class="proker-presentation-footer">
         <button type="button" class="btn-pleno-nav-dark" id="btnPlenoPrev" ${!prevItem ? 'disabled' : ''} title="Agenda Sebelumnya (Tombol Panah Kiri ←)">
           <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
-          <span>Sebelumnya</span>
+          <span>Prev</span>
         </button>
 
         <div class="proker-pleno-counter-pill">
@@ -1800,7 +1857,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
         </div>
 
         <button type="button" class="btn-pleno-nav-dark" id="btnPlenoNext" ${!nextItem ? 'disabled' : ''} title="Agenda Selanjutnya (Tombol Panah Kanan →)">
-          <span>Selanjutnya</span>
+          <span>Next</span>
           <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
         </button>
       </div>
@@ -1887,7 +1944,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
             renderInlineProkerWidget();
             try {
               renderProkerModal('all', 'all', '', 'timeline', 1, false, currentItem.kategori || currentActiveKategori);
-            } catch (err) {}
+            } catch (err) { }
           } else {
             showToast('Gagal mengubah status: ' + (res?.message || 'Terjadi kesalahan'), 'danger');
           }

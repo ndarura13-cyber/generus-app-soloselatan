@@ -140,9 +140,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           </select>
           <select id="kbmFilterFormat" class="kbm-select" title="Filter Format KBM">
             <option value="all" ${filterFormat === 'all' ? 'selected' : ''}>Semua Format KBM</option>
-            <option value="remaja" ${filterFormat === 'remaja' ? 'selected' : ''}>Remaja</option>
             <option value="caberawit" ${filterFormat === 'caberawit' ? 'selected' : ''}>Caberawit</option>
-            <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
+            <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP (Pra-remaja)</option>
+            <option value="pra_nikah" ${filterFormat === 'pra_nikah' ? 'selected' : ''}>Pra Nikah (19-22 Th)</option>
+            <option value="remaja" ${filterFormat === 'remaja' ? 'selected' : ''}>Remaja/Dewasa</option>
           </select>
         </div>
       </div>
@@ -160,9 +161,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           </select>
           <select id="kbmFilterFormat" class="kbm-select" title="Filter Format KBM">
             <option value="all" ${filterFormat === 'all' ? 'selected' : ''}>Semua Format KBM</option>
-            <option value="remaja" ${filterFormat === 'remaja' ? 'selected' : ''}>Remaja</option>
             <option value="caberawit" ${filterFormat === 'caberawit' ? 'selected' : ''}>Caberawit</option>
-            <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
+            <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP (Pra-remaja)</option>
+            <option value="pra_nikah" ${filterFormat === 'pra_nikah' ? 'selected' : ''}>Pra Nikah (19-22 Th)</option>
+            <option value="remaja" ${filterFormat === 'remaja' ? 'selected' : ''}>Remaja/Dewasa</option>
           </select>
         </div>
       </div>
@@ -186,9 +188,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           </div>
           <select id="kbmFilterFormat" class="kbm-select" title="Filter Format KBM" style="padding:5px 9px;">
             <option value="all" ${filterFormat === 'all' ? 'selected' : ''}>Semua Format</option>
-            <option value="remaja" ${filterFormat === 'remaja' ? 'selected' : ''}>Remaja</option>
             <option value="caberawit" ${filterFormat === 'caberawit' ? 'selected' : ''}>Caberawit</option>
-            <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler</option>
+            <option value="gp_reguler" ${filterFormat === 'gp_reguler' ? 'selected' : ''}>GP (Pra-remaja)</option>
+            <option value="pra_nikah" ${filterFormat === 'pra_nikah' ? 'selected' : ''}>Pra Nikah (19-22 Th)</option>
+            <option value="remaja" ${filterFormat === 'remaja' ? 'selected' : ''}>Remaja/Dewasa</option>
           </select>
         </div>
       </div>
@@ -245,13 +248,20 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       }
 
       let formatBadge = 'badge-primary';
-      let formatName = 'Remaja';
+      let formatName = 'Remaja/Dewasa';
+      let formatStyle = 'background:#f3e8ff;color:#7c3aed;';
       if (ev.format_kbm === 'caberawit') {
         formatBadge = 'badge-amber';
         formatName = 'Caberawit';
+        formatStyle = 'background:#fef3c7;color:#b45309;';
       } else if (ev.format_kbm === 'gp_reguler') {
         formatBadge = 'badge-info';
-        formatName = 'GP Reguler';
+        formatName = 'GP (Pra-remaja)';
+        formatStyle = 'background:#dbeafe;color:#1d4ed8;';
+      } else if (ev.format_kbm === 'pra_nikah') {
+        formatBadge = 'badge-pink';
+        formatName = 'Pra Nikah (19-22 Th)';
+        formatStyle = 'background:#fce7f3;color:#be185d;';
       }
 
       let wilayahLabel = 'Solo Selatan';
@@ -352,13 +362,20 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       }
 
       let formatBadge = 'badge-primary';
-      let formatName = 'Remaja';
+      let formatName = 'Remaja/Dewasa';
+      let formatStyle = 'background:#f3e8ff;color:#7c3aed;';
       if (ev.format_kbm === 'caberawit') {
         formatBadge = 'badge-amber';
         formatName = 'Caberawit';
+        formatStyle = 'background:#fef3c7;color:#b45309;';
       } else if (ev.format_kbm === 'gp_reguler') {
         formatBadge = 'badge-info';
-        formatName = 'GP Reguler';
+        formatName = 'GP (Pra-remaja)';
+        formatStyle = 'background:#dbeafe;color:#1d4ed8;';
+      } else if (ev.format_kbm === 'pra_nikah') {
+        formatBadge = 'badge-pink';
+        formatName = 'Pra Nikah (19-22 Th)';
+        formatStyle = 'background:#fce7f3;color:#be185d;';
       }
 
       let wilayahLabel = 'Solo Selatan';
@@ -544,9 +561,10 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
           Format KBM <span style="color:red">*</span>
         </label>
         <select id="modalSelJenisKbm" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--surface);font-weight:700;color:#1e3a8a;font-size:12.5px;box-sizing:border-box;">
-          <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>Remaja (SMP - Dewasa)</option>
-          <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>GP Reguler (SMP - SMA)</option>
           <option value="caberawit" ${defaultFormat === 'caberawit' ? 'selected' : ''}>Caberawit (PAUD - SD)</option>
+          <option value="gp_reguler" ${defaultFormat === 'gp_reguler' ? 'selected' : ''}>GP (Pra-remaja) (SMP)</option>
+          <option value="pra_nikah" ${defaultFormat === 'pra_nikah' ? 'selected' : ''}>Pra Nikah (19 - 22 Th)</option>
+          <option value="remaja" ${defaultFormat === 'remaja' ? 'selected' : ''}>Remaja/Dewasa (SMA &amp; Dewasa)</option>
         </select>
       </div>
 

@@ -459,21 +459,21 @@ function renderProker() {
 
       let dotsHtml = '';
       if (startP > 1) {
-        dotsHtml += `<button class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all page-dot text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" data-page="1">1</button>`;
+        dotsHtml += `<button class="page-dot ${1 === currentProkerPage ? 'active bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400'}" data-page="1">1</button>`;
         if (startP > 2) dotsHtml += `<span class="px-1 text-xs text-slate-400 select-none">&hellip;</span>`;
       }
       pages.forEach(p => {
-        dotsHtml += `<button class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all page-dot ${p === currentProkerPage ? 'bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}" data-page="${p}" aria-label="Halaman ${p}">${p}</button>`;
+        dotsHtml += `<button class="page-dot ${p === currentProkerPage ? 'active bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400'}" data-page="${p}" aria-label="Halaman ${p}">${p}</button>`;
       });
       if (endP < totalPages) {
         if (endP < totalPages - 1) dotsHtml += `<span class="px-1 text-xs text-slate-400 select-none">&hellip;</span>`;
-        dotsHtml += `<button class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all page-dot text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" data-page="${totalPages}">${totalPages}</button>`;
+        dotsHtml += `<button class="page-dot ${totalPages === currentProkerPage ? 'active bg-brandBlue text-white shadow' : 'text-slate-600 dark:text-slate-400'}" data-page="${totalPages}">${totalPages}</button>`;
       }
 
       paginationContainer.innerHTML = `
-        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav prev" ${currentProkerPage === 1 ? 'disabled' : ''} title="Halaman Sebelumnya"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
-        <div class="page-dots flex items-center gap-1">${dotsHtml}</div>
-        <button class="p-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center page-nav next" ${currentProkerPage === totalPages ? 'disabled' : ''} title="Halaman Berikutnya"><span class="material-symbols-outlined text-lg">chevron_right</span></button>
+        <button class="page-nav prev" ${currentProkerPage === 1 ? 'disabled' : ''} title="Halaman Sebelumnya"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
+        <div class="page-dots">${dotsHtml}</div>
+        <button class="page-nav next" ${currentProkerPage === totalPages ? 'disabled' : ''} title="Halaman Berikutnya"><span class="material-symbols-outlined text-lg">chevron_right</span></button>
       `;
 
       // Bind events

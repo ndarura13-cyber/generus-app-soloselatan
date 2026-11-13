@@ -664,9 +664,10 @@
       <div class="filter-group">
         <label>1. Format KBM</label>
         <select id="selJenisKbm">
-          <option value="remaja">KBM Remaja (Muda-Mudi &amp; GP)</option>
-          <option value="gp_reguler">KBM GP Reguler (SMP - SMA)</option>
           <option value="caberawit">KBM Caberawit (PAUD - SD)</option>
+          <option value="gp_reguler">KBM GP (Pra-remaja) (SMP)</option>
+          <option value="pra_nikah">KBM Pra Nikah (19 - 22 Th)</option>
+          <option value="remaja">KBM Remaja/Dewasa (SMA &amp; Usia Nikah)</option>
         </select>
       </div>
 
@@ -844,9 +845,26 @@
     selUrutan.value = paramUrutan;
     selBarisKosong.value = paramBaris;
 
+    // Helper to calculate student age
+    function getStudentAge(siswa) {
+      if (!siswa.tanggal_lahir) return null;
+      const birth = new Date(siswa.tanggal_lahir);
+      if (isNaN(birth.getTime())) return null;
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age;
+    }
+
     // Helper to get Jenjang Label like in PDF
     function getJenjangPrintLabel(siswa, formatKbm) {
       const k = (siswa.jenjang_kelas || '').toUpperCase();
+      if (formatKbm === 'pra_nikah') {
+        return 'PRA NIKAH';
+      }
       if (formatKbm === 'remaja') {
         if (k.includes('SMA') || k.includes('SMK') || k.includes('MA')) return 'SMA';
         if (k.includes('SMP') || k.includes('MTS')) return 'SMP';
@@ -871,13 +889,14 @@
       if (urutan === 'official') {
         const orderWeight = (s) => {
           const lbl = getJenjangPrintLabel(s, formatKbm);
-          if (lbl === 'REMAJA') return 1;
-          if (lbl === 'SMA') return 2;
-          if (lbl === 'SMP') return 3;
-          if (lbl === 'SD') return 4;
-          if (lbl === 'TK') return 5;
-          if (lbl === 'PAUD') return 6;
-          return 7;
+          if (lbl === 'PRA NIKAH') return 1;
+          if (lbl === 'REMAJA') return 2;
+          if (lbl === 'SMA') return 3;
+          if (lbl === 'SMP') return 4;
+          if (lbl === 'SD') return 5;
+          if (lbl === 'TK') return 6;
+          if (lbl === 'PAUD') return 7;
+          return 8;
         };
         list.sort((a, b) => {
           const wA = orderWeight(a);
@@ -902,8 +921,10 @@
         titleLine1 = 'PRESENSI KBM CABERAWIT';
       } else if (formatKbm === 'gp_reguler') {
         titleLine1 = 'PRESENSI KBM GP REGULER';
+      } else if (formatKbm === 'pra_nikah') {
+        titleLine1 = 'PRESENSI KBM PRA NIKAH (19 - 22 TH)';
       } else {
-        titleLine1 = 'PRESENSI PENGAJIAN MUDA-MUDI';
+        titleLine1 = 'PRESENSI PENGAJIAN MUDA-MUDI / REMAJA';
       }
 
       const titleLine2 = desa ? `DESA ${desa.nama.toUpperCase()}, SOLO SELATAN` : 'SOLO SELATAN';
@@ -1111,6 +1132,15 @@
             // Filter jenjang
             if (format === 'caberawit' && s.kategori_usia !== 'caberawit') return false;
             if (format === 'gp_reguler' && s.kategori_usia !== 'gp_reguler') return false;
+            if (format === 'pra_nikah') {
+              const age = getStudentAge(s);
+              if (age !== null) {
+                if (age < 19 || age > 22) return false;
+              } else {
+                const k = (s.jenjang_kelas || '').toUpperCase();
+                if (!k.includes('MAHASISWA') && !k.includes('KULIAH') && !k.includes('KERJA') && !k.includes('PRA NIKAH')) return false;
+              }
+            }
             if (format === 'remaja' && s.kategori_usia !== 'remaja' && s.kategori_usia !== 'gp_reguler') return false;
 
             // Filter gender
