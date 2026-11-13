@@ -1271,6 +1271,14 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     renderProkerModal('all', 'all', '', activeTab, 1, false, 'KMM');
   });
 
+  // Auto-scroll tab aktif ke posisi terlihat pada tampilan mobile
+  const activeCatBtn = isKmmActive ? document.getElementById('catTabKmm') : document.getElementById('catTabPpg');
+  if (activeCatBtn && typeof window !== 'undefined' && window.innerWidth <= 768) {
+    try {
+      activeCatBtn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+    } catch (e) {}
+  }
+
   // 2. Pencarian & Filter (Jangan auto-focus agar keyboard virtual mobile tidak terbuka otomatis)
   const searchInput = document.getElementById('inputProkerSearch');
   if (searchInput) {

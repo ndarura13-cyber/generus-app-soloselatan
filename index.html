@@ -113,6 +113,19 @@
     }
     
     .level-pill { transition: all 0.2s; }
+
+    /* Clean Mobile Touch Scrollbars (Completely Hidden) */
+    @media (max-width: 768px), (pointer: coarse) {
+      * {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+      *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    }
     .level-pill:hover { @apply transform -translate-y-1 shadow-md; }
     .stat-card { transition: all 0.2s; }
     .stat-card:hover { @apply transform -translate-y-1 shadow-xl; }

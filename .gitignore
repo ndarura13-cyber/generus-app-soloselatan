@@ -8,3 +8,9 @@ Desktop.ini
 # Logs & temp
 *.log
 scratch/
+
+# Pinegrow
+_pgbackup/
+_pginfo/
+pinegrow.json
+

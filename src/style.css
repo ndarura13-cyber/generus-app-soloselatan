@@ -2604,3 +2604,92 @@ img {
   --gold: #fbbf24;
   --gold-dark: #fcd34d;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL INTERACTION-DRIVEN SCROLLBAR SYSTEM
+   - Mobile: ALL scrollbars completely hidden (clean native PWA look)
+   - Desktop: Floating, transparent track, thumb only appears on hover
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 769px) {
+  html, body, div, section, main, article, aside, nav, table {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  html:hover, body:hover, div:hover, section:hover, main:hover {
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  }
+
+  .dark html:hover, .dark body:hover, .dark div:hover, .dark section:hover, .dark main:hover {
+    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  *:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35) !important;
+  }
+
+  *:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.65) !important;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: transparent !important;
+  }
+
+  .dark *:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25) !important;
+  }
+
+  .dark *:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(203, 213, 225, 0.5) !important;
+  }
+}
+
+/* ── Mobile View & Touch Devices: Completely Hide Scrollbars ── */
+@media (max-width: 768px), (pointer: coarse) {
+  html,
+  body,
+  #app,
+  .modal-backdrop,
+  .modal-box,
+  .modal-body,
+  .proker-category-nav-wrap,
+  .proker-table-wrap,
+  .desa-tabs,
+  .struktur-tabs-nav,
+  .proker-filter-scroll,
+  .dash-proker-filter-scroll,
+  .table-responsive,
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  ::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+

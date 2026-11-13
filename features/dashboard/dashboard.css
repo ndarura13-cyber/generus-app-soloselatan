@@ -746,23 +746,18 @@ body {
   gap: 8px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   padding-bottom: 6px;
   margin-bottom: 18px;
   flex-wrap: nowrap;
 }
 
 .desa-tabs::-webkit-scrollbar {
-  height: 4px;
-}
-
-.desa-tabs::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.dark .desa-tabs::-webkit-scrollbar-thumb {
-  background: #334155;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .desa-tab-btn {
@@ -2309,31 +2304,65 @@ body {
   color: #f3e8ff;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .proker-category-nav-wrap {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    margin-left: -4px !important;
+    margin-right: -4px !important;
+    padding: 2px 4px 6px 4px !important;
+    width: auto !important;
+  }
+
+  .proker-category-nav-wrap::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
   .proker-category-tabs {
-    grid-template-columns: 1fr 1fr !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
     gap: 8px !important;
+    width: max-content !important;
+    min-width: 100% !important;
   }
+
   .proker-cat-btn {
-    padding: 8px 10px !important;
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+    padding: 9px 13px !important;
     gap: 8px !important;
+    white-space: nowrap !important;
+    border-radius: 12px !important;
   }
+
   .proker-cat-btn .proker-cat-icon {
     font-size: 20px !important;
     padding: 6px !important;
+    border-radius: 8px !important;
   }
+
   .proker-cat-title {
-    font-size: 11.5px !important;
+    font-size: 12.5px !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
   }
+
   .proker-cat-subtitle {
     display: none !important;
   }
+
   .proker-cat-badge {
-    display: none !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    padding: 2px 7px !important;
+    border-radius: 9999px !important;
+    display: inline-flex !important;
   }
 }
 
@@ -2443,26 +2472,35 @@ body {
   background: #ffffff;
   box-shadow: var(--shadow-sm);
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f8fafc;
+  scrollbar-color: transparent transparent;
   position: relative;
 }
 
+.proker-table-wrap:hover {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
 .proker-table-wrap::-webkit-scrollbar {
-  height: 8px;
+  height: 6px;
+  width: 6px;
+}
+
+.proker-table-wrap::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
 .proker-table-wrap::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.proker-table-wrap:hover::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
 }
 
 .proker-table-wrap::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-.proker-table-wrap::-webkit-scrollbar-track {
-  background: #f8fafc;
-  border-radius: 0 0 6px 6px;
 }
 
 .proker-table {
@@ -4084,26 +4122,65 @@ body {
   overflow-y: auto !important;
 }
 
-/* Custom Dark Scrollbar inside Modal */
-.dark .modal-body::-webkit-scrollbar,
-.dark .modal-box::-webkit-scrollbar {
-  width: 8px;
-}
+/* ── Clean Floating Scrollbars inside Modal (Desktop Only) ── */
+@media (min-width: 769px) {
+  .modal-body,
+  .modal-box {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.2s ease;
+  }
 
-.dark .modal-body::-webkit-scrollbar-track,
-.dark .modal-box::-webkit-scrollbar-track {
-  background: #070d1d;
-}
+  .modal-body:hover,
+  .modal-box:hover {
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  }
 
-.dark .modal-body::-webkit-scrollbar-thumb,
-.dark .modal-box::-webkit-scrollbar-thumb {
-  background: #223554;
-  border-radius: 6px;
-}
+  .dark .modal-body:hover,
+  .dark .modal-box:hover {
+    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+  }
 
-.dark .modal-body::-webkit-scrollbar-thumb:hover,
-.dark .modal-box::-webkit-scrollbar-thumb:hover {
-  background: #334d7a;
+  .modal-body::-webkit-scrollbar,
+  .modal-box::-webkit-scrollbar,
+  .dark .modal-body::-webkit-scrollbar,
+  .dark .modal-box::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .modal-body::-webkit-scrollbar-track,
+  .modal-box::-webkit-scrollbar-track,
+  .dark .modal-body::-webkit-scrollbar-track,
+  .dark .modal-box::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb,
+  .modal-box::-webkit-scrollbar-thumb,
+  .dark .modal-body::-webkit-scrollbar-thumb,
+  .dark .modal-box::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border-radius: 9999px;
+    transition: background 0.2s ease;
+  }
+
+  .modal-body:hover::-webkit-scrollbar-thumb,
+  .modal-box:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4) !important;
+  }
+
+  .dark .modal-body:hover::-webkit-scrollbar-thumb,
+  .dark .modal-box:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3) !important;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb:hover,
+  .modal-box::-webkit-scrollbar-thumb:hover,
+  .dark .modal-body::-webkit-scrollbar-thumb:hover,
+  .dark .modal-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.7) !important;
+  }
 }
 
 /* ── Proker Action Banner Frame (Matched with Generus & Pembiasaan) ── */
@@ -5386,16 +5463,24 @@ body {
   border: 1px solid #1e293b !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   border-radius: 12px !important;
-  scrollbar-color: #223554 #070d1d !important;
+  scrollbar-color: transparent transparent !important;
+}
+
+.dark .proker-table-wrap:hover {
+  scrollbar-color: #223554 transparent !important;
 }
 
 .dark .proker-table-wrap::-webkit-scrollbar-track {
-  background: #070d1d !important;
+  background: transparent !important;
 }
 
 .dark .proker-table-wrap::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border-radius: 9999px;
+}
+
+.dark .proker-table-wrap:hover::-webkit-scrollbar-thumb {
   background: #223554 !important;
-  border-radius: 4px;
 }
 
 .dark .proker-table-wrap::-webkit-scrollbar-thumb:hover {
@@ -9697,6 +9782,98 @@ body {
     width: 100%;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL INTERACTION-DRIVEN SCROLLBAR SYSTEM
+   - Mobile: ALL scrollbars completely hidden (clean native PWA look)
+   - Desktop: Floating, transparent track, thumb only appears on hover
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 769px) {
+  /* Default Desktop Scrollbars: Clean & Floating */
+  html, body, div, section, main, article, aside, nav, table {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  html:hover, body:hover, div:hover, section:hover, main:hover {
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  }
+
+  .dark html:hover, .dark body:hover, .dark div:hover, .dark section:hover, .dark main:hover {
+    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  *:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35) !important;
+  }
+
+  *:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.65) !important;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: transparent !important;
+  }
+
+  .dark *:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25) !important;
+  }
+
+  .dark *:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(203, 213, 225, 0.5) !important;
+  }
+}
+
+/* ── Mobile View & Touch Devices: Completely Hide Scrollbars ── */
+@media (max-width: 768px), (pointer: coarse) {
+  html,
+  body,
+  #app,
+  .modal-backdrop,
+  .modal-box,
+  .modal-body,
+  .dark .modal-body,
+  .dark .modal-box,
+  .proker-category-nav-wrap,
+  .proker-table-wrap,
+  .desa-tabs,
+  .struktur-tabs-nav,
+  .proker-filter-scroll,
+  .dash-proker-filter-scroll,
+  .table-responsive,
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  ::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
 
 
 

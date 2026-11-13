@@ -589,3 +589,16 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Mobile Scrollbar Suppression ── */
+@media (max-width: 768px), (pointer: coarse) {
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
