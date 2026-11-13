@@ -1414,6 +1414,9 @@ body {
 
 .modal-body {
   padding: 20px 24px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-content-fade {
@@ -1705,6 +1708,7 @@ body {
   .modal-body {
     flex: 1 1 auto !important;
     overflow-y: auto !important;
+    scroll-behavior: smooth !important;
     padding: 14px 16px max(20px, env(safe-area-inset-bottom)) 16px !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior-y: contain !important;
