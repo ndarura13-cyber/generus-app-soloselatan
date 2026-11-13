@@ -2783,9 +2783,8 @@ body {
 }
 
 .proker-presentation-header {
-  padding: 14px 20px;
+  padding: 16px 22px 8px;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2797,16 +2796,16 @@ body {
 }
 
 .proker-presentation-body {
-  padding: 20px 24px;
+  padding: 8px 24px 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   flex: 1 1 auto;
 }
 
 .proker-presentation-footer {
-  padding: 12px 20px;
+  padding: 14px 22px;
   background: var(--bg);
   border-top: 1px solid var(--border);
   display: flex;
@@ -2817,6 +2816,451 @@ body {
 }
 .dark .proker-presentation-footer {
   background: #0b1329;
+}
+
+/* Pleno Top Pill & Dropdowns (Gambar Referensi) */
+.pleno-top-pill-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pleno-unified-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #1d4ed8;
+  border-radius: 9999px;
+  padding: 2px 4px;
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(29, 78, 216, 0.25);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.dark .pleno-unified-pill {
+  background: #1e40af;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.pleno-pill-status-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: background 0.15s ease;
+}
+.pleno-pill-status-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.pleno-pill-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.35);
+  margin: 0 2px;
+}
+
+.pleno-pill-meatball-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: background 0.15s ease;
+}
+.pleno-pill-meatball-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Pleno Dropdown Menus */
+.pleno-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 210px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.22), 0 6px 12px -4px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: plenoDropAnim 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dark .pleno-dropdown-panel {
+  background: #0f172a;
+  border-color: #1e293b;
+  box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.6);
+}
+.pleno-dropdown-panel.hidden {
+  display: none !important;
+}
+@keyframes plenoDropAnim {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pleno-dropdown-header {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  padding: 6px 10px 4px;
+}
+
+.pleno-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.pleno-dropdown-item:hover {
+  background: var(--surface-2, #f1f5f9);
+}
+.dark .pleno-dropdown-item:hover {
+  background: #1e293b;
+}
+.pleno-dropdown-item.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+.dark .pleno-dropdown-item.active {
+  background: rgba(29, 78, 216, 0.22);
+  color: #93c5fd;
+}
+.pleno-dropdown-item.is-danger:hover {
+  background: #fef2f2;
+}
+.dark .pleno-dropdown-item.is-danger:hover {
+  background: rgba(239, 68, 68, 0.16);
+}
+.pleno-drop-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Pleno Center Hero */
+.pleno-hero-section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 10px 12px;
+}
+.pleno-hero-tracker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pleno-hero-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.32;
+  max-width: 800px;
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .pleno-hero-title {
+    font-size: 18.5px;
+  }
+}
+.pleno-hero-badge-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0;
+}
+.pleno-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 16px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #ffffff;
+}
+.pleno-hero-badge.is-belum {
+  background: #dc2626;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+}
+.pleno-hero-badge.is-terlaksana {
+  background: #16a34a;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+.pleno-hero-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 500;
+}
+
+/* Pleno Middle Section (2 Columns Grid) */
+.pleno-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .pleno-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+.pleno-info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dark .pleno-info-card {
+  background: #111d38;
+  border-color: #1e3256;
+}
+.pleno-info-card-header {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dark .pleno-info-card-header {
+  color: #60a5fa;
+}
+.pleno-info-card-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.pleno-agenda-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  justify-content: center;
+}
+.pleno-agenda-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  font-size: 13.5px;
+}
+.pleno-agenda-item .material-symbols-outlined {
+  color: #1e3a8a;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.dark .pleno-agenda-item .material-symbols-outlined {
+  color: #60a5fa;
+}
+
+/* Pleno Bottom Full-Width Financial Card */
+.pleno-finance-card {
+  width: 100%;
+}
+.pleno-metric-boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 6px 0 10px;
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .pleno-metric-boxes-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+.pleno-metric-box {
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+}
+.pleno-metric-box.mint-box {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+.dark .pleno-metric-box.mint-box {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.pleno-metric-box.blue-box {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+.dark .pleno-metric-box.blue-box {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+.pleno-metric-box.gray-box {
+  background: #fffaf5;
+  border-color: #fed7aa;
+}
+.dark .pleno-metric-box.gray-box {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+.pleno-metric-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mint-icon {
+  background: #059669;
+  color: #ffffff;
+}
+.blue-icon {
+  background: #2563eb;
+  color: #ffffff;
+}
+.gray-icon {
+  color: #1e293b;
+}
+.dark .gray-icon {
+  color: #f1f5f9;
+}
+.pleno-metric-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pleno-metric-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pleno-metric-value {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pleno-rincian-biaya-row {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pleno-rincian-lbl {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pleno-rincian-txt {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.pleno-lpj-card {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.dark .pleno-lpj-card {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.pleno-lpj-tgl {
+  font-size: 11.5px;
+  color: #047857;
+  font-weight: 700;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dark .pleno-lpj-tgl {
+  color: #34d399;
+}
+
+/* Pleno Dark Navy Navigation Buttons */
+.btn-pleno-nav-dark {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 12.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.btn-pleno-nav-dark:hover:not(:disabled) {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+.btn-pleno-nav-dark:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.dark .btn-pleno-nav-dark {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+.dark .btn-pleno-nav-dark:hover:not(:disabled) {
+  background: #334155;
 }
 
 /* Pleno Actions (Edit, Hapus, LPJ, Tutup) */

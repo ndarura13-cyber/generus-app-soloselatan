@@ -1519,25 +1519,53 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
   const diffVal = estVal - realVal;
 
   let efficiencyHtml = '';
+  let trendIcon = 'trending_down';
   if (realVal === 0 && !isTerlaksana) {
     efficiencyHtml = `<span style="color:var(--text-muted);font-weight:700;">Belum Terealisasi</span>`;
+    trendIcon = 'savings';
   } else if (diffVal > 0) {
     const pct = estVal > 0 ? Math.round((diffVal / estVal) * 100) : 0;
-    efficiencyHtml = `<span style="color:#057a55;font-weight:800;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">trending_down</span> +Rp ${diffVal.toLocaleString('id-ID')} (Hemat ${pct}%)</span>`;
+    efficiencyHtml = `<span style="color:#057a55;font-weight:800;">+Rp ${diffVal.toLocaleString('id-ID')} (hemat ${pct}%)</span>`;
+    trendIcon = 'trending_down';
   } else if (diffVal < 0) {
     const pct = estVal > 0 ? Math.round((Math.abs(diffVal) / estVal) * 100) : 0;
-    efficiencyHtml = `<span style="color:#c81e1e;font-weight:800;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">trending_up</span> -Rp ${Math.abs(diffVal).toLocaleString('id-ID')} (Lebih ${pct}%)</span>`;
+    efficiencyHtml = `<span style="color:#c81e1e;font-weight:800;">-Rp ${Math.abs(diffVal).toLocaleString('id-ID')} (lebih ${pct}%)</span>`;
+    trendIcon = 'trending_up';
   } else if (diffVal === 0 && realVal > 0) {
-    efficiencyHtml = `<span style="color:#0284c7;font-weight:800;display:inline-flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Tepat 100% Sesuai RAB</span>`;
+    efficiencyHtml = `<span style="color:#0284c7;font-weight:800;">Tepat Sesuai RAB (Rp 0)</span>`;
+    trendIcon = 'check_circle';
   } else {
     efficiencyHtml = `<span style="color:var(--text-muted);font-weight:700;">Tanpa Anggaran (Rp 0)</span>`;
+    trendIcon = 'savings';
   }
 
-  let statusClass = currentItem.status || 'planned';
-  let statusLabel = 'Direncanakan';
-  if (statusClass === 'done') statusLabel = 'Selesai';
-  else if (statusClass === 'ongoing') statusLabel = 'Berlangsung';
-  else if (statusClass === 'upcoming') statusLabel = 'Akan Datang';
+  const statusLabels = {
+    'planned': 'Direncanakan',
+    'ongoing': 'Sedang Berlangsung',
+    'upcoming': 'Akan Datang',
+    'done': 'Selesai'
+  };
+  let currentStatusKey = currentItem.status || 'planned';
+  if (currentStatusKey === 'berjalan' || currentStatusKey === 'sedang_berlangsung') currentStatusKey = 'ongoing';
+  else if (currentStatusKey === 'akan_datang') currentStatusKey = 'upcoming';
+  else if (currentStatusKey === 'selesai') currentStatusKey = 'done';
+  else if (!statusLabels[currentStatusKey]) currentStatusKey = 'planned';
+
+  const statusLabel = statusLabels[currentStatusKey] || 'Direncanakan';
+
+  const picText = currentItem.kategori === 'KMM'
+    ? `Divisi ${currentItem.subBidang || 'Umum'}`
+    : (currentItem.penanggungJawab || 'Sekretaris');
+
+  const realisasiBadgeHtml = isTerlaksana
+    ? `<span class="pleno-hero-badge is-terlaksana">
+        <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>
+        <span>TERLAKSANA</span>
+      </span>`
+    : `<span class="pleno-hero-badge is-belum">
+        <span class="material-symbols-outlined" style="font-size:16px;">priority_high</span>
+        <span>BELUM TERLAKSANA</span>
+      </span>`;
 
   let overlay = document.getElementById('prokerPresentationOverlay');
   if (!overlay) {
@@ -1545,6 +1573,12 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
     overlay.id = 'prokerPresentationOverlay';
     overlay.className = 'proker-presentation-backdrop';
     document.body.appendChild(overlay);
+  }
+
+  // Cleanup old global listeners
+  if (window._plenoDocClickHandler) {
+    document.removeEventListener('click', window._plenoDocClickHandler);
+    window._plenoDocClickHandler = null;
   }
 
   function closePlenoPresentation() {
@@ -1560,16 +1594,76 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
       window.removeEventListener('keydown', window._plenoKeyHandler);
       window._plenoKeyHandler = null;
     }
+    if (window._plenoDocClickHandler) {
+      document.removeEventListener('click', window._plenoDocClickHandler);
+      window._plenoDocClickHandler = null;
+    }
   }
 
   overlay.innerHTML = `
     <div class="proker-presentation-modal" role="dialog" aria-modal="true" aria-label="Mode Presentasi Program Kerja">
-      <!-- HEADER PLENO TOOLBAR (Gambar 3: Mode Pleno Pill & Tombol Tutup) -->
+      <!-- HEADER PLENO (Pill Dropdown Status & Meatball di Kiri, Tombol Tutup di Kanan) -->
       <div class="proker-presentation-header">
-        <span class="proker-pleno-pill-mode">
-          <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
-          <span>MODE PLENO</span>
-        </span>
+        <div class="pleno-top-pill-container">
+          <div class="pleno-unified-pill">
+            <button type="button" class="pleno-pill-status-btn" id="btnPlenoStatusDrop" title="${isSuper ? 'Ubah Status Agenda' : 'Status Agenda'}">
+              <span>${statusLabel.toUpperCase()}</span>
+              ${isSuper ? '<span class="material-symbols-outlined" style="font-size:16px;">arrow_drop_down</span>' : ''}
+            </button>
+            ${isSuper ? `
+              <div class="pleno-pill-divider"></div>
+              <button type="button" class="pleno-pill-meatball-btn" id="btnPlenoMeatball" title="Menu Opsi Agenda (Edit, LPJ, Hapus)">
+                <span class="material-symbols-outlined" style="font-size:18px;">more_horiz</span>
+              </button>
+            ` : ''}
+          </div>
+
+          <!-- Dropdown Ubah Status (Khusus Superadmin) -->
+          ${isSuper ? `
+            <div id="plenoStatusDropdownMenu" class="pleno-dropdown-panel hidden">
+              <div class="pleno-dropdown-header">Ubah Status Agenda</div>
+              <button type="button" class="pleno-dropdown-item ${currentStatusKey === 'planned' ? 'active' : ''}" data-status="planned">
+                <span class="pleno-drop-dot" style="background:#6366f1;"></span>
+                <span style="flex:1;">Direncanakan</span>
+                ${currentStatusKey === 'planned' ? '<span class="material-symbols-outlined" style="font-size:16px;color:#6366f1;">check</span>' : ''}
+              </button>
+              <button type="button" class="pleno-dropdown-item ${currentStatusKey === 'ongoing' ? 'active' : ''}" data-status="ongoing">
+                <span class="pleno-drop-dot" style="background:#10b981;"></span>
+                <span style="flex:1;">Sedang Berlangsung</span>
+                ${currentStatusKey === 'ongoing' ? '<span class="material-symbols-outlined" style="font-size:16px;color:#10b981;">check</span>' : ''}
+              </button>
+              <button type="button" class="pleno-dropdown-item ${currentStatusKey === 'upcoming' ? 'active' : ''}" data-status="upcoming">
+                <span class="pleno-drop-dot" style="background:#f59e0b;"></span>
+                <span style="flex:1;">Akan Datang</span>
+                ${currentStatusKey === 'upcoming' ? '<span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b;">check</span>' : ''}
+              </button>
+              <button type="button" class="pleno-dropdown-item ${currentStatusKey === 'done' ? 'active' : ''}" data-status="done">
+                <span class="pleno-drop-dot" style="background:#64748b;"></span>
+                <span style="flex:1;">Selesai</span>
+                ${currentStatusKey === 'done' ? '<span class="material-symbols-outlined" style="font-size:16px;color:#64748b;">check</span>' : ''}
+              </button>
+            </div>
+
+            <!-- Dropdown Meatball Menu (Edit, LPJ, Hapus) -->
+            <div id="plenoMeatballDropdownMenu" class="pleno-dropdown-panel hidden" style="left: 60px;">
+              <div class="pleno-dropdown-header">Aksi Agenda</div>
+              <button type="button" class="pleno-dropdown-item" id="btnPlenoMenuEdit">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#2563eb;">edit</span>
+                <span>Edit Program Kerja</span>
+              </button>
+              <button type="button" class="pleno-dropdown-item" id="btnPlenoMenuLpj">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#059669;">assignment_turned_in</span>
+                <span>Lapor Realisasi (LPJ)</span>
+              </button>
+              <div style="border-top:1px solid var(--border);margin:4px 0;"></div>
+              <button type="button" class="pleno-dropdown-item is-danger" id="btnPlenoMenuDel">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#dc2626;">delete</span>
+                <span style="color:#dc2626;font-weight:700;">Hapus Program Kerja</span>
+              </button>
+            </div>
+          ` : ''}
+        </div>
+
         <button type="button" class="btn-pleno-close" id="btnPlenoClose" aria-label="Tutup Pleno" title="Tutup Mode Presentasi (Esc)">
           <span class="material-symbols-outlined" style="font-size:20px;">close</span>
         </button>
@@ -1577,133 +1671,113 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
 
       <!-- BODY PRESENTASI PROKER -->
       <div class="proker-presentation-body">
-        ${isSuper ? `
-        <!-- BARIS TOMBOL AKSI TIGA KOLOM (LPJ Realisasi, Edit, Hapus) - KHUSUS SUPERADMIN -->
-        <div class="proker-pleno-actions-bar">
-          <button type="button" class="btn-pleno-action btn-pleno-lpj" id="btnPlenoLpj" title="Lapor LPJ & Realisasi Dana">
-            <span class="material-symbols-outlined" style="font-size:16px;">assignment_turned_in</span>
-            <span>LPJ Realisasi</span>
-          </button>
-          <button type="button" class="btn-pleno-action btn-pleno-edit" id="btnPlenoEdit" title="Edit Program Kerja">
-            <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
-            <span>Edit</span>
-          </button>
-          <button type="button" class="btn-pleno-action btn-pleno-del" id="btnPlenoDel" title="Hapus Program Kerja">
-            <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
-            <span>Hapus</span>
-          </button>
-        </div>
-        ` : ''}
-
-        <!-- HERO STATUS & JUDUL AGENDA -->
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <span class="proker-pleno-badge-terlaksana ${isTerlaksana ? 'is-yes' : 'is-no'}">
-              <span class="material-symbols-outlined" style="font-size:15px;">${isTerlaksana ? 'check_circle' : 'pending_actions'}</span>
-              <span>${isTerlaksana ? 'TERLAKSANA' : 'BELUM TERLAKSANA'}</span>
-            </span>
-            <span class="proker-pleno-badge-substatus">
-              ${statusLabel.toUpperCase()}
-            </span>
-            ${currentItem.kategori === 'KMM' ? `
-              <span class="proker-sub-badge-kmm" style="font-size:11px;padding:3px 10px;">
-                <span class="material-symbols-outlined" style="font-size:14px;">diversity_3</span>
-                KMM &bull; Divisi ${currentItem.subBidang || 'Umum'}
-              </span>
-            ` : ''}
+        <!-- HERO STATUS & JUDUL AGENDA (Tengah) -->
+        <div class="pleno-hero-section">
+          <div class="pleno-hero-tracker">PROGRAM KERJA</div>
+          <h2 class="pleno-hero-title">${currentItem.kegiatan}</h2>
+          <div class="pleno-hero-badge-wrap">
+            ${realisasiBadgeHtml}
           </div>
-
-          <h2 style="margin:4px 0 2px;font-size:20px;font-weight:900;color:var(--text);line-height:1.35;">
-            #${currentItem.no || (currentIndex + 1)}. ${currentItem.kegiatan}
-          </h2>
-
-          <div style="font-size:12.5px;color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span>Tingkat Pelaksanaan: <strong style="color:var(--text);">Daerah Solo Selatan</strong></span>
+          <div class="pleno-hero-meta">
+            <span>Tingkat: <strong style="color:var(--text);">Daerah Solo Selatan</strong></span>
             <span>&bull;</span>
-            ${currentItem.kategori === 'KMM' ? `
-              <span>Divisi: <strong style="color:#7c3aed;">Divisi ${currentItem.subBidang || 'Umum'}</strong></span>
-            ` : `
-              <span>Penanggung Jawab: <strong style="color:#1d4ed8;">${currentItem.penanggungJawab || 'Sekretaris & Ketua'}</strong></span>
-            `}
-          </div>
-
-          <div style="border-bottom:1.5px dashed var(--border);margin:8px 0 12px;"></div>
-        </div>
-
-        <!-- CARD 1: MAKSUD & TUJUAN KEGIATAN -->
-        <div class="proker-pleno-box">
-          <div class="proker-pleno-box-header">
-            <span class="material-symbols-outlined" style="font-size:18px;">track_changes</span>
-            <span>MAKSUD &amp; TUJUAN KEGIATAN</span>
-          </div>
-          <div class="proker-pleno-box-body">
-            ${currentItem.tujuan || '<span style="color:var(--text-muted);font-style:italic;">Belum ada deskripsi maksud dan tujuan kegiatan.</span>'}
+            <span>PIC: <strong style="color:var(--text);">${picText}</strong></span>
           </div>
         </div>
 
-        <!-- CARD 2: WAKTU, TEMPAT & SASARAN -->
-        <div class="proker-pleno-box">
-          <div class="proker-pleno-box-header">
-            <span class="material-symbols-outlined" style="font-size:18px;">schedule</span>
-            <span>WAKTU, TEMPAT &amp; SASARAN</span>
+        <!-- MIDDLE SECTION: 2 KOLOM (Maksud & Tujuan, dan Waktu/Tempat/Sasaran) -->
+        <div class="pleno-cards-grid">
+          <!-- CARD KIRI: MAKSUD & TUJUAN KEGIATAN -->
+          <div class="pleno-info-card">
+            <div class="pleno-info-card-header">
+              <span class="material-symbols-outlined" style="font-size:22px;color:#1e3a8a;">track_changes</span>
+              <span>MAKSUD &amp; TUJUAN KEGIATAN</span>
+            </div>
+            <div class="pleno-info-card-body">
+              ${currentItem.tujuan || currentItem.deskripsi || '<span style="color:var(--text-muted);font-style:italic;">Belum ada deskripsi maksud dan tujuan kegiatan.</span>'}
+            </div>
           </div>
-          <div class="proker-pleno-box-list">
-            <div class="list-item">
-              <span class="material-symbols-outlined">calendar_today</span>
-              <span><strong>Waktu:</strong> ${currentItem.waktu || '-'}</span>
-            </div>
-            <div class="list-item">
-              <span class="material-symbols-outlined">location_on</span>
-              <span><strong>Tempat:</strong> ${currentItem.tempat || '-'}</span>
-            </div>
-            <div class="list-item">
-              <span class="material-symbols-outlined">group</span>
-              <span><strong>Sasaran:</strong> ${currentItem.sasaran || '-'}</span>
+
+          <!-- CARD KANAN: WAKTU, TEMPAT & SASARAN -->
+          <div class="pleno-info-card">
+            <div class="pleno-agenda-list">
+              <div class="pleno-agenda-item">
+                <span class="material-symbols-outlined">calendar_today</span>
+                <div class="pleno-agenda-text"><strong>Waktu:</strong> ${currentItem.waktu || '-'}</div>
+              </div>
+              <div class="pleno-agenda-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <div class="pleno-agenda-text"><strong>Tempat:</strong> ${currentItem.tempat || '-'}</div>
+              </div>
+              <div class="pleno-agenda-item">
+                <span class="material-symbols-outlined">group</span>
+                <div class="pleno-agenda-text"><strong>Sasaran:</strong> ${currentItem.sasaran || '-'}</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- CARD 3: RENCANA ANGGARAN BIAYA (RAB) & REALISASI KEUANGAN -->
-        <div class="proker-pleno-box">
-          <div class="proker-pleno-box-header">
-            <span class="material-symbols-outlined" style="font-size:18px;color:#057a55;">payments</span>
+        <!-- BOTTOM SECTION: FULL-WIDTH KEUANGAN & RAB -->
+        <div class="pleno-info-card pleno-finance-card">
+          <div class="pleno-info-card-header">
+            <span class="material-symbols-outlined" style="font-size:22px;color:#1e3a8a;">account_balance_wallet</span>
             <span>RENCANA ANGGARAN BIAYA (RAB) &amp; REALISASI KEUANGAN</span>
           </div>
-          <div class="proker-pleno-rab-grid">
-            <div class="proker-pleno-rab-item">
-              <span class="rab-lbl">ESTIMASI BIAYA (RAB)</span>
-              <strong class="rab-val est">Rp ${estVal.toLocaleString('id-ID')}</strong>
+
+          <div class="pleno-metric-boxes-grid">
+            <!-- Box 1: Estimasi RAB -->
+            <div class="pleno-metric-box mint-box">
+              <div class="pleno-metric-icon mint-icon">
+                <span class="material-symbols-outlined" style="font-size:20px;">receipt_long</span>
+              </div>
+              <div class="pleno-metric-content">
+                <div class="pleno-metric-label">ESTIMASI (RAB)</div>
+                <div class="pleno-metric-value">Rp ${estVal.toLocaleString('id-ID')}</div>
+              </div>
             </div>
-            <div class="proker-pleno-rab-item">
-              <span class="rab-lbl">REALISASI PENGGUNAAN DANA</span>
-              <strong class="rab-val real">Rp ${realVal.toLocaleString('id-ID')}</strong>
+
+            <!-- Box 2: Realisasi -->
+            <div class="pleno-metric-box blue-box">
+              <div class="pleno-metric-icon blue-icon">
+                <span class="material-symbols-outlined" style="font-size:20px;">account_balance_wallet</span>
+              </div>
+              <div class="pleno-metric-content">
+                <div class="pleno-metric-label">REALISASI</div>
+                <div class="pleno-metric-value">Rp ${realVal.toLocaleString('id-ID')}</div>
+              </div>
             </div>
-            <div class="proker-pleno-rab-item">
-              <span class="rab-lbl">STATUS EFISIENSI DANA</span>
-              <div class="rab-val status" style="font-size:12px;margin-top:2px;">${efficiencyHtml}</div>
+
+            <!-- Box 3: Efisiensi Dana -->
+            <div class="pleno-metric-box gray-box">
+              <div class="pleno-metric-icon gray-icon">
+                <span class="material-symbols-outlined" style="font-size:26px;">${trendIcon}</span>
+              </div>
+              <div class="pleno-metric-content">
+                <div class="pleno-metric-label">EFISIENSI DANA</div>
+                <div class="pleno-metric-value" style="font-size:13.5px;">${efficiencyHtml}</div>
+              </div>
             </div>
           </div>
-          ${currentItem.rincianBiaya ? `
-            <div style="font-size:12px;color:var(--text);border-top:1px dashed var(--border);padding-top:8px;margin-top:4px;">
-              <strong style="color:var(--text-muted);font-size:10.5px;text-transform:uppercase;display:block;margin-bottom:2px;">Rincian Komponen Biaya:</strong>
-              <div style="font-style:italic;color:var(--text);">${currentItem.rincianBiaya}</div>
-            </div>
-          ` : ''}
+
+          <div class="pleno-rincian-biaya-row">
+            <div class="pleno-rincian-lbl">RINCIAN KOMPONEN BIAYA:</div>
+            <div class="pleno-rincian-txt">${currentItem.rincianBiaya || '-'}</div>
+          </div>
         </div>
 
-        <!-- CARD 4: CATATAN EVALUASI & REALISASI LPJ (HASIL FORUM) -->
+        <!-- CARD 4: CATATAN EVALUASI & REALISASI LPJ (JIKA ADA) -->
         ${currentItem.deskripsiRealisasi ? `
-          <div class="proker-pleno-box" style="background:#f0fdf4;border-color:#86efac;">
-            <div class="proker-pleno-box-header" style="color:#166534;">
-              <span class="material-symbols-outlined" style="font-size:18px;color:#166534;">rate_review</span>
+          <div class="pleno-info-card pleno-lpj-card">
+            <div class="pleno-info-card-header" style="color:#166534;">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#166534;">rate_review</span>
               <span>CATATAN EVALUASI &amp; REALISASI LPJ (HASIL FORUM)</span>
             </div>
-            <div class="proker-pleno-box-body" style="color:#065f46;">
+            <div class="pleno-info-card-body" style="color:#065f46;">
               ${currentItem.deskripsiRealisasi}
             </div>
             ${currentItem.tglRealisasi ? `
-              <div style="font-size:11px;color:#047857;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:4px;">
-                <span class="material-symbols-outlined" style="font-size:14px;">event_available</span>
+              <div class="pleno-lpj-tgl">
+                <span class="material-symbols-outlined" style="font-size:15px;">event_available</span>
                 <span>Tanggal Pelaporan LPJ: ${currentItem.tglRealisasi}</span>
               </div>
             ` : ''}
@@ -1711,9 +1785,9 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
         ` : ''}
       </div>
 
-      <!-- FOOTER SLIDE NAVIGATION (Gambar 3: Sebelumnya, Counter, Selanjutnya) -->
+      <!-- FOOTER SLIDE NAVIGATION -->
       <div class="proker-presentation-footer">
-        <button type="button" class="btn-pleno-prev-clean" id="btnPlenoPrev" ${!prevItem ? 'disabled' : ''} title="Agenda Sebelumnya (Tombol Panah Kiri ←)">
+        <button type="button" class="btn-pleno-nav-dark" id="btnPlenoPrev" ${!prevItem ? 'disabled' : ''} title="Agenda Sebelumnya (Tombol Panah Kiri ←)">
           <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
           <span>Sebelumnya</span>
         </button>
@@ -1725,7 +1799,7 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
           <span>Agenda <strong>${currentIndex + 1}</strong> dari ${list.length}</span>
         </div>
 
-        <button type="button" class="btn-pleno-next-clean" id="btnPlenoNext" ${!nextItem ? 'disabled' : ''} title="Agenda Selanjutnya (Tombol Panah Kanan →)">
+        <button type="button" class="btn-pleno-nav-dark" id="btnPlenoNext" ${!nextItem ? 'disabled' : ''} title="Agenda Selanjutnya (Tombol Panah Kanan →)">
           <span>Selanjutnya</span>
           <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
         </button>
@@ -1758,18 +1832,90 @@ export function renderProkerPresentationModal(prokerId, contextList = null) {
     }
   });
 
-  if (isSuper) {
-    document.getElementById('btnPlenoLpj')?.addEventListener('click', () => {
-      closePlenoPresentation();
-      renderLaporRealisasiModal(currentItem);
-    });
+  // Dropdown controls
+  const statusMenu = document.getElementById('plenoStatusDropdownMenu');
+  const meatballMenu = document.getElementById('plenoMeatballDropdownMenu');
 
-    document.getElementById('btnPlenoEdit')?.addEventListener('click', () => {
+  const closeDropdowns = () => {
+    statusMenu?.classList.add('hidden');
+    meatballMenu?.classList.add('hidden');
+  };
+
+  window._plenoDocClickHandler = (e) => {
+    if (!e.target.closest('.pleno-top-pill-container')) {
+      closeDropdowns();
+    }
+  };
+  document.addEventListener('click', window._plenoDocClickHandler);
+
+  document.getElementById('btnPlenoStatusDrop')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!isSuper) {
+      showToast('Hanya Superadmin / Pengurus Daerah yang memiliki akses mengubah status agenda.', 'warning');
+      return;
+    }
+    meatballMenu?.classList.add('hidden');
+    statusMenu?.classList.toggle('hidden');
+  });
+
+  document.getElementById('btnPlenoMeatball')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    statusMenu?.classList.add('hidden');
+    meatballMenu?.classList.toggle('hidden');
+  });
+
+  // Status option items click
+  const statusItems = overlay.querySelectorAll('#plenoStatusDropdownMenu .pleno-dropdown-item');
+  statusItems.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const targetStatus = btn.getAttribute('data-status');
+      closeDropdowns();
+      if (targetStatus && targetStatus !== currentStatusKey) {
+        showDatabaseLoading();
+        try {
+          const res = await updateProker(currentItem.id, { status: targetStatus });
+          hideDatabaseLoading();
+          if (res && res.success) {
+            showToast(`Status agenda diubah menjadi "${statusLabels[targetStatus] || targetStatus}"`, 'success');
+            currentItem.status = targetStatus;
+            if (contextList) {
+              const idx = contextList.findIndex(x => String(x.id) === String(currentItem.id));
+              if (idx !== -1) contextList[idx].status = targetStatus;
+            }
+            renderProkerPresentationModal(currentItem.id, list);
+            renderInlineProkerWidget();
+            try {
+              renderProkerModal('all', 'all', '', 'timeline', 1, false, currentItem.kategori || currentActiveKategori);
+            } catch (err) {}
+          } else {
+            showToast('Gagal mengubah status: ' + (res?.message || 'Terjadi kesalahan'), 'danger');
+          }
+        } catch (err) {
+          hideDatabaseLoading();
+          showToast('Gagal mengubah status: ' + err.message, 'danger');
+        }
+      }
+    });
+  });
+
+  // Meatball Actions (Edit, LPJ, Hapus)
+  if (isSuper) {
+    document.getElementById('btnPlenoMenuEdit')?.addEventListener('click', (e) => {
+      e.stopPropagation();
       closePlenoPresentation();
       renderAddEditProkerForm(currentItem, currentItem.kategori || currentActiveKategori);
     });
 
-    document.getElementById('btnPlenoDel')?.addEventListener('click', () => {
+    document.getElementById('btnPlenoMenuLpj')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closePlenoPresentation();
+      renderLaporRealisasiModal(currentItem);
+    });
+
+    document.getElementById('btnPlenoMenuDel')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeDropdowns();
       showConfirmModal({
         title: 'Hapus Program Kerja',
         message: `Apakah Anda yakin ingin menghapus program "${currentItem.kegiatan}" dari agenda tahunan?`,
