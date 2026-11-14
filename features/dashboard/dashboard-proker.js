@@ -18,12 +18,15 @@ import {
 import {
   currentUser,
   openModal,
+  closeModal,
   showToast,
   showConfirmModal,
   modalBody,
   showDatabaseLoading,
   hideDatabaseLoading,
-  renderPaginationBar
+  renderPaginationBar,
+  showDashboardView,
+  showDashboardHomePage
 } from './dashboard-common.js';
 
 let appHooks = {
@@ -1302,15 +1305,68 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     `;
   }
 
-  openModal('Program Kerja Tahunan PPG Solo Selatan', 'event_note', `
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      ${categoryTabsHtml}
-      ${bannerNoticeHtml}
-      ${statsHtml}
-      ${filterHtml}
-      ${contentHtml}
-    </div>
-  `, 'wide');
+  const viewContainer = document.getElementById('viewProker');
+  if (viewContainer) {
+    viewContainer.innerHTML = `
+      <!-- Top Bar: Breadcrumb -->
+      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <button type="button" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-[18px]">dashboard</span>
+            <span>Dashboard</span>
+          </button>
+          <span class="text-slate-300 dark:text-slate-600">/</span>
+          <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-blue-600 text-[18px]">assignment</span>
+            Proker PPG
+          </span>
+        </div>
+      </div>
+
+      <!-- Header Hero Banner -->
+      <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-teal-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
+              <span class="material-symbols-outlined text-[14px]">event_note</span>
+              <span>Program Kerja Tahunan PPG &amp; KMM</span>
+            </div>
+            <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Program Kerja PPG Solo Selatan</h1>
+            <p class="text-xs text-blue-100 mt-0.5 leading-relaxed">
+              Monitoring realisasi agenda tahunan, timeline kegiatan, evaluasi pleno, dan pelaporan pertanggungjawaban (LPJ).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Card Body -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-4">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          ${categoryTabsHtml}
+          ${bannerNoticeHtml}
+          ${statsHtml}
+          ${filterHtml}
+          ${contentHtml}
+        </div>
+      </div>
+    `;
+
+    viewContainer.querySelectorAll('.btnBackToDashboardBreadcrumb').forEach(b => {
+      b.addEventListener('click', showDashboardHomePage);
+    });
+  } else {
+    openModal('Program Kerja Tahunan PPG Solo Selatan', 'event_note', `
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        ${categoryTabsHtml}
+        ${bannerNoticeHtml}
+        ${statsHtml}
+        ${filterHtml}
+        ${contentHtml}
+      </div>
+    `, 'wide');
+  }
+
+  const prokerContainer = viewContainer || modalBody;
 
   // Event Listeners
   // 1. Kategori Switcher (PPG vs KMM)
@@ -1405,7 +1461,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // 5. Standar Default Pagination Bar
-  const modalPaginWrap = modalBody.querySelector('#prokerModalPaginationWrap');
+  const modalPaginWrap = prokerContainer.querySelector('#prokerModalPaginationWrap');
   if (modalPaginWrap) {
     renderPaginationBar({
       container: modalPaginWrap,
@@ -1433,7 +1489,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // Aksi Cepat Pergantian Realisasi Proker (Terlaksana / Belum Terlaksana) Langsung Tersimpan
-  modalBody.querySelectorAll('.proker-realisasi-quick-select').forEach(select => {
+  prokerContainer.querySelectorAll('.proker-realisasi-quick-select').forEach(select => {
     select.addEventListener('change', async (e) => {
       const pId = select.dataset.id;
       const newStatus = select.value;
@@ -1446,7 +1502,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // Tombol Detail / Mode Pleno (Menayangkan Agenda Terpilih)
-  modalBody.querySelectorAll('.btn-proker-preview').forEach(btn => {
+  prokerContainer.querySelectorAll('.btn-proker-preview').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const pId = btn.dataset.id;
@@ -1455,7 +1511,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // Tombol Pelaporan LPJ & Realisasi Dana Khusus
-  modalBody.querySelectorAll('.btn-proker-lpj').forEach(btn => {
+  prokerContainer.querySelectorAll('.btn-proker-lpj').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const pId = btn.dataset.id;
@@ -1465,7 +1521,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // Mobile View: Menjadikan seluruh baris proker tombol nyaman di jari yang langsung masuk ke mode pleno
-  modalBody.querySelectorAll('.proker-card-item').forEach(card => {
+  prokerContainer.querySelectorAll('.proker-card-item').forEach(card => {
     card.addEventListener('click', (e) => {
       if (window.innerWidth <= 768) {
         if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del')) {
@@ -1480,7 +1536,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   });
 
   // Accordion Toggle di Desktop: Tampilkan / Sembunyikan Detil Program Kerja
-  modalBody.querySelectorAll('.btn-toggle-proker-detail').forEach(btn => {
+  prokerContainer.querySelectorAll('.btn-toggle-proker-detail').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const card = btn.closest('.proker-card-item');
@@ -1492,7 +1548,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     });
   });
 
-  modalBody.querySelectorAll('.proker-card-header').forEach(header => {
+  prokerContainer.querySelectorAll('.proker-card-header').forEach(header => {
     header.addEventListener('click', (e) => {
       if (e.target.closest('.btn-proker-edit') || e.target.closest('.btn-proker-del') || e.target.closest('.btn-proker-lpj') || e.target.closest('.btn-proker-preview') || e.target.closest('.btn-toggle-proker-detail')) {
         return;
@@ -1520,7 +1576,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     });
   });
 
-  modalBody.querySelectorAll('.btn-proker-edit').forEach(btn => {
+  prokerContainer.querySelectorAll('.btn-proker-edit').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const pId = btn.dataset.id;
@@ -1529,7 +1585,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     });
   });
 
-  modalBody.querySelectorAll('.btn-proker-del').forEach(btn => {
+  prokerContainer.querySelectorAll('.btn-proker-del').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const pId = btn.dataset.id;

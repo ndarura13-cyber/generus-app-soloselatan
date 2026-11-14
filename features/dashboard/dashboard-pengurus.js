@@ -24,7 +24,9 @@ import {
   closeModal,
   showToast,
   showConfirmModal,
-  modalBody
+  modalBody,
+  showDashboardView,
+  showDashboardHomePage
 } from './dashboard-common.js';
 
 let appHooks = {
@@ -411,9 +413,9 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     `;
   }
 
-  openModal(`Struktur Pengurus PPG Solo Selatan (${filtered.length} Pengurus)`, 'diversity_2', 'large');
-  modalBody.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:12px;">
+  const viewContainer = document.getElementById('viewStrukturPengurus');
+  const innerContentHtml = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
 
       <!-- HEADER ACTION BAR: SUBTITLE & SUPERADMIN BUTTON -->
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -423,8 +425,8 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
           </p>
         </div>
         ${isSuper ? `
-          <button type="button" id="btnBukaKelolaSemua" style="padding:6px 12px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:var(--blue);transition:all .15s ease;">
-            <span class="material-symbols-outlined" style="font-size:16px;">manage_accounts</span>
+          <button type="button" id="btnBukaKelolaSemua" style="padding:6px 14px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--blue);transition:all .15s ease;">
+            <span class="material-symbols-outlined" style="font-size:18px;">manage_accounts</span>
             <span>Kelola Hak Akses</span>
           </button>
         ` : ''}
@@ -474,8 +476,8 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
         </select>
       </div>
 
-      <!-- DATA LIST CONTAINER (SMOOTH SCROLL AREA) -->
-      <div style="max-height:48vh;overflow-y:auto;padding-right:2px;" class="custom-scrollbar">
+      <!-- DATA LIST CONTAINER -->
+      <div>
         <!-- 1. Desktop View (2 Columns Grid) -->
         <div class="struktur-desktop-grid">
           ${totalItems > 0 ? desktopCardsHtml : emptyStateHtml}
@@ -493,9 +495,63 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     </div>
   `;
 
+  if (viewContainer) {
+    viewContainer.innerHTML = `
+      <!-- Top Bar: Breadcrumb -->
+      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <button type="button" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-[18px]">dashboard</span>
+            <span>Dashboard</span>
+          </button>
+          <span class="text-slate-300 dark:text-slate-600">/</span>
+          <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-indigo-600 text-[18px]">diversity_2</span>
+            Struktur Pengurus
+          </span>
+        </div>
+      </div>
+
+      <!-- Header Hero Banner with Statistics -->
+      <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
+              <span class="material-symbols-outlined text-[14px]">diversity_2</span>
+              <span>Kepengurusan PPG Solo Selatan</span>
+            </div>
+            <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Struktur Pengurus PPG</h1>
+            <p class="text-xs text-indigo-100 mt-0.5 leading-relaxed">
+              Jajaran Dewan Penasehat, Pengurus Harian (BPH), dan Koordinator 14 Bidang Masa Bakti Berjalan.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/15 text-xs font-bold">
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/80 text-white font-extrabold">${filtered.length} Pengurus</span>
+            <span class="text-indigo-100">&bull;</span>
+            <span class="text-white">${totalAll} Total</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Card Body -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-4">
+        ${innerContentHtml}
+      </div>
+    `;
+
+    viewContainer.querySelectorAll('.btnBackToDashboardBreadcrumb').forEach(b => {
+      b.addEventListener('click', showDashboardHomePage);
+    });
+  } else {
+    openModal(`Struktur Pengurus PPG Solo Selatan (${filtered.length} Pengurus)`, 'diversity_2', 'large');
+    modalBody.innerHTML = innerContentHtml;
+  }
+
+  const container = viewContainer || modalBody;
+
   // Attach Event Listeners
   // 1. Tab buttons
-  document.querySelectorAll('.struktur-tab-btn').forEach(btn => {
+  container.querySelectorAll('.struktur-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
       renderStrukturDaerahModal(tab, searchQuery, filterDesa, isFilterOpen, 1);
@@ -536,10 +592,10 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   });
 
   // 6. Mobile accordion card toggle
-  document.querySelectorAll('.btn-toggle-struktur-card').forEach(header => {
+  container.querySelectorAll('.btn-toggle-struktur-card').forEach(header => {
     header.addEventListener('click', () => {
       const idx = header.dataset.idx;
-      const card = document.querySelector(`.struktur-mobile-card[data-idx="${idx}"]`);
+      const card = container.querySelector(`.struktur-mobile-card[data-idx="${idx}"]`);
       if (card) {
         card.classList.toggle('open');
       }
@@ -554,13 +610,12 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   }
 
   // 8. Pagination buttons
-  modalBody.querySelectorAll('.struktur-page-btn').forEach(btn => {
+  container.querySelectorAll('.struktur-page-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const pNum = parseInt(btn.dataset.page, 10);
       if (pNum && pNum >= 1 && pNum <= totalPages && pNum !== currentPage) {
         renderStrukturDaerahModal(activeTab, searchQuery, filterDesa, isFilterOpen, pNum);
-        const scrollArea = modalBody.querySelector('.custom-scrollbar');
-        if (scrollArea) scrollArea.scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
   });

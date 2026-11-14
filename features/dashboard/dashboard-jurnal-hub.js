@@ -14,7 +14,9 @@ import {
   MASTER_WILAYAH,
   openModal,
   closeModal,
-  showToast
+  showToast,
+  showDashboardView,
+  showDashboardHomePage
 } from './dashboard-common.js';
 
 import {
@@ -107,32 +109,11 @@ export function showJurnalKbmPage(preferredJenjang = null) {
   }
 
   initWilayahFilters();
-
-  const viewHome = document.getElementById('viewDashboardHome');
-  const viewKbm = document.getElementById('viewJurnalKbm');
-
-  if (viewHome && viewKbm) {
-    viewHome.classList.add('hidden');
-    viewKbm.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
+  showDashboardView('viewJurnalKbm');
   renderJurnalKbmPageView();
 }
 
-/**
- * Kembali ke Tampilan Dashboard Utama
- */
-export function showDashboardHomePage() {
-  const viewHome = document.getElementById('viewDashboardHome');
-  const viewKbm = document.getElementById('viewJurnalKbm');
-
-  if (viewHome && viewKbm) {
-    viewKbm.classList.add('hidden');
-    viewHome.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-}
+export { showDashboardHomePage };
 
 /**
  * Render elemen dinamis pada Halaman Jurnal KBM
@@ -207,7 +188,7 @@ export function renderJurnalKbmPageView() {
     <!-- Top Bar: Breadcrumb -->
     <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
       <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
-        <button type="button" id="btnBackToDashboardBreadcrumb" class="hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
+        <button type="button" id="btnBackToDashboardBreadcrumb" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
           <span class="material-symbols-outlined text-[18px]">dashboard</span>
           <span>Dashboard</span>
         </button>

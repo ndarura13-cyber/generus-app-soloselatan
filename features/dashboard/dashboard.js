@@ -30,7 +30,9 @@ import {
   closeModal,
   showConfirmModal,
   renderKontakModal,
-  modalBody
+  modalBody,
+  showDashboardView,
+  showDashboardHomePage
 } from './dashboard-common.js';
 
 import {
@@ -526,6 +528,11 @@ btnKontakDesa?.addEventListener('click', () => {
 });
 
 /* ── 5. Centralized Database-Aware Menu Openers with Visual Loading Feedback ── */
+export const openDashboardHome = () => {
+  closeModal();
+  showDashboardView('viewDashboardHome');
+};
+
 const openMenuSiswa = async () => {
   showDatabaseLoading('Loading Database', 'Mengambil data generus terbaru...');
   try {
@@ -534,6 +541,8 @@ const openMenuSiswa = async () => {
     console.warn('Sync Siswa error:', err);
   } finally {
     hideDatabaseLoading();
+    closeModal();
+    showDashboardView('viewDatabaseGenerus');
     renderSiswaModal();
   }
 };
@@ -546,7 +555,23 @@ const openMenuProker = async () => {
     console.warn('Sync Proker error:', err);
   } finally {
     hideDatabaseLoading();
+    closeModal();
+    showDashboardView('viewProker');
     renderProkerModal('all', 'all', '', 'timeline', 1, false);
+  }
+};
+
+const openMenuStruktur = async () => {
+  showDatabaseLoading('Loading Database', 'Mengambil data struktur pengurus...');
+  try {
+    if (isSupabaseConfigured()) await syncPengurusFromSupabase();
+  } catch (err) {
+    console.warn('Sync Pengurus error:', err);
+  } finally {
+    hideDatabaseLoading();
+    closeModal();
+    showDashboardView('viewStrukturPengurus');
+    renderStrukturDaerahModal();
   }
 };
 
@@ -588,6 +613,8 @@ export const openMenuJurnalKbm = async (preferredJenjang = null) => {
     console.warn('Sync Jurnal KBM error:', err);
   } finally {
     hideDatabaseLoading();
+    closeModal();
+    showDashboardView('viewJurnalKbm');
     showJurnalKbmPage(preferredJenjang);
   }
 };
@@ -608,7 +635,7 @@ const openMenuPengurus = async (filterMode = 'all') => {
 btnMenuSiswa?.addEventListener('click', openMenuSiswa);
 btnMenuProker?.addEventListener('click', openMenuProker);
 btnMenuJurnalKbm?.addEventListener('click', () => openMenuJurnalKbm());
-btnMenuStrukturDaerah?.addEventListener('click', () => renderStrukturDaerahModal());
+btnMenuStrukturDaerah?.addEventListener('click', openMenuStruktur);
 btnMenuPengurus?.addEventListener('click', () => openMenuPengurus('all'));
 btnApprovalList?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnOpenApprovalModal')?.addEventListener('click', () => renderApprovalListModal());
@@ -624,10 +651,11 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
 (function setupNavigation() {
   // Desktop Sidebar Listeners
   document.getElementById('sideBtnLogout')?.addEventListener('click', doLogout);
+  document.getElementById('sideBtnDashboardHome')?.addEventListener('click', openDashboardHome);
   document.getElementById('sideBtnSiswa')?.addEventListener('click', openMenuSiswa);
   document.getElementById('sideBtnProker')?.addEventListener('click', openMenuProker);
   document.getElementById('sideBtnJurnalKbm')?.addEventListener('click', () => openMenuJurnalKbm());
-  document.getElementById('sideBtnStruktur')?.addEventListener('click', () => { renderStrukturDaerahModal(); });
+  document.getElementById('sideBtnStruktur')?.addEventListener('click', openMenuStruktur);
   document.getElementById('sideBtnPengurus')?.addEventListener('click', () => openMenuPengurus('all'));
   document.getElementById('sideBtnProfil')?.addEventListener('click', () => { renderSelfProfileModal(); });
 
@@ -654,7 +682,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
     window.location.href = '../../index.html';
   });
   mobNavJurnalKbm?.addEventListener('click', () => { openMenuJurnalKbm(); });
-  mobNavPengurus?.addEventListener('click', () => { renderStrukturDaerahModal(); });
+  mobNavPengurus?.addEventListener('click', openMenuStruktur);
   mobNavProfil?.addEventListener('click', () => { renderSelfProfileModal(); });
   mobNavLogout?.addEventListener('click', doLogout);
 
@@ -676,10 +704,11 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
 
   // Mobile Drop-Up Actions (4 Komponen Utama & Profil)
+  document.getElementById('mobBtnDashboardHome')?.addEventListener('click', () => { toggleDropUp(); openDashboardHome(); });
   document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); openMenuSiswa(); });
   document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); openMenuProker(); });
   document.getElementById('mobBtnJurnalKbm')?.addEventListener('click', () => { toggleDropUp(); openMenuJurnalKbm(); });
-  document.getElementById('mobBtnStruktur')?.addEventListener('click', () => { toggleDropUp(); renderStrukturDaerahModal(); });
+  document.getElementById('mobBtnStruktur')?.addEventListener('click', () => { toggleDropUp(); openMenuStruktur(); });
   document.getElementById('mobBtnProfilMenu')?.addEventListener('click', () => { toggleDropUp(); renderSelfProfileModal(); });
 
   const btnToggleSidebar = document.getElementById('btnToggleSidebar');
@@ -713,6 +742,10 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   });
 
   // Action listeners untuk menu flyout saat sidebar collapsed (4 Komponen Utama)
+  document.getElementById('flyBtnDashboardHome')?.addEventListener('click', () => {
+    sideFiturFlyout?.classList.add('hidden');
+    openDashboardHome();
+  });
   document.getElementById('flyBtnSiswa')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
     openMenuSiswa();
@@ -727,7 +760,7 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   });
   document.getElementById('flyBtnStruktur')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
-    renderStrukturDaerahModal();
+    openMenuStruktur();
   });
   document.getElementById('flyBtnKelolaPengurus')?.addEventListener('click', () => {
     sideFiturFlyout?.classList.add('hidden');
@@ -737,6 +770,13 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', () => rende
   // Backup listener for Kelola Program in Dashboard widget
   document.getElementById('btnKelolaProkerDashboard')?.addEventListener('click', () => {
     openMenuProker();
+  });
+
+  // Global listener for breadcrumb back button across all full page views
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.btnBackToDashboardBreadcrumb')) {
+      openDashboardHome();
+    }
   });
 
   window.addEventListener('keydown', (e) => {

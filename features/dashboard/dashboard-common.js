@@ -228,6 +228,34 @@ export function closeModal() {
 
 btnCloseModal?.addEventListener('click', closeModal);
 
+/* ── 4. Central In-Dashboard Full Page View Management ─────── */
+export function showDashboardView(viewId) {
+  const allViews = [
+    'viewDashboardHome',
+    'viewDatabaseGenerus',
+    'viewProker',
+    'viewJurnalKbm',
+    'viewStrukturPengurus'
+  ];
+
+  allViews.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (id === viewId) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+export function showDashboardHomePage() {
+  showDashboardView('viewDashboardHome');
+}
+
 /**
  * Deteksi apakah modal saat ini merupakan form pembuatan / pengeditan data
  * yang melibatkan input dari pengguna. Jika ya, blokir penutupan tidak sengaja

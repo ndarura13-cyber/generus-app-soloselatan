@@ -27,7 +27,9 @@ import {
   showToast,
   showConfirmModal,
   modalBody,
-  renderPaginationBar
+  renderPaginationBar,
+  showDashboardView,
+  showDashboardHomePage
 } from './dashboard-common.js';
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -546,7 +548,57 @@ export function renderSiswaModal() {
     </div>
   `;
 
-  openModal(`Database Generus (${activeCount} Aktif / ${totalCount} Total)`, 'database', modalHtml, 'wide');
+  const viewContainer = document.getElementById('viewDatabaseGenerus');
+  if (viewContainer) {
+    viewContainer.innerHTML = `
+      <!-- Top Bar: Breadcrumb -->
+      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <button type="button" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-[18px]">dashboard</span>
+            <span>Dashboard</span>
+          </button>
+          <span class="text-slate-300 dark:text-slate-600">/</span>
+          <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-purple-600 text-[18px]">database</span>
+            Database Generus
+          </span>
+        </div>
+      </div>
+
+      <!-- Header Hero Banner with Statistics -->
+      <div class="bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
+              <span class="material-symbols-outlined text-[14px]">groups</span>
+              <span>Pusat Data Generus Solo Selatan</span>
+            </div>
+            <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Database Generus</h1>
+            <p class="text-xs text-purple-100 mt-0.5 leading-relaxed">
+              Data profil santri, jenjang pembinaan, mutasi sambung, dan monitoring usia generasi penerus se-Daerah Solo Selatan.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/15 text-xs font-bold">
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/80 text-white font-extrabold">${activeCount} Aktif</span>
+            <span class="text-purple-100">&bull;</span>
+            <span class="text-white">${totalCount} Total Generus</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Card Body -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-4">
+        ${modalHtml}
+      </div>
+    `;
+
+    viewContainer.querySelectorAll('.btnBackToDashboardBreadcrumb').forEach(b => {
+      b.addEventListener('click', showDashboardHomePage);
+    });
+  } else {
+    openModal(`Database Generus (${activeCount} Aktif / ${totalCount} Total)`, 'database', modalHtml, 'wide');
+  }
 
   // Attach Filter Listeners
   document.getElementById('inputSiswaSearch').addEventListener('input', (e) => {
