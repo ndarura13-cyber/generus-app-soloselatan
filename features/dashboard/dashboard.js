@@ -71,8 +71,7 @@ import {
 } from './dashboard-kbm.js';
 
 import {
-  showJurnalKbmPage,
-  showDashboardHomePage
+  showJurnalKbmPage
 } from './dashboard-jurnal-hub.js';
 
 // DOM Elements
