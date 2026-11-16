@@ -47,7 +47,7 @@ export const JENJANG_CONFIG = {
   },
   gp_reguler: {
     id: 'gp_reguler',
-    label: 'GP Reguler (Remaja Awal / SMP - SMA)',
+    label: 'GP Reguler (Pra-remaja / SMP - SMA)',
     badge: 'GP Reguler',
     color: 'var(--blue)',
     bg: 'var(--blue-light)',
@@ -63,13 +63,35 @@ export const JENJANG_CONFIG = {
   },
   remaja: {
     id: 'remaja',
-    label: 'Remaja & Dewasa (Muda-Mudi & Pra-Nikah)',
+    label: 'Remaja (Termasuk 1 - 3 SMP, SMA & Pra-Nikah)',
     badge: 'Remaja',
     color: '#7c3aed',
     bg: '#f3e8ff',
-    kelas: ['Mahasiswa', 'Bekerja', 'Kelas Remaja', 'Pra-Nikah', 'Lainnya']
+    kelas: ['1 SMP', '2 SMP', '3 SMP', '1 SMA', '2 SMA', '3 SMA', 'Mahasiswa', 'Bekerja', 'Kelas Remaja', 'Pra-Nikah', 'Lainnya']
   }
 };
+
+/**
+ * Helper terpadu pengecekan kecocokan santri dengan filter jenjang
+ * Sesuai aturan: kategori Remaja mencakup kelas 1 - 3 SMP di seluruh penyortiran
+ */
+export function isSiswaMatchJenjang(s, jenjangKey) {
+  if (!s || !jenjangKey || jenjangKey === 'all') return true;
+  if (jenjangKey === 'caberawit') return s.kategori_usia === 'caberawit';
+  if (jenjangKey === 'gp_reguler') return s.kategori_usia === 'gp_reguler';
+  if (jenjangKey === 'pra_nikah') {
+    const u = calculateUmur(s.tanggal_lahir);
+    const isPraNikahAge = u >= 19 && u <= 22;
+    const isPraNikahClass = s.jenjang_kelas === 'Pra-Nikah' || s.jenjang_kelas === '19-22 Tahun';
+    const isPraNikahKat = s.kategori_usia === 'pra_nikah';
+    return isPraNikahAge || isPraNikahClass || isPraNikahKat;
+  }
+  if (jenjangKey === 'remaja') {
+    const isSmp = s.jenjang_kelas === '1 SMP' || s.jenjang_kelas === '2 SMP' || s.jenjang_kelas === '3 SMP' || (s.jenjang_kelas && s.jenjang_kelas.includes('SMP'));
+    return s.kategori_usia === 'remaja' || isSmp;
+  }
+  return s.kategori_usia === jenjangKey;
+}
 
 export function getKelasFilterOptions(selectedJenjang, selectedKelas = 'all') {
   let classes = [];
@@ -122,7 +144,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 
   const cabList = activeSiswa.filter(s => (s.kategori_usia || '').toLowerCase() === 'caberawit');
   const gpList = activeSiswa.filter(s => (s.kategori_usia || '').toLowerCase() === 'gp_reguler');
-  const remList = activeSiswa.filter(s => (s.kategori_usia || '').toLowerCase() === 'remaja');
+  const remList = activeSiswa.filter(s => isSiswaMatchJenjang(s, 'remaja'));
 
   const catMeta = {
     all: {
@@ -424,10 +446,10 @@ export function buildSiswaDrawerContentHtml(prefix = 'dt') {
     {
       id: 'remaja',
       label: 'Remaja & Dewasa',
-      sub: 'SMA, Mahasiswa, Usia Mandiri',
+      sub: 'Termasuk 1 - 3 SMP, SMA, Mahasiswa & Mandiri',
       badge: 'Remaja',
       color: 'purple',
-      classes: ['1 SMA', '2 SMA', '3 SMA', 'Mahasiswa', 'Bekerja', 'Kelas Remaja', 'Usia Mandiri', 'Lainnya']
+      classes: ['1 SMP', '2 SMP', '3 SMP', '1 SMA', '2 SMA', '3 SMA', 'Mahasiswa', 'Bekerja', 'Kelas Remaja', 'Pra-Nikah', 'Lainnya']
     }
   ];
 
@@ -839,6 +861,7 @@ export function renderActiveSiswaFilterChips() {
   }
 
   if (chips.length > 0) {
+    container.classList.remove('hidden');
     container.innerHTML = `
       <div class="flex items-center gap-1.5 flex-wrap">
         <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1">Filter Aktif:</span>
@@ -846,9 +869,8 @@ export function renderActiveSiswaFilterChips() {
       </div>
     `;
   } else {
-    container.innerHTML = `
-      <span class="text-[11px] text-slate-400 dark:text-slate-500 italic">Tidak ada filter aktif (menampilkan seluruh data sesuai hak akses wilayah).</span>
-    `;
+    container.classList.add('hidden');
+    container.innerHTML = '';
   }
 
   // Attach chip remove listeners
@@ -894,7 +916,12 @@ export function renderActiveSiswaFilterChips() {
 export function updateSiswaFilterUI() {
   const activeCount = countActiveSiswaFilters();
 
-  // Badges
+  // Badges & Active States
+  const btnOpenFilterDrawer = document.getElementById('btnOpenFilterDrawer');
+  if (btnOpenFilterDrawer) {
+    btnOpenFilterDrawer.classList.toggle('has-active', activeCount > 0);
+  }
+
   const filterActiveBadge = document.getElementById('filterActiveBadge');
   if (filterActiveBadge) {
     filterActiveBadge.textContent = activeCount;
@@ -980,12 +1007,27 @@ export function renderSiswaModal() {
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:14px;">
 
-      <!-- BARIS 1: PENCARIAN & AKSI CEPAT (TAMBAH, EXPORT, IMPORT, KENAIKAN) -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
-        <!-- Search bar -->
-        <div class="relative flex-1 max-w-md">
-          <input type="text" id="inputSiswaSearch" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" value="${currentSiswaFilter.search}" placeholder="Cari nama, NIS, atau kelompok..." />
-          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+      <!-- BARIS 1: PENCARIAN & FILTER GROUP + AKSI CEPAT -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+        <!-- Search bar + Unified Filter/Reset Group -->
+        <div class="flex items-center gap-2 flex-1 w-full max-w-xl">
+          <div class="relative flex-1">
+            <input type="text" id="inputSiswaSearch" class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" value="${currentSiswaFilter.search}" placeholder="Cari nama, NIS, atau kelompok..." />
+            <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+          </div>
+
+          <!-- Unified Bordered Filter + Reset Button Group -->
+          <div class="filter-btn-group shrink-0">
+            <button type="button" id="btnOpenFilterDrawer" class="filter-btn-group-btn" title="Buka Panel Filter Generus">
+              <span class="material-symbols-outlined text-[17px]">tune</span>
+              <span>Filter</span>
+              <span id="filterActiveBadge" class="filter-badge hidden">0</span>
+            </button>
+            <div class="filter-btn-group-divider"></div>
+            <button type="button" id="btnResetAllFilters" class="filter-btn-group-reset" title="Reset Semua Filter">
+              <span class="material-symbols-outlined text-[17px]">restart_alt</span>
+            </button>
+          </div>
         </div>
 
         <!-- Action Buttons -->
@@ -1022,6 +1064,11 @@ export function renderSiswaModal() {
         </div>
       </div>
 
+      <!-- Active Filter Tags / Chips (Hanya muncul jika ada filter aktif) -->
+      <div id="filterActiveChipsContainer" class="flex items-center gap-1.5 flex-wrap -mt-1 empty:hidden">
+        <!-- Rendered dynamically -->
+      </div>
+
       <!-- BULK ACTION BAR -->
       <div id="bulkActionSiswaBar" class="bulk-action-bar" style="display:none;">
         <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:12.5px;">
@@ -1036,55 +1083,6 @@ export function renderSiswaModal() {
             <span class="material-symbols-outlined" style="font-size:16px;">delete_sweep</span>
             Hapus Terpilih
           </button>
-        </div>
-      </div>
-
-      <!-- MULTI-LEVEL FILTER BAR TEMPLATE -->
-      <div class="filter-bar-shell">
-        <!-- Top row: Primary filter button + Quick chips + Reset -->
-        <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-0.5">
-          <div class="flex items-center gap-2 shrink-0">
-            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 hidden sm:inline">Filter:</span>
-            
-            <!-- Primary Filter Pill -->
-            <button type="button" id="btnOpenFilterDrawer" class="filter-main-btn" title="Buka Panel Filter Lengkap">
-              <span class="material-symbols-outlined text-[17px]">tune</span>
-              <span>Filter</span>
-              <span id="filterActiveBadge" class="filter-badge hidden">0</span>
-            </button>
-
-            <!-- Quick Filter Chips -->
-            <button type="button" class="filter-quick-chip" data-quick-filter="jenjang" title="Pilih Jenjang">
-              <span>Jenjang: <strong id="quickChipJenjang">Semua</strong></span>
-              <span class="material-symbols-outlined text-[16px]">expand_more</span>
-            </button>
-
-            <button type="button" class="filter-quick-chip" data-quick-filter="wilayah" title="Pilih Wilayah">
-              <span>Wilayah: <strong id="quickChipWilayah">Semua</strong></span>
-              <span class="material-symbols-outlined text-[16px]">expand_more</span>
-            </button>
-
-            <button type="button" class="filter-quick-chip" data-quick-filter="status" title="Pilih Status">
-              <span>Status: <strong id="quickChipStatus">Semua</strong></span>
-              <span class="material-symbols-outlined text-[16px]">expand_more</span>
-            </button>
-
-            <button type="button" class="filter-quick-chip" data-quick-filter="gender" title="Pilih Gender">
-              <span>Gender: <strong id="quickChipGender">Semua</strong></span>
-              <span class="material-symbols-outlined text-[16px]">expand_more</span>
-            </button>
-          </div>
-
-          <!-- Reset All -->
-          <button type="button" id="btnResetAllFilters" class="filter-reset-link" title="Reset Semua Kriteria Filter">
-            <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-            <span>Reset Filter</span>
-          </button>
-        </div>
-
-        <!-- Active Filter Tags / Chips -->
-        <div id="filterActiveChipsContainer" class="pt-1 border-t border-slate-200/70 dark:border-slate-700/70 min-h-[26px]">
-          <!-- Rendered dynamically -->
         </div>
       </div>
 
@@ -1445,16 +1443,9 @@ export function exportGenerusToExcel(filteredOnly = false) {
       if (currentSiswaFilter.status !== 'all' && s.status_sambung !== currentSiswaFilter.status) return false;
       if (currentSiswaFilter.desa !== 'all' && s.desa_id !== currentSiswaFilter.desa) return false;
       if (currentSiswaFilter.kelompok !== 'all' && s.kelompok_id !== currentSiswaFilter.kelompok) return false;
+      // Kategori Jenjang Usia (Remaja mencakup 1 - 3 SMP)
       if (currentSiswaFilter.jenjang !== 'all') {
-        if (currentSiswaFilter.jenjang === 'pra_nikah') {
-          const u = calculateUmur(s.tanggal_lahir);
-          const isPraNikahAge = u >= 19 && u <= 22;
-          const isPraNikahClass = s.jenjang_kelas === 'Pra-Nikah' || s.jenjang_kelas === '19-22 Tahun';
-          const isPraNikahKat = s.kategori_usia === 'pra_nikah';
-          if (!isPraNikahAge && !isPraNikahClass && !isPraNikahKat) return false;
-        } else if (s.kategori_usia !== currentSiswaFilter.jenjang) {
-          return false;
-        }
+        if (!isSiswaMatchJenjang(s, currentSiswaFilter.jenjang)) return false;
       }
       if (currentSiswaFilter.kelas && currentSiswaFilter.kelas !== 'all') {
         if (Array.isArray(currentSiswaFilter.kelas)) {
@@ -2526,17 +2517,9 @@ export function renderSiswaTableRows() {
     if (currentSiswaFilter.desa !== 'all' && s.desa_id !== currentSiswaFilter.desa) return false;
     if (currentSiswaFilter.kelompok !== 'all' && s.kelompok_id !== currentSiswaFilter.kelompok) return false;
     
-    // Kategori Jenjang Usia (Termasuk Pra Nikah)
+    // Kategori Jenjang Usia (Remaja mencakup 1 - 3 SMP)
     if (currentSiswaFilter.jenjang !== 'all') {
-      if (currentSiswaFilter.jenjang === 'pra_nikah') {
-        const u = calculateUmur(s.tanggal_lahir);
-        const isPraNikahAge = u >= 19 && u <= 22;
-        const isPraNikahClass = s.jenjang_kelas === 'Pra-Nikah' || s.jenjang_kelas === '19-22 Tahun';
-        const isPraNikahKat = s.kategori_usia === 'pra_nikah';
-        if (!isPraNikahAge && !isPraNikahClass && !isPraNikahKat) return false;
-      } else if (s.kategori_usia !== currentSiswaFilter.jenjang) {
-        return false;
-      }
+      if (!isSiswaMatchJenjang(s, currentSiswaFilter.jenjang)) return false;
     }
 
     // Tingkat / Kelas Terpilih

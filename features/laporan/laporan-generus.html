@@ -738,7 +738,14 @@
       let filtered = allSiswa.filter(s => {
         if (currentFilter.desa !== 'all' && s.desa_id !== currentFilter.desa) return false;
         if (currentFilter.kelompok !== 'all' && s.kelompok_id !== currentFilter.kelompok) return false;
-        if (currentFilter.jenjang !== 'all' && s.kategori_usia !== currentFilter.jenjang) return false;
+        if (currentFilter.jenjang !== 'all') {
+          const isSmp = s.jenjang_kelas === '1 SMP' || s.jenjang_kelas === '2 SMP' || s.jenjang_kelas === '3 SMP' || (s.jenjang_kelas && s.jenjang_kelas.includes('SMP'));
+          if (currentFilter.jenjang === 'remaja') {
+            if (s.kategori_usia !== 'remaja' && !isSmp) return false;
+          } else if (s.kategori_usia !== currentFilter.jenjang) {
+            return false;
+          }
+        }
         if (currentFilter.status !== 'all' && s.status_sambung !== currentFilter.status) return false;
         return true;
       });
@@ -921,7 +928,14 @@
       let filtered = allSiswa.filter(s => {
         if (currentFilter.desa !== 'all' && s.desa_id !== currentFilter.desa) return false;
         if (currentFilter.kelompok !== 'all' && s.kelompok_id !== currentFilter.kelompok) return false;
-        if (currentFilter.jenjang !== 'all' && s.kategori_usia !== currentFilter.jenjang) return false;
+        if (currentFilter.jenjang !== 'all') {
+          const isSmp = s.jenjang_kelas === '1 SMP' || s.jenjang_kelas === '2 SMP' || s.jenjang_kelas === '3 SMP' || (s.jenjang_kelas && s.jenjang_kelas.includes('SMP'));
+          if (currentFilter.jenjang === 'remaja') {
+            if (s.kategori_usia !== 'remaja' && !isSmp) return false;
+          } else if (s.kategori_usia !== currentFilter.jenjang) {
+            return false;
+          }
+        }
         if (currentFilter.status !== 'all' && s.status_sambung !== currentFilter.status) return false;
         return true;
       });

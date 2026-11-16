@@ -654,6 +654,126 @@ export function getProkerYear(p) {
   return '2026';
 }
 
+export function toggleProkerFilterDrawer(open) {
+  const desktopDrawer = document.getElementById('filterProkerDesktopDrawer');
+  const mobileSheet = document.getElementById('filterProkerMobileBottomSheet');
+  const backdrop = document.getElementById('filterProkerOverlayBackdrop');
+  if (desktopDrawer) desktopDrawer.classList.toggle('active', open);
+  if (mobileSheet) mobileSheet.classList.toggle('active', open);
+  if (backdrop) backdrop.classList.toggle('active', open);
+  if (open) {
+    document.body.classList.add('filter-drawer-open');
+  } else {
+    document.body.classList.remove('filter-drawer-open');
+  }
+}
+
+/**
+ * Konten Form Filter Proker (Accordion Kategori, Tahun, Status, Bidang)
+ */
+function buildProkerDrawerContentHtml(prefix, filterTahun, filterStatus, filterBidang, activeKategori, availableYears) {
+  const isKmm = activeKategori === 'KMM';
+  const bidangList = isKmm ? DAFTAR_SUB_BIDANG_KMM : DAFTAR_BIDANG_PPG;
+
+  return `
+    <div class="p-4 space-y-4 text-xs">
+      <!-- 1. KATEGORI PROGRAM KERJA -->
+      <div class="filter-accordion-item open" id="accordionProkerKategori_${prefix}">
+        <button type="button" class="filter-accordion-header" data-toggle-accordion>
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-blue-600 dark:text-blue-400">category</span>
+            <span>1. Kategori Program Kerja</span>
+          </span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400 arrow-icon">expand_more</span>
+        </button>
+        <div class="filter-accordion-content space-y-2">
+          <label class="flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-colors ${!isKmm ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-900/30 font-bold' : 'border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-800'}">
+            <div class="flex items-center gap-2.5">
+              <input type="radio" name="prokerKategoriRadio_${prefix}" value="PPG" ${!isKmm ? 'checked' : ''} class="w-4 h-4 text-blue-600 cursor-pointer" />
+              <div>
+                <div class="font-bold text-slate-800 dark:text-white">Program Kerja PPG</div>
+                <div class="text-[10.5px] text-slate-500 dark:text-slate-400">12 Bidang PPG Solo Selatan</div>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">PPG</span>
+          </label>
+
+          <label class="flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-colors ${isKmm ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-900/30 font-bold' : 'border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-800'}">
+            <div class="flex items-center gap-2.5">
+              <input type="radio" name="prokerKategoriRadio_${prefix}" value="KMM" ${isKmm ? 'checked' : ''} class="w-4 h-4 text-blue-600 cursor-pointer" />
+              <div>
+                <div class="font-bold text-slate-800 dark:text-white">Bidang KMM (Muda-Mudi)</div>
+                <div class="text-[10.5px] text-slate-500 dark:text-slate-400">9 Divisi Komunitas Muda-Mudi</div>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">KMM</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 2. TAHUN PELAKSANAAN -->
+      <div class="filter-accordion-item open" id="accordionProkerTahun_${prefix}">
+        <button type="button" class="filter-accordion-header" data-toggle-accordion>
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-amber-600 dark:text-amber-400">calendar_today</span>
+            <span>2. Tahun Pelaksanaan</span>
+          </span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400 arrow-icon">expand_more</span>
+        </button>
+        <div class="filter-accordion-content">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button type="button" class="filter-radio-pill ${filterTahun === 'all' ? 'selected' : ''}" data-proker-tahun="all">Semua Tahun</button>
+            ${availableYears.map(y => `
+              <button type="button" class="filter-radio-pill ${String(filterTahun) === String(y) ? 'selected' : ''}" data-proker-tahun="${y}">Tahun ${y}</button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. STATUS PROGRAM KERJA -->
+      <div class="filter-accordion-item open" id="accordionProkerStatus_${prefix}">
+        <button type="button" class="filter-accordion-header" data-toggle-accordion>
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-emerald-600 dark:text-emerald-400">flag</span>
+            <span>3. Status Program Kerja</span>
+          </span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400 arrow-icon">expand_more</span>
+        </button>
+        <div class="filter-accordion-content">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button type="button" class="filter-radio-pill ${filterStatus === 'all' ? 'selected' : ''}" data-proker-status="all">Semua Status</button>
+            <button type="button" class="filter-radio-pill ${filterStatus === 'ongoing' ? 'selected' : ''}" data-proker-status="ongoing">Sedang Berlangsung</button>
+            <button type="button" class="filter-radio-pill ${filterStatus === 'upcoming' ? 'selected' : ''}" data-proker-status="upcoming">Akan Datang</button>
+            <button type="button" class="filter-radio-pill ${filterStatus === 'planned' ? 'selected' : ''}" data-proker-status="planned">Direncanakan</button>
+            <button type="button" class="filter-radio-pill ${filterStatus === 'done' ? 'selected' : ''}" data-proker-status="done">Selesai</button>
+            <button type="button" class="filter-radio-pill ${filterStatus === 'terlaksana' ? 'selected' : ''}" data-proker-status="terlaksana">Terlaksana (LPJ)</button>
+            <button type="button" class="filter-radio-pill ${filterStatus === 'belum_terlaksana' ? 'selected' : ''}" data-proker-status="belum_terlaksana">Belum Terlaksana</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. BIDANG / PENANGGUNG JAWAB -->
+      <div class="filter-accordion-item open" id="accordionProkerBidang_${prefix}">
+        <button type="button" class="filter-accordion-header" data-toggle-accordion>
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-purple-600 dark:text-purple-400">group_work</span>
+            <span>4. ${isKmm ? 'Divisi KMM' : 'Bidang PPG'}</span>
+          </span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400 arrow-icon">expand_more</span>
+        </button>
+        <div class="filter-accordion-content space-y-2">
+          <select id="selectProkerDrawerBidang_${prefix}" class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>-- Semua ${isKmm ? 'Divisi KMM' : 'Bidang PPG'} --</option>
+            ${bidangList.map(b => `
+              <option value="${b}" ${filterBidang === b ? 'selected' : ''}>${isKmm ? 'Divisi ' : 'Bidang '}${b}</option>
+            `).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export async function renderProkerModal(filterBidang = 'all', filterStatus = 'all', searchQuery = '', activeTab = 'timeline', currentPage = 1, shouldSync = true, activeKategori = currentActiveKategori, filterTahun = 'all') {
   // Update state kategori aktif
   currentActiveKategori = activeKategori === 'KMM' ? 'KMM' : 'PPG';
@@ -881,58 +1001,155 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     </div>
   `;
 
-  // Filter Bar
-  const bidangOptions = isKmmActive
-    ? DAFTAR_SUB_BIDANG_KMM.map(sb =>
-      `<option value="${sb}" ${filterBidang === sb ? 'selected' : ''}>Divisi ${sb}</option>`
-    ).join('')
-    : DAFTAR_BIDANG_PPG.map(b =>
-      `<option value="${b}" ${filterBidang === b ? 'selected' : ''}>Bidang ${b}</option>`
-    ).join('');
+  // Active Filter Count & Tags
+  const activeChips = [];
+  if (filterTahun !== 'all') {
+    activeChips.push(`
+      <span class="filter-active-chip">
+        <span>Tahun: <strong>${filterTahun}</strong></span>
+        <button type="button" data-remove-proker-filter="tahun" title="Hapus filter tahun">
+          <span class="material-symbols-outlined text-[13px]">close</span>
+        </button>
+      </span>
+    `);
+  }
+  if (filterStatus !== 'all') {
+    const statusLabels = {
+      ongoing: 'Sedang Berlangsung',
+      upcoming: 'Akan Datang',
+      planned: 'Direncanakan',
+      done: 'Selesai',
+      terlaksana: 'Terlaksana (LPJ)',
+      belum_terlaksana: 'Belum Terlaksana'
+    };
+    activeChips.push(`
+      <span class="filter-active-chip">
+        <span>Status: <strong>${statusLabels[filterStatus] || filterStatus}</strong></span>
+        <button type="button" data-remove-proker-filter="status" title="Hapus filter status">
+          <span class="material-symbols-outlined text-[13px]">close</span>
+        </button>
+      </span>
+    `);
+  }
+  if (filterBidang !== 'all') {
+    activeChips.push(`
+      <span class="filter-active-chip">
+        <span>${isKmmActive ? 'Divisi' : 'Bidang'}: <strong>${filterBidang}</strong></span>
+        <button type="button" data-remove-proker-filter="bidang" title="Hapus filter bidang">
+          <span class="material-symbols-outlined text-[13px]">close</span>
+        </button>
+      </span>
+    `);
+  }
 
-  const bidangAllLabel = isKmmActive ? 'Semua Sub-Bidang KMM (9 Divisi)' : 'Semua Bidang PPG (12 Bidang)';
+  const activeFilterCount = (filterTahun !== 'all' ? 1 : 0) + (filterStatus !== 'all' ? 1 : 0) + (filterBidang !== 'all' ? 1 : 0);
 
   const filterHtml = `
-    <div class="proker-filter-bar">
-      <!-- BARIS 1: PENCARIAN (FULL WIDTH) -->
-      <div class="proker-filter-row-1">
-        <div class="proker-search-wrap">
-          <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan..." class="proker-input" />
-          <span class="material-symbols-outlined proker-search-icon">search</span>
+    <!-- PROKER OVERLAY BACKDROP -->
+    <div id="filterProkerOverlayBackdrop" class="filter-overlay-backdrop"></div>
+
+    <!-- PROKER DESKTOP OVERLAY DRAWER (MD UP) -->
+    <aside id="filterProkerDesktopDrawer" class="filter-drawer-desktop hidden md:flex">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">tune</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-white">Filter Program Kerja</h3>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Saring proker berdasarkan tahun, status, &amp; bidang</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" class="btnApplyFilterProkerDrawer px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer">
+            Terapkan
+          </button>
+          <button type="button" class="btnCloseFilterProkerDrawer p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Tutup Filter">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
         </div>
       </div>
 
-      <!-- BARIS 2: FILTER TAHUN, STATUS DAN BIDANG -->
-      <div class="proker-filter-row-2">
-        <div class="proker-filter-col">
-          <select id="selectFilterTahun" class="proker-select" title="Filter Tahun Proker">
-            <option value="all" ${filterTahun === 'all' ? 'selected' : ''}>Semua Tahun</option>
-            ${availableYears.map(y => `<option value="${y}" ${filterTahun === y ? 'selected' : ''}>Tahun ${y}</option>`).join('')}
-          </select>
+      <div id="prokerDesktopDrawerBody" class="flex-1 overflow-y-auto">
+        ${buildProkerDrawerContentHtml('desktop', filterTahun, filterStatus, filterBidang, currentActiveKategori, availableYears)}
+      </div>
+
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between gap-3">
+        <button type="button" class="btnResetFilterProkerDrawer filter-reset-link">
+          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+          <span>Reset Semua</span>
+        </button>
+        <button type="button" class="btnApplyFilterProkerDrawer flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">check</span>
+          <span>${activeFilterCount > 0 ? `Terapkan Filter (${activeFilterCount})` : 'Terapkan Filter'}</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- PROKER MOBILE BOTTOM SHEET (MAX-MD) -->
+    <div id="filterProkerMobileBottomSheet" class="filter-bottom-sheet-mobile md:hidden">
+      <div class="pt-3 pb-1 flex justify-center">
+        <div class="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+      </div>
+
+      <div class="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <button type="button" class="btnCloseFilterProkerDrawer text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+          <span>Tutup</span>
+        </button>
+        <div class="text-sm font-bold text-slate-800 dark:text-white">Filter Program Kerja</div>
+        <button type="button" class="btnApplyFilterProkerDrawer px-3.5 py-1.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs">
+          Terapkan
+        </button>
+      </div>
+
+      <div id="prokerMobileSheetBody" class="flex-1 overflow-y-auto">
+        ${buildProkerDrawerContentHtml('mobile', filterTahun, filterStatus, filterBidang, currentActiveKategori, availableYears)}
+      </div>
+
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between gap-3 pb-safe">
+        <button type="button" class="btnResetFilterProkerDrawer filter-reset-link">
+          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+          <span>Reset</span>
+        </button>
+        <button type="button" class="btnApplyFilterProkerDrawer flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">check</span>
+          <span>${activeFilterCount > 0 ? `Terapkan Filter (${activeFilterCount})` : 'Terapkan Filter'}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PROKER MOBILE FLOATING ACTION PILL -->
+    <button type="button" id="btnFloatingFilterProkerMobile" class="filter-floating-pill md:hidden" title="Buka Filter Program Kerja">
+      <span class="material-symbols-outlined text-[18px]">tune</span>
+      <span>Filter Proker</span>
+      <span class="filter-badge ${activeFilterCount > 0 ? '' : 'hidden'}">${activeFilterCount}</span>
+    </button>
+
+    <div class="proker-filter-bar space-y-2.5">
+      <!-- BARIS 1: PENCARIAN & FILTER GROUP (SAMPING-SAMPINGAN) -->
+      <div class="flex items-center gap-2 w-full">
+        <div class="relative flex-1">
+          <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan, PIC..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" />
+          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
         </div>
 
-        <div class="proker-filter-col">
-          <select id="selectFilterStatus" class="proker-select" title="Filter Status Proker">
-            <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>Semua Status</option>
-            <option value="ongoing" ${filterStatus === 'ongoing' ? 'selected' : ''}>Sedang Berlangsung</option>
-            <option value="upcoming" ${filterStatus === 'upcoming' ? 'selected' : ''}>Akan Datang</option>
-            <option value="planned" ${filterStatus === 'planned' ? 'selected' : ''}>Direncanakan</option>
-            <option value="done" ${filterStatus === 'done' ? 'selected' : ''}>Selesai</option>
-            <option value="terlaksana" ${filterStatus === 'terlaksana' ? 'selected' : ''}>Terlaksana (LPJ)</option>
-            <option value="belum_terlaksana" ${filterStatus === 'belum_terlaksana' ? 'selected' : ''}>Belum Terlaksana</option>
-          </select>
-        </div>
-
-        <div class="proker-filter-col">
-          <select id="selectFilterBidang" class="proker-select" title="Filter Bidang Proker">
-            <option value="all" ${filterBidang === 'all' ? 'selected' : ''}>${bidangAllLabel}</option>
-            ${bidangOptions}
-          </select>
+        <!-- Unified Bordered Filter + Reset Button Group -->
+        <div class="filter-btn-group shrink-0">
+          <button type="button" id="btnOpenFilterProker" class="filter-btn-group-btn ${activeFilterCount > 0 ? 'has-active' : ''}" title="Buka Filter Program Kerja">
+            <span class="material-symbols-outlined text-[17px]">tune</span>
+            <span>Filter</span>
+            <span id="filterProkerActiveBadge" class="filter-badge ${activeFilterCount > 0 ? '' : 'hidden'}">${activeFilterCount}</span>
+          </button>
+          <div class="filter-btn-group-divider"></div>
+          <button type="button" id="btnResetProkerFilters" class="filter-btn-group-reset" title="Reset Semua Filter">
+            <span class="material-symbols-outlined text-[17px]">restart_alt</span>
+          </button>
         </div>
       </div>
 
-      <!-- BARIS 3: AKSI TABS & DROPDOWN DOWNLOAD (RESPONSIVE FULL-WIDTH PADA MOBILE) -->
-      <div class="proker-filter-row-3">
+      <!-- BARIS 2: VIEW CONTROLS & DOWNLOAD DROPDOWN -->
+      <div class="flex items-center justify-between gap-2 flex-wrap">
         <div class="proker-view-controls-bar">
           <button type="button" id="tabViewTimeline" class="proker-control-tab ${activeTab === 'timeline' ? 'active' : ''}">
             <span class="material-symbols-outlined" style="font-size:16px;">view_timeline</span>
@@ -974,7 +1191,14 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
       </div>
+
+      <!-- BARIS 3: ACTIVE FILTER TAGS / CHIPS -->
+      <div id="filterProkerActiveChipsContainer" class="flex items-center gap-1.5 flex-wrap ${activeChips.length > 0 ? '' : 'hidden'}">
+        <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1">Filter Aktif:</span>
+        ${activeChips.join('')}
+      </div>
     </div>
+  `;
   `;
 
   // Pagination Calculation
@@ -1402,16 +1626,103 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     });
   }
 
-  document.getElementById('selectFilterTahun')?.addEventListener('change', (e) => {
-    renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori, e.target.value);
+  // 3. Multi-Level Filter Drawer & Popup Event Listeners
+  document.getElementById('btnOpenFilterProker')?.addEventListener('click', () => {
+    toggleProkerFilterDrawer(true);
+  });
+  document.getElementById('btnFloatingFilterProkerMobile')?.addEventListener('click', () => {
+    toggleProkerFilterDrawer(true);
+  });
+  document.querySelectorAll('.btnCloseFilterProkerDrawer').forEach(btn => {
+    btn.addEventListener('click', () => toggleProkerFilterDrawer(false));
+  });
+  document.getElementById('filterProkerOverlayBackdrop')?.addEventListener('click', () => {
+    toggleProkerFilterDrawer(false);
   });
 
-  document.getElementById('selectFilterStatus')?.addEventListener('change', (e) => {
-    renderProkerModal(filterBidang, e.target.value, searchQuery, activeTab, 1, false, currentActiveKategori, filterTahun);
+  // Reset Button Group (Icon panah berputar di sebelah Filter button)
+  document.getElementById('btnResetProkerFilters')?.addEventListener('click', () => {
+    toggleProkerFilterDrawer(false);
+    renderProkerModal('all', 'all', '', activeTab, 1, false, currentActiveKategori, 'all');
+  });
+  document.querySelectorAll('.btnResetFilterProkerDrawer').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleProkerFilterDrawer(false);
+      renderProkerModal('all', 'all', '', activeTab, 1, false, currentActiveKategori, 'all');
+    });
   });
 
-  document.getElementById('selectFilterBidang')?.addEventListener('change', (e) => {
-    renderProkerModal(e.target.value, filterStatus, searchQuery, activeTab, 1, false, currentActiveKategori, filterTahun);
+  // Chip remove triggers
+  document.querySelectorAll('[data-remove-proker-filter]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const fType = btn.dataset.removeProkerFilter;
+      let newTahun = filterTahun;
+      let newStatus = filterStatus;
+      let newBidang = filterBidang;
+      if (fType === 'tahun') newTahun = 'all';
+      if (fType === 'status') newStatus = 'all';
+      if (fType === 'bidang') newBidang = 'all';
+      renderProkerModal(newBidang, newStatus, searchQuery, activeTab, 1, false, currentActiveKategori, newTahun);
+    });
+  });
+
+  // Drawer Draft Filters State
+  let draftTahun = filterTahun;
+  let draftStatus = filterStatus;
+  let draftBidang = filterBidang;
+  let draftKategori = currentActiveKategori;
+
+  // Accordion Toggle inside Proker Drawers
+  document.querySelectorAll('#filterProkerDesktopDrawer [data-toggle-accordion], #filterProkerMobileBottomSheet [data-toggle-accordion]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.filter-accordion-item');
+      if (item) item.classList.toggle('open');
+    });
+  });
+
+  // Radio Kategori
+  document.querySelectorAll('input[name^="prokerKategoriRadio_"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      draftKategori = e.target.value;
+      document.querySelectorAll(`input[name^="prokerKategoriRadio_"][value="${draftKategori}"]`).forEach(el => el.checked = true);
+    });
+  });
+
+  // Pills Tahun
+  document.querySelectorAll('[data-proker-tahun]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      draftTahun = btn.dataset.prokerTahun;
+      document.querySelectorAll('[data-proker-tahun]').forEach(b => {
+        b.classList.toggle('selected', b.dataset.prokerTahun === draftTahun);
+      });
+    });
+  });
+
+  // Pills Status
+  document.querySelectorAll('[data-proker-status]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      draftStatus = btn.dataset.prokerStatus;
+      document.querySelectorAll('[data-proker-status]').forEach(b => {
+        b.classList.toggle('selected', b.dataset.prokerStatus === draftStatus);
+      });
+    });
+  });
+
+  // Select Bidang
+  document.querySelectorAll('[id^="selectProkerDrawerBidang_"]').forEach(sel => {
+    sel.addEventListener('change', (e) => {
+      draftBidang = e.target.value;
+      document.querySelectorAll('[id^="selectProkerDrawerBidang_"]').forEach(s => s.value = draftBidang);
+    });
+  });
+
+  // Apply Buttons
+  document.querySelectorAll('.btnApplyFilterProkerDrawer').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleProkerFilterDrawer(false);
+      renderProkerModal(draftBidang, draftStatus, searchQuery, activeTab, 1, false, draftKategori, draftTahun);
+    });
   });
 
   // Dropdown Download & Ekspor

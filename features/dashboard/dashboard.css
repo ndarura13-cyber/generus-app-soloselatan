@@ -10363,6 +10363,133 @@ body {
   border-color: rgba(51, 65, 85, 0.7);
 }
 
+/* Unified Bordered Filter + Reset Button Group (Beside Search) */
+.filter-btn-group {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  height: 38px;
+}
+
+.dark .filter-btn-group {
+  border-color: #334155;
+  background-color: #0f172a;
+}
+
+.filter-btn-group:hover,
+.filter-btn-group:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+}
+
+.filter-btn-group-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 100%;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.dark .filter-btn-group-btn {
+  color: #e2e8f0;
+}
+
+.filter-btn-group-btn:hover {
+  background-color: #f1f5f9;
+  color: #2563eb;
+}
+
+.dark .filter-btn-group-btn:hover {
+  background-color: #1e293b;
+  color: #60a5fa;
+}
+
+.filter-btn-group-btn.has-active {
+  color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.dark .filter-btn-group-btn.has-active {
+  color: #60a5fa;
+  background-color: rgba(37, 99, 235, 0.15);
+}
+
+.filter-btn-group-btn .filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9999px;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.dark .filter-btn-group-btn .filter-badge {
+  background-color: #3b82f6;
+}
+
+.filter-btn-group-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.dark .filter-btn-group-divider {
+  background-color: #334155;
+}
+
+.filter-btn-group-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  height: 100%;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.dark .filter-btn-group-reset {
+  color: #94a3b8;
+}
+
+.filter-btn-group-reset:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.dark .filter-btn-group-reset:hover {
+  background-color: rgba(220, 38, 38, 0.2);
+  color: #f87171;
+}
+
+.filter-btn-group-reset:active {
+  transform: rotate(-90deg);
+}
+
 /* Main Trigger Button */
 .filter-main-btn {
   display: inline-flex;
@@ -10534,7 +10661,7 @@ body {
 /* Floating Action Pill (Mobile View Only: Bottom-Right above Bottom Nav) */
 .filter-floating-pill {
   position: fixed;
-  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   right: 16px;
   left: auto;
   transform: none;

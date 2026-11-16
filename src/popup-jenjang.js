@@ -60,7 +60,15 @@ function hitungStat(key) {
     if (key === "all") {
       filtered = siswaList;
     } else if (KATEGORI_UTAMA.includes(key)) {
-      filtered = siswaList.filter(function(s) { return (s.kategori_usia || "").toLowerCase() === key.toLowerCase(); });
+      if (key.toLowerCase() === "remaja") {
+        filtered = siswaList.filter(function(s) {
+          const kat = (s.kategori_usia || "").toLowerCase();
+          const isSmp = s.jenjang_kelas === "1 SMP" || s.jenjang_kelas === "2 SMP" || s.jenjang_kelas === "3 SMP" || (s.jenjang_kelas && s.jenjang_kelas.includes("SMP"));
+          return kat === "remaja" || isSmp;
+        });
+      } else {
+        filtered = siswaList.filter(function(s) { return (s.kategori_usia || "").toLowerCase() === key.toLowerCase(); });
+      }
     } else {
       filtered = siswaList.filter(function(s) {
         return (s.jenjang_kelas || "").trim().toLowerCase() === key.trim().toLowerCase();
@@ -74,7 +82,11 @@ function hitungStat(key) {
 
   const cabCount = filtered.filter(function(s) { return (s.kategori_usia || "").toLowerCase() === "caberawit"; }).length;
   const gpCount  = filtered.filter(function(s) { return (s.kategori_usia || "").toLowerCase() === "gp_reguler"; }).length;
-  const remCount = filtered.filter(function(s) { return (s.kategori_usia || "").toLowerCase() === "remaja"; }).length;
+  const remCount = filtered.filter(function(s) {
+    const kat = (s.kategori_usia || "").toLowerCase();
+    const isSmp = s.jenjang_kelas === "1 SMP" || s.jenjang_kelas === "2 SMP" || s.jenjang_kelas === "3 SMP" || (s.jenjang_kelas && s.jenjang_kelas.includes("SMP"));
+    return kat === "remaja" || isSmp;
+  }).length;
 
   const desaStats = (MASTER_WILAYAH.desa || []).map(function(desa) {
     const inDesa = filtered.filter(function(s) { return s.desa_id === desa.id; });
