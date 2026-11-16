@@ -10531,17 +10531,18 @@ body {
   background-color: rgba(239, 68, 68, 0.15);
 }
 
-/* Floating Action Pill (Mobile View Only) */
+/* Floating Action Pill (Mobile View Only: Bottom-Right above Bottom Nav) */
 .filter-floating-pill {
   position: fixed;
-  bottom: 74px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  right: 16px;
+  left: auto;
+  transform: none;
   z-index: 40;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 10px 18px;
   border-radius: 9999px;
   background: linear-gradient(135deg, #2563eb, #4f46e5);
   color: #ffffff;
@@ -10556,7 +10557,7 @@ body {
 }
 
 .filter-floating-pill:active {
-  transform: translateX(-50%) scale(0.95);
+  transform: scale(0.95);
 }
 
 .filter-floating-pill .filter-badge {
@@ -10584,13 +10585,13 @@ body {
 .filter-overlay-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.65);
+  background-color: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  z-index: 55;
+  z-index: 44;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .filter-overlay-backdrop.active {
@@ -10598,31 +10599,51 @@ body {
   pointer-events: auto;
 }
 
-/* Desktop Drawer (Slide from Left) */
-.filter-drawer-desktop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 380px;
-  max-width: 90vw;
-  background-color: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-  z-index: 56;
-  display: flex;
-  flex-direction: column;
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Desktop Floating Overlay Card (Melayang Futuristik di samping Sidebar) */
+@media (min-width: 768px) {
+  .filter-drawer-desktop {
+    position: fixed;
+    top: 76px;
+    bottom: 24px;
+    left: calc(16rem + 16px);
+    width: 400px;
+    max-width: calc(100vw - 18rem);
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    z-index: 46;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(12px) scale(0.97);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, left 0.3s ease;
+  }
+
+  .dark .filter-drawer-desktop {
+    background-color: #0f172a;
+    border-color: #1e293b;
+    box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  body.sidebar-collapsed .filter-drawer-desktop {
+    left: calc(5rem + 16px);
+    max-width: calc(100vw - 7rem);
+  }
+
+  .filter-drawer-desktop.active {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
-.dark .filter-drawer-desktop {
-  background-color: #0f172a;
-  border-right-color: #1e293b;
-}
-
-.filter-drawer-desktop.active {
-  transform: translateX(0);
+@media (max-width: 767px) {
+  .filter-drawer-desktop {
+    display: none !important;
+  }
 }
 
 /* Mobile Bottom Sheet (Slide from Bottom) */
