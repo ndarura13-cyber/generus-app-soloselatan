@@ -1120,21 +1120,21 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     <button type="button" id="btnFloatingFilterProkerMobile" class="filter-floating-pill md:hidden" title="Buka Filter Program Kerja">
       <span class="material-symbols-outlined text-[18px]">tune</span>
       <span>Filter Proker</span>
-      <span class="filter-badge ${activeFilterCount > 0 ? '' : 'hidden'}">${activeFilterCount}</span>
+      <span class="filter-badge">${activeFilterCount}</span>
     </button>
 
     <div class="proker-filter-bar space-y-2.5">
       <!-- BARIS UTAMA: PENCARIAN & FILTER GROUP + VIEW CONTROLS & DOWNLOAD DROPDOWN (SEJAJAR) -->
       <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
-        <!-- Sisi Kiri: Pencarian & Filter Group (Samping-sampingan) -->
+        <!-- Sisi Kiri: Pencarian & Filter Group (Di mobile filter group di-hide, search full-width) -->
         <div class="flex items-center gap-2 flex-1 w-full max-w-xl">
           <div class="relative flex-1">
             <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan, PIC..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" />
             <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
           </div>
 
-          <!-- Unified Bordered Filter + Reset Button Group -->
-          <div class="filter-btn-group shrink-0">
+          <!-- Unified Bordered Filter + Reset Button Group (Hanya tampil di Desktop MD ke atas) -->
+          <div class="filter-btn-group shrink-0 hidden md:flex">
             <button type="button" id="btnOpenFilterProker" class="filter-btn-group-btn ${activeFilterCount > 0 ? 'has-active' : ''}" title="Buka Filter Program Kerja">
               <span class="material-symbols-outlined text-[17px]">tune</span>
               <span>Filter</span>

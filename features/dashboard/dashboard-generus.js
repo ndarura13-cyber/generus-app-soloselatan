@@ -935,11 +935,7 @@ export function updateSiswaFilterUI() {
   const floatingFilterBadge = document.getElementById('floatingFilterBadge');
   if (floatingFilterBadge) {
     floatingFilterBadge.textContent = activeCount;
-    if (activeCount > 0) {
-      floatingFilterBadge.classList.remove('hidden');
-    } else {
-      floatingFilterBadge.classList.add('hidden');
-    }
+    floatingFilterBadge.classList.remove('hidden');
   }
 
   // Terapkan label counts
@@ -1015,76 +1011,80 @@ export function renderSiswaModal() {
         </button>
       </div>
 
-      <!-- BARIS 1: PENCARIAN & FILTER GROUP + AKSI CEPAT -->
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
-        <!-- Search bar + Unified Filter/Reset Group -->
-        <div class="flex items-center gap-2 flex-1 w-full max-w-xl">
-          <div class="relative flex-1">
-            <input type="text" id="inputSiswaSearch" class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" value="${currentSiswaFilter.search}" placeholder="Cari nama, NIS, atau kelompok..." />
-            <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-          </div>
+      <!-- BARIS KONTROL & PENCARIAN (RESPONSIF MOBILE & WEB) -->
+      <div class="siswa-filter-bar space-y-2.5">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+          <!-- Sisi Kiri: Pencarian & Filter Group (Di mobile filter group di-hide, search full-width) -->
+          <div class="flex items-center gap-2 flex-1 w-full max-w-xl">
+            <div class="relative flex-1 w-full">
+              <input type="text" id="inputSiswaSearch" class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" value="${currentSiswaFilter.search}" placeholder="Cari nama, NIS, atau kelompok..." />
+              <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+            </div>
 
-          <!-- Unified Bordered Filter + Reset Button Group -->
-          <div class="filter-btn-group shrink-0">
-            <button type="button" id="btnOpenFilterDrawer" class="filter-btn-group-btn" title="Buka Panel Filter Generus">
-              <span class="material-symbols-outlined text-[17px]">tune</span>
-              <span>Filter</span>
-              <span id="filterActiveBadge" class="filter-badge hidden">0</span>
-            </button>
-            <div class="filter-btn-group-divider"></div>
-            <button type="button" id="btnResetAllFilters" class="filter-btn-group-reset" title="Reset Semua Filter">
-              <span class="material-symbols-outlined text-[17px]">restart_alt</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <!-- Dropdown Download Generus (Excel / PDF) -->
-          <div class="relative shrink-0">
-            <button type="button" id="btnGenerusDownloadDropdown" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer" aria-haspopup="true" aria-expanded="false" title="Download & Ekspor Data Generus">
-              <span class="material-symbols-outlined text-[17px] text-blue-600">file_download</span>
-              <span>Download</span>
-              <span class="material-symbols-outlined dropdown-arrow text-[16px]">expand_more</span>
-            </button>
-            <div id="generusDownloadMenu" class="proker-dropdown-menu hidden" style="right:0;left:auto;">
-              <button type="button" id="btnExportExcelGenerus" class="proker-dropdown-item">
-                <span class="material-symbols-outlined" style="color:#057a55;font-size:18px;">table_view</span>
-                <div class="dropdown-item-text">
-                  <div class="item-title">Excel (.xlsx / .csv)</div>
-                  <div class="item-desc">Unduh format spreadsheet lengkap</div>
-                </div>
+            <!-- Unified Bordered Filter + Reset Button Group (Hanya tampil di Desktop MD ke atas) -->
+            <div class="filter-btn-group shrink-0 hidden md:flex">
+              <button type="button" id="btnOpenFilterDrawer" class="filter-btn-group-btn" title="Buka Panel Filter Generus">
+                <span class="material-symbols-outlined text-[17px]">tune</span>
+                <span>Filter</span>
+                <span id="filterActiveBadge" class="filter-badge hidden">0</span>
               </button>
-              <button type="button" id="btnExportPdfGenerus" class="proker-dropdown-item">
-                <span class="material-symbols-outlined" style="color:#dc2626;font-size:18px;">picture_as_pdf</span>
-                <div class="dropdown-item-text">
-                  <div class="item-title">PDF Dokumen</div>
-                  <div class="item-desc">Cetak format resmi A4</div>
-                </div>
+              <div class="filter-btn-group-divider"></div>
+              <button type="button" id="btnResetAllFilters" class="filter-btn-group-reset" title="Reset Semua Filter">
+                <span class="material-symbols-outlined text-[17px]">restart_alt</span>
               </button>
             </div>
           </div>
 
-          <button type="button" id="btnImportWizardGenerus" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 dark:bg-slate-800 dark:hover:bg-blue-950/40 dark:hover:text-blue-300 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer" title="Import Data">
-            <span class="material-symbols-outlined text-[17px] text-blue-600">upload_file</span>
-            <span class="hidden sm:inline">Import</span>
-          </button>
+          <!-- Sisi Kanan: Susunan Tombol Kontrol (Export, Naik Jenjang, Download) -->
+          <div class="proker-view-controls-bar w-full xl:w-auto shrink-0">
+            <!-- Tombol 1: Export (Smart Import Wizard / Upload) -->
+            <button type="button" id="btnImportWizardGenerus" class="proker-control-tab border border-blue-500/40 bg-blue-50/50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-bold" title="Export / Import Data Santri (Upload CSV/Excel)">
+              <span class="material-symbols-outlined" style="font-size:16px;">upload_file</span>
+              <span>Export</span>
+            </button>
 
-          <button type="button" id="btnAutoPromoteJenjang" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-purple-50 hover:text-purple-700 dark:bg-slate-800 dark:hover:bg-purple-950/40 dark:hover:text-purple-300 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer" title="Kenaikan Jenjang">
-            <span class="material-symbols-outlined text-[17px] text-purple-600">auto_mode</span>
-            <span class="hidden sm:inline">Kenaikan</span>
-          </button>
+            <!-- Tombol 2: Naik Jenjang -->
+            <button type="button" id="btnAutoPromoteJenjang" class="proker-control-tab text-slate-700 dark:text-slate-300" title="Kenaikan Jenjang Otomatis">
+              <span class="material-symbols-outlined" style="font-size:16px;color:#a855f7;">auto_mode</span>
+              <span>Naik Jenjang</span>
+            </button>
 
-          <!-- Hidden legacy buttons for backward compatibility -->
-          <button type="button" id="btnExportCsvGenerus" style="display:none;" aria-hidden="true"></button>
-          <input type="file" id="inputImportCsvGenerus" accept=".csv,.xlsx,.xls" style="display:none;" />
-          <button type="button" id="btnImportCsvGenerus" style="display:none;" aria-hidden="true"></button>
+            <!-- Tombol 3: Dropdown Download (Excel & PDF) -->
+            <div class="proker-dropdown-container">
+              <button type="button" id="btnGenerusDownloadDropdown" class="proker-control-tab proker-dropdown-trigger text-slate-700 dark:text-slate-300" aria-haspopup="true" aria-expanded="false" title="Download & Ekspor Data Generus">
+                <span class="material-symbols-outlined" style="font-size:16px;">file_download</span>
+                <span>Download</span>
+                <span class="material-symbols-outlined dropdown-arrow" style="font-size:16px;">expand_more</span>
+              </button>
+              <div id="generusDownloadMenu" class="proker-dropdown-menu hidden">
+                <button type="button" id="btnExportExcelGenerus" class="proker-dropdown-item">
+                  <span class="material-symbols-outlined" style="color:#057a55;font-size:18px;">table_view</span>
+                  <div class="dropdown-item-text">
+                    <div class="item-title">Excel (.xlsx / .csv)</div>
+                    <div class="item-desc">Unduh format spreadsheet lengkap</div>
+                  </div>
+                </button>
+                <button type="button" id="btnExportPdfGenerus" class="proker-dropdown-item">
+                  <span class="material-symbols-outlined" style="color:#dc2626;font-size:18px;">picture_as_pdf</span>
+                  <div class="dropdown-item-text">
+                    <div class="item-title">PDF Dokumen</div>
+                    <div class="item-desc">Cetak format resmi A4</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Active Filter Tags / Chips (Hanya muncul jika ada filter aktif) -->
-      <div id="filterActiveChipsContainer" class="flex items-center gap-1.5 flex-wrap -mt-1 empty:hidden">
-        <!-- Rendered dynamically -->
+        <!-- Hidden legacy buttons for backward compatibility -->
+        <button type="button" id="btnExportCsvGenerus" style="display:none;" aria-hidden="true"></button>
+        <input type="file" id="inputImportCsvGenerus" accept=".csv,.xlsx,.xls" style="display:none;" />
+        <button type="button" id="btnImportCsvGenerus" style="display:none;" aria-hidden="true"></button>
+
+        <!-- Active Filter Tags / Chips (Hanya muncul jika ada filter aktif) -->
+        <div id="filterActiveChipsContainer" class="flex items-center gap-1.5 flex-wrap -mt-1 empty:hidden">
+          <!-- Rendered dynamically -->
+        </div>
       </div>
 
       <!-- BULK ACTION BAR -->
@@ -1186,7 +1186,7 @@ export function renderSiswaModal() {
       <button type="button" id="btnFloatingFilterMobile" class="filter-floating-pill md:hidden" title="Buka Filter Generus">
         <span class="material-symbols-outlined text-[18px]">tune</span>
         <span>Filter Generus</span>
-        <span id="floatingFilterBadge" class="filter-badge hidden">0</span>
+        <span id="floatingFilterBadge" class="filter-badge">0</span>
       </button>
 
       <!-- DESKTOP TABLE VIEW (MD UP) -->
