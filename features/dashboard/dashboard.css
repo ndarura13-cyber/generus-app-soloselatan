@@ -5218,6 +5218,33 @@ body {
   transition: transform 0.2s ease;
 }
 
+@media (max-width: 640px) {
+  .proker-view-controls-bar {
+    padding: 3px !important;
+    gap: 3px !important;
+    border-radius: 11px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .proker-control-tab {
+    padding: 7px 5px !important;
+    font-size: 11px !important;
+    gap: 3.5px !important;
+    border-radius: 8px !important;
+    letter-spacing: -0.2px !important;
+    min-width: 0 !important;
+  }
+  .proker-control-tab .material-symbols-outlined {
+    font-size: 15px !important;
+  }
+  .proker-dropdown-trigger {
+    gap: 2px !important;
+  }
+  .proker-dropdown-trigger .dropdown-arrow {
+    font-size: 14px !important;
+  }
+}
+
 .proker-dropdown-trigger[aria-expanded="true"] .dropdown-arrow {
   transform: rotate(180deg);
 }
@@ -6490,6 +6517,15 @@ body {
 .btn-download-template:hover {
   background: #047857;
   transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .btn-download-template {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 12px !important;
+    box-sizing: border-box !important;
+  }
 }
 
 .import-dropzone {

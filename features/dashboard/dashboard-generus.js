@@ -1734,17 +1734,19 @@ export function openImportWizardModal() {
 
   const modalHtml = `
     <div class="import-wizard-wrapper" style="padding:4px 0;">
-      <!-- TOP BANNER -->
+      <!-- TOP BANNER (RESPONSIF MOBILE TANPA MELEBIHI LAYAR) -->
       <div class="import-wizard-banner">
-        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <span class="material-symbols-outlined" style="font-size:28px;color:#2563eb;flex-shrink:0;">lightbulb</span>
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:800;color:var(--text);">Import Cerdas &amp; Fleksibel</div>
-            <p style="font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.4;">
-              Unggah berkas <strong>.xlsx</strong>, <strong>.xls</strong>, atau <strong>.csv</strong> yang Anda miliki. Sistem cerdas otomatis mengenali nama kolom dan menormalkan nama Desa serta Kelompok.
-            </p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[24px] sm:text-[28px] shrink-0 mt-0.5">lightbulb</span>
+            <div>
+              <div class="text-xs sm:text-[13px] font-extrabold text-slate-800 dark:text-slate-100">Import Cerdas &amp; Fleksibel</div>
+              <p class="text-[11px] sm:text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                Unggah berkas <strong>.xlsx</strong>, <strong>.xls</strong>, atau <strong>.csv</strong>. Sistem cerdas otomatis mengenali kolom dan menormalkan nama Desa serta Kelompok.
+              </p>
+            </div>
           </div>
-          <button type="button" id="btnDownloadTemplateInWizard" class="btn-download-template" title="Download Template Excel Resmi">
+          <button type="button" id="btnDownloadTemplateInWizard" class="btn-download-template shrink-0 w-full sm:w-auto justify-center cursor-pointer" title="Download Template Excel Resmi">
             <span class="material-symbols-outlined" style="font-size:16px;">download</span>
             <span>Unduh Template (.xlsx)</span>
           </button>
@@ -2350,91 +2352,102 @@ export function renderAutoPromoteModal() {
       <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;">
         
         <!-- BANNER ATURAN TAHUN AJARAN SETELAH AGUSTUS -->
-        <div style="background:#eff6ff;border:1.5px solid #3b82f6;border-radius:12px;padding:14px 16px;color:#1e3a8a;">
-          <div style="font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span class="material-symbols-outlined" style="font-size:20px;color:#2563eb;">auto_mode</span>
-            Kenaikan Jenjang Massal Otomatis (Tahun Ajaran ${academicInfo.academicYearLabel})
+        <div class="rounded-xl p-3.5 sm:p-4 border transition-all bg-blue-50/80 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800/60 text-blue-900 dark:text-blue-100">
+          <div class="font-extrabold text-xs sm:text-[13.5px] flex items-center gap-1.5 mb-1 text-blue-900 dark:text-blue-200">
+            <span class="material-symbols-outlined text-[20px] text-blue-600 dark:text-blue-400">auto_mode</span>
+            <span>Kenaikan Jenjang Massal Otomatis (Tahun Ajaran ${academicInfo.academicYearLabel})</span>
           </div>
-          <div style="font-size:12px;color:#1e40af;line-height:1.5;">
+          <div class="text-[11.5px] sm:text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
             Seluruh generus aktif naik <strong>1 tingkat ke jenjang berikutnya</strong> setelah bulan Agustus. Generus yang baru diinput setelah bulan Agustus tidak bertambah (tetap pada kelas saat diinput).<br/>
-            <em>*Catatan: Bagi generus yang tinggal kelas, pamong/pengurus dapat memperbarui kelas secara manual melalui tombol Edit Generus.</em>
+            <span class="opacity-80 italic mt-0.5 inline-block">*Catatan: Bagi generus yang tinggal kelas, pamong/pengurus dapat memperbarui kelas secara manual melalui tombol Edit Generus.</span>
           </div>
         </div>
 
-        <!-- STAT STRIP / INFORMASI CEPAT -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">
-          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 12px;text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:#15803d;">SIAP NAIK KELAS</div>
-            <div style="font-size:20px;font-weight:900;color:#166534;margin-top:2px;">${countEligible}</div>
-            <div style="font-size:10px;color:#15803d;">+1 Tingkat Baru</div>
+        <!-- STAT STRIP / INFORMASI CEPAT (DARK MODE ADAPTIVE) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <!-- Siap Naik Kelas -->
+          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-emerald-50/90 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
+            <div class="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400 tracking-wide uppercase">Siap Naik Kelas</div>
+            <div class="text-xl sm:text-2xl font-black text-emerald-800 dark:text-emerald-300 mt-0.5">${countEligible}</div>
+            <div class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400/80 mt-0.5">+1 Tingkat Baru</div>
           </div>
-          <div style="background:#fefce8;border:1px solid #fef08a;border-radius:10px;padding:10px 12px;text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:#a16207;">INPUT SETELAH AGU</div>
-            <div style="font-size:20px;font-weight:900;color:#854d0e;margin-top:2px;">${countAfterAugust}</div>
-            <div style="font-size:10px;color:#a16207;">Tidak Bertambah</div>
+
+          <!-- Input Setelah Agu -->
+          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 shadow-xs">
+            <div class="text-[10.5px] font-bold text-amber-700 dark:text-amber-400 tracking-wide uppercase">Input Setelah Agu</div>
+            <div class="text-xl sm:text-2xl font-black text-amber-800 dark:text-amber-300 mt-0.5">${countAfterAugust}</div>
+            <div class="text-[10px] font-medium text-amber-600 dark:text-amber-400/80 mt-0.5">Tidak Bertambah</div>
           </div>
-          <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:#475569;">JENJANG MAKSIMAL</div>
-            <div style="font-size:20px;font-weight:900;color:#334155;margin-top:2px;">${countMaxJenjang}</div>
-            <div style="font-size:10px;color:#475569;">Mahasiswa/Remaja/Dll</div>
+
+          <!-- Jenjang Maksimal -->
+          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 shadow-xs">
+            <div class="text-[10.5px] font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase">Jenjang Maksimal</div>
+            <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-200 mt-0.5">${countMaxJenjang}</div>
+            <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400/80 mt-0.5">Mahasiswa/Remaja/Dll</div>
           </div>
-          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:#1d4ed8;">SUDAH PERNAH NAIK</div>
-            <div style="font-size:20px;font-weight:900;color:#1e40af;margin-top:2px;">${countAlreadyPromoted}</div>
-            <div style="font-size:10px;color:#1d4ed8;">Periode T.A. Ini</div>
+
+          <!-- Sudah Pernah Naik -->
+          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-blue-50/90 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 shadow-xs">
+            <div class="text-[10.5px] font-bold text-blue-700 dark:text-blue-400 tracking-wide uppercase">Sudah Pernah Naik</div>
+            <div class="text-xl sm:text-2xl font-black text-blue-800 dark:text-blue-300 mt-0.5">${countAlreadyPromoted}</div>
+            <div class="text-[10px] font-medium text-blue-600 dark:text-blue-400/80 mt-0.5">Periode T.A. Ini</div>
           </div>
         </div>
 
-        <!-- SEARCH & TAB SELECTOR -->
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-          <div style="display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#f1f5f9;padding:2px;">
-            <button type="button" id="tabShowEligible" style="padding:6px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;border-radius:6px;background:${activeTab === 'eligible' ? '#ffffff' : 'transparent'};color:${activeTab === 'eligible' ? '#2563eb' : 'var(--text-muted)'};box-shadow:${activeTab === 'eligible' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'};">
+        <!-- SEARCH & TAB SELECTOR (DARK MODE ADAPTIVE) -->
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="inline-flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 p-1">
+            <button type="button" id="tabShowEligible" class="px-3.5 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'eligible' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
               Siap Naik (${filteredEligible.length})
             </button>
-            <button type="button" id="tabShowSkipped" style="padding:6px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;border-radius:6px;background:${activeTab === 'skipped' ? '#ffffff' : 'transparent'};color:${activeTab === 'skipped' ? '#2563eb' : 'var(--text-muted)'};box-shadow:${activeTab === 'skipped' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'};">
+            <button type="button" id="tabShowSkipped" class="px-3.5 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'skipped' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
               Tidak Bertambah (${filteredSkipped.length})
             </button>
           </div>
-          <div style="flex:1;max-width:260px;min-width:180px;">
-            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="Cari nama / desa..." style="width:100%;padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:8px;outline:none;" />
+          <div class="flex-1 max-w-xs min-w-[180px]">
+            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="Cari nama / desa..." class="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 shadow-xs" />
           </div>
         </div>
 
-        <!-- TABEL PRATINJAU -->
-        <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;">
-          <div style="max-height:280px;overflow-y:auto;font-size:11.5px;">
+        <!-- TABEL PRATINJAU (TANPA BACKGROUND PUTIH DI MODE GELAP) -->
+        <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800/40 shadow-xs">
+          <div class="max-h-[280px] overflow-y-auto text-[11.5px]">
             ${activeTab === 'eligible' ? (
         filteredEligible.length === 0 ? `
-                <div style="padding:36px;text-align:center;color:var(--text-muted);">
-                  <span class="material-symbols-outlined" style="font-size:36px;color:#10b981;display:block;margin-bottom:6px;">check_circle</span>
-                  <strong style="color:var(--text);">Tidak ada generus yang perlu dinaikkan saat ini</strong>
-                  <p style="margin:4px 0 0;font-size:11px;">Semua data generus sudah mutakhir untuk Tahun Ajaran ${academicInfo.academicYearLabel}.</p>
+                <div class="p-8 text-center text-slate-500 dark:text-slate-400">
+                  <span class="material-symbols-outlined text-[40px] text-emerald-500 dark:text-emerald-400 mx-auto block mb-2">check_circle</span>
+                  <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">Tidak ada generus yang perlu dinaikkan saat ini</div>
+                  <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Semua data generus sudah mutakhir untuk Tahun Ajaran ${academicInfo.academicYearLabel}.</p>
                 </div>
               ` : `
-                <table style="width:100%;border-collapse:collapse;text-align:left;">
-                  <thead style="background:#f8fafc;position:sticky;top:0;font-size:11px;color:#475569;z-index:2;">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-slate-50 dark:bg-slate-800 sticky top-0 text-[11px] font-bold text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 z-10">
                     <tr>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;width:40px;">No</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Nama Generus</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Desa / Kelompok</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Kelas Asal</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">
-                        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">arrow_forward</span>
+                      <th class="p-2.5 text-center w-10">No</th>
+                      <th class="p-2.5">Nama Generus</th>
+                      <th class="p-2.5">Desa / Kelompok</th>
+                      <th class="p-2.5 text-center">Kelas Asal</th>
+                      <th class="p-2.5 text-center w-8">
+                        <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
                       </th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;">Kelas Baru</th>
+                      <th class="p-2.5 text-center">Kelas Baru</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60">
                     ${filteredEligible.map((item, idx) => `
-                      <tr style="border-bottom:1px solid #f1f5f9;background:${idx % 2 === 0 ? '#fff' : '#fafafa'};">
-                        <td style="padding:8px 10px;text-align:center;color:var(--text-muted);">${idx + 1}</td>
-                        <td style="padding:8px 10px;font-weight:700;color:var(--text);">${item.siswa.nama_lengkap}</td>
-                        <td style="padding:8px 10px;color:var(--text-muted);font-size:11px;">Desa ${item.siswa.desa_nama || '-'} (${item.siswa.kelompok_nama || '-'})</td>
-                        <td style="padding:8px 10px;text-align:center;"><span style="background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.fromKelas}</span></td>
-                        <td style="padding:8px 10px;text-align:center;color:#64748b;font-weight:900;">
-                          <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">arrow_forward</span>
+                      <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+                        <td class="p-2.5 text-center text-slate-400 dark:text-slate-500">${idx + 1}</td>
+                        <td class="p-2.5 font-bold text-slate-800 dark:text-slate-100">${item.siswa.nama_lengkap}</td>
+                        <td class="p-2.5 text-slate-500 dark:text-slate-400 text-[11px]">Desa ${item.siswa.desa_nama || '-'} (${item.siswa.kelompok_nama || '-'})</td>
+                        <td class="p-2.5 text-center">
+                          <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-bold bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40">${item.fromKelas}</span>
                         </td>
-                        <td style="padding:8px 10px;text-align:center;"><span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.toKelas}</span></td>
+                        <td class="p-2.5 text-center text-slate-400 dark:text-slate-500 font-black">
+                          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                        </td>
+                        <td class="p-2.5 text-center">
+                          <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/40">${item.toKelas}</span>
+                        </td>
                       </tr>
                     `).join('')}
                   </tbody>
@@ -2442,25 +2455,27 @@ export function renderAutoPromoteModal() {
               `
       ) : (
         filteredSkipped.length === 0 ? `
-                <div style="padding:32px;text-align:center;color:var(--text-muted);">Tidak ada data yang dilewati.</div>
+                <div class="p-8 text-center text-slate-500 dark:text-slate-400">Tidak ada data yang dilewati.</div>
               ` : `
-                <table style="width:100%;border-collapse:collapse;text-align:left;">
-                  <thead style="background:#f8fafc;position:sticky;top:0;font-size:11px;color:#475569;z-index:2;">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-slate-50 dark:bg-slate-800 sticky top-0 text-[11px] font-bold text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 z-10">
                     <tr>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;text-align:center;width:40px;">No</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Nama Generus</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Kelas Saat Ini</th>
-                      <th style="padding:8px 10px;border-bottom:1px solid #cbd5e1;">Alasan Tidak Bertambah</th>
+                      <th class="p-2.5 text-center w-10">No</th>
+                      <th class="p-2.5">Nama Generus</th>
+                      <th class="p-2.5">Kelas Saat Ini</th>
+                      <th class="p-2.5">Alasan Tidak Bertambah</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60">
                     ${filteredSkipped.map((item, idx) => `
-                      <tr style="border-bottom:1px solid #f1f5f9;background:${idx % 2 === 0 ? '#fff' : '#fafafa'};">
-                        <td style="padding:8px 10px;text-align:center;color:var(--text-muted);">${idx + 1}</td>
-                        <td style="padding:8px 10px;font-weight:700;color:var(--text);">${item.siswa.nama_lengkap}</td>
-                        <td style="padding:8px 10px;"><span style="background:#f1f5f9;color:#475569;padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:700;">${item.siswa.jenjang_kelas || '-'}</span></td>
-                        <td style="padding:8px 10px;color:#b45309;font-size:11px;font-weight:600;">
-                          <span style="display:inline-block;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;margin-right:4px;">${item.reason}</span>
+                      <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+                        <td class="p-2.5 text-center text-slate-400 dark:text-slate-500">${idx + 1}</td>
+                        <td class="p-2.5 font-bold text-slate-800 dark:text-slate-100">${item.siswa.nama_lengkap}</td>
+                        <td class="p-2.5">
+                          <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">${item.siswa.jenjang_kelas || '-'}</span>
+                        </td>
+                        <td class="p-2.5 text-[11px] text-amber-700 dark:text-amber-400">
+                          <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40 mr-1">${item.reason}</span>
                           ${item.detail}
                         </td>
                       </tr>
