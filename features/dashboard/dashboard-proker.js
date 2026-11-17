@@ -902,101 +902,80 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     </div>
   `;
 
-  // Role Header Banner (Model Banner Action Frame Sesuai Generus)
+  // Role Header Banner (Tombol tambah kini terintegrasi di Ultra-Compact Header)
   let bannerNoticeHtml = '';
-  if (isSuper) {
-    const btnAddText = isKmmActive ? 'Tambah Program Kerja (KMM)' : 'Tambah Program Kerja';
-    bannerNoticeHtml = `
-      <div class="banner-action-frame proker-banner-gold">
-        <button type="button" id="btnTambahProkerBaru" class="btn-banner-action-blue btn-proker-banner-gold" title="${btnAddText}">
-          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
-          <span>${btnAddText}</span>
-        </button>
-      </div>
-    `;
-  } else {
-    bannerNoticeHtml = '';
-  }
 
   // Summary Stat Strip (Realisasi & LPJ Integrated)
   const statsHtml = `
     <div class="proker-stats-container">
-      <!-- BARIS 1: INFORMASI KETERCAPAIAN & STATUS -->
-      <div class="proker-stats-row-1">
-        <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
-          <div class="proker-stat-info">
-            <span class="stat-label">TOTAL PROGRAM ${isKmmActive ? 'KMM' : 'PPG'}</span>
-            <span class="stat-num">${stats.total} <span class="stat-unit">Prog</span></span>
+      <!-- BARIS 1 & 2: DESKTOP ONLY (HIDDEN DI MOBILE AGAR HEMAT RUANG) -->
+      <div class="hidden md:flex flex-col gap-2.5">
+        <div class="proker-stats-row-1">
+          <div class="proker-stat-box">
+            <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
+            <div class="proker-stat-info">
+              <span class="stat-label">TOTAL PROGRAM ${isKmmActive ? 'KMM' : 'PPG'}</span>
+              <span class="stat-num">${stats.total} <span class="stat-unit">Prog</span></span>
+            </div>
+          </div>
+          <div class="proker-stat-box">
+            <span class="material-symbols-outlined proker-stat-icon" style="color:#057a55;">check_circle</span>
+            <div class="proker-stat-info">
+              <span class="stat-label">TERLAKSANA (LPJ)</span>
+              <span class="stat-num" style="color:#057a55;">${stats.totalTerlaksana} <span class="stat-unit">Prog</span></span>
+            </div>
+          </div>
+          <div class="proker-stat-box">
+            <span class="material-symbols-outlined proker-stat-icon" style="color:#c81e1e;">pending_actions</span>
+            <div class="proker-stat-info">
+              <span class="stat-label">BELUM TERLAKSANA</span>
+              <span class="stat-num" style="color:#c81e1e;">${stats.totalBelumTerlaksana} <span class="stat-unit">Prog</span></span>
+            </div>
           </div>
         </div>
-        <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon" style="color:#057a55;">check_circle</span>
-          <div class="proker-stat-info">
-            <span class="stat-label">TERLAKSANA (LPJ)</span>
-            <span class="stat-num" style="color:#057a55;">${stats.totalTerlaksana} <span class="stat-unit">Prog</span></span>
+
+        <!-- BARIS 2 ANGGARAN DESKTOP (3 KOLOM) -->
+        <div class="proker-stats-row-2 proker-stats-row-2-desktop">
+          <div class="proker-stat-box">
+            <span class="material-symbols-outlined proker-stat-icon">payments</span>
+            <div class="proker-stat-info">
+              <span class="stat-label">EST. BIAYA (${isKmmActive ? 'RAB KMM' : 'RAB KONSOLIDASI'})</span>
+              <span class="stat-num">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
+              <span class="stat-sub">${isKmmActive ? 'Rencana Anggaran 9 Divisi KMM' : `Termasuk alokasi KMM Rp ${(stats.kmmAnggaran || 0).toLocaleString('id-ID')}`}</span>
+            </div>
           </div>
-        </div>
-        <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon" style="color:#c81e1e;">pending_actions</span>
-          <div class="proker-stat-info">
-            <span class="stat-label">BELUM TERLAKSANA</span>
-            <span class="stat-num" style="color:#c81e1e;">${stats.totalBelumTerlaksana} <span class="stat-unit">Prog</span></span>
+          <div class="proker-stat-box">
+            <span class="material-symbols-outlined proker-stat-icon" style="color:#0e7039;">account_balance_wallet</span>
+            <div class="proker-stat-info">
+              <span class="stat-label">REALISASI DANA (${isKmmActive ? 'LPJ KMM' : 'KONSOLIDASI'})</span>
+              <span class="stat-num" style="color:#0e7039;">Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</span>
+              <span class="stat-sub">${isKmmActive ? 'Aktual Pengeluaran KMM' : `PPG Rp ${(stats.ppgRealisasi || 0).toLocaleString('id-ID')} + KMM Rp ${(stats.kmmRealisasi || 0).toLocaleString('id-ID')}`}</span>
+            </div>
+          </div>
+          <div class="proker-stat-box">
+            <span class="material-symbols-outlined proker-stat-icon" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#2563eb'};">pie_chart</span>
+            <div class="proker-stat-info">
+              <span class="stat-label">PENYERAPAN DANA (${stats.persenRealisasiDana}%)</span>
+              <span class="stat-num" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#057a55'};">
+                ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
+              </span>
+              <span class="stat-sub">${stats.selisihDana > 0 ? 'Sisa Pagu Anggaran' : (stats.selisihDana < 0 ? 'Melebihi Estimasi RAB' : 'Tepat 100% Sesuai RAB')}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- BARIS 2 ANGGARAN DESKTOP (3 KOLOM) -->
-      <div class="proker-stats-row-2 proker-stats-row-2-desktop">
-        <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon">payments</span>
-          <div class="proker-stat-info">
-            <span class="stat-label">EST. BIAYA (${isKmmActive ? 'RAB KMM' : 'RAB KONSOLIDASI'})</span>
-            <span class="stat-num">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
-            <span class="stat-sub">${isKmmActive ? 'Rencana Anggaran 9 Divisi KMM' : `Termasuk alokasi KMM Rp ${(stats.kmmAnggaran || 0).toLocaleString('id-ID')}`}</span>
-          </div>
+      <!-- RINGKASAN ANGGARAN MOBILE (CHIP PILL RAMPING, TIDAK MEMAKAN RUANG) -->
+      <div class="md:hidden flex items-center justify-between gap-2 p-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs">
+        <div class="flex items-center gap-1.5 min-w-0 truncate text-slate-600 dark:text-slate-300">
+          <span class="material-symbols-outlined text-[16px] text-blue-600 dark:text-blue-400 shrink-0">payments</span>
+          <span class="truncate">RAB: <strong>Rp ${(stats.totalAnggaran / 1000000).toFixed(0)}Jt</strong></span>
+          <span class="text-slate-300 dark:text-slate-600">&bull;</span>
+          <span class="truncate text-emerald-600 dark:text-emerald-400">Realisasi: <strong>Rp ${(stats.totalRealisasiDana / 1000000).toFixed(0)}Jt</strong></span>
         </div>
-        <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon" style="color:#0e7039;">account_balance_wallet</span>
-          <div class="proker-stat-info">
-            <span class="stat-label">REALISASI DANA (${isKmmActive ? 'LPJ KMM' : 'KONSOLIDASI'})</span>
-            <span class="stat-num" style="color:#0e7039;">Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</span>
-            <span class="stat-sub">${isKmmActive ? 'Aktual Pengeluaran KMM' : `PPG Rp ${(stats.ppgRealisasi || 0).toLocaleString('id-ID')} + KMM Rp ${(stats.kmmRealisasi || 0).toLocaleString('id-ID')}`}</span>
-          </div>
-        </div>
-        <div class="proker-stat-box">
-          <span class="material-symbols-outlined proker-stat-icon" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#2563eb'};">pie_chart</span>
-          <div class="proker-stat-info">
-            <span class="stat-label">PENYERAPAN DANA (${stats.persenRealisasiDana}%)</span>
-            <span class="stat-num" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#057a55'};">
-              ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
-            </span>
-            <span class="stat-sub">${stats.selisihDana > 0 ? 'Sisa Pagu Anggaran' : (stats.selisihDana < 0 ? 'Melebihi Estimasi RAB' : 'Tepat 100% Sesuai RAB')}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- BARIS 2 ANGGARAN MOBILE -->
-      <div class="proker-stats-anggaran-mobile">
-        <div class="proker-anggaran-line-1">
-          <div class="anggaran-line-label">
-            <span class="material-symbols-outlined" style="font-size:15px;color:#2563eb;">payments</span>
-            <span>RAB: Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
-          </div>
-          <strong style="color:#0e7039;">Realisasi: Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</strong>
-        </div>
-        <div class="proker-anggaran-line-2">
-          <div class="anggaran-line-prev">
-            <span>Penyerapan: <strong>${stats.persenRealisasiDana}%</strong> &bull; </span>
-            <span style="font-weight:700;color:${stats.selisihDana < 0 ? '#c81e1e' : '#057a55'};">
-              ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
-            </span>
-          </div>
-          <div class="proker-growth-pill ${stats.percentGrowth >= 0 ? 'up' : 'down'}">
-            <span>${stats.percentGrowth > 0 ? '+' : ''}${stats.percentGrowth}%</span>
-            <span class="material-symbols-outlined" style="font-size:13px;">${stats.percentGrowth >= 0 ? 'trending_up' : 'trending_down'}</span>
-          </div>
-        </div>
+        <span class="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-extrabold text-[10.5px] shrink-0">
+          ${stats.persenRealisasiDana}%
+        </span>
       </div>
     </div>
   `;
@@ -1529,42 +1508,41 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   const viewContainer = document.getElementById('viewProker');
   if (viewContainer) {
     viewContainer.innerHTML = `
-      <!-- Top Bar: Breadcrumb -->
-      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
-        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
-          <button type="button" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
-            <span class="material-symbols-outlined text-[18px]">dashboard</span>
-            <span>Dashboard</span>
+      <!-- ULTRA-COMPACT HEADER BAR (HEMAT RUANG VERTIKAL) -->
+      <div class="flex items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
+        <!-- Sisi Kiri: Tombol Back + Judul + Badge Angka -->
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <span class="text-slate-300 dark:text-slate-600">/</span>
-          <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-blue-600 text-[18px]">assignment</span>
-            Proker PPG
-          </span>
-        </div>
-      </div>
-
-      <!-- Header Hero Banner -->
-      <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-teal-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
-              <span class="material-symbols-outlined text-[14px]">event_note</span>
-              <span>Program Kerja Tahunan PPG &amp; KMM</span>
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200/50 dark:border-blue-800/50">
+              <span class="material-symbols-outlined text-[19px]">event_note</span>
             </div>
-            <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Program Kerja PPG Solo Selatan</h1>
-            <p class="text-xs text-blue-100 mt-0.5 leading-relaxed">
-              Monitoring realisasi agenda tahunan, timeline kegiatan, evaluasi pleno, dan pelaporan pertanggungjawaban (LPJ).
-            </p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h1 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">Program Kerja</h1>
+                <span class="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-200 dark:border-blue-800/50 shrink-0">
+                  ${stats.total} Agenda <span class="hidden sm:inline font-normal text-slate-400 dark:text-slate-500">(${stats.totalTerlaksana} Selesai)</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Sisi Kanan: Tombol Tambah Proker Ramping -->
+        ${isSuper ? `
+          <button type="button" id="btnTambahProkerBaru" class="shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer" title="${isKmmActive ? 'Tambah Program Kerja KMM' : 'Tambah Program Kerja'}">
+            <span class="material-symbols-outlined text-[17px]">add_circle</span>
+            <span>Tambah</span>
+          </button>
+        ` : ''}
       </div>
 
       <!-- Main Card Body -->
       <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-4">
-        <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
           ${categoryTabsHtml}
-          ${bannerNoticeHtml}
           ${statsHtml}
           ${filterHtml}
           ${contentHtml}
@@ -1578,8 +1556,15 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   } else {
     openModal('Program Kerja Tahunan PPG Solo Selatan', 'event_note', `
       <div style="display:flex;flex-direction:column;gap:16px;">
+        ${isSuper ? `
+          <div class="flex justify-end">
+            <button type="button" id="btnTambahProkerBaru" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer" title="${isKmmActive ? 'Tambah Program Kerja KMM' : 'Tambah Program Kerja'}">
+              <span class="material-symbols-outlined text-[17px]">add_circle</span>
+              <span>Tambah</span>
+            </button>
+          </div>
+        ` : ''}
         ${categoryTabsHtml}
-        ${bannerNoticeHtml}
         ${statsHtml}
         ${filterHtml}
         ${contentHtml}

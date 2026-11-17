@@ -417,20 +417,15 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   const innerContentHtml = `
     <div style="display:flex;flex-direction:column;gap:14px;">
 
-      <!-- HEADER ACTION BAR: SUBTITLE & SUPERADMIN BUTTON -->
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <div>
-          <p style="margin:0;font-size:12px;color:var(--text-muted);">
-            Jajaran Pengurus PPG Daerah Solo Selatan &bull; Masa Bakti Berjalan
-          </p>
-        </div>
-        ${isSuper ? `
+      <!-- HEADER ACTION BAR: SUBTITLE & SUPERADMIN BUTTON (Tampil di modal jika viewContainer tidak ada) -->
+      ${!viewContainer && isSuper ? `
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:6px;">
           <button type="button" id="btnBukaKelolaSemua" style="padding:6px 14px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--blue);transition:all .15s ease;">
             <span class="material-symbols-outlined" style="font-size:18px;">manage_accounts</span>
             <span>Kelola Hak Akses</span>
           </button>
-        ` : ''}
-      </div>
+        </div>
+      ` : ''}
 
       <!-- TABS BAR -->
       <div class="struktur-tabs-nav">
@@ -497,40 +492,35 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
 
   if (viewContainer) {
     viewContainer.innerHTML = `
-      <!-- Top Bar: Breadcrumb -->
-      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
-        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
-          <button type="button" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
-            <span class="material-symbols-outlined text-[18px]">dashboard</span>
-            <span>Dashboard</span>
+      <!-- ULTRA-COMPACT HEADER BAR (HEMAT RUANG VERTIKAL) -->
+      <div class="flex items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
+        <!-- Sisi Kiri: Tombol Back + Judul + Badge Angka -->
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <span class="text-slate-300 dark:text-slate-600">/</span>
-          <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-indigo-600 text-[18px]">diversity_2</span>
-            Struktur Pengurus
-          </span>
-        </div>
-      </div>
-
-      <!-- Header Hero Banner with Statistics -->
-      <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
-              <span class="material-symbols-outlined text-[14px]">diversity_2</span>
-              <span>Kepengurusan PPG Solo Selatan</span>
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/50 dark:border-indigo-800/50">
+              <span class="material-symbols-outlined text-[19px]">diversity_2</span>
             </div>
-            <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Struktur Pengurus PPG</h1>
-            <p class="text-xs text-indigo-100 mt-0.5 leading-relaxed">
-              Jajaran Dewan Penasehat, Pengurus Harian (BPH), dan Koordinator 14 Bidang Masa Bakti Berjalan.
-            </p>
-          </div>
-          <div class="flex items-center gap-2 shrink-0 bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/15 text-xs font-bold">
-            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/80 text-white font-extrabold">${filtered.length} Pengurus</span>
-            <span class="text-indigo-100">&bull;</span>
-            <span class="text-white">${totalAll} Total</span>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h1 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">Struktur Pengurus</h1>
+                <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] border border-indigo-200 dark:border-indigo-800/50 shrink-0">
+                  ${filtered.length} Personel <span class="hidden sm:inline font-normal text-slate-400 dark:text-slate-500">/ ${totalAll} Total</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Sisi Kanan: Tombol Kelola Hak Akses (Jika Superadmin) -->
+        ${isSuper ? `
+          <button type="button" id="btnBukaKelolaSemua" class="shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 font-bold text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer" title="Kelola Hak Akses">
+            <span class="material-symbols-outlined text-[17px]">manage_accounts</span>
+            <span>Hak Akses</span>
+          </button>
+        ` : ''}
       </div>
 
       <!-- Main Card Body -->

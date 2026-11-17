@@ -185,43 +185,32 @@ export function renderJurnalKbmPageView() {
   const meta = JENJANG_METADATA[activeJenjang];
 
   container.innerHTML = `
-    <!-- Top Bar: Breadcrumb -->
-    <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
-      <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
-        <button type="button" id="btnBackToDashboardBreadcrumb" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
-          <span class="material-symbols-outlined text-[18px]">dashboard</span>
-          <span>Dashboard</span>
+    <!-- ULTRA-COMPACT HEADER BAR (HEMAT RUANG VERTIKAL) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
+      <!-- Sisi Kiri: Tombol Back + Judul + Tingkatan Badge -->
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <button type="button" id="btnBackToDashboardBreadcrumb" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
-        <span class="text-slate-300 dark:text-slate-600">/</span>
-        <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-emerald-600 text-[18px]">menu_book</span>
-          Jurnal KBM
-        </span>
-      </div>
-    </div>
-
-    <!-- Header Hero Banner with Auto-Tingkatan Indicator -->
-    <div class="bg-gradient-to-r from-emerald-600 via-teal-700 to-blue-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
-      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
-            <span class="material-symbols-outlined text-[14px]">verified_user</span>
-            <span>${tingkatanLabel}</span>
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/50 dark:border-emerald-800/50">
+            <span class="material-symbols-outlined text-[19px]">menu_book</span>
           </div>
-          <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Jurnal KBM &amp; Pembinaan Generus</h1>
-          <p class="text-xs text-emerald-100 mt-0.5 leading-relaxed">
-            Presensi kehadiran santri, monitoring materi KBM, dan lembar pembiasaan karakter.
-          </p>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">Jurnal KBM</h1>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200 dark:border-emerald-800/50 shrink-0 truncate max-w-[200px] sm:max-w-none" title="${tingkatanLabel}">
+                ${isDaerah ? 'Daerah' : (isDesa ? `Desa ${currentUser.desaNama || ''}` : `Kel. ${currentUser.kelompokNama || ''}`)}
+              </span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <!-- Bar Filter Wilayah -->
-        <div class="flex items-center flex-wrap gap-2 shrink-0 bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/15">
-          <span class="text-xs font-bold text-emerald-100 flex items-center gap-1">
-            <span class="material-symbols-outlined text-[15px]">filter_alt</span> Wilayah:
-          </span>
-          ${desaDropdownHtml}
-          ${kelompokDropdownHtml}
-        </div>
+      <!-- Sisi Kanan: Wilayah Filter Dropdowns -->
+      <div class="flex items-center flex-wrap gap-1.5 sm:gap-2 shrink-0">
+        ${desaDropdownHtml}
+        ${kelompokDropdownHtml}
       </div>
     </div>
 

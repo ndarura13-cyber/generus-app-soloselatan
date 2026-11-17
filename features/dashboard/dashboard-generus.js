@@ -1003,14 +1003,6 @@ export function renderSiswaModal() {
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:14px;">
 
-      <!-- ACTION BANNER: TAMBAH GENERUS FULL-WIDTH (SESUAI HALAMAN PROKER) -->
-      <div class="banner-action-frame">
-        <button type="button" id="btnTambahSiswaBaru" class="btn-banner-action-blue w-full" title="Tambah Data Generus Baru">
-          <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
-          <span>Tambah Generus Baru</span>
-        </button>
-      </div>
-
       <!-- BARIS KONTROL & PENCARIAN (RESPONSIF MOBILE & WEB) -->
       <div class="siswa-filter-bar space-y-2.5">
         <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
@@ -1258,40 +1250,33 @@ export function renderSiswaModal() {
   const viewContainer = document.getElementById('viewDatabaseGenerus');
   if (viewContainer) {
     viewContainer.innerHTML = `
-      <!-- Top Bar: Breadcrumb -->
-      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
-        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400">
-          <button type="button" class="btnBackToDashboardBreadcrumb hover:text-brandBlue dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors">
-            <span class="material-symbols-outlined text-[18px]">dashboard</span>
-            <span>Dashboard</span>
+      <!-- ULTRA-COMPACT HEADER BAR (HEMAT RUANG VERTIKAL) -->
+      <div class="flex items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
+        <!-- Sisi Kiri: Tombol Back + Judul + Badge Angka -->
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <span class="text-slate-300 dark:text-slate-600">/</span>
-          <span class="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-purple-600 text-[18px]">database</span>
-            Database Generus
-          </span>
-        </div>
-      </div>
-
-      <!-- Header Hero Banner with Statistics -->
-      <div class="bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-800 rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold border border-white/30 mb-1.5">
-              <span class="material-symbols-outlined text-[14px]">groups</span>
-              <span>Pusat Data Generus Solo Selatan</span>
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-200/50 dark:border-purple-800/50">
+              <span class="material-symbols-outlined text-[19px]">database</span>
             </div>
-            <h1 class="text-lg md:text-xl font-extrabold tracking-tight">Database Generus</h1>
-            <p class="text-xs text-purple-100 mt-0.5 leading-relaxed">
-              Data profil santri, jenjang pembinaan, mutasi sambung, dan monitoring usia generasi penerus se-Daerah Solo Selatan.
-            </p>
-          </div>
-          <div class="flex items-center gap-2 shrink-0 bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/15 text-xs font-bold">
-            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/80 text-white font-extrabold">${activeCount} Aktif</span>
-            <span class="text-purple-100">&bull;</span>
-            <span class="text-white">${totalCount} Total Generus</span>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h1 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">Database Generus</h1>
+                <span class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200 dark:border-emerald-800/50 shrink-0">
+                  ${activeCount} Aktif <span class="hidden sm:inline font-normal text-slate-400 dark:text-slate-500">/ ${totalCount} Total</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Sisi Kanan: Tombol Tambah Generus Kompak -->
+        <button type="button" id="btnTambahSiswaBaru" class="shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer" title="Tambah Data Generus Baru">
+          <span class="material-symbols-outlined text-[17px]">person_add</span>
+          <span>Tambah</span>
+        </button>
       </div>
 
       <!-- Main Card Body -->
