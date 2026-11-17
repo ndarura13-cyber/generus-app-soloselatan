@@ -1061,9 +1061,6 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
         <div class="flex items-center gap-1.5">
-          <button type="button" class="btnApplyFilterProkerDrawer px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer">
-            Terapkan
-          </button>
           <button type="button" class="btnCloseFilterProkerDrawer p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Tutup Filter">
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -1093,13 +1090,13 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       </div>
 
       <div class="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        <button type="button" class="btnCloseFilterProkerDrawer text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1">
+        <div class="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-blue-600 dark:text-blue-400">tune</span>
+          <span>Filter Program Kerja</span>
+        </div>
+        <button type="button" class="btnCloseFilterProkerDrawer text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1 cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">close</span>
           <span>Tutup</span>
-        </button>
-        <div class="text-sm font-bold text-slate-800 dark:text-white">Filter Program Kerja</div>
-        <button type="button" class="btnApplyFilterProkerDrawer px-3.5 py-1.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs">
-          Terapkan
         </button>
       </div>
 
@@ -1127,30 +1124,31 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     </button>
 
     <div class="proker-filter-bar space-y-2.5">
-      <!-- BARIS 1: PENCARIAN & FILTER GROUP (SAMPING-SAMPINGAN) -->
-      <div class="flex items-center gap-2 w-full">
-        <div class="relative flex-1">
-          <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan, PIC..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" />
-          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+      <!-- BARIS UTAMA: PENCARIAN & FILTER GROUP + VIEW CONTROLS & DOWNLOAD DROPDOWN (SEJAJAR) -->
+      <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+        <!-- Sisi Kiri: Pencarian & Filter Group (Samping-sampingan) -->
+        <div class="flex items-center gap-2 flex-1 w-full max-w-xl">
+          <div class="relative flex-1">
+            <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan, PIC..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" />
+            <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+          </div>
+
+          <!-- Unified Bordered Filter + Reset Button Group -->
+          <div class="filter-btn-group shrink-0">
+            <button type="button" id="btnOpenFilterProker" class="filter-btn-group-btn ${activeFilterCount > 0 ? 'has-active' : ''}" title="Buka Filter Program Kerja">
+              <span class="material-symbols-outlined text-[17px]">tune</span>
+              <span>Filter</span>
+              <span id="filterProkerActiveBadge" class="filter-badge ${activeFilterCount > 0 ? '' : 'hidden'}">${activeFilterCount}</span>
+            </button>
+            <div class="filter-btn-group-divider"></div>
+            <button type="button" id="btnResetProkerFilters" class="filter-btn-group-reset" title="Reset Semua Filter">
+              <span class="material-symbols-outlined text-[17px]">restart_alt</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Unified Bordered Filter + Reset Button Group -->
-        <div class="filter-btn-group shrink-0">
-          <button type="button" id="btnOpenFilterProker" class="filter-btn-group-btn ${activeFilterCount > 0 ? 'has-active' : ''}" title="Buka Filter Program Kerja">
-            <span class="material-symbols-outlined text-[17px]">tune</span>
-            <span>Filter</span>
-            <span id="filterProkerActiveBadge" class="filter-badge ${activeFilterCount > 0 ? '' : 'hidden'}">${activeFilterCount}</span>
-          </button>
-          <div class="filter-btn-group-divider"></div>
-          <button type="button" id="btnResetProkerFilters" class="filter-btn-group-reset" title="Reset Semua Filter">
-            <span class="material-symbols-outlined text-[17px]">restart_alt</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- BARIS 2: VIEW CONTROLS & DOWNLOAD DROPDOWN -->
-      <div class="flex items-center justify-between gap-2 flex-wrap">
-        <div class="proker-view-controls-bar">
+        <!-- Sisi Kanan: Tab Timeline, Tabel, & Dropdown Download (Sejajar) -->
+        <div class="proker-view-controls-bar w-full xl:w-auto shrink-0">
           <button type="button" id="tabViewTimeline" class="proker-control-tab ${activeTab === 'timeline' ? 'active' : ''}">
             <span class="material-symbols-outlined" style="font-size:16px;">view_timeline</span>
             <span>Timeline</span>
@@ -1192,7 +1190,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         </div>
       </div>
 
-      <!-- BARIS 3: ACTIVE FILTER TAGS / CHIPS -->
+      <!-- ACTIVE FILTER TAGS / CHIPS -->
       <div id="filterProkerActiveChipsContainer" class="flex items-center gap-1.5 flex-wrap ${activeChips.length > 0 ? '' : 'hidden'}">
         <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1">Filter Aktif:</span>
         ${activeChips.join('')}
@@ -1611,7 +1609,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
     } catch (e) { }
   }
 
-  // 2. Pencarian & Filter (Jangan auto-focus agar keyboard virtual mobile tidak terbuka otomatis)
+  // 2. Pencarian & Filter (Dengan debounce 300ms & Enter key agar mulus)
   const searchInput = document.getElementById('inputProkerSearch');
   if (searchInput) {
     if (searchQuery && window.innerWidth >= 768) {
@@ -1620,8 +1618,18 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       searchInput.value = '';
       searchInput.value = val;
     }
+    let prokerSearchTimer = null;
     searchInput.addEventListener('input', (e) => {
-      renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori, filterTahun);
+      clearTimeout(prokerSearchTimer);
+      prokerSearchTimer = setTimeout(() => {
+        renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori, filterTahun);
+      }, 300);
+    });
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(prokerSearchTimer);
+        renderProkerModal(filterBidang, filterStatus, e.target.value, activeTab, 1, false, currentActiveKategori, filterTahun);
+      }
     });
   }
 
