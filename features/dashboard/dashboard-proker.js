@@ -1199,7 +1199,6 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       </div>
     </div>
   `;
-  `;
 
   // Pagination Calculation
   const itemsPerPage = prokerModalPageSize;
