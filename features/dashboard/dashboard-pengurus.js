@@ -88,32 +88,47 @@ export function renderApprovalListModal() {
     return;
   }
 
-  const itemsHtml = pendingList.map(p => `
-    <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <strong style="font-size:14px;color:var(--text);">${p.nama}</strong>
-          <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${p.peran || p.jabatan || 'Pamong'}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:4px;">
-            <span class="material-symbols-outlined" style="font-size:13px;">mail</span> ${p.email} &bull; <span class="material-symbols-outlined" style="font-size:13px;">call</span> ${p.noWa || '-'}
-          </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;gap:4px;">
-            <span class="material-symbols-outlined" style="font-size:13px;">location_on</span> Asal: Kelompok <strong>${p.kelompokNama || '-'}</strong>, Desa <strong>${p.desaNama || '-'}</strong>
-          </div>
-        </div>
-        <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;">Pending</span>
-      </div>
+  const itemsHtml = pendingList.map(p => {
+    const roleDisplay = p.peran === 'Pengurus Kelompok' ? 'Pengurus' : (p.peran || p.jabatan || 'Pamong');
+    const asalClean = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
-      <div style="display:flex;gap:8px;margin-top:4px;">
-        <button type="button" class="btn-action-approve" data-id="${p.id}" data-name="${p.nama}" style="flex:1;padding:8px 12px;border:none;background:var(--green-dark);color:#fff;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:16px;">check</span> Setujui Akun
-        </button>
-        <button type="button" class="btn-action-reject" data-id="${p.id}" data-name="${p.nama}" style="padding:8px 12px;border:1px solid var(--border);background:var(--surface);color:#dc2626;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-          <span class="material-symbols-outlined" style="font-size:16px;">close</span> Tolak
-        </button>
+    return `
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;overflow:hidden;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0;">
+          <div style="flex:1;min-width:0;">
+            <strong style="font-size:14px;color:var(--text);word-break:break-word;">${p.nama}</strong>
+            <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${roleDisplay}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;">
+              <span style="display:inline-flex;align-items:center;gap:3px;min-width:0;word-break:break-all;">
+                <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">mail</span>
+                <span style="word-break:break-all;">${p.email}</span>
+              </span>
+              ${p.noWa ? `
+                <span style="display:inline-flex;align-items:center;gap:3px;white-space:nowrap;flex-shrink:0;">
+                  <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">call</span>
+                  <span>${p.noWa}</span>
+                </span>
+              ` : ''}
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px;display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+              <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">location_on</span>
+              <span>Asal: <strong>${asalClean}</strong></span>
+            </div>
+          </div>
+          <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;white-space:nowrap;flex-shrink:0;">Pending</span>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:2px;">
+          <button type="button" class="btn-action-approve" data-id="${p.id}" data-name="${p.nama}" style="flex:1;padding:8px 12px;border:none;background:var(--green-dark);color:#fff;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">check</span> Setujui Akun
+          </button>
+          <button type="button" class="btn-action-reject" data-id="${p.id}" data-name="${p.nama}" style="padding:8px 12px;border:1px solid var(--border);background:var(--surface);color:#dc2626;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">close</span> Tolak
+          </button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   openModal(`Persetujuan Pendaftaran (${pendingList.length} Menunggu)`, 'how_to_reg', 'default');
   modalBody.innerHTML = `
@@ -237,7 +252,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   const filterDesaOptions = `
     <option value="all" ${filterDesa === 'all' ? 'selected' : ''}>Semua Desa</option>
   ` + MASTER_WILAYAH.desa.map(d => `
-    <option value="${d.id}" ${filterDesa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>
+    <option value="${d.id}" ${filterDesa === d.id ? 'selected' : ''}>${d.nama}</option>
   `).join('');
 
   // Pagination parameters (8 pengurus per page: 4 baris x 2 kolom di desktop, nyaman & rapi di mobile)
@@ -257,7 +272,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     const waMsg = encodeURIComponent(`Assalamu'alaikum ${p.nama}, terkait koordinasi PPG Solo Selatan...`);
     const roleName = p.peran || p.jabatan || 'Pengurus Daerah';
     const initial = (p.nama || 'P').trim().charAt(0).toUpperCase();
-    const asalTxt = `${p.kelompokNama ? 'Kel. ' + p.kelompokNama + ' &bull; ' : ''}Desa ${p.desaNama || '-'}`;
+    const asalTxt = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
       <div class="struktur-card-desktop">
@@ -303,7 +318,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     const waMsg = encodeURIComponent(`Assalamu'alaikum ${p.nama}, terkait koordinasi PPG Solo Selatan...`);
     const roleName = p.peran || p.jabatan || 'Pengurus Daerah';
     const initial = (p.nama || 'P').trim().charAt(0).toUpperCase();
-    const asalTxt = `${p.kelompokNama ? 'Kel. ' + p.kelompokNama + ' &bull; ' : ''}Desa ${p.desaNama || '-'}`;
+    const asalTxt = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
       <div class="struktur-mobile-card" data-idx="${idx}">
@@ -657,81 +672,96 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
     if (p.tingkatan === 'desa') {
       levelBadgeBg = 'var(--gold-light)';
       levelBadgeColor = '#8a6a00';
-      levelLabel = `Desa ${p.desaNama || '-'}`;
+      levelLabel = p.desaNama || 'Desa';
     } else if (p.tingkatan === 'kelompok') {
       levelBadgeBg = 'var(--green-pastel)';
       levelBadgeColor = 'var(--green-dark)';
-      levelLabel = `Kelompok ${p.kelompokNama || '-'} (${p.desaNama || '-'})`;
+      levelLabel = p.kelompokNama ? `${p.kelompokNama} (${p.desaNama || '-'})` : 'Kelompok';
     }
 
     let statusChip = isActive
-      ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#e8f7ee;color:#2e8b57;display:inline-flex;align-items:center;gap:4px;"><span class="dot ongoing" style="width:6px;height:6px;"></span> Aktif</span>`
-      : `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#fef2f2;color:#dc2626;display:inline-flex;align-items:center;gap:4px;"><span class="dot done" style="width:6px;height:6px;background:#dc2626;"></span> Nonaktif</span>`;
+      ? `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:#e8f7ee;color:#2e8b57;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;"><span class="dot ongoing" style="width:6px;height:6px;flex-shrink:0;"></span> Aktif</span>`
+      : `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:#fef2f2;color:#dc2626;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;"><span class="dot done" style="width:6px;height:6px;background:#dc2626;flex-shrink:0;"></span> Nonaktif</span>`;
 
     if (isPending) {
-      statusChip = `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;">Pending</span>`;
+      statusChip = `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;white-space:nowrap;flex-shrink:0;">Pending</span>`;
     }
 
     let toggleBtnHtml = '';
     if (!isSelf) {
       if (isActive) {
         toggleBtnHtml = `
-          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="false" style="padding:6px 12px;border-radius:8px;border:1px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Nonaktifkan akun">
-            <span class="material-symbols-outlined" style="font-size:16px;">block</span>
+          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="false" style="padding:6px 10px;border-radius:8px;border:1px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Nonaktifkan akun">
+            <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">block</span>
             <span class="btn-label-text">Nonaktifkan</span>
           </button>
         `;
       } else {
         toggleBtnHtml = `
-          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="true" style="padding:6px 12px;border-radius:8px;border:none;background:var(--green-dark);color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Aktifkan akun">
-            <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>
+          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="true" style="padding:6px 10px;border-radius:8px;border:none;background:var(--green-dark);color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Aktifkan akun">
+            <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">check_circle</span>
             <span class="btn-label-text">Aktifkan</span>
           </button>
         `;
       }
     } else {
-      toggleBtnHtml = `<span style="font-size:11px;color:var(--text-muted);font-style:italic;">(Akun Anda)</span>`;
+      toggleBtnHtml = `<span style="font-size:11px;color:var(--text-muted);font-style:italic;white-space:nowrap;">(Akun Anda)</span>`;
     }
 
     const editBtnHtml = `
-      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Edit data &amp; hak akses">
-        <span class="material-symbols-outlined" style="font-size:16px;">edit_note</span>
+      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Edit data &amp; hak akses">
+        <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">edit_note</span>
         <span class="btn-label-text">Edit &amp; Hak Akses</span>
       </button>
     `;
 
     // Tombol hapus — tidak muncul untuk diri sendiri & hanya 1 superadmin
     const deleteBtnHtml = isSelf ? '' : `
-      <button type="button" class="btn-hapus-pengurus" data-id="${p.id}" data-name="${p.nama}" style="padding:6px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Hapus akun pengurus">
-        <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+      <button type="button" class="btn-hapus-pengurus" data-id="${p.id}" data-name="${p.nama}" style="padding:6px 8px;border-radius:8px;border:1.5px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Hapus akun pengurus">
+        <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">delete</span>
         <span class="btn-label-text">Hapus</span>
       </button>
     `;
 
-    const asalTxt = `Kelompok ${p.kelompokNama || '-'} &bull; Desa ${p.desaNama || '-'}`;
+    const roleDisplay = p.peran === 'Pengurus Kelompok' ? 'Pengurus' : (p.peran || p.jabatan || 'Pengurus');
+    const asalTxt = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
-      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <strong style="font-size:14px;color:var(--text);">${p.nama}</strong>
-              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};">${levelLabel}</span>
+      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);overflow:hidden;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0;">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+              <strong style="font-size:14px;color:var(--text);word-break:break-word;">${p.nama}</strong>
+              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};white-space:nowrap;flex-shrink:0;">${levelLabel}</span>
             </div>
-            <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${p.peran || p.jabatan || 'Pengurus'}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:13px;">location_on</span> Asal: <strong>${asalTxt}</strong></div>
-            <div style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:13px;">mail</span> ${p.email} &bull; <span class="material-symbols-outlined" style="font-size:13px;">call</span> ${p.noWa || '-'}</div>
+            <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${roleDisplay}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+              <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">location_on</span>
+              <span>Asal: <strong>${asalTxt}</strong></span>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;">
+              <span style="display:inline-flex;align-items:center;gap:3px;min-width:0;word-break:break-all;">
+                <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">mail</span>
+                <span style="word-break:break-all;">${p.email}</span>
+              </span>
+              ${p.noWa ? `
+                <span style="display:inline-flex;align-items:center;gap:3px;white-space:nowrap;flex-shrink:0;">
+                  <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">call</span>
+                  <span>${p.noWa}</span>
+                </span>
+              ` : ''}
+            </div>
           </div>
-          <div style="text-align:right;">
+          <div style="flex-shrink:0;text-align:right;">
             ${statusChip}
           </div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
-          <span style="font-size:11px;color:var(--text-muted);">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">
             Tingkat: <strong style="text-transform:capitalize;">${p.tingkatan}</strong>
           </span>
-          <div style="display:flex;gap:6px;align-items:center;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             ${editBtnHtml}
             ${toggleBtnHtml}
             ${deleteBtnHtml}
@@ -827,7 +857,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
       </div>
 
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <input type="text" id="inputSearchPengurus" placeholder="Cari nama, email, peran, atau wilayah asal pengurus..." value="${searchQuery}" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <input type="text" id="inputSearchPengurus" placeholder="Cari nama, email, peran, wilayah..." value="${searchQuery}" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
         
         <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="filterTabsWrap">
           <button type="button" class="filter-tab-btn ${filterLevel === 'all' ? 'active-tab' : ''}" data-filter="all">Semua (${totalCount})</button>
@@ -838,7 +868,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow-y:auto;padding-right:4px;">
+      <div style="display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow-y:auto;overflow-x:hidden;padding-right:2px;">
         ${pengurusCardsHtml}
       </div>
 
@@ -986,12 +1016,12 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
   const currentPeran = p.peran || p.jabatan || 'Pamong Caberawit (Paud - SD)';
 
   let desaOptions = MASTER_WILAYAH.desa.map(d => `
-    <option value="${d.id}" data-name="${d.nama}" ${currentDesaId === d.id ? 'selected' : ''}>Desa ${d.nama}</option>
+    <option value="${d.id}" data-name="${d.nama}" ${currentDesaId === d.id ? 'selected' : ''}>${d.nama}</option>
   `).join('');
 
   const currentDesa = MASTER_WILAYAH.desa.find(d => d.id === currentDesaId) || MASTER_WILAYAH.desa[0];
   let kelOptions = currentDesa.kelompok.map(k => `
-    <option value="${k.id}" data-name="${k.nama}" ${currentKelId === k.id ? 'selected' : ''}>Kelompok ${k.nama}</option>
+    <option value="${k.id}" data-name="${k.nama}" ${currentKelId === k.id ? 'selected' : ''}>${k.nama}</option>
   `).join('');
 
   const rolesList = getRolesByTingkatan(currentTingkat);
@@ -1099,7 +1129,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
     const foundDesa = MASTER_WILAYAH.desa.find(d => d.id === selectedDesaId);
     if (foundDesa) {
       const sortedKels = [...foundDesa.kelompok].sort((a, b) => a.nama.localeCompare(b.nama));
-      editKelompok.innerHTML = sortedKels.map(k => `<option value="${k.id}" data-name="${k.nama}">Kelompok ${k.nama}</option>`).join('');
+      editKelompok.innerHTML = sortedKels.map(k => `<option value="${k.id}" data-name="${k.nama}">${k.nama}</option>`).join('');
     }
   });
 

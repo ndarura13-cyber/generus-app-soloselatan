@@ -533,7 +533,7 @@ export function buildSiswaDrawerContentHtml(prefix = 'dt') {
             <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Desa:</label>
             <select id="selectDesa_${prefix}" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold focus:ring-2 focus:ring-blue-500 outline-none" ${isKelompok || (isDesa && currentUser.desaId) ? 'disabled' : ''}>
               <option value="all">-- Semua Desa --</option>
-              ${desaList.map(d => `<option value="${d.id}" ${currentSiswaFilter.desa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
+              ${desaList.map(d => `<option value="${d.id}" ${currentSiswaFilter.desa === d.id ? 'selected' : ''}>${d.nama}</option>`).join('')}
             </select>
           </div>
 
@@ -541,7 +541,7 @@ export function buildSiswaDrawerContentHtml(prefix = 'dt') {
             <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Kelompok:</label>
             <select id="selectKelompok_${prefix}" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold focus:ring-2 focus:ring-blue-500 outline-none" ${isKelompok && currentUser.kelompokId ? 'disabled' : ''}>
               <option value="all">-- Semua Kelompok --</option>
-              ${availableKelompok.map(k => `<option value="${k.id}" ${currentSiswaFilter.kelompok === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
+              ${availableKelompok.map(k => `<option value="${k.id}" ${currentSiswaFilter.kelompok === k.id ? 'selected' : ''}>${k.nama}</option>`).join('')}
             </select>
           </div>
         </div>
@@ -641,7 +641,7 @@ export function bindSiswaDrawerEvents(prefix = 'dt') {
         kels = kels.filter(k => k.desaId === dId);
       }
       selectKel.innerHTML = '<option value="all">-- Semua Kelompok --</option>' +
-        kels.map(k => `<option value="${k.id}">Kel. ${k.nama}</option>`).join('');
+        kels.map(k => `<option value="${k.id}">${k.nama}</option>`).join('');
     });
   }
 
@@ -2423,7 +2423,7 @@ export function renderAutoPromoteModal() {
                       <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
                         <td class="p-2.5 text-center text-slate-400 dark:text-slate-500">${idx + 1}</td>
                         <td class="p-2.5 font-bold text-slate-800 dark:text-slate-100">${item.siswa.nama_lengkap}</td>
-                        <td class="p-2.5 text-slate-500 dark:text-slate-400 text-[11px]">Desa ${item.siswa.desa_nama || '-'} (${item.siswa.kelompok_nama || '-'})</td>
+                        <td class="p-2.5 text-slate-500 dark:text-slate-400 text-[11px]">${item.siswa.desa_nama || '-'} (${item.siswa.kelompok_nama || '-'})</td>
                         <td class="p-2.5 text-center">
                           <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-bold bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40">${item.fromKelas}</span>
                         </td>
@@ -2666,8 +2666,8 @@ export function renderSiswaTableRows() {
           <td style="padding:8px 12px;font-weight:700;min-width:160px;color:var(--text);">${s.nama_lengkap}</td>
           <td style="padding:8px 12px;">${s.tempat_lahir || '-'}</td>
           <td style="padding:8px 12px;white-space:nowrap;font-size:11px;">${tglFormatted}</td>
-          <td style="padding:8px 12px;">Desa ${s.desa_nama || '-'}</td>
-          <td style="padding:8px 12px;">Kel. ${s.kelompok_nama || '-'}</td>
+          <td style="padding:8px 12px;">${s.desa_nama || '-'}</td>
+          <td style="padding:8px 12px;">${s.kelompok_nama || '-'}</td>
           <td style="padding:8px 12px;text-align:center;font-weight:700;">${calculateUmur(s.tanggal_lahir)}</td>
           <td style="padding:8px 12px;text-align:center;font-weight:700;color:${s.jenis_kelamin === 'L' ? '#1d4ed8' : '#be185d'};">${s.jenis_kelamin}</td>
           <td style="padding:8px 12px;">
@@ -2712,10 +2712,10 @@ export function renderSiswaTableRows() {
                   <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:4px;${s.jenis_kelamin === 'L' ? 'background:#dbeafe;color:#1e40af;' : 'background:#fce7f3;color:#be185d;'}">${s.jenis_kelamin}</span>
                 </div>
                 <div class="siswa-mobile-sub-text">
-                  <span class="material-symbols-outlined" style="font-size:13px;color:var(--blue);">location_on</span>
-                  <span>Kel. ${s.kelompok_nama || '-'}</span>
+                  <span class="material-symbols-outlined" style="font-size:13px;color:var(--blue);flex-shrink:0;">location_on</span>
+                  <span>${s.kelompok_nama || '-'}</span>
                   <span>•</span>
-                  <span>Desa ${s.desa_nama || '-'}</span>
+                  <span>${s.desa_nama || '-'}</span>
                 </div>
               </div>
             </div>
@@ -2967,7 +2967,7 @@ export function renderSiswaFormModal(existingData = null) {
     : (!isSuper && currentUser?.tingkatan === 'kelompok' && currentUser?.kelompokId ? currentUser.kelompokId : '');
 
   const desaOptions = MASTER_WILAYAH.desa.map(d =>
-    `<option value="${d.id}" data-name="${d.nama}" ${currentDesaId === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`
+    `<option value="${d.id}" data-name="${d.nama}" ${currentDesaId === d.id ? 'selected' : ''}>${d.nama}</option>`
   ).join('');
 
   function getKelompokOptionsForDesa(desaId, selectedKelId = '') {
@@ -2976,7 +2976,7 @@ export function renderSiswaFormModal(existingData = null) {
     if (!foundDesa || !foundDesa.kelompok) return '<option value="">-- Tidak Ada Kelompok --</option>';
     const sorted = [...foundDesa.kelompok].sort((a, b) => a.nama.localeCompare(b.nama));
     return '<option value="">-- Pilih Kelompok --</option>' + sorted.map(k =>
-      `<option value="${k.id}" data-name="${k.nama}" ${selectedKelId === k.id ? 'selected' : ''}>Kelompok ${k.nama}</option>`
+      `<option value="${k.id}" data-name="${k.nama}" ${selectedKelId === k.id ? 'selected' : ''}>${k.nama}</option>`
     ).join('');
   }
 

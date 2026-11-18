@@ -1415,6 +1415,8 @@ body {
 .modal-body {
   padding: 20px 24px;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
@@ -1721,6 +1723,8 @@ body {
     font-size: 14px !important;
     min-height: 42px !important;
     border-radius: 10px !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
   }
 
   /* Modal Sticky Bottom Actions (Mobile View: Icon Only tanpa kata) */

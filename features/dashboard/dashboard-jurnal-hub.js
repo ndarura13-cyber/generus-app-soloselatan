@@ -142,8 +142,8 @@ export function renderJurnalKbmPageView() {
   if (isDaerah) {
     desaDropdownHtml = `
       <select id="hubSelDesa" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-sm cursor-pointer">
-        <option value="all" ${selectedDesaId === 'all' ? 'selected' : ''}>Semua Desa (${MASTER_WILAYAH.desa.length} Desa)</option>
-        ${MASTER_WILAYAH.desa.map(d => `<option value="${d.id}" ${selectedDesaId === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
+        <option value="all" ${selectedDesaId === 'all' ? 'selected' : ''}>Semua Desa</option>
+        ${MASTER_WILAYAH.desa.map(d => `<option value="${d.id}" ${selectedDesaId === d.id ? 'selected' : ''}>${d.nama}</option>`).join('')}
       </select>
     `;
 
@@ -153,7 +153,7 @@ export function renderJurnalKbmPageView() {
     kelompokDropdownHtml = `
       <select id="hubSelKelompok" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-sm cursor-pointer">
         <option value="all" ${selectedKelompokId === 'all' ? 'selected' : ''}>Semua Kelompok</option>
-        ${kelompokList.map(k => `<option value="${k.id}" ${selectedKelompokId === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
+        ${kelompokList.map(k => `<option value="${k.id}" ${selectedKelompokId === k.id ? 'selected' : ''}>${k.nama}</option>`).join('')}
       </select>
     `;
   } else if (isDesa) {
@@ -161,14 +161,14 @@ export function renderJurnalKbmPageView() {
     desaDropdownHtml = `
       <span class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 border border-blue-200 dark:border-blue-800">
         <span class="material-symbols-outlined text-[15px]">location_city</span>
-        Desa ${desaObj?.nama || currentUser.desaNama}
+        ${desaObj?.nama || currentUser.desaNama}
       </span>
     `;
 
     kelompokDropdownHtml = `
       <select id="hubSelKelompok" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-sm cursor-pointer">
-        <option value="all" ${selectedKelompokId === 'all' ? 'selected' : ''}>Semua Kelompok di Desa Ini</option>
-        ${(desaObj?.kelompok || []).map(k => `<option value="${k.id}" ${selectedKelompokId === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
+        <option value="all" ${selectedKelompokId === 'all' ? 'selected' : ''}>Semua Kelompok</option>
+        ${(desaObj?.kelompok || []).map(k => `<option value="${k.id}" ${selectedKelompokId === k.id ? 'selected' : ''}>${k.nama}</option>`).join('')}
       </select>
     `;
   } else {
@@ -176,7 +176,7 @@ export function renderJurnalKbmPageView() {
     desaDropdownHtml = `
       <span class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
         <span class="material-symbols-outlined text-[15px]">location_on</span>
-        ${currentUser.kelompokNama || 'Kelompok'} (${currentUser.desaNama || 'Desa'})
+        ${currentUser.kelompokNama || ''} (${currentUser.desaNama || ''})
       </span>
     `;
     kelompokDropdownHtml = '';
@@ -200,7 +200,7 @@ export function renderJurnalKbmPageView() {
             <div class="flex items-center gap-2 flex-wrap">
               <h1 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">Jurnal KBM</h1>
               <span class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200 dark:border-emerald-800/50 shrink-0 truncate max-w-[200px] sm:max-w-none" title="${tingkatanLabel}">
-                ${isDaerah ? 'Daerah' : (isDesa ? `Desa ${currentUser.desaNama || ''}` : `Kel. ${currentUser.kelompokNama || ''}`)}
+                ${isDaerah ? 'Daerah' : (isDesa ? currentUser.desaNama || '' : currentUser.kelompokNama || '')}
               </span>
             </div>
           </div>

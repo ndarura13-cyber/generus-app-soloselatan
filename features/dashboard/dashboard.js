@@ -107,11 +107,11 @@ export function renderUserProfile() {
   const mobScopeText = document.getElementById('mobScopeText');
   if (mobScopeText) {
     if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
-      mobScopeText.textContent = 'Daerah Solo Selatan';
+      mobScopeText.textContent = 'Solo Selatan';
     } else if (currentUser.tingkatan === 'desa') {
-      mobScopeText.textContent = `Desa ${currentUser.desaNama || ''}`;
+      mobScopeText.textContent = currentUser.desaNama || '';
     } else {
-      mobScopeText.textContent = `Kel. ${currentUser.kelompokNama || ''}`;
+      mobScopeText.textContent = currentUser.kelompokNama || '';
     }
   }
 
@@ -131,9 +131,9 @@ export function renderUserProfile() {
     userBadgeEl.style.color = '#1a1d2e';
 
     const asalInfo = (currentUser.desaNama && currentUser.kelompokNama)
-      ? ` &bull; Asal: Kel. ${currentUser.kelompokNama}, Desa ${currentUser.desaNama}`
+      ? ` &bull; Asal: ${currentUser.kelompokNama} &bull; ${currentUser.desaNama}`
       : '';
-    scopeTextEl.innerHTML = `<strong>Tingkat:</strong> Pengurus PPG Daerah Solo Selatan${asalInfo}`;
+    scopeTextEl.innerHTML = `<strong>Tingkat:</strong> Pengurus PPG Solo Selatan${asalInfo}`;
 
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'flex';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'block');
@@ -147,11 +147,11 @@ export function renderUserProfile() {
     }
 
   } else if (currentUser.tingkatan === 'desa') {
-    userBadgeEl.textContent = `Koordinator Desa ${currentUser.desaNama || ''}`;
+    userBadgeEl.textContent = `Koordinator ${currentUser.desaNama || ''}`;
     userBadgeEl.style.background = 'var(--gold-light)';
     userBadgeEl.style.color = '#715700';
 
-    scopeTextEl.innerHTML = `<strong>Wilayah Koordinasi:</strong> Desa ${currentUser.desaNama || 'Barat'} &bull; Asal Kel. ${currentUser.kelompokNama || '-'}`;
+    scopeTextEl.innerHTML = `<strong>Wilayah:</strong> ${currentUser.desaNama || 'Barat'} &bull; Asal: ${currentUser.kelompokNama || '-'}`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
@@ -164,11 +164,11 @@ export function renderUserProfile() {
     }
 
   } else {
-    userBadgeEl.textContent = `Pamong Kel. ${currentUser.kelompokNama || ''}`;
+    userBadgeEl.textContent = `Pamong ${currentUser.kelompokNama || ''}`;
     userBadgeEl.style.background = 'var(--blue-light)';
     userBadgeEl.style.color = 'var(--blue-dark)';
 
-    scopeTextEl.innerHTML = `<strong>Kelompok Binaan:</strong> Kelompok ${currentUser.kelompokNama || 'Gentan'} (Desa ${currentUser.desaNama || 'Barat'})`;
+    scopeTextEl.innerHTML = `<strong>Wilayah:</strong> ${currentUser.kelompokNama || 'Gentan'} (${currentUser.desaNama || 'Barat'})`;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
@@ -204,13 +204,13 @@ export function renderSelfProfileModal() {
     levelBadgeBg = 'linear-gradient(135deg, #fef3c7, #fde68a)';
     levelBadgeColor = '#92400e';
   } else if (currentUser.tingkatan === 'desa') {
-    levelBadgeLabel = `Koordinator Desa ${currentUser.desaNama || ''}`;
+    levelBadgeLabel = `Koordinator ${currentUser.desaNama || ''}`;
     levelBadgeBg = '#dcfce7';
     levelBadgeColor = '#166534';
   }
 
   const roleName = currentUser.peran || currentUser.jabatan || 'Pengurus';
-  const wilayahTxt = `Desa ${currentUser.desaNama || '-'} &bull; Kel. ${currentUser.kelompokNama || '-'}`;
+  const wilayahTxt = `${currentUser.kelompokNama || '-'} &bull; ${currentUser.desaNama || '-'}`;
 
   const formHtml = `
     <form id="formSelfProfile" class="flex flex-col gap-3">
