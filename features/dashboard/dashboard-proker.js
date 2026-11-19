@@ -2903,10 +2903,10 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
    Komponen agenda bulanan di dashboard admin serupa landing page
    ═══════════════════════════════════════════════════════════════ */
 
-let currentDashProkerFilter = 'ongoing'; // Default: Program Kerja Berjalan
+let currentDashProkerFilter = 'all'; // Default: Tampilkan Semua Agenda Bulan Ini
 let currentDashProkerSegment = 'event'; // 'event' (Agenda Utama) atau 'routine' (Rutin Bulanan)
 let currentDashProkerPage = 1;
-let dashProkerItemsPerPage = 5;
+let dashProkerItemsPerPage = 4;
 
 const dashShortMonthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
 const dashFullMonthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];

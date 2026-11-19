@@ -26,8 +26,11 @@ import {
   showConfirmModal,
   modalBody,
   showDashboardView,
-  showDashboardHomePage
+  showDashboardHomePage,
+  renderPaginationBar
 } from './dashboard-common.js';
+
+let strukturPageSize = 8;
 
 let appHooks = {
   renderUserProfile: () => {},
@@ -42,9 +45,12 @@ export function setPengurusHooks(hooks) {
 export function checkPendingApprovals() {
   const cardPending = document.getElementById('cardPendingApproval');
   const pendingCountText = document.getElementById('pendingCountText');
+  const pillTop = document.getElementById('pillTopPendingApproval');
+  const topPendingCountText = document.getElementById('topPendingCountText');
 
   if (!currentUser || (!currentUser.isSuperadmin && currentUser.tingkatan !== 'daerah')) {
     if (cardPending) cardPending.style.display = 'none';
+    if (pillTop) pillTop.style.display = 'none';
     return;
   }
 
@@ -58,6 +64,15 @@ export function checkPendingApprovals() {
       if (pendingCountText) pendingCountText.textContent = `Terdapat ${count} pamong/pengurus baru yang menunggu persetujuan (approval) Anda.`;
     } else {
       cardPending.style.display = 'none';
+    }
+  }
+
+  if (pillTop) {
+    if (count > 0) {
+      pillTop.style.display = 'inline-flex';
+      if (topPendingCountText) topPendingCountText.textContent = `${count} Menunggu Persetujuan`;
+    } else {
+      pillTop.style.display = 'none';
     }
   }
 
@@ -256,7 +271,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
   `).join('');
 
   // Pagination parameters (8 pengurus per page: 4 baris x 2 kolom di desktop, nyaman & rapi di mobile)
-  const itemsPerPage = 8;
+  const itemsPerPage = strukturPageSize;
   const totalItems = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   if (currentPage > totalPages) currentPage = totalPages;
@@ -370,64 +385,6 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     </div>
   `;
 
-  // 3. PAGINATION BUILDER HTML
-  let paginationHtml = '';
-  if (totalItems > 0) {
-    let pageButtonsHtml = '';
-    const maxButtons = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-    if (endPage - startPage + 1 < maxButtons) {
-      startPage = Math.max(1, endPage - maxButtons + 1);
-    }
-
-    if (startPage > 1) {
-      pageButtonsHtml += `
-        <button type="button" class="pagination-btn struktur-page-btn" data-page="1">1</button>
-      `;
-      if (startPage > 2) {
-        pageButtonsHtml += `<span style="color:var(--text-muted);padding:0 2px;">&hellip;</span>`;
-      }
-    }
-
-    for (let pNum = startPage; pNum <= endPage; pNum++) {
-      const isActivePage = pNum === currentPage;
-      pageButtonsHtml += `
-        <button type="button" class="pagination-btn struktur-page-btn ${isActivePage ? 'active' : ''}" data-page="${pNum}">
-          ${pNum}
-        </button>
-      `;
-    }
-
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        pageButtonsHtml += `<span style="color:var(--text-muted);padding:0 2px;">&hellip;</span>`;
-      }
-      pageButtonsHtml += `
-        <button type="button" class="pagination-btn struktur-page-btn" data-page="${totalPages}">${totalPages}</button>
-      `;
-    }
-
-    paginationHtml = `
-      <div class="pagination-wrap" style="margin-top: 10px;">
-        <span style="font-size:12px;color:var(--text-muted);">
-          Menampilkan <strong>${startIndex + 1} &ndash; ${Math.min(startIndex + itemsPerPage, totalItems)}</strong> dari <strong>${totalItems}</strong> pengurus
-        </span>
-        ${totalPages > 1 ? `
-        <div class="pagination-controls">
-          <button type="button" class="pagination-btn struktur-page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}" title="Halaman Sebelumnya">
-            <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
-          </button>
-          ${pageButtonsHtml}
-          <button type="button" class="pagination-btn struktur-page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}" title="Halaman Selanjutnya">
-            <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
-          </button>
-        </div>
-        ` : ''}
-      </div>
-    `;
-  }
-
   const viewContainer = document.getElementById('viewStrukturPengurus');
   const innerContentHtml = `
     <div style="display:flex;flex-direction:column;gap:14px;">
@@ -499,8 +456,8 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
         </div>
       </div>
 
-      <!-- PAGINATION CONTROLS -->
-      ${paginationHtml}
+      <!-- PAGINATION CONTROLS (Standard Reusable Architecture) -->
+      <div id="strukturPaginationWrap" class="pagination-wrap" style="margin-top: 14px;"></div>
 
     </div>
   `;
@@ -614,16 +571,30 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
     });
   }
 
-  // 8. Pagination buttons
-  container.querySelectorAll('.struktur-page-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pNum = parseInt(btn.dataset.page, 10);
-      if (pNum && pNum >= 1 && pNum <= totalPages && pNum !== currentPage) {
-        renderStrukturDaerahModal(activeTab, searchQuery, filterDesa, isFilterOpen, pNum);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+  // 8. Pagination Bar (Standard Reusable Architecture)
+  const paginWrap = container.querySelector('#strukturPaginationWrap');
+  if (paginWrap) {
+    renderPaginationBar({
+      container: paginWrap,
+      currentPage: currentPage,
+      totalItems: totalItems,
+      pageSize: strukturPageSize,
+      pageSizeOptions: [8, 16, 24, 32],
+      itemName: 'pengurus',
+      maxVisiblePages: 5,
+      showPageSize: true,
+      showInfo: true,
+      onPageChange: (newPage) => {
+        renderStrukturDaerahModal(activeTab, searchQuery, filterDesa, isFilterOpen, newPage);
+        const tEl = document.getElementById('viewStrukturPengurus') || document.querySelector('.modal-box');
+        if (tEl) tEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      onPageSizeChange: (newSize) => {
+        strukturPageSize = newSize;
+        renderStrukturDaerahModal(activeTab, searchQuery, filterDesa, isFilterOpen, 1);
       }
     });
-  });
+  }
 }
 
 /* ── 3. Kelola Pengurus & Hak Akses (Superadmin) ────────────── */

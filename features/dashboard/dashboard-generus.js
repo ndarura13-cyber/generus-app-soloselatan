@@ -357,6 +357,17 @@ let currentSiswaFilter = {
 };
 
 /**
+ * Buka modal Database Generus dengan preset filter jenjang tertentu (mis. dari kartu dashboard)
+ */
+export function openSiswaModalWithJenjang(jenjang = 'all') {
+  currentSiswaFilter.jenjang = jenjang;
+  currentSiswaFilter.kelas = 'all';
+  siswaCurrentPage = 1;
+  applyUserRegionFilter(true);
+  renderSiswaModal();
+}
+
+/**
  * Otomatis sesuaikan filter wilayah jika pamong kelompok atau koordinator desa (seperti pada fitur pembiasaan)
  */
 export function applyUserRegionFilter(force = false) {

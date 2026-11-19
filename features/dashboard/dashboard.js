@@ -62,7 +62,8 @@ import {
 import {
   updateDashboardStats,
   renderSiswaModal,
-  renderDetailRingkasanModal
+  renderDetailRingkasanModal,
+  openSiswaModalWithJenjang
 } from './dashboard-generus.js';
 
 import {
@@ -100,7 +101,7 @@ export function renderUserProfile() {
   if (!currentUser) return;
   if (userNameEl) userNameEl.textContent = currentUser.nama || 'Pengurus';
   if (headingUserNameEl) headingUserNameEl.textContent = currentUser.nama || 'Pengurus';
-  
+
   const mobHeadingUserName = document.getElementById('mobHeadingUserName');
   if (mobHeadingUserName) mobHeadingUserName.textContent = currentUser.nama;
 
@@ -118,21 +119,41 @@ export function renderUserProfile() {
   updateDashboardStats();
   renderInlineProkerWidget();
 
-  const prokerCardDesc = document.getElementById('prokerCardDesc');
+  const totalPpgDaerah = getPengurusDaerahList().length;
   const strukturPpgDesc = document.getElementById('strukturCardDesc') || document.getElementById('strukturPpgDesc');
   if (strukturPpgDesc) {
-    const totalPpgDaerah = getPengurusDaerahList().length;
-    strukturPpgDesc.textContent = `14 Bidang & ${totalPpgDaerah} Pengurus PPG`;
+    strukturPpgDesc.textContent = `14 Bidang &bull; Solo Selatan`;
+  }
+  const elCardStrukturTotal = document.getElementById('cardStrukturTotal');
+  if (elCardStrukturTotal) elCardStrukturTotal.textContent = totalPpgDaerah;
+
+  const pStats = getProkerStats();
+  const elCardProkerTotal = document.getElementById('cardProkerTotal');
+  if (elCardProkerTotal) elCardProkerTotal.textContent = pStats.total;
+  const elCardProkerOngoing = document.getElementById('cardProkerOngoing');
+  if (elCardProkerOngoing) elCardProkerOngoing.textContent = `${pStats.ongoing} Berjalan`;
+  const elCardProkerUpcoming = document.getElementById('cardProkerUpcoming');
+  if (elCardProkerUpcoming) elCardProkerUpcoming.textContent = `${pStats.upcoming} Mendatang`;
+
+  const prokerCardDesc = document.getElementById('prokerCardDesc');
+  if (prokerCardDesc) {
+    prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
   }
 
-  if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
+  const isSuperadminOrDaerah = currentUser.isSuperadmin || currentUser.tingkatan === 'daerah';
+  const btnTopKelolaPengurus = document.getElementById('btnTopKelolaPengurus');
+  if (btnTopKelolaPengurus) {
+    btnTopKelolaPengurus.style.display = isSuperadminOrDaerah ? 'inline-flex' : 'none';
+  }
+
+  if (isSuperadminOrDaerah) {
     userBadgeEl.textContent = 'Superadmin Daerah';
     userBadgeEl.style.background = 'linear-gradient(135deg, var(--gold), #d49b10)';
     userBadgeEl.style.color = '#1a1d2e';
 
     const asalInfo = (currentUser.desaNama && currentUser.kelompokNama)
-      ? ` &bull; Asal: ${currentUser.kelompokNama} &bull; ${currentUser.desaNama}`
-      : '';
+        ? ` &bull; Asal: ${currentUser.kelompokNama} &bull; ${currentUser.desaNama}`
+        : '';
     scopeTextEl.innerHTML = `<strong>Tingkat:</strong> Pengurus PPG Solo Selatan${asalInfo}`;
 
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'flex';
@@ -140,11 +161,6 @@ export function renderUserProfile() {
     document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'flex');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'flex');
     checkPendingApprovals();
-
-    const pStats = getProkerStats();
-    if (prokerCardDesc) {
-      prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
-    }
 
   } else if (currentUser.tingkatan === 'desa') {
     userBadgeEl.textContent = `Koordinator ${currentUser.desaNama || ''}`;
@@ -158,11 +174,6 @@ export function renderUserProfile() {
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
 
-    const pStats = getProkerStats();
-    if (prokerCardDesc) {
-      prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
-    }
-
   } else {
     userBadgeEl.textContent = `Pamong ${currentUser.kelompokNama || ''}`;
     userBadgeEl.style.background = 'var(--blue-light)';
@@ -174,11 +185,6 @@ export function renderUserProfile() {
     document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('mobBtnKelolaPengurus')?.style.setProperty('display', 'none');
     if (btnApprovalList) btnApprovalList.style.display = 'none';
-
-    const pStats = getProkerStats();
-    if (prokerCardDesc) {
-      prokerCardDesc.textContent = `${pStats.total} Agenda (${pStats.ongoing} berjalan, ${pStats.upcoming} akan datang)`;
-    }
   }
 }
 
@@ -636,15 +642,26 @@ btnMenuProker?.addEventListener('click', openMenuProker);
 btnMenuJurnalKbm?.addEventListener('click', () => openMenuJurnalKbm());
 btnMenuStrukturDaerah?.addEventListener('click', openMenuStruktur);
 btnMenuPengurus?.addEventListener('click', () => openMenuPengurus('all'));
+document.getElementById('btnTopKelolaPengurus')?.addEventListener('click', () => openMenuPengurus('all'));
 btnApprovalList?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnOpenApprovalModal')?.addEventListener('click', () => renderApprovalListModal());
+document.getElementById('pillTopPendingApproval')?.addEventListener('click', () => renderApprovalListModal());
 document.getElementById('btnSupabaseStatus')?.addEventListener('click', () => renderSupabaseModal(updateDashboardStats));
 
-// Overview Stat Cards Shortcuts
-document.getElementById('cardStatTotal')?.addEventListener('click', () => renderDetailRingkasanModal('all'));
-document.getElementById('cardStatCaberawit')?.addEventListener('click', () => renderDetailRingkasanModal('caberawit'));
-document.getElementById('cardStatGp')?.addEventListener('click', () => renderDetailRingkasanModal('gp_reguler'));
-document.getElementById('cardStatRemaja')?.addEventListener('click', () => renderDetailRingkasanModal('remaja'));
+// Deep-Filter Jenjang Pills & Database Generus Card
+btnMenuSiswa?.addEventListener('click', () => openMenuSiswa());
+document.getElementById('cardStatCaberawit')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  openSiswaModalWithJenjang('caberawit');
+});
+document.getElementById('cardStatGp')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  openSiswaModalWithJenjang('gp_reguler');
+});
+document.getElementById('cardStatRemaja')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  openSiswaModalWithJenjang('remaja');
+});
 
 /* ── 6. Navigation Listeners (Sidebar, Bottom Nav, & Shortcuts) ──── */
 (function setupNavigation() {

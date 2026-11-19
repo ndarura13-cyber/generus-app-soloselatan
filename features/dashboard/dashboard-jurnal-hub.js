@@ -489,9 +489,9 @@ export function openPresensiOpsiModal(jenjang = 'caberawit', desaId = 'all', kel
           <div class="grid grid-cols-2 gap-2">
             <select id="modalPresensiBulan" class="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100">
               ${[
-                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-              ].map((m, idx) => `<option value="${idx + 1}" ${idx + 1 === currentMonth ? 'selected' : ''}>${m}</option>`).join('')}
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ].map((m, idx) => `<option value="${idx + 1}" ${idx + 1 === currentMonth ? 'selected' : ''}>${m}</option>`).join('')}
             </select>
             <input type="number" id="modalPresensiTahun" value="${currentYear}" class="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100">
           </div>
@@ -507,18 +507,18 @@ export function openPresensiOpsiModal(jenjang = 'caberawit', desaId = 'all', kel
               <option value="all:all" ${effectiveDesa === 'all' && effectiveKel === 'all' ? 'selected' : ''}>Seluruh Wilayah (Se-Daerah Solo Selatan)</option>
             ` : ''}
             ${MASTER_WILAYAH.desa.filter(d => {
-              if (tingkatan === 'desa') return d.id === currentUser?.desaId;
-              if (tingkatan === 'kelompok') return d.id === currentUser?.desaId;
-              return true;
-            }).map(d => `
+      if (tingkatan === 'desa') return d.id === currentUser?.desaId;
+      if (tingkatan === 'kelompok') return d.id === currentUser?.desaId;
+      return true;
+    }).map(d => `
               <optgroup label="Desa ${d.nama}">
                 ${tingkatan !== 'kelompok' ? `
                   <option value="${d.id}:all" ${effectiveDesa === d.id && effectiveKel === 'all' ? 'selected' : ''}>Seluruh Desa ${d.nama}</option>
                 ` : ''}
                 ${d.kelompok.filter(k => {
-                  if (tingkatan === 'kelompok') return k.id === currentUser?.kelompokId;
-                  return true;
-                }).map(k => `
+      if (tingkatan === 'kelompok') return k.id === currentUser?.kelompokId;
+      return true;
+    }).map(k => `
                   <option value="${d.id}:${k.id}" ${effectiveKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>
                 `).join('')}
               </optgroup>
