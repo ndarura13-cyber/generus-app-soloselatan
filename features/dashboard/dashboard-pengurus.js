@@ -15,7 +15,8 @@ import {
   approvePengurus,
   togglePengurusActive,
   updatePengurus,
-  deletePengurus
+  deletePengurus,
+  registerNewPengurus
 } from '../../src/db-master.js';
 
 import {
@@ -30,7 +31,7 @@ import {
   renderPaginationBar
 } from './dashboard-common.js';
 
-let strukturPageSize = 8;
+let strukturPageSize = 9;
 
 let appHooks = {
   renderUserProfile: () => {},
@@ -108,8 +109,8 @@ export function renderApprovalListModal() {
     const asalClean = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
-      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;overflow:hidden;box-sizing:border-box;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0;">
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
           <div style="flex:1;min-width:0;">
             <strong style="font-size:14px;color:var(--text);word-break:break-word;">${p.nama}</strong>
             <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${roleDisplay}</div>
@@ -579,7 +580,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
       currentPage: currentPage,
       totalItems: totalItems,
       pageSize: strukturPageSize,
-      pageSizeOptions: [8, 16, 24, 32],
+      pageSizeOptions: [9, 18, 27, 36],
       itemName: 'pengurus',
       maxVisiblePages: 5,
       showPageSize: true,
@@ -680,7 +681,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
     }
 
     const editBtnHtml = `
-      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Edit data &amp; hak akses">
+      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--blue);font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Edit data &amp; hak akses">
         <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">edit_note</span>
         <span class="btn-label-text">Edit &amp; Hak Akses</span>
       </button>
@@ -688,7 +689,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
 
     // Tombol hapus — tidak muncul untuk diri sendiri & hanya 1 superadmin
     const deleteBtnHtml = isSelf ? '' : `
-      <button type="button" class="btn-hapus-pengurus" data-id="${p.id}" data-name="${p.nama}" style="padding:6px 8px;border-radius:8px;border:1.5px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Hapus akun pengurus">
+      <button type="button" class="btn-hapus-pengurus" data-id="${p.id}" data-name="${p.nama}" style="padding:6px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Hapus akun pengurus">
         <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">delete</span>
         <span class="btn-label-text">Hapus</span>
       </button>
@@ -698,12 +699,12 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
     const asalTxt = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
-      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);overflow:hidden;box-sizing:border-box;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0;">
+      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
               <strong style="font-size:14px;color:var(--text);word-break:break-word;">${p.nama}</strong>
-              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};white-space:nowrap;flex-shrink:0;">${levelLabel}</span>
+              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${levelLabel}">${levelLabel}</span>
             </div>
             <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${roleDisplay}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
@@ -723,7 +724,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
               ` : ''}
             </div>
           </div>
-          <div style="flex-shrink:0;text-align:right;">
+          <div style="flex-shrink:0;">
             ${statusChip}
           </div>
         </div>
@@ -828,7 +829,13 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
       </div>
 
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <input type="text" id="inputSearchPengurus" placeholder="Cari nama, email, peran, wilayah..." value="${searchQuery}" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="inputSearchPengurus" placeholder="Cari nama, email, peran, wilayah..." value="${searchQuery}" style="flex:1;min-width:180px;box-sizing:border-box;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <button type="button" id="btnTambahPengurusModal" style="padding:10px 14px;border-radius:10px;background:var(--blue);color:#fff;border:none;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;flex-shrink:0;" title="Tambah Pengurus Baru">
+            <span class="material-symbols-outlined" style="font-size:17px;">person_add</span>
+            <span>Tambah Pengurus</span>
+          </button>
+        </div>
         
         <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="filterTabsWrap">
           <button type="button" class="filter-tab-btn ${filterLevel === 'all' ? 'active-tab' : ''}" data-filter="all">Semua (${totalCount})</button>
@@ -839,7 +846,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow-y:auto;overflow-x:hidden;padding-right:2px;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
         ${pengurusCardsHtml}
       </div>
 
@@ -892,6 +899,10 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
       updatedInput.focus();
       updatedInput.setSelectionRange(q.length, q.length);
     }
+  });
+
+  modalBody.querySelector('#btnTambahPengurusModal')?.addEventListener('click', () => {
+    renderEditPengurusModal('new', filterLevel, 'manage', currentPage);
   });
 
   modalBody.querySelectorAll('.btn-edit-pengurus').forEach(btn => {
@@ -976,9 +987,23 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
   });
 }
 
-/* ── 4. Modal Edit Detail Pengurus & Hak Akses ──────────────── */
+/* ── 4. Modal Edit Detail Pengurus & Hak Akses / Tambah Pengurus ──────────────── */
 export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source = 'manage', returnPage = 1) {
-  const p = getPengurusById(pengurusId);
+  const isNew = pengurusId === 'new' || !pengurusId;
+  const p = isNew
+    ? {
+        id: null,
+        nama: '',
+        email: '',
+        noWa: '',
+        tingkatan: 'kelompok',
+        peran: 'Pamong Caberawit (Paud - SD)',
+        desaId: 'desa-barat',
+        kelompokId: 'kel-gentan',
+        isActive: true
+      }
+    : getPengurusById(pengurusId);
+
   if (!p) return;
 
   const currentDesaId = p.desaId || 'desa-barat';
@@ -1000,29 +1025,39 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
     <option value="${r}" ${currentPeran === r ? 'selected' : ''}>${r}</option>
   `).join('');
 
-  openModal(`Edit Pengurus: ${p.nama}`, 'edit_note', 'default');
+  const modalTitleText = isNew ? 'Tambah Pengurus Baru' : `Edit Pengurus: ${p.nama}`;
+  const modalIconName = isNew ? 'person_add' : 'edit_note';
+
+  openModal(modalTitleText, modalIconName, 'default');
   modalBody.innerHTML = `
     <form id="formEditPengurus" style="display:flex;flex-direction:column;gap:14px;">
       <div style="background:var(--gold-light);padding:12px 16px;border-radius:10px;border-left:4px solid var(--gold);font-size:12px;color:#715700;line-height:1.5;">
-        <strong>Kelola Hak Akses &amp; Asal Wilayah Pengurus:</strong><br/>
-        Setiap pengurus di tingkat Daerah, Desa, maupun Kelompok memiliki basis asal Kelompok dan Desa.
+        <strong>${isNew ? 'Tambah Akun Pengurus Baru:' : 'Kelola Hak Akses &amp; Asal Wilayah Pengurus:'}</strong><br/>
+        ${isNew ? 'Akun baru yang dibuat langsung aktif dan dapat digunakan login ke aplikasi.' : 'Setiap pengurus di tingkat Daerah, Desa, maupun Kelompok memiliki basis asal Kelompok dan Desa.'}
       </div>
 
       <div>
         <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Nama Lengkap <span style="color:red;">*</span></label>
-        <input type="text" id="editNama" value="${p.nama}" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <input type="text" id="editNama" value="${p.nama}" required placeholder="Masukkan nama lengkap pengurus..." style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Email Akun <span style="color:red;">*</span></label>
-          <input type="email" id="editEmail" value="${p.email}" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <input type="email" id="editEmail" value="${p.email}" required placeholder="email@contoh.org" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
         </div>
         <div>
           <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Nomor WhatsApp <span style="color:red;">*</span></label>
-          <input type="text" id="editNoWa" value="${p.noWa || ''}" required style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <input type="text" id="editNoWa" value="${p.noWa || ''}" required placeholder="08xxxxxxxxxx" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
         </div>
       </div>
+
+      ${isNew ? `
+      <div>
+        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Kata Sandi Awal (Password)</label>
+        <input type="password" id="editPassword" placeholder="Default: 123456 (Minimal 6 karakter)" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+      </div>
+      ` : ''}
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
@@ -1064,7 +1099,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
         </select>
       </div>
 
-      <!-- Info Keamanan: Kata sandi bersifat privat dan tidak dapat diubah oleh akun lain/superadmin -->
+      <!-- Info Keamanan: Kata sandi bersifat privat -->
       <div style="background:var(--surface-alt, #f8fafc);border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:10px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:var(--brandBlue, #3b82f6);flex-shrink:0;">lock</span>
         <span>Kata sandi bersifat privat. Pengurus dapat memperbarui kata sandinya masing-masing secara mandiri melalui menu <b>Edit Profil</b>.</span>
@@ -1074,11 +1109,11 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       <div class="modal-sticky-footer">
         <button type="button" class="btn-sticky-back btn-cancel-edit-p" title="Kembali ke Tabel">
           <span class="material-symbols-outlined">arrow_back</span>
-          <span class="btn-text">Kembali ke Tabel</span>
+          <span class="btn-text">Kembali</span>
         </button>
-        <button type="submit" class="btn-sticky-save" title="Simpan Perubahan">
-          <span class="material-symbols-outlined">save</span>
-          <span class="btn-text">Simpan Perubahan</span>
+        <button type="submit" class="btn-sticky-save" title="${isNew ? 'Tambah Pengurus' : 'Simpan Perubahan'}">
+          <span class="material-symbols-outlined">${isNew ? 'person_add' : 'save'}</span>
+          <span class="btn-text">${isNew ? 'Tambah Pengurus' : 'Simpan Perubahan'}</span>
         </button>
       </div>
     </form>
@@ -1136,11 +1171,22 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
     const submitBtn = document.querySelector('#formEditPengurus button[type="submit"]');
     if (submitBtn) submitBtn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Menyimpan...`;
 
-    const res = await updatePengurus(p.id, updateData);
-    if (submitBtn) submitBtn.innerHTML = `Simpan Perubahan`;
+    let res;
+    if (isNew) {
+      const passVal = document.getElementById('editPassword')?.value.trim() || '123456';
+      res = await registerNewPengurus({
+        ...updateData,
+        password: passVal,
+        statusApproval: 'approved'
+      });
+    } else {
+      res = await updatePengurus(p.id, updateData);
+    }
+
+    if (submitBtn) submitBtn.innerHTML = isNew ? 'Tambah Pengurus' : 'Simpan Perubahan';
     
     if (res.success) {
-      showToast(`Data pengurus "${updateData.nama}" berhasil diperbarui!`, 'success');
+      showToast(isNew ? `Pengurus baru "${updateData.nama}" berhasil ditambahkan!` : `Data pengurus "${updateData.nama}" berhasil diperbarui!`, 'success');
       appHooks.renderKelompokGrid();
       if (source === 'struktur') {
         renderStrukturDaerahModal();
@@ -1149,7 +1195,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
       }
       appHooks.renderUserProfile();
     } else {
-      showToast(res.message || 'Gagal memperbarui data pengurus.', 'danger');
+      showToast(res.message || 'Gagal menyimpan data pengurus.', 'danger');
     }
   });
 }

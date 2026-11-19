@@ -151,10 +151,8 @@ export function renderUserProfile() {
     userBadgeEl.style.background = 'linear-gradient(135deg, var(--gold), #d49b10)';
     userBadgeEl.style.color = '#1a1d2e';
 
-    const asalInfo = (currentUser.desaNama && currentUser.kelompokNama)
-        ? ` &bull; Asal: ${currentUser.kelompokNama} &bull; ${currentUser.desaNama}`
-        : '';
-    scopeTextEl.innerHTML = `<strong>Tingkat:</strong> Pengurus PPG Solo Selatan${asalInfo}`;
+    const roleField = currentUser.peran || currentUser.jabatan || currentUser.bidang || 'Superadmin PPG';
+    scopeTextEl.textContent = roleField;
 
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'flex';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'block');
@@ -167,7 +165,8 @@ export function renderUserProfile() {
     userBadgeEl.style.background = 'var(--gold-light)';
     userBadgeEl.style.color = '#715700';
 
-    scopeTextEl.innerHTML = `<strong>Wilayah:</strong> ${currentUser.desaNama || 'Barat'} &bull; Asal: ${currentUser.kelompokNama || '-'}`;
+    const roleField = currentUser.peran || currentUser.jabatan || `Koordinator Desa ${currentUser.desaNama || ''}`;
+    scopeTextEl.textContent = roleField;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
@@ -179,7 +178,8 @@ export function renderUserProfile() {
     userBadgeEl.style.background = 'var(--blue-light)';
     userBadgeEl.style.color = 'var(--blue-dark)';
 
-    scopeTextEl.innerHTML = `<strong>Wilayah:</strong> ${currentUser.kelompokNama || 'Gentan'} (${currentUser.desaNama || 'Barat'})`;
+    const roleField = currentUser.peran || currentUser.jabatan || 'Pamong Kelompok';
+    scopeTextEl.textContent = roleField;
     if (btnMenuPengurus) btnMenuPengurus.style.display = 'none';
     document.getElementById('sideBtnKelolaPengurus')?.style.setProperty('display', 'none');
     document.getElementById('flyBtnKelolaPengurus')?.style.setProperty('display', 'none');
@@ -488,33 +488,34 @@ export function renderKelompokGrid() {
       p => p.kelompokId === kel.id && p.isActive !== false
     );
     const hasPengurus = pengurusKelompok.length > 0;
-    card.className = `kelompok-card !p-3 ${hasPengurus ? 'active-kelompok' : 'disabled-kelompok'}`;
-
-    const leader = pengurusKelompok[0] || null;
-    const leaderName = leader ? leader.nama : 'Belum Terdata';
-    const leaderPeran = leader ? (leader.peran || leader.jabatan || 'Pamong') : 'Pamong Kelompok';
+    card.className = `kelompok-card !p-2 sm:!p-2.5 flex flex-col justify-between rounded-xl border transition-all ${
+      hasPengurus
+        ? 'border-slate-200 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 shadow-2xs'
+        : 'border-slate-200/60 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/40 opacity-70'
+    }`;
 
     card.innerHTML = `
-      <div class="flex items-center gap-2 overflow-hidden">
-        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-brandBlue dark:text-blue-400 flex flex-shrink-0 items-center justify-center">
-          <span class="material-symbols-outlined text-sm">diversity_3</span>
-        </div>
-        <div class="flex flex-col min-w-0">
-          <div class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate w-full">${kel.nama}</div>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400">
-            ${hasPengurus ? `<span class="text-green-600 dark:text-green-400 font-semibold">${pengurusKelompok.length} Org</span>` : '0 Org'}
-          </div>
+      <div class="flex items-center justify-between w-full gap-1 mb-1">
+        <span class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+          hasPengurus
+            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300'
+            : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+        }">
+          ${hasPengurus ? `${pengurusKelompok.length} Org` : '0 Org'}
+        </span>
+        <div>
+          ${hasPengurus
+            ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center p-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/40 dark:hover:bg-blue-900/70 text-brandBlue dark:text-blue-400 transition-colors cursor-pointer" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak ${kel.nama}">
+                 <span class="material-symbols-outlined text-[15px]">visibility</span>
+               </button>`
+            : `<button type="button" class="flex items-center justify-center p-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
+                 <span class="material-symbols-outlined text-[15px]">visibility_off</span>
+               </button>`
+          }
         </div>
       </div>
-      <div>
-        ${hasPengurus
-        ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak">
-              <span class="material-symbols-outlined text-[16px]">visibility</span>
-             </button>`
-        : `<button type="button" class="btn-view-kontak-empty flex items-center justify-center p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined text-[16px]">visibility_off</span>
-             </button>`
-      }
+      <div class="font-extrabold text-[11px] sm:text-xs text-slate-800 dark:text-slate-100 truncate w-full" title="${kel.nama}">
+        ${kel.nama}
       </div>
     `;
 

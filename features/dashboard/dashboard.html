@@ -46,7 +46,7 @@
     rel="stylesheet" />
 
   <!-- Restoring legacy CSS for dynamic JS components (modals, toasts, forms) -->
-  <link rel="stylesheet" href="dashboard.css?v=10.0" />
+  <link rel="stylesheet" href="dashboard.css?v=10.1" />
 
   <!-- SheetJS Pustaka Excel (.xlsx / .xls) Asli (Client-side) -->
   <script src="../../src/vendor/xlsx.full.min.js"></script>
@@ -473,32 +473,37 @@
     <div id="viewDashboardHome" class="space-y-4 md:space-y-5">
 
       <!-- TOP COMPACT GREETING & COMMAND BAR -->
-      <section class="bg-white dark:bg-slate-800 rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <section
+        class="bg-white dark:bg-slate-800 rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <!-- User Greeting & Scope Info -->
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-xl bg-brandBlue/10 text-brandBlue dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-brandBlue/10 text-brandBlue dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-[22px]">waving_hand</span>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Selamat bertugas,</span>
-              <span class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white truncate" id="headingUserName">Pengurus</span>
-              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/60" id="welcomeScope">
+              <span class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white truncate"
+                id="headingUserName">Pengurus</span>
+              <span
+                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/60"
+                id="welcomeScope">
                 <span class="material-symbols-outlined text-[13px]">verified_user</span>
                 <span id="scopeText">Daerah Solo Selatan</span>
               </span>
             </div>
             <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate hidden sm:block">
-              Pusat Pembinaan Generus &bull; Tertib administrasi, terpadu, dan akurat.
+              Pusat Pembinaan Generus &bull; Implementasi 29 Karakter Luhur dalam Jamaah
             </p>
           </div>
         </div>
 
-        <!-- Superadmin Quick Actions & Alert Pill -->
-        <div class="flex items-center gap-2 self-stretch sm:self-auto justify-end flex-wrap">
+        <!-- Superadmin Quick Actions & Alert Pill (Mobile: Full Width & Center) -->
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end flex-wrap sm:flex-nowrap">
           <!-- Pending Approval Alert Pill (Interactive) -->
           <button type="button" id="pillTopPendingApproval" style="display:none;"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm transition-all animate-pulse cursor-pointer shrink-0"
+            class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm transition-all animate-pulse cursor-pointer shrink-0"
             title="Ada pendaftar yang menunggu verifikasi Superadmin">
             <span class="material-symbols-outlined text-[16px]">pending_actions</span>
             <span id="topPendingCountText">1 Menunggu</span>
@@ -506,9 +511,10 @@
 
           <!-- Kelola Hak Akses Superadmin Pill Button -->
           <button type="button" id="btnTopKelolaPengurus" style="display:none;"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-colors cursor-pointer shrink-0"
+            class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-colors cursor-pointer shrink-0 text-center"
             title="Kelola Akun Pamong & Peran Hak Akses">
-            <span class="material-symbols-outlined text-[16px] text-rose-600 dark:text-rose-400">admin_panel_settings</span>
+            <span
+              class="material-symbols-outlined text-[16px] text-rose-600 dark:text-rose-400">admin_panel_settings</span>
             <span>Kelola Akun</span>
           </button>
         </div>
@@ -520,7 +526,7 @@
 
       <!-- 4 INTEGRATED COMMAND CARDS (MODUL + STATISTIK REAL-TIME) -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
-        
+
         <!-- CARD 1: DATABASE GENERUS -->
         <div id="btnMenuSiswa"
           class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600/50 transition-all flex flex-col justify-between cursor-pointer group">
@@ -530,15 +536,18 @@
                 <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[18px]">database</span>
                 Database Generus
               </span>
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+              <span
+                class="material-symbols-outlined text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              <span id="statTotal" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">1.250</span>
+              <span id="statTotal"
+                class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">1.250</span>
               <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Santri</span>
             </div>
           </div>
           <!-- Deep-Filter Jenjang Pills -->
-          <div class="flex items-center gap-1 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-700/60" id="cardGenerusChips">
+          <div class="flex items-center gap-1 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-700/60"
+            id="cardGenerusChips">
             <button type="button" id="cardStatCaberawit" title="Filter Caberawit"
               class="px-2 py-0.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60 transition-colors">
               CR: <span id="statCaberawit">410</span>
@@ -563,19 +572,23 @@
                 <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-[18px]">assignment</span>
                 Program Kerja
               </span>
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-brandBlue dark:group-hover:text-blue-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+              <span
+                class="material-symbols-outlined text-slate-400 group-hover:text-brandBlue dark:group-hover:text-blue-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              <span id="cardProkerTotal" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">88</span>
+              <span id="cardProkerTotal"
+                class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">88</span>
               <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Agenda</span>
             </div>
           </div>
           <!-- Status Breakdown Pills -->
           <div class="flex items-center gap-1 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <span id="cardProkerOngoing" class="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/60 dark:border-emerald-800/60">
+            <span id="cardProkerOngoing"
+              class="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/60 dark:border-emerald-800/60">
               12 Berjalan
             </span>
-            <span id="cardProkerUpcoming" class="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60">
+            <span id="cardProkerUpcoming"
+              class="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60">
               6 Mendatang
             </span>
           </div>
@@ -587,13 +600,17 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">menu_book</span>
-                Jurnal KBM
+                <span
+                  class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">menu_book</span>
+                Kegiatan Belajar Mengajar<!--  -->
               </span>
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+              <span
+                class="material-symbols-outlined text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              <span class="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">Presensi &amp; KBM</span>
+              <span
+                class="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">Presensi
+                &amp; Jurnal KBM</span>
             </div>
           </div>
           <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
@@ -610,13 +627,16 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[18px]">diversity_2</span>
+                <span
+                  class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[18px]">diversity_2</span>
                 Struktur Pengurus
               </span>
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+              <span
+                class="material-symbols-outlined text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              <span id="cardStrukturTotal" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">57</span>
+              <span id="cardStrukturTotal"
+                class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">57</span>
               <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pengurus</span>
             </div>
           </div>
@@ -631,13 +651,16 @@
 
       <!-- 2-COLUMN OVERVIEW (DESKTOP) / QUICK OVERVIEW (MOBILE) -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 items-start">
-        
+
         <!-- KOLOM 1: PROGRAM KERJA BULAN INI -->
-        <div id="sectionProkerTahunan" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+        <div id="sectionProkerTahunan"
+          class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
           <!-- Header Bar -->
-          <div class="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3">
+          <div
+            class="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0">
+              <div
+                class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-[18px]">event_note</span>
               </div>
               <div>
@@ -645,7 +668,7 @@
                 <span class="text-[11px] text-slate-400" id="dashProkerHeaderTitle">September 2026</span>
               </div>
             </div>
-            
+
             <button type="button" id="btnKelolaProkerDashboard"
               class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer shrink-0">
               <span>Semua Agenda</span>
@@ -654,8 +677,10 @@
           </div>
 
           <!-- Sub-Tab Segment Switcher (Event vs Rutin) & Filter -->
-          <div class="px-3.5 pt-2.5 pb-2 flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30">
-            <div class="inline-flex p-0.5 bg-slate-200/80 dark:bg-slate-700/60 rounded-xl text-xs font-bold" id="dashProkerSegmentBar">
+          <div
+            class="px-3.5 pt-2.5 pb-2 flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30">
+            <div class="inline-flex p-0.5 bg-slate-200/80 dark:bg-slate-700/60 rounded-xl text-xs font-bold"
+              id="dashProkerSegmentBar">
               <button type="button"
                 class="dash-proker-segment-btn px-2.5 py-1 rounded-lg text-xs transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-xs cursor-pointer"
                 data-segment="event">Event &amp; Agenda</button>
@@ -663,10 +688,12 @@
                 class="dash-proker-segment-btn px-2.5 py-1 rounded-lg text-xs transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer"
                 data-segment="routine">
                 <span>Rutin</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[9px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold ml-0.5" id="dashProkerRoutineCount">0</span>
+                <span
+                  class="px-1.5 py-0.2 rounded-full text-[9px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold ml-0.5"
+                  id="dashProkerRoutineCount">0</span>
               </button>
             </div>
-            <div class="flex items-center gap-1 dash-proker-filter-scroll" id="dashProkerFilterBar">
+            <div class="flex items-center gap-1 dash-proker-filter-scroll ml-auto justify-end" id="dashProkerFilterBar">
               <button type="button" class="dash-proker-filter-btn" data-filter="all">Semua</button>
               <button type="button" class="dash-proker-filter-btn" data-filter="ongoing">Berjalan</button>
               <button type="button" class="dash-proker-filter-btn" data-filter="upcoming">Mendatang</button>
@@ -674,18 +701,23 @@
           </div>
 
           <!-- Agenda List Container -->
-          <div class="proker-list p-3 sm:p-4 divide-y divide-slate-100 dark:divide-slate-700/60" id="dashProkerList" style="min-height: 140px;"></div>
+          <div class="proker-list p-3 sm:p-4 divide-y divide-slate-100 dark:divide-slate-700/60" id="dashProkerList"
+            style="min-height: 140px;"></div>
 
           <!-- Footer / Pagination Controls -->
-          <div class="border-t border-slate-100 dark:border-slate-800 p-2 bg-slate-50/60 dark:bg-slate-900/30" id="dashProkerPagination"></div>
+          <div class="border-t border-slate-100 dark:border-slate-800 p-2 bg-slate-50/60 dark:bg-slate-900/30"
+            id="dashProkerPagination"></div>
         </div>
 
         <!-- KOLOM 2: MONITORING WILAYAH -->
-        <div id="sectionMonitoringWilayah" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
-          <!-- Header Bar -->
-          <div class="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3">
+        <div id="sectionMonitoringWilayah"
+          class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+          <!-- Header Bar (Mobile: Atas-Bawah Lega / Desktop: Side-by-Side) -->
+          <div
+            class="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
             <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <div
+                class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-[18px]">location_on</span>
               </div>
               <div>
@@ -695,22 +727,23 @@
             </div>
 
             <button type="button" id="btnKontakDesa"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer shrink-0">
-              <span class="material-symbols-outlined text-[15px]">support_agent</span>
+              class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer shrink-0">
+              <span class="material-symbols-outlined text-[15px] text-emerald-600 dark:text-emerald-400">support_agent</span>
               <span id="btnKontakDesaText">Kontak Pamong</span>
             </button>
           </div>
 
           <!-- Desa Tabs Pill Bar -->
-          <div class="p-2.5 sm:p-3 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 overflow-x-auto scrollbar-none">
+          <div
+            class="p-2.5 sm:p-3 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 overflow-x-auto scrollbar-none">
             <div id="desaTabs" class="flex items-center gap-1.5 min-w-max">
               <!-- Rendered by JS -->
             </div>
           </div>
 
-          <!-- Kelompok Grid Container (Selected Desa) -->
-          <div class="p-3 sm:p-4" style="min-height: 140px;">
-            <div id="kelompokGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- Kelompok Grid Container (Selected Desa) — 3-Column Grid -->
+          <div class="p-2.5 sm:p-4" style="min-height: 140px;">
+            <div id="kelompokGrid" class="grid grid-cols-3 gap-2 sm:gap-2.5">
               <!-- Rendered by JS -->
             </div>
           </div>
@@ -896,7 +929,7 @@
     class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
   </div>
 
-  <script type="module" src="dashboard.js?v=10.0"></script>
+  <script type="module" src="dashboard.js?v=10.1"></script>
 </body>
 
 </html>

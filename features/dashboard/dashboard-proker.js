@@ -905,61 +905,85 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   // Role Header Banner (Tombol tambah kini terintegrasi di Ultra-Compact Header)
   let bannerNoticeHtml = '';
 
-  // Summary Stat Strip (Realisasi & LPJ Integrated)
+  // Summary Stat Strip (Streamlined 1-Row Compact on Desktop)
   const statsHtml = `
     <div class="proker-stats-container">
-      <!-- BARIS 1 & 2: DESKTOP ONLY (HIDDEN DI MOBILE AGAR HEMAT RUANG) -->
-      <div class="hidden md:flex flex-col gap-2.5">
-        <div class="proker-stats-row-1">
-          <div class="proker-stat-box">
-            <span class="material-symbols-outlined proker-stat-icon">inventory_2</span>
-            <div class="proker-stat-info">
-              <span class="stat-label">TOTAL PROGRAM ${isKmmActive ? 'KMM' : 'PPG'}</span>
-              <span class="stat-num">${stats.total} <span class="stat-unit">Prog</span></span>
-            </div>
+      <!-- DESKTOP SLIM 1-ROW CONSOLIDATED SUMMARY BAR -->
+      <div class="hidden md:flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs">
+        <!-- Metric 1: Total Program -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">inventory_2</span>
           </div>
-          <div class="proker-stat-box">
-            <span class="material-symbols-outlined proker-stat-icon" style="color:#057a55;">check_circle</span>
-            <div class="proker-stat-info">
-              <span class="stat-label">TERLAKSANA (LPJ)</span>
-              <span class="stat-num" style="color:#057a55;">${stats.totalTerlaksana} <span class="stat-unit">Prog</span></span>
-            </div>
-          </div>
-          <div class="proker-stat-box">
-            <span class="material-symbols-outlined proker-stat-icon" style="color:#c81e1e;">pending_actions</span>
-            <div class="proker-stat-info">
-              <span class="stat-label">BELUM TERLAKSANA</span>
-              <span class="stat-num" style="color:#c81e1e;">${stats.totalBelumTerlaksana} <span class="stat-unit">Prog</span></span>
-            </div>
+          <div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Total Program ${isKmmActive ? 'KMM' : 'PPG'}</div>
+            <div class="font-extrabold text-slate-900 dark:text-white text-sm">${stats.total} <span class="text-[11px] font-normal text-slate-500">Prog</span></div>
           </div>
         </div>
 
-        <!-- BARIS 2 ANGGARAN DESKTOP (3 KOLOM) -->
-        <div class="proker-stats-row-2 proker-stats-row-2-desktop">
-          <div class="proker-stat-box">
-            <span class="material-symbols-outlined proker-stat-icon">payments</span>
-            <div class="proker-stat-info">
-              <span class="stat-label">EST. BIAYA (${isKmmActive ? 'RAB KMM' : 'RAB KONSOLIDASI'})</span>
-              <span class="stat-num">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</span>
-              <span class="stat-sub">${isKmmActive ? 'Rencana Anggaran 9 Divisi KMM' : `Termasuk alokasi KMM Rp ${(stats.kmmAnggaran || 0).toLocaleString('id-ID')}`}</span>
-            </div>
+        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+        <!-- Metric 2: Terlaksana LPJ -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
           </div>
-          <div class="proker-stat-box">
-            <span class="material-symbols-outlined proker-stat-icon" style="color:#0e7039;">account_balance_wallet</span>
-            <div class="proker-stat-info">
-              <span class="stat-label">REALISASI DANA (${isKmmActive ? 'LPJ KMM' : 'KONSOLIDASI'})</span>
-              <span class="stat-num" style="color:#0e7039;">Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</span>
-              <span class="stat-sub">${isKmmActive ? 'Aktual Pengeluaran KMM' : `PPG Rp ${(stats.ppgRealisasi || 0).toLocaleString('id-ID')} + KMM Rp ${(stats.kmmRealisasi || 0).toLocaleString('id-ID')}`}</span>
-            </div>
+          <div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Terlaksana (LPJ)</div>
+            <div class="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">${stats.totalTerlaksana} <span class="text-[11px] font-normal text-slate-500">Prog</span></div>
           </div>
-          <div class="proker-stat-box">
-            <span class="material-symbols-outlined proker-stat-icon" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#2563eb'};">pie_chart</span>
-            <div class="proker-stat-info">
-              <span class="stat-label">PENYERAPAN DANA (${stats.persenRealisasiDana}%)</span>
-              <span class="stat-num" style="color:${stats.selisihDana < 0 ? '#c81e1e' : '#057a55'};">
-                ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
-              </span>
-              <span class="stat-sub">${stats.selisihDana > 0 ? 'Sisa Pagu Anggaran' : (stats.selisihDana < 0 ? 'Melebihi Estimasi RAB' : 'Tepat 100% Sesuai RAB')}</span>
+        </div>
+
+        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+        <!-- Metric 3: Belum Terlaksana -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">pending_actions</span>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Belum Terlaksana</div>
+            <div class="font-extrabold text-rose-600 dark:text-rose-400 text-sm">${stats.totalBelumTerlaksana} <span class="text-[11px] font-normal text-slate-500">Prog</span></div>
+          </div>
+        </div>
+
+        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+        <!-- Metric 4: RAB -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Estimasi RAB</div>
+            <div class="font-extrabold text-slate-900 dark:text-white text-sm">Rp ${stats.totalAnggaran.toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+
+        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+        <!-- Metric 5: Realisasi Dana -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Realisasi Dana</div>
+            <div class="font-extrabold text-teal-600 dark:text-teal-400 text-sm">Rp ${stats.totalRealisasiDana.toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+
+        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+        <!-- Metric 6: Penyerapan Dana -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">pie_chart</span>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Serapan (${stats.persenRealisasiDana}%)</div>
+            <div class="font-extrabold ${stats.selisihDana < 0 ? 'text-rose-600' : 'text-emerald-600'} text-sm">
+              ${stats.selisihDana < 0 ? 'Over Rp ' + Math.abs(stats.selisihDana).toLocaleString('id-ID') : (stats.selisihDana > 0 ? 'Sisa Rp ' + stats.selisihDana.toLocaleString('id-ID') : 'Rp 0')}
             </div>
           </div>
         </div>
@@ -1106,7 +1130,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       <!-- BARIS UTAMA: PENCARIAN & FILTER GROUP + VIEW CONTROLS & DOWNLOAD DROPDOWN (SEJAJAR) -->
       <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
         <!-- Sisi Kiri: Pencarian & Filter Group (Di mobile filter group di-hide, search full-width) -->
-        <div class="flex items-center gap-2 flex-1 w-full max-w-xl">
+        <div class="flex items-center gap-2 flex-1 w-full xl:max-w-xl">
           <div class="relative flex-1">
             <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan, PIC..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" />
             <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
@@ -1212,11 +1236,29 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       let actionsCell = `
         <td style="white-space:nowrap;text-align:right;">
-          <div style="display:inline-flex;gap:5px;align-items:center;justify-content:flex-end;">
-            <button type="button" class="btn-proker-preview" data-id="${p.id}" title="Tampilkan Detail Lengkap & Mode Pleno">
-              <span class="material-symbols-outlined">visibility</span>
-              <span>Detail</span>
+          <div class="proker-table-action-wrap" style="position:relative;display:inline-block;">
+            <button type="button" class="btn-proker-action-dots" data-id="${p.id}" title="Menu Aksi Program" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s ease;">
+              <span class="material-symbols-outlined" style="font-size:18px;">more_vert</span>
             </button>
+            <div class="proker-table-action-menu hidden" data-id="${p.id}" style="position:absolute;right:0;top:calc(100% + 4px);z-index:90;min-width:165px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.18);padding:5px;display:flex;flex-direction:column;gap:2px;text-align:left;">
+              <button type="button" class="btn-table-action-preview" data-id="${p.id}" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:6px;border:none;background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:left;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">visibility</span>
+                <span>Detail &amp; Pleno</span>
+              </button>
+              <button type="button" class="btn-table-action-edit" data-id="${p.id}" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:6px;border:none;background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:left;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#2563eb;">edit_note</span>
+                <span>Edit Program</span>
+              </button>
+              <button type="button" class="btn-table-action-lpj" data-id="${p.id}" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:6px;border:none;background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:left;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#059669;">fact_check</span>
+                <span>Lapor LPJ</span>
+              </button>
+              <div style="height:1px;background:var(--border);margin:2px 0;"></div>
+              <button type="button" class="btn-table-action-delete" data-id="${p.id}" data-name="${p.kegiatan}" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:6px;border:none;background:transparent;color:#dc2626;font-size:12px;font-weight:600;cursor:pointer;text-align:left;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#dc2626;">delete</span>
+                <span>Hapus</span>
+              </button>
+            </div>
           </div>
         </td>
       `;
@@ -1382,7 +1424,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
           <div style="font-size:12.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
             <span class="material-symbols-outlined" style="font-size:17px;color:var(--blue);">view_timeline</span>
-            Timeline kronologis agenda kegiatan program kerja tahunan 2026.
+            Timeline kronologis agenda kegiatan program kerja tahunan.
           </div>
           <span style="font-size:12px;font-weight:700;color:var(--text-muted);">
             Halaman ${currentPage} dari ${totalPages} (${totalItems} Total)
@@ -1810,6 +1852,90 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       e.stopPropagation();
       const pId = btn.dataset.id;
       renderProkerPresentationModal(pId, filtered);
+    });
+  });
+
+  // Menu Titik 3 Kolom Aksi Tabel Proker (Detail, Edit, Lapor LPJ, Delete)
+  prokerContainer.querySelectorAll('.btn-proker-action-dots').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pId = btn.dataset.id;
+      const targetMenu = prokerContainer.querySelector(`.proker-table-action-menu[data-id="${pId}"]`);
+      
+      // Tutup menu lain yang terbuka
+      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => {
+        if (m !== targetMenu) m.classList.add('hidden');
+      });
+
+      if (targetMenu) {
+        targetMenu.classList.toggle('hidden');
+      }
+    });
+  });
+
+  // Tutup menu aksi saat klik di luar
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.proker-table-action-wrap')) {
+      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
+    }
+  });
+
+  // Aksi Tabel: Detail & Pleno
+  prokerContainer.querySelectorAll('.btn-table-action-preview').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
+      const pId = btn.dataset.id;
+      renderProkerPresentationModal(pId, filtered);
+    });
+  });
+
+  // Aksi Tabel: Edit Program
+  prokerContainer.querySelectorAll('.btn-table-action-edit').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
+      const pId = btn.dataset.id;
+      const prokerItem = prokerList.find(p => p.id === pId);
+      if (prokerItem) renderAddEditProkerForm(prokerItem, currentActiveKategori);
+    });
+  });
+
+  // Aksi Tabel: Lapor LPJ
+  prokerContainer.querySelectorAll('.btn-table-action-lpj').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
+      const pId = btn.dataset.id;
+      const prokerItem = prokerList.find(p => p.id === pId);
+      if (prokerItem) renderLaporRealisasiModal(prokerItem);
+    });
+  });
+
+  // Aksi Tabel: Hapus Program
+  prokerContainer.querySelectorAll('.btn-table-action-delete').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
+      const pId = btn.dataset.id;
+      const pTitle = btn.dataset.name || 'Program Kerja';
+
+      showConfirmModal({
+        title: 'Hapus Program Kerja',
+        message: `Apakah Anda yakin ingin menghapus kegiatan "${pTitle}"? Tindakan ini tidak dapat dibatalkan.`,
+        icon: 'delete',
+        iconBg: 'var(--red-light)',
+        iconColor: 'var(--red)',
+        confirmText: 'Ya, Hapus',
+        confirmBtnColor: 'var(--red)',
+        onConfirm: async () => {
+          await deleteProker(pId);
+          showToast(`Program kerja "${pTitle}" berhasil dihapus`, 'success');
+          renderProkerModal(filterBidang, filterStatus, searchQuery, activeTab, currentPage, false, currentActiveKategori, filterTahun);
+          renderInlineProkerWidget();
+          appHooks.renderUserProfile();
+        }
+      });
     });
   });
 
@@ -2903,7 +3029,7 @@ export async function renderAddEditProkerForm(p = null, defaultKategori = curren
    Komponen agenda bulanan di dashboard admin serupa landing page
    ═══════════════════════════════════════════════════════════════ */
 
-let currentDashProkerFilter = 'all'; // Default: Tampilkan Semua Agenda Bulan Ini
+let currentDashProkerFilter = 'ongoing'; // Default: Tampilkan Agenda Berjalan (Ongoing) Bulan Ini
 let currentDashProkerSegment = 'event'; // 'event' (Agenda Utama) atau 'routine' (Rutin Bulanan)
 let currentDashProkerPage = 1;
 let dashProkerItemsPerPage = 4;

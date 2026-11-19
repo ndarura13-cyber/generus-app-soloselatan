@@ -7404,10 +7404,7 @@ body {
   .btn-import-wizard .btn-label-text,
   .btn-export-csv .btn-label-text,
   .btn-import-csv .btn-label-text,
-  .btn-auto-promote .btn-label-text,
-  .btn-edit-pengurus .btn-label-text,
-  .btn-toggle-active .btn-label-text,
-  .btn-hapus-pengurus .btn-label-text {
+  .btn-auto-promote .btn-label-text {
     display: none !important;
   }
 
@@ -7423,17 +7420,6 @@ body {
     height: 38px !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
-  }
-
-  .btn-edit-pengurus,
-  .btn-toggle-active,
-  .btn-hapus-pengurus {
-    padding: 6px 8px !important;
-    min-width: 32px !important;
-    height: 32px !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    gap: 0 !important;
   }
 
   /* Banner Generus Mobile: Tombol Tambah Generus tepat di bawah judul memenuhi lebar kontainer */
@@ -7514,20 +7500,45 @@ body {
   color: #ffffff !important;
 }
 
+/* Subtle Colored Filter Pills (Hijau untuk Berjalan, Oranye untuk Mendatang) */
+.dash-proker-filter-btn[data-filter="ongoing"] {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #059669 !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  font-weight: 600 !important;
+}
+.dark .dash-proker-filter-btn[data-filter="ongoing"] {
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #34d399 !important;
+  background: rgba(16, 185, 129, 0.18) !important;
+}
+
+.dash-proker-filter-btn[data-filter="upcoming"] {
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: #d97706 !important;
+  background: rgba(245, 158, 11, 0.08) !important;
+  font-weight: 600 !important;
+}
+.dark .dash-proker-filter-btn[data-filter="upcoming"] {
+  border-color: rgba(251, 191, 36, 0.45) !important;
+  color: #fbbf24 !important;
+  background: rgba(245, 158, 11, 0.18) !important;
+}
+
 .dash-proker-filter-btn.active-ongoing {
   background: #10b981 !important;
   border-color: #6ee7b7 !important;
   color: #ffffff !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
 }
 
 .dash-proker-filter-btn.active-upcoming {
   background: #f59e0b !important;
   border-color: #fde68a !important;
   color: #ffffff !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important;
 }
 
 .dash-proker-filter-btn.active-planned {
@@ -7548,10 +7559,34 @@ body {
 
 .dash-proker-filter-btn.active-all {
   background: #ffffff !important;
-  border-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
   color: #1e40af !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+.dark .dash-proker-filter-btn.active-all {
+  background: #1e293b !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 3-Dots Action Dropdown in Proker Table */
+.proker-table-action-menu {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+}
+.dark .proker-table-action-menu {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.55) !important;
+}
+.proker-table-action-menu button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.dark .proker-table-action-menu button:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -9745,10 +9780,10 @@ body {
   display: flex;
 }
 
-/* ── 1. Desktop View (2-Column Grid) ── */
+/* ── 1. Desktop View (3-Column Grid, 3x3 Layout) ── */
 .struktur-desktop-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
