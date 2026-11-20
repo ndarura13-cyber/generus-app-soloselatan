@@ -496,16 +496,16 @@ export function renderCetakAbsensiModal(activeTab = 'rekap_bulanan', options = {
               ‹
             </button>
             ${(() => {
-              const maxV = 5;
-              let sP = Math.max(1, currentPage - Math.floor(maxV / 2));
-              let eP = Math.min(totalPages, sP + maxV - 1);
-              if (eP - sP < maxV - 1) sP = Math.max(1, eP - maxV + 1);
-              let h = '';
-              for (let p = sP; p <= eP; p++) {
-                h += `<button type="button" class="kbm-page-btn btn-page-nav ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
-              }
-              return h;
-            })()}
+          const maxV = 5;
+          let sP = Math.max(1, currentPage - Math.floor(maxV / 2));
+          let eP = Math.min(totalPages, sP + maxV - 1);
+          if (eP - sP < maxV - 1) sP = Math.max(1, eP - maxV + 1);
+          let h = '';
+          for (let p = sP; p <= eP; p++) {
+            h += `<button type="button" class="kbm-page-btn btn-page-nav ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+          }
+          return h;
+        })()}
             <button type="button" class="kbm-page-btn btn-page-nav" data-page="${currentPage + 1}" ${currentPage >= totalPages ? 'disabled' : ''} title="Halaman Selanjutnya">
               ›
             </button>
@@ -1165,23 +1165,23 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
             </thead>
             <tbody>
               ${scopedDesa.map(d => {
-                let desaRows = `
+    let desaRows = `
                   <tr style="background:#e2e8f0;font-weight:800;">
                     <td colspan="8" style="padding:5px 8px;color:var(--text);">Desa ${d.nama}</td>
                   </tr>
                 `;
-                d.kelompok.forEach(kel => {
-                  const kVal = currentRekap[kel.id] || { hadir: 0, ijin: 0, alfa: 0 };
-                  const h = parseInt(kVal.hadir) || 0;
-                  const i = parseInt(kVal.ijin) || 0;
-                  const a = parseInt(kVal.alfa) || 0;
-                  const tot = h + i + a;
-                  const pH = tot > 0 ? ((h / tot) * 100).toFixed(2) : '0.00';
-                  const pI = tot > 0 ? ((i / tot) * 100).toFixed(2) : '0.00';
-                  const pA = tot > 0 ? ((a / tot) * 100).toFixed(2) : '0.00';
-                  const isHigh = parseFloat(pA) >= 13.0;
+    d.kelompok.forEach(kel => {
+      const kVal = currentRekap[kel.id] || { hadir: 0, ijin: 0, alfa: 0 };
+      const h = parseInt(kVal.hadir) || 0;
+      const i = parseInt(kVal.ijin) || 0;
+      const a = parseInt(kVal.alfa) || 0;
+      const tot = h + i + a;
+      const pH = tot > 0 ? ((h / tot) * 100).toFixed(2) : '0.00';
+      const pI = tot > 0 ? ((i / tot) * 100).toFixed(2) : '0.00';
+      const pA = tot > 0 ? ((a / tot) * 100).toFixed(2) : '0.00';
+      const isHigh = parseFloat(pA) >= 13.0;
 
-                  desaRows += `
+      desaRows += `
                     <tr class="row-kelompok-input" data-kel-id="${kel.id}" data-desa-id="${d.id}" style="border-bottom:1px solid #f1f5f9;">
                       <td style="padding:4px 8px;font-weight:600;">${kel.nama}</td>
                       <td style="padding:2px 4px;text-align:center;">
@@ -1199,9 +1199,9 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
                       <td class="cell-pct-a" id="pct_a_${kel.id}" style="padding:4px;text-align:center;font-size:11px;${isHigh ? 'background:#fef08a;font-weight:800;' : ''}">${pA}%</td>
                     </tr>
                   `;
-                });
+    });
 
-                desaRows += `
+    desaRows += `
                   <tr class="subtotal-desa-row" id="subtotal_row_${d.id}" style="background:var(--surface)beb;font-weight:800;border-bottom:1.5px solid #cbd5e1;">
                     <td style="padding:5px 8px;">Subtotal Desa ${d.nama}</td>
                     <td style="text-align:center;" id="sub_h_${d.id}">0</td>
@@ -1214,8 +1214,8 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
                   </tr>
                 `;
 
-                return desaRows;
-              }).join('')}
+    return desaRows;
+  }).join('')}
 
               <tr id="grandTotalRow" style="background:#fef08a;font-weight:900;position:sticky;bottom:0;border-top:2px solid #000;font-size:12.5px;">
                 <td style="padding:7px 8px;">TOTAL (${wilayahRekapLabel.toUpperCase()})</td>

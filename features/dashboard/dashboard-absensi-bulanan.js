@@ -18,7 +18,9 @@ import {
   getAbsensiBulananList,
   getAbsensiBulananById,
   saveAbsensiBulanan,
-  deleteAbsensiBulanan
+  deleteAbsensiBulanan,
+  syncAbsensiBulananFromSupabase,
+  isSupabaseConfigured
 } from '../../src/db-master.js';
 
 import {
@@ -88,6 +90,16 @@ export function renderAbsensiBulananTab(container, options = {}) {
   const selectedDesa = options.desaId || (isDaerah ? 'all' : currentDesaId);
   const selectedKel = options.kelompokId || (isKelompok ? currentKelId : 'all');
 
+  // Sinkronisasi otomatis data terbaru dari Supabase Cloud saat pertama kali tab dibuka
+  if (isSupabaseConfigured() && !container._hasAutoSynced) {
+    container._hasAutoSynced = true;
+    syncAbsensiBulananFromSupabase().then(res => {
+      if (res && res.success && res.count > 0) {
+        renderAbsensiBulananTab(container, options);
+      }
+    });
+  }
+
   const allKels = getAllKelompok();
   const desaList = MASTER_WILAYAH.desa;
 
@@ -137,6 +149,9 @@ export function renderAbsensiBulananTab(container, options = {}) {
 
       <!-- Tombol Buat / Input Baru -->
       <div class="flex items-center gap-2">
+        <button type="button" id="btnSyncCloudAbsensi" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors cursor-pointer" title="Sinkronkan dengan Database Cloud Supabase">
+          <span class="material-symbols-outlined text-[17px]">cloud_sync</span>
+        </button>
         <button type="button" id="btnBukaGrafikTahunan" class="px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1.5 transition-all hover:bg-blue-100 cursor-pointer" title="Lihat Grafik Kehadiran Tahunan">
           <span class="material-symbols-outlined text-[17px]">analytics</span>
           <span>Grafik Tahunan</span>
@@ -271,6 +286,24 @@ export function renderAbsensiBulananTab(container, options = {}) {
     renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: e.target.value });
   });
 
+  // Action Sync Cloud Database Supabase
+  container.querySelector('#btnSyncCloudAbsensi')?.addEventListener('click', async () => {
+    const btn = container.querySelector('#btnSyncCloudAbsensi');
+    const icon = btn?.querySelector('.material-symbols-outlined');
+    if (icon) icon.classList.add('animate-spin');
+    showToast('Menghubungkan ke Supabase Cloud...', 'info');
+    
+    const res = await syncAbsensiBulananFromSupabase();
+    if (icon) icon.classList.remove('animate-spin');
+    
+    renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
+    if (res.success) {
+      showToast(`Data absensi berhasil disinkronkan (${res.count} rekap dari Cloud)`, 'success');
+    } else {
+      showToast(res.error || 'Gagal tersambung ke Supabase Cloud', 'warning');
+    }
+  });
+
   // Action Buka Form Input
   const triggerInput = () => {
     openFormAbsensiBulananModal({
@@ -345,7 +378,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
         confirmText: 'Ya, Hapus',
         confirmBtnColor: 'var(--red)',
         onConfirm: async () => {
-          deleteAbsensiBulanan(rId);
+          await deleteAbsensiBulanan(rId);
           showToast('Rekap absensi berhasil dihapus', 'success');
           renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
         }
@@ -668,8 +701,8 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
         }
       };
 
-      saveAbsensiBulanan(payload);
-      showToast('Rekap absensi bulanan berhasil disimpan!', 'success');
+      await saveAbsensiBulanan(payload);
+      showToast('Rekap absensi bulanan berhasil disimpan ke database!', 'success');
       closeModal();
       if (typeof onSavedCallback === 'function') {
         onSavedCallback(payload);

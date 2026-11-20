@@ -1174,3 +1174,101 @@ export async function deleteProkerFromSupabase(prokerId) {
     return false;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   REKAP ABSENSI BULANAN PER JENJANG (CABERAWIT & GP)
+   Menghubungkan antar perangkat pamong, kelompok, dan daerah
+   ═══════════════════════════════════════════════════════════════ */
+
+export async function fetchAbsensiBulananFromSupabase(filter = {}) {
+  const client = getSupabase();
+  if (!client) return { success: false, data: [] };
+
+  try {
+    let query = client.from('rekap_absensi_bulanan').select('*').order('updated_at', { ascending: false });
+
+    if (filter.tahun) query = query.eq('tahun', Number(filter.tahun));
+    if (filter.bulanIndex) query = query.eq('bulan_index', Number(filter.bulanIndex));
+    if (filter.jenjang && filter.jenjang !== 'all') query = query.eq('jenjang', filter.jenjang);
+    if (filter.desaId && filter.desaId !== 'all') query = query.eq('desa_id', filter.desaId);
+    if (filter.kelompokId && filter.kelompokId !== 'all') query = query.eq('kelompok_id', filter.kelompokId);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const mapped = (data || []).map(row => ({
+      id: row.id,
+      tahun: row.tahun,
+      bulan: row.bulan,
+      bulanIndex: row.bulan_index,
+      tahunAjaran: row.tahun_ajaran,
+      jenjang: row.jenjang,
+      desaId: row.desa_id,
+      desaNama: row.desa_nama,
+      kelompokId: row.kelompok_id,
+      kelompokNama: row.kelompok_nama,
+      tanggalPertemuan: row.tanggal_pertemuan || [],
+      totalPertemuan: row.total_pertemuan || 0,
+      records: row.records || [],
+      summary: row.summary || {},
+      created_at: row.created_at,
+      updatedAt: row.updated_at
+    }));
+
+    return { success: true, data: mapped };
+  } catch (err) {
+    console.error("Supabase Error fetching Absensi Bulanan:", err);
+    return { success: false, data: [], error: err.message };
+  }
+}
+
+export async function upsertAbsensiBulananToSupabase(rekap) {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const record = {
+      id: rekap.id,
+      tahun: Number(rekap.tahun),
+      bulan: rekap.bulan,
+      bulan_index: Number(rekap.bulanIndex),
+      tahun_ajaran: rekap.tahunAjaran || `${rekap.tahun}/${Number(rekap.tahun) + 1}`,
+      jenjang: rekap.jenjang,
+      desa_id: rekap.desaId || null,
+      desa_nama: rekap.desaNama || null,
+      kelompok_id: rekap.kelompokId,
+      kelompok_nama: rekap.kelompokNama,
+      tanggal_pertemuan: rekap.tanggalPertemuan || [],
+      total_pertemuan: Number(rekap.totalPertemuan) || (rekap.tanggalPertemuan ? rekap.tanggalPertemuan.length : 0),
+      records: rekap.records || [],
+      summary: rekap.summary || {},
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await client
+      .from('rekap_absensi_bulanan')
+      .upsert(record)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error("Supabase Error upserting Absensi Bulanan:", err.message);
+    return null;
+  }
+}
+
+export async function deleteAbsensiBulananFromSupabase(rekapId) {
+  const client = getSupabase();
+  if (!client) return false;
+
+  try {
+    const { error } = await client.from('rekap_absensi_bulanan').delete().eq('id', rekapId);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error("Supabase Error deleting Absensi Bulanan:", err.message);
+    return false;
+  }
+}
