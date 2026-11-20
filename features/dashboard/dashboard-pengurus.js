@@ -109,8 +109,8 @@ export function renderApprovalListModal() {
     const asalClean = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
-      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
           <div style="flex:1;min-width:0;">
             <strong style="font-size:14px;color:var(--text);word-break:break-word;">${p.nama}</strong>
             <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${roleDisplay}</div>
@@ -131,7 +131,7 @@ export function renderApprovalListModal() {
               <span>Asal: <strong>${asalClean}</strong></span>
             </div>
           </div>
-          <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;white-space:nowrap;flex-shrink:0;">Pending</span>
+          <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;white-space:nowrap;flex-shrink:0;margin-left:4px;">Pending</span>
         </div>
 
         <div style="display:flex;gap:8px;margin-top:2px;">
@@ -648,7 +648,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
     } else if (p.tingkatan === 'kelompok') {
       levelBadgeBg = 'var(--green-pastel)';
       levelBadgeColor = 'var(--green-dark)';
-      levelLabel = p.kelompokNama ? `${p.kelompokNama} (${p.desaNama || '-'})` : 'Kelompok';
+      levelLabel = p.kelompokNama || 'Kelompok';
     }
 
     let statusChip = isActive
@@ -699,14 +699,14 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
     const asalTxt = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
     return `
-      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);box-sizing:border-box;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);box-sizing:border-box;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
           <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
-              <strong style="font-size:14px;color:var(--text);word-break:break-word;">${p.nama}</strong>
-              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${levelLabel}">${levelLabel}</span>
+            <strong style="font-size:14px;color:var(--text);word-break:break-word;display:block;">${p.nama}</strong>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px;">
+              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${levelLabel}">${levelLabel}</span>
+              <span style="font-size:11.5px;color:var(--blue);font-weight:600;">${roleDisplay}</span>
             </div>
-            <div style="font-size:12px;color:var(--blue);font-weight:600;margin-top:2px;">${roleDisplay}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
               <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">location_on</span>
               <span>Asal: <strong>${asalTxt}</strong></span>
@@ -724,7 +724,7 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
               ` : ''}
             </div>
           </div>
-          <div style="flex-shrink:0;">
+          <div style="flex-shrink:0;margin-left:4px;">
             ${statusChip}
           </div>
         </div>

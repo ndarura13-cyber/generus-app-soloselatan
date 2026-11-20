@@ -908,8 +908,8 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
   // Summary Stat Strip (Streamlined 1-Row Compact on Desktop)
   const statsHtml = `
     <div class="proker-stats-container">
-      <!-- DESKTOP SLIM 1-ROW CONSOLIDATED SUMMARY BAR -->
-      <div class="hidden md:flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs">
+      <!-- DESKTOP / TABLET RESPONSIVE CONSOLIDATED SUMMARY BAR -->
+      <div class="hidden md:grid grid-cols-2 md:grid-cols-3 xl:flex xl:items-center xl:justify-between gap-3 p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs">
         <!-- Metric 1: Total Program -->
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -921,7 +921,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
 
-        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <div class="hidden xl:block h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         <!-- Metric 2: Terlaksana LPJ -->
         <div class="flex items-center gap-2">
@@ -934,7 +934,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
 
-        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <div class="hidden xl:block h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         <!-- Metric 3: Belum Terlaksana -->
         <div class="flex items-center gap-2">
@@ -947,7 +947,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
 
-        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <div class="hidden xl:block h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         <!-- Metric 4: RAB -->
         <div class="flex items-center gap-2">
@@ -960,7 +960,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
 
-        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <div class="hidden xl:block h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         <!-- Metric 5: Realisasi Dana -->
         <div class="flex items-center gap-2">
@@ -973,7 +973,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
 
-        <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <div class="hidden xl:block h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         <!-- Metric 6: Penyerapan Dana -->
         <div class="flex items-center gap-2">
@@ -1126,12 +1126,12 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       <span class="filter-badge">${activeFilterCount}</span>
     </button>
 
-    <div class="proker-filter-bar space-y-2.5">
+    <div class="proker-filter-bar w-full space-y-2.5">
       <!-- BARIS UTAMA: PENCARIAN & FILTER GROUP + VIEW CONTROLS & DOWNLOAD DROPDOWN (SEJAJAR) -->
-      <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+      <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5 w-full">
         <!-- Sisi Kiri: Pencarian & Filter Group (Di mobile filter group di-hide, search full-width) -->
-        <div class="flex items-center gap-2 flex-1 w-full xl:max-w-xl">
-          <div class="relative flex-1">
+        <div class="flex items-center gap-2 w-full xl:max-w-xl">
+          <div class="relative flex-1 w-full">
             <input type="text" id="inputProkerSearch" value="${searchQuery}" placeholder="Cari kegiatan, tempat, tujuan, PIC..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xs" />
             <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
           </div>
@@ -1150,7 +1150,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
           </div>
         </div>
 
-        <!-- Sisi Kanan: Tab Timeline, Tabel, & Dropdown Download (Sejajar) -->
+        <!-- Sisi Kanan: Tab Timeline, Tabel, & Dropdown Download (Sejajar & Full Width di Mobile) -->
         <div class="proker-view-controls-bar w-full xl:w-auto shrink-0">
           <button type="button" id="tabViewTimeline" class="proker-control-tab ${activeTab === 'timeline' ? 'active' : ''}">
             <span class="material-symbols-outlined" style="font-size:16px;">view_timeline</span>
@@ -1236,11 +1236,11 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
 
       let actionsCell = `
         <td style="white-space:nowrap;text-align:right;">
-          <div class="proker-table-action-wrap" style="position:relative;display:inline-block;">
+          <div class="proker-table-action-wrap">
             <button type="button" class="btn-proker-action-dots" data-id="${p.id}" title="Menu Aksi Program" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s ease;">
               <span class="material-symbols-outlined" style="font-size:18px;">more_vert</span>
             </button>
-            <div class="proker-table-action-menu hidden" data-id="${p.id}" style="position:absolute;right:0;top:calc(100% + 4px);z-index:90;min-width:165px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.18);padding:5px;display:flex;flex-direction:column;gap:2px;text-align:left;">
+            <div class="proker-table-action-menu hidden" data-id="${p.id}">
               <button type="button" class="btn-table-action-preview" data-id="${p.id}" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:6px;border:none;background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:left;">
                 <span class="material-symbols-outlined" style="font-size:16px;color:var(--blue);">visibility</span>
                 <span>Detail &amp; Pleno</span>
@@ -1868,17 +1868,28 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       });
 
       if (targetMenu) {
+        // Cek posisi apakah di dekat batas bawah viewport agar menu tidak terpotong
+        const rect = btn.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 185) {
+          targetMenu.classList.add('drop-up');
+        } else {
+          targetMenu.classList.remove('drop-up');
+        }
         targetMenu.classList.toggle('hidden');
       }
     });
   });
 
-  // Tutup menu aksi saat klik di luar
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.proker-table-action-wrap')) {
-      prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
-    }
-  });
+  // Tutup menu aksi saat klik di luar (gunakan global guard agar tidak stacking)
+  if (!window._prokerMenuCloseListenerBound) {
+    window._prokerMenuCloseListenerBound = true;
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.proker-table-action-wrap')) {
+        document.querySelectorAll('.proker-table-action-menu').forEach(m => m.classList.add('hidden'));
+      }
+    });
+  }
 
   // Aksi Tabel: Detail & Pleno
   prokerContainer.querySelectorAll('.btn-table-action-preview').forEach(btn => {

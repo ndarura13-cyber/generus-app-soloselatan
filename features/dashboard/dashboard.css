@@ -7572,15 +7572,37 @@ body {
 }
 
 /* 3-Dots Action Dropdown in Proker Table */
+.proker-table-action-wrap {
+  position: relative;
+  display: inline-block;
+}
 .proker-table-action-menu {
+  display: flex !important;
+  flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 120 !important;
+  min-width: 170px;
   background: #ffffff;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  gap: 2px;
+  text-align: left;
+}
+.proker-table-action-menu.hidden {
+  display: none !important;
+}
+.proker-table-action-menu.drop-up {
+  top: auto !important;
+  bottom: calc(100% + 4px) !important;
 }
 .dark .proker-table-action-menu {
   background: #0f172a !important;
   border-color: #334155 !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.55) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.65) !important;
 }
 .proker-table-action-menu button:hover {
   background: rgba(0, 0, 0, 0.05);
@@ -10950,11 +10972,11 @@ body {
 /* Floating Action Pill (Mobile View Only: Bottom-Right comfortably above Bottom Nav) */
 .filter-floating-pill {
   position: fixed;
-  bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-  right: 20px;
+  bottom: calc(105px + env(safe-area-inset-bottom, 12px));
+  right: 18px;
   left: auto;
   transform: none;
-  z-index: 45;
+  z-index: 55 !important;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -10965,7 +10987,7 @@ body {
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.2px;
-  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.5), 0 2px 6px rgba(0, 0, 0, 0.2);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -11188,4 +11210,135 @@ body {
   background-color: #3b82f6;
   color: #ffffff;
   border-color: #3b82f6;
+}
+
+/* ── Naik Jenjang Modal – Dark Mode & Clean Card System ── */
+.naik-jenjang-banner {
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+}
+.dark .naik-jenjang-banner {
+  background: #0f172a !important;
+  border-color: #1e3a8a !important;
+  color: #bfdbfe !important;
+}
+.dark .naik-jenjang-banner .banner-title {
+  color: #60a5fa !important;
+}
+.dark .naik-jenjang-banner .banner-desc {
+  color: #94a3b8 !important;
+}
+
+/* Stat Cards Naik Jenjang */
+.naik-stat-card {
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.naik-stat-card.eligible {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+.dark .naik-stat-card.eligible {
+  background: rgba(6, 78, 59, 0.45) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+.naik-stat-card.skipped-august {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+.dark .naik-stat-card.skipped-august {
+  background: rgba(120, 53, 15, 0.45) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+.naik-stat-card.skipped-max {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+.dark .naik-stat-card.skipped-max {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(100, 116, 139, 0.4) !important;
+}
+.naik-stat-card.already {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+.dark .naik-stat-card.already {
+  background: rgba(23, 37, 84, 0.45) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Preview Box / Table Box Naik Jenjang */
+.naik-jenjang-preview-box {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+}
+.dark .naik-jenjang-preview-box {
+  background: #090e1a !important;
+  border-color: #1e293b !important;
+}
+
+/* Fallback override selector untuk element yang terlanjur menggunakan utility background */
+.dark .modal-body .bg-emerald-50\/90,
+.dark .modal-body [class*="bg-emerald-50"] {
+  background-color: rgba(6, 78, 59, 0.45) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+.dark .modal-body .bg-amber-50\/90,
+.dark .modal-body [class*="bg-amber-50"] {
+  background-color: rgba(120, 53, 15, 0.45) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+.dark .modal-body .bg-blue-50\/90,
+.dark .modal-body [class*="bg-blue-50"] {
+  background-color: rgba(23, 37, 84, 0.45) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+.dark .modal-body .bg-slate-50 {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(100, 116, 139, 0.4) !important;
+}
+.dark .modal-body .bg-white {
+  background-color: #090e1a !important;
+  border-color: #1e293b !important;
+}
+
+/* ── Proker Filter Bar & View Controls: Full Width on Mobile ── */
+@media (max-width: 640px) {
+  .proker-filter-bar,
+  .proker-view-controls-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .proker-filter-bar .flex.flex-col {
+    width: 100% !important;
+  }
+  .proker-view-controls-bar {
+    display: flex !important;
+    width: 100% !important;
+  }
+  .proker-control-tab {
+    flex: 1 1 0 !important;
+  }
+
+  /* Padding modal-body di dark mode mobile view agar proporsional dan tidak terpotong */
+  .dark .modal-body {
+    padding: 14px 14px max(20px, env(safe-area-inset-bottom)) 14px !important;
+  }
+
+  /* Import Wizard Banner Mobile */
+  .import-wizard-banner {
+    padding: 12px 14px !important;
+  }
+  .import-wizard-banner .btn-download-template {
+    width: 100% !important;
+    margin-top: 8px !important;
+    justify-content: center !important;
+  }
 }

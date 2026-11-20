@@ -1732,17 +1732,17 @@ export function openImportWizardModal() {
     <div class="import-wizard-wrapper" style="padding:4px 0;">
       <!-- TOP BANNER (RESPONSIF MOBILE TANPA MELEBIHI LAYAR) -->
       <div class="import-wizard-banner">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex flex-col gap-3">
           <div class="flex items-start gap-2.5">
-            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[24px] sm:text-[28px] shrink-0 mt-0.5">lightbulb</span>
-            <div>
+            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[24px] shrink-0 mt-0.5">lightbulb</span>
+            <div class="min-w-0 flex-1">
               <div class="text-xs sm:text-[13px] font-extrabold text-slate-800 dark:text-slate-100">Import Cerdas &amp; Fleksibel</div>
-              <p class="text-[11px] sm:text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                Unggah berkas <strong>.xlsx</strong>, <strong>.xls</strong>, atau <strong>.csv</strong>. Sistem cerdas otomatis mengenali kolom dan menormalkan nama Desa serta Kelompok.
+              <p class="text-[11px] sm:text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed break-words">
+                Unggah berkas <strong>.xlsx</strong>, <strong>.xls</strong>, atau <strong>.csv</strong>. Sistem cerdas otomatis mengenali kolom dan menormalkan nama wilayah.
               </p>
             </div>
           </div>
-          <button type="button" id="btnDownloadTemplateInWizard" class="btn-download-template shrink-0 w-full sm:w-auto justify-center cursor-pointer" title="Download Template Excel Resmi">
+          <button type="button" id="btnDownloadTemplateInWizard" class="btn-download-template w-full justify-center cursor-pointer" title="Download Template Excel Resmi">
             <span class="material-symbols-outlined" style="font-size:16px;">download</span>
             <span>Unduh Template (.xlsx)</span>
           </button>
@@ -2348,12 +2348,12 @@ export function renderAutoPromoteModal() {
       <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;">
         
         <!-- BANNER ATURAN TAHUN AJARAN SETELAH AGUSTUS -->
-        <div class="rounded-xl p-3.5 sm:p-4 border transition-all bg-blue-50/80 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800/60 text-blue-900 dark:text-blue-100">
-          <div class="font-extrabold text-xs sm:text-[13.5px] flex items-center gap-1.5 mb-1 text-blue-900 dark:text-blue-200">
+        <div class="naik-jenjang-banner transition-all">
+          <div class="font-extrabold text-xs sm:text-[13.5px] flex items-center gap-1.5 mb-1 banner-title">
             <span class="material-symbols-outlined text-[20px] text-blue-600 dark:text-blue-400">auto_mode</span>
             <span>Kenaikan Jenjang Massal Otomatis (Tahun Ajaran ${academicInfo.academicYearLabel})</span>
           </div>
-          <div class="text-[11.5px] sm:text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+          <div class="text-[11.5px] sm:text-xs leading-relaxed banner-desc">
             Seluruh generus aktif naik <strong>1 tingkat ke jenjang berikutnya</strong> setelah bulan Agustus. Generus yang baru diinput setelah bulan Agustus tidak bertambah (tetap pada kelas saat diinput).<br/>
             <span class="opacity-80 italic mt-0.5 inline-block">*Catatan: Bagi generus yang tinggal kelas, pamong/pengurus dapat memperbarui kelas secara manual melalui tombol Edit Generus.</span>
           </div>
@@ -2362,57 +2362,57 @@ export function renderAutoPromoteModal() {
         <!-- STAT STRIP / INFORMASI CEPAT (DARK MODE ADAPTIVE) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <!-- Siap Naik Kelas -->
-          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-emerald-50/90 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
-            <div class="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400 tracking-wide uppercase">Siap Naik Kelas</div>
+          <div class="naik-stat-card eligible shadow-xs">
+            <div class="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-300 tracking-wide uppercase">Siap Naik Kelas</div>
             <div class="text-xl sm:text-2xl font-black text-emerald-800 dark:text-emerald-300 mt-0.5">${countEligible}</div>
-            <div class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400/80 mt-0.5">+1 Tingkat Baru</div>
+            <div class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400/90 mt-0.5">+1 Tingkat Baru</div>
           </div>
 
           <!-- Input Setelah Agu -->
-          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 shadow-xs">
-            <div class="text-[10.5px] font-bold text-amber-700 dark:text-amber-400 tracking-wide uppercase">Input Setelah Agu</div>
+          <div class="naik-stat-card skipped-august shadow-xs">
+            <div class="text-[10.5px] font-bold text-amber-700 dark:text-amber-300 tracking-wide uppercase">Input Setelah Agu</div>
             <div class="text-xl sm:text-2xl font-black text-amber-800 dark:text-amber-300 mt-0.5">${countAfterAugust}</div>
-            <div class="text-[10px] font-medium text-amber-600 dark:text-amber-400/80 mt-0.5">Tidak Bertambah</div>
+            <div class="text-[10px] font-medium text-amber-600 dark:text-amber-400/90 mt-0.5">Tidak Bertambah</div>
           </div>
 
           <!-- Jenjang Maksimal -->
-          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 shadow-xs">
-            <div class="text-[10.5px] font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase">Jenjang Maksimal</div>
-            <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-200 mt-0.5">${countMaxJenjang}</div>
-            <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400/80 mt-0.5">Mahasiswa/Remaja/Dll</div>
+          <div class="naik-stat-card skipped-max shadow-xs">
+            <div class="text-[10.5px] font-bold text-slate-600 dark:text-slate-300 tracking-wide uppercase">Jenjang Maksimal</div>
+            <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-100 mt-0.5">${countMaxJenjang}</div>
+            <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400/90 mt-0.5">Mahasiswa/Remaja/Dll</div>
           </div>
 
           <!-- Sudah Pernah Naik -->
-          <div class="rounded-xl p-2.5 sm:p-3 text-center transition-all bg-blue-50/90 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 shadow-xs">
-            <div class="text-[10.5px] font-bold text-blue-700 dark:text-blue-400 tracking-wide uppercase">Sudah Pernah Naik</div>
+          <div class="naik-stat-card already shadow-xs">
+            <div class="text-[10.5px] font-bold text-blue-700 dark:text-blue-300 tracking-wide uppercase">Sudah Pernah Naik</div>
             <div class="text-xl sm:text-2xl font-black text-blue-800 dark:text-blue-300 mt-0.5">${countAlreadyPromoted}</div>
-            <div class="text-[10px] font-medium text-blue-600 dark:text-blue-400/80 mt-0.5">Periode T.A. Ini</div>
+            <div class="text-[10px] font-medium text-blue-600 dark:text-blue-400/90 mt-0.5">Periode T.A. Ini</div>
           </div>
         </div>
 
         <!-- SEARCH & TAB SELECTOR (DARK MODE ADAPTIVE) -->
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="inline-flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 p-1">
-            <button type="button" id="tabShowEligible" class="px-3.5 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'eligible' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+          <div class="inline-flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 p-1 w-full sm:w-auto">
+            <button type="button" id="tabShowEligible" class="flex-1 sm:flex-none px-3.5 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'eligible' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
               Siap Naik (${filteredEligible.length})
             </button>
-            <button type="button" id="tabShowSkipped" class="px-3.5 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'skipped' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
+            <button type="button" id="tabShowSkipped" class="flex-1 sm:flex-none px-3.5 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'skipped' ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
               Tidak Bertambah (${filteredSkipped.length})
             </button>
           </div>
-          <div class="flex-1 max-w-xs min-w-[180px]">
-            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="Cari nama / desa..." class="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 shadow-xs" />
+          <div class="w-full sm:flex-1 sm:max-w-xs">
+            <input type="text" id="searchPromoteSiswa" value="${searchFilter}" placeholder="Cari nama / lokasi..." class="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 shadow-xs" />
           </div>
         </div>
 
         <!-- TABEL PRATINJAU (TANPA BACKGROUND PUTIH DI MODE GELAP) -->
-        <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800/40 shadow-xs">
+        <div class="naik-jenjang-preview-box shadow-xs">
           <div class="max-h-[280px] overflow-y-auto text-[11.5px]">
             ${activeTab === 'eligible' ? (
         filteredEligible.length === 0 ? `
                 <div class="p-8 text-center text-slate-500 dark:text-slate-400">
                   <span class="material-symbols-outlined text-[40px] text-emerald-500 dark:text-emerald-400 mx-auto block mb-2">check_circle</span>
-                  <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">Tidak ada generus yang perlu dinaikkan saat ini</div>
+                  <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">Tidak ada generus yang perlu dinaikkan saat ini</div>
                   <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Semua data generus sudah mutakhir untuk Tahun Ajaran ${academicInfo.academicYearLabel}.</p>
                 </div>
               ` : `
