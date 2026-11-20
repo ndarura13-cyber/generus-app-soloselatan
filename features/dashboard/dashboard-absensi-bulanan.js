@@ -82,7 +82,7 @@ export function openRekapAbsensiBulananModal(options = {}) {
 
   openModal(
     `Laporan & Rekap Absensi Bulanan (${jenjangLabel})`,
-    'fact_check',
+    'analytics',
     modalHtml,
     'wide'
   );
@@ -136,86 +136,102 @@ export function renderAbsensiBulananTab(container, options = {}) {
     kelompokId: selectedKel
   });
 
-  // ── Multi-level Dropdown Wilayah (Desa & Kelompok) ──
-  let wilayahFilterHtml = '';
+  // ── Multi-level Dropdown Wilayah (Desa & Kelompok) & Periode (Tahun & Bulan) ──
+  let selDesaHtml = '';
+  let selKelompokHtml = '';
+
   if (isDaerah) {
-    // Admin / Superadmin: Dropdown Desa + Dropdown Kelompok (otomatis disaring sesuai desa)
     let filteredKels = allKels;
     if (selectedDesa !== 'all') {
       filteredKels = allKels.filter(k => k.desaId === selectedDesa);
     }
-    wilayahFilterHtml = `
-      <select id="selDesaAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer max-w-[165px]" title="Pilih Desa">
+    selDesaHtml = `
+      <select id="selDesaAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Desa">
         <option value="all" ${selectedDesa === 'all' ? 'selected' : ''}>Semua Desa</option>
         ${desaList.map(d => `<option value="${d.id}" ${selectedDesa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
       </select>
-
-      <select id="selKelompokAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-medium outline-none cursor-pointer max-w-[165px]" title="Pilih Kelompok">
+    `;
+    selKelompokHtml = `
+      <select id="selKelompokAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Kelompok">
         <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>${selectedDesa === 'all' ? 'Semua Kelompok' : 'Semua Kelompok di Desa Ini'}</option>
         ${filteredKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
       </select>
     `;
   } else if (isDesa) {
-    // Pengurus Desa: Desa terkunci, Kelompok bisa dipilih
     const desaObj = desaList.find(d => d.id === currentDesaId) || desaList[0];
     const filteredKels = allKels.filter(k => k.desaId === currentDesaId);
-    wilayahFilterHtml = `
-      <span class="px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center gap-1 shrink-0">
-        <span class="material-symbols-outlined text-[15px]">domain</span>
-        <span>Desa ${desaObj ? desaObj.nama : 'Desa'}</span>
-      </span>
-
-      <select id="selKelompokAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-medium outline-none cursor-pointer max-w-[165px]" title="Pilih Kelompok">
+    selDesaHtml = `
+      <div class="w-full px-3 py-2 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold text-xs flex items-center justify-between">
+        <span class="truncate">Desa ${desaObj ? desaObj.nama : 'Desa'}</span>
+        <span class="material-symbols-outlined text-[15px] opacity-60">lock</span>
+      </div>
+    `;
+    selKelompokHtml = `
+      <select id="selKelompokAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Kelompok">
         <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>Semua Kelompok</option>
         ${filteredKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
       </select>
     `;
   } else {
-    // Pengurus Kelompok: Terkunci pada kelompoknya
     const currentKelObj = allKels.find(k => k.id === currentKelId);
-    wilayahFilterHtml = `
-      <span class="px-2.5 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1 shrink-0">
-        <span class="material-symbols-outlined text-[15px]">location_on</span>
-        <span>Kel. ${currentKelObj ? currentKelObj.nama : 'Kelompok'}</span>
-      </span>
+    const desaObj = desaList.find(d => d.id === currentDesaId) || desaList[0];
+    selDesaHtml = `
+      <div class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-between">
+        <span class="truncate">Desa ${desaObj ? desaObj.nama : 'Desa'}</span>
+        <span class="material-symbols-outlined text-[15px] opacity-60">lock</span>
+      </div>
+    `;
+    selKelompokHtml = `
+      <div class="w-full px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold text-xs flex items-center justify-between">
+        <span class="truncate">Kel. ${currentKelObj ? currentKelObj.nama : 'Kelompok'}</span>
+        <span class="material-symbols-outlined text-[15px] opacity-60">lock</span>
+      </div>
     `;
   }
 
-  // ── Susun Filter Bar HTML yang Kompak & Luas ──
+  const selTahunHtml = `
+    <select id="selTahunAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Tahun">
+      <option value="${currentYear - 1}">${currentYear - 1}</option>
+      <option value="${currentYear}" selected>${currentYear}</option>
+      <option value="${currentYear + 1}">${currentYear + 1}</option>
+    </select>
+  `;
+
+  const selBulanHtml = `
+    <select id="selBulanAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Bulan">
+      ${BULAN_NAMES.map((bName, i) => `<option value="${i + 1}" ${currentMonthIdx === (i + 1) ? 'selected' : ''}>${bName}</option>`).join('')}
+    </select>
+  `;
+
+  // ── Susun Filter Bar HTML Sesuai Mockup Gambar (2 Baris di Kiri, Aksi di Kanan) ──
   const filterBarHtml = `
-    <div class="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
-      <!-- Sisi Kiri: Filter Terpadu (Jenjang Otomatis, Multi-level Wilayah, Periode) -->
-      <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
-        <!-- Pilihan Jenjang Kompak (Otomatis Sesuai Checkbox KBM) -->
-        <select id="selJenjangAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer text-xs" title="Filter Jenjang">
-          <option value="caberawit" ${selectedJenjang === 'caberawit' ? 'selected' : ''}>👶 Caberawit (Sen-Jum)</option>
-          <option value="gp_reguler" ${selectedJenjang === 'gp_reguler' ? 'selected' : ''}>🎓 GP / SMP-SMA (Sen, Kam, Jum)</option>
-        </select>
+    <div class="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+        <!-- Sisi Kiri: 2 Baris Filter Grid (Desa + Kelompok, lalu Tahun + Bulan) -->
+        <div class="flex flex-col gap-2 w-full md:w-auto md:min-w-[280px] md:max-w-[360px]">
+          <!-- Baris 1: Wilayah (Desa & Kelompok) -->
+          <div class="grid grid-cols-2 gap-2">
+            ${selDesaHtml}
+            ${selKelompokHtml}
+          </div>
+          <!-- Baris 2: Periode (Tahun & Bulan) -->
+          <div class="grid grid-cols-2 gap-2">
+            ${selTahunHtml}
+            ${selBulanHtml}
+          </div>
+        </div>
 
-        ${wilayahFilterHtml}
-
-        <!-- Pilihan Bulan & Tahun -->
-        <select id="selBulanAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer text-xs" title="Pilih Bulan">
-          ${BULAN_NAMES.map((bName, i) => `<option value="${i + 1}" ${currentMonthIdx === (i + 1) ? 'selected' : ''}>${bName}</option>`).join('')}
-        </select>
-
-        <select id="selTahunAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer text-xs" title="Pilih Tahun">
-          <option value="${currentYear - 1}">${currentYear - 1}</option>
-          <option value="${currentYear}" selected>${currentYear}</option>
-          <option value="${currentYear + 1}">${currentYear + 1}</option>
-        </select>
-      </div>
-
-      <!-- Sisi Kanan: Aksi (Grafik Tahunan & Input Absensi Baru) -->
-      <div class="flex items-center gap-2 shrink-0">
-        <button type="button" id="btnBukaGrafikTahunan" class="px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1.5 transition-all hover:bg-blue-100 cursor-pointer text-xs" title="Lihat Grafik Kehadiran Tahunan">
-          <span class="material-symbols-outlined text-[17px]">analytics</span>
-          <span>Grafik Tahunan</span>
-        </button>
-        <button type="button" id="btnInputAbsensiBaru" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer text-xs">
-          <span class="material-symbols-outlined text-[17px]">add_task</span>
-          <span>Input Absensi Bulanan</span>
-        </button>
+        <!-- Sisi Kanan: Tombol Aksi (Grafik Tahunan & Input Absensi Bulanan) -->
+        <div class="grid grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800/80">
+          <button type="button" id="btnBukaGrafikTahunan" class="w-full md:w-auto px-3 sm:px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center gap-1.5 transition-all hover:bg-blue-100 cursor-pointer text-[11px] sm:text-xs whitespace-nowrap" title="Lihat Grafik Kehadiran Tahunan">
+            <span class="material-symbols-outlined text-[16px] sm:text-[17px]">analytics</span>
+            <span>Grafik Tahunan</span>
+          </button>
+          <button type="button" id="btnInputAbsensiBaru" class="w-full md:w-auto px-3 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer text-[11px] sm:text-xs whitespace-nowrap">
+            <span class="material-symbols-outlined text-[16px] sm:text-[17px]">add_task</span>
+            <span>Input Absensi Bulanan</span>
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -230,7 +246,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
           Pamong belum mengisi checklist presensi untuk jenjang <strong>${selectedJenjang === 'caberawit' ? 'Caberawit' : 'GP Reguler'}</strong> pada bulan <strong>${BULAN_NAMES[currentMonthIdx - 1]} ${currentYear}</strong>.
         </p>
-        <div class="mt-4 flex items-center justify-center gap-2.5">
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2.5">
           <button type="button" class="btn-quick-create-rekap px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer">
             <span class="material-symbols-outlined text-[16px]">edit_note</span>
             <span>Mulai Isi Absensi Bulan Ini</span>
@@ -253,55 +269,57 @@ export function renderAbsensiBulananTab(container, options = {}) {
           const badgeBg = rekap.jenjang === 'caberawit' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200';
 
           return `
-            <div class="rounded-2xl p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3">
+            <div class="rounded-2xl p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3.5">
               <div>
+                <!-- Header Card: Badge + Title + Subtitle di Kiri, Persentase di Kanan -->
                 <div class="flex items-start justify-between gap-2">
-                  <div>
-                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${badgeBg}">
+                  <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${badgeBg} inline-block">
                       ${jenjangLabel}
                     </span>
-                    <h4 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 mt-1.5">
+                    <h4 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 mt-1.5 truncate">
                       Kelompok ${rekap.kelompokNama || '-'}
                     </h4>
-                    <p class="text-[11.5px] text-slate-500 dark:text-slate-400">
-                      Periode: <strong>${rekap.bulan} ${rekap.tahun}</strong> &bull; ${rekap.desaNama ? `Desa ${rekap.desaNama}` : ''}
+                    <p class="text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                      Periode: <strong>${(rekap.bulan || '').toUpperCase()} ${rekap.tahun}</strong>${rekap.desaNama ? ` &bull; Desa ${rekap.desaNama}` : ''}
                     </p>
                   </div>
-                  <div class="text-right">
+                  <div class="text-right shrink-0">
                     <span class="text-xl font-black ${avgPercent >= 85 ? 'text-emerald-600 dark:text-emerald-400' : (avgPercent >= 70 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400')}">
                       ${avgPercent}%
                     </span>
-                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Rerata Hadir</span>
+                    <span class="block text-[9.5px] text-slate-400 font-bold uppercase tracking-wider">Rerata Hadir</span>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs text-slate-600 dark:text-slate-300">
+                <!-- Stats Box (Total Santri & Pertemuan) Sesuai Mockup Gambar -->
+                <div class="grid grid-cols-2 gap-2 mt-3.5 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 text-xs">
                   <div>
-                    <span class="text-[10.5px] text-slate-400 block">Total Santri</span>
-                    <strong class="text-sm font-bold text-slate-800 dark:text-slate-100">${totalSiswa} Siswa</strong>
+                    <span class="text-[10.5px] text-slate-400 block font-medium">Total Santri</span>
+                    <strong class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">${totalSiswa} Siswa</strong>
                   </div>
                   <div>
-                    <span class="text-[10.5px] text-slate-400 block">Pertemuan</span>
-                    <strong class="text-sm font-bold text-slate-800 dark:text-slate-100">${totalPertemuan} Sesi</strong>
+                    <span class="text-[10.5px] text-slate-400 block font-medium">Pertemuan</span>
+                    <strong class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">${totalPertemuan} Sesi</strong>
                   </div>
                 </div>
               </div>
 
-              <!-- Action buttons -->
-              <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <button type="button" class="btn-edit-rekap px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 flex items-center gap-1 cursor-pointer" data-id="${rekap.id}">
-                  <span class="material-symbols-outlined text-[15px] text-blue-600">edit_note</span>
+              <!-- Action buttons Sesuai Gambar: Isi/Edit di Kiri, Cetak + Excel + Delete di Kanan -->
+              <div class="flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all" data-id="${rekap.id}" title="Isi atau Edit Absensi">
+                  <span class="material-symbols-outlined text-[16px]">edit_note</span>
                   <span>Isi / Edit</span>
                 </button>
-                <div class="flex items-center gap-1">
-                  <button type="button" class="btn-print-rekap px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 flex items-center gap-1 cursor-pointer" data-id="${rekap.id}" title="Cetak Lembar Presensi Lengkap (PDF A4 Landscape)">
+                <div class="flex items-center gap-1.5">
+                  <button type="button" class="btn-print-rekap px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 transition-all flex items-center gap-1 cursor-pointer" data-id="${rekap.id}" title="Cetak Lembar Presensi Lengkap (PDF A4 Landscape)">
                     <span class="material-symbols-outlined text-[15px]">print</span>
                     <span>Cetak</span>
                   </button>
-                  <button type="button" class="btn-excel-rekap px-2.5 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 flex items-center gap-1 cursor-pointer" data-id="${rekap.id}" title="Ekspor Lembar Excel">
-                    <span class="material-symbols-outlined text-[15px]">table_view</span>
+                  <button type="button" class="btn-excel-rekap p-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 transition-all cursor-pointer flex items-center justify-center" data-id="${rekap.id}" title="Ekspor Lembar Excel">
+                    <span class="material-symbols-outlined text-[16px]">table_view</span>
                   </button>
-                  <button type="button" class="btn-delete-rekap p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer" data-id="${rekap.id}" title="Hapus Dokumen Rekap">
+                  <button type="button" class="btn-delete-rekap p-1.5 px-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer flex items-center justify-center" data-id="${rekap.id}" title="Hapus Dokumen Rekap">
                     <span class="material-symbols-outlined text-[16px]">delete</span>
                   </button>
                 </div>
