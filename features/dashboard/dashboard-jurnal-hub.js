@@ -28,6 +28,10 @@ import {
   renderEventPembiasaanModal
 } from './dashboard-pembiasaan.js';
 
+import {
+  openRekapAbsensiBulananModal
+} from './dashboard-absensi-bulanan.js';
+
 // State Halaman Jurnal KBM
 let activeJenjang = 'caberawit'; // 'caberawit', 'gp_reguler', 'remaja'
 let selectedDesaId = 'all';
@@ -423,12 +427,16 @@ function attachJurnalKbmHubListeners() {
     });
   });
 
-  // Aksi 1: Absensi KBM
+  // Aksi 1: Presensi Kehadiran -> Buka Modal Laporan & Rekap Absensi Bulanan Per Jenjang
   document.getElementById('btnCardHubAbsensi')?.addEventListener('click', () => {
-    openPresensiOpsiModal(activeJenjang, selectedDesaId, selectedKelompokId);
+    openRekapAbsensiBulananModal({
+      jenjang: activeJenjang,
+      desaId: selectedDesaId,
+      kelompokId: selectedKelompokId
+    });
   });
 
-  // Aksi 2: Jurnal KBM
+  // Aksi 2: Materi & Kurikulum -> Jurnal & Agenda KBM
   document.getElementById('btnCardHubJurnal')?.addEventListener('click', () => {
     openJurnalKbmDialog(activeJenjang, selectedDesaId, selectedKelompokId);
   });
@@ -445,9 +453,15 @@ function attachJurnalKbmHubListeners() {
 }
 
 /**
- * Dialog Interaktif Opsi Presensi KBM (Pilih Bulan, Tanggal & Cetak Lembar Presensi A4)
+ * Dialog Interaktif Opsi Presensi KBM (Mengarahkan ke Rekap Absensi Bulanan Per Jenjang)
  */
 export function openPresensiOpsiModal(jenjang = 'caberawit', desaId = 'all', kelompokId = 'all') {
+  openRekapAbsensiBulananModal({
+    jenjang,
+    desaId,
+    kelompokId
+  });
+}
   const meta = JENJANG_METADATA[jenjang] || JENJANG_METADATA.caberawit;
   const now = new Date();
   const currentMonth = now.getMonth() + 1;

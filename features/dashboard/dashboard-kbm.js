@@ -23,13 +23,21 @@ import {
   modalBody
 } from './dashboard-common.js';
 
-import { renderAbsensiBulananTab } from './dashboard-absensi-bulanan.js';
+import {
+  openRekapAbsensiBulananModal,
+  renderAbsensiBulananTab
+} from './dashboard-absensi-bulanan.js';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MODUL EVENT KBM & REKAP KEHADIRAN (MULTI-JENJANG & CETAK DOKUMEN FISIK)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function renderCetakAbsensiModal(activeTab = 'rekap_bulanan', options = {}) {
+export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
+  // Jika tab rekap bulanan yang diminta, buka langsung modal khusus Laporan & Rekap Absensi Bulanan
+  if (activeTab === 'rekap_bulanan') {
+    openRekapAbsensiBulananModal(options);
+    return;
+  }
   // ── Hak Akses 3 Tingkatan ──
   const isDaerah = currentUser.tingkatan === 'daerah' || currentUser.isSuperadmin === true;
   const isDesa = currentUser.tingkatan === 'desa';
@@ -663,64 +671,22 @@ export function renderCetakAbsensiModal(activeTab = 'rekap_bulanan', options = {
 
   // ── RENDER CONTAINER MODAL ──
   const isFormView = (activeTab === 'create_event' || activeTab === 'edit_event');
-  const isRekapBulanan = (activeTab === 'rekap_bulanan');
-
-  // Top Nav Tab Header (Jurnal KBM Hub)
-  const navTabsHtml = isFormView ? '' : `
-    <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800 mb-2 gap-2 flex-wrap">
-      <div class="inline-flex rounded-xl p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs">
-        <button type="button" id="tabNavRekapBulanan" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${isRekapBulanan ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px]">fact_check</span>
-            <span>Rekap Absensi Bulanan</span>
-          </span>
-        </button>
-        <button type="button" id="tabNavAgendaHarian" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${!isRekapBulanan ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-            <span>Agenda &amp; Jurnal Harian</span>
-          </span>
-        </button>
-      </div>
-
-      <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
-        Fokus: <strong>Caberawit</strong> (Sen-Jum) &bull; <strong>GP</strong> (Sen, Kam, Jum)
-      </div>
-    </div>
-  `;
 
   const modalHtml = `
     <div style="display:flex;flex-direction:column;gap:8px;">
-      ${navTabsHtml}
       <div id="tabContentContainer">
-        ${isFormView ? eventFormHtml : (isRekapBulanan ? '<div id="absensiBulananTabContainer"></div>' : agendaContentHtml)}
+        ${isFormView ? eventFormHtml : agendaContentHtml}
       </div>
     </div>
   `;
 
   const modalSize = isFormView ? 'medium' : 'wide';
   openModal(
-    isRekapBulanan ? 'Laporan & Rekap Absensi Bulanan Per Jenjang' : 'Manajemen Event KBM & Presensi Cepat',
-    isRekapBulanan ? 'fact_check' : 'event_available',
+    isFormView ? (activeTab === 'create_event' ? 'Buat Agenda KBM Baru' : 'Edit Agenda KBM') : 'Agenda & Kurikulum KBM',
+    isFormView ? 'edit_calendar' : 'menu_book',
     modalHtml,
     modalSize
   );
-
-  // Jika tab rekap bulanan aktif, render kontennya ke container
-  if (isRekapBulanan) {
-    const containerEl = document.getElementById('absensiBulananTabContainer');
-    if (containerEl) {
-      renderAbsensiBulananTab(containerEl, options);
-    }
-  }
-
-  // Listener Switch Tab Atas
-  document.getElementById('tabNavRekapBulanan')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('rekap_bulanan', options);
-  });
-  document.getElementById('tabNavAgendaHarian')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('agenda', options);
-  });
 
   // ══════════════════════════════════════════════════════════════
   // EVENT LISTENERS & LOGIC BINDINGS

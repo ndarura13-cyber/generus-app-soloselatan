@@ -70,6 +70,30 @@ function getSiswaByJenjangAndKelompok(jenjang, kelId) {
 }
 
 /**
+ * Modal Terpadu Laporan & Rekap Absensi Bulanan Per Jenjang
+ */
+export function openRekapAbsensiBulananModal(options = {}) {
+  const jenjang = options.jenjang || 'caberawit';
+  const jenjangLabel = jenjang === 'caberawit' ? 'Caberawit' : (jenjang === 'gp_reguler' ? 'GP (SMP - SMA)' : jenjang);
+
+  const modalHtml = `
+    <div id="absensiBulananModalContainer" class="p-0.5 space-y-3"></div>
+  `;
+
+  openModal(
+    `Laporan & Rekap Absensi Bulanan (${jenjangLabel})`,
+    'fact_check',
+    modalHtml,
+    'wide'
+  );
+
+  const container = document.getElementById('absensiBulananModalContainer');
+  if (container) {
+    renderAbsensiBulananTab(container, options);
+  }
+}
+
+/**
  * Render Tampilan Utama Tab Rekap Absensi Bulanan di Jurnal KBM Hub
  */
 export function renderAbsensiBulananTab(container, options = {}) {
@@ -112,51 +136,83 @@ export function renderAbsensiBulananTab(container, options = {}) {
     kelompokId: selectedKel
   });
 
-  // Susun filter bar HTML
-  const filterBarHtml = `
-    <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
-      <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
-        <!-- Pilihan Jenjang -->
-        <div class="inline-flex rounded-xl p-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs">
-          <button type="button" id="tabJenjangCaberawit" class="px-3 py-1.5 rounded-lg font-bold transition-all ${selectedJenjang === 'caberawit' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
-            Caberawit (Sen-Jum)
-          </button>
-          <button type="button" id="tabJenjangGp" class="px-3 py-1.5 rounded-lg font-bold transition-all ${selectedJenjang === 'gp_reguler' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
-            GP / SMP-SMA (Sen, Kam, Jum)
-          </button>
-        </div>
+  // ── Multi-level Dropdown Wilayah (Desa & Kelompok) ──
+  let wilayahFilterHtml = '';
+  if (isDaerah) {
+    // Admin / Superadmin: Dropdown Desa + Dropdown Kelompok (otomatis disaring sesuai desa)
+    let filteredKels = allKels;
+    if (selectedDesa !== 'all') {
+      filteredKels = allKels.filter(k => k.desaId === selectedDesa);
+    }
+    wilayahFilterHtml = `
+      <select id="selDesaAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer max-w-[165px]" title="Pilih Desa">
+        <option value="all" ${selectedDesa === 'all' ? 'selected' : ''}>Semua Desa</option>
+        ${desaList.map(d => `<option value="${d.id}" ${selectedDesa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
+      </select>
 
-        <!-- Pilihan Bulan -->
-        <select id="selBulanAbsensi" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer">
+      <select id="selKelompokAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-medium outline-none cursor-pointer max-w-[165px]" title="Pilih Kelompok">
+        <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>${selectedDesa === 'all' ? 'Semua Kelompok' : 'Semua Kelompok di Desa Ini'}</option>
+        ${filteredKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
+      </select>
+    `;
+  } else if (isDesa) {
+    // Pengurus Desa: Desa terkunci, Kelompok bisa dipilih
+    const desaObj = desaList.find(d => d.id === currentDesaId) || desaList[0];
+    const filteredKels = allKels.filter(k => k.desaId === currentDesaId);
+    wilayahFilterHtml = `
+      <span class="px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center gap-1 shrink-0">
+        <span class="material-symbols-outlined text-[15px]">domain</span>
+        <span>Desa ${desaObj ? desaObj.nama : 'Desa'}</span>
+      </span>
+
+      <select id="selKelompokAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-medium outline-none cursor-pointer max-w-[165px]" title="Pilih Kelompok">
+        <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>Semua Kelompok</option>
+        ${filteredKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
+      </select>
+    `;
+  } else {
+    // Pengurus Kelompok: Terkunci pada kelompoknya
+    const currentKelObj = allKels.find(k => k.id === currentKelId);
+    wilayahFilterHtml = `
+      <span class="px-2.5 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1 shrink-0">
+        <span class="material-symbols-outlined text-[15px]">location_on</span>
+        <span>Kel. ${currentKelObj ? currentKelObj.nama : 'Kelompok'}</span>
+      </span>
+    `;
+  }
+
+  // ── Susun Filter Bar HTML yang Kompak & Luas ──
+  const filterBarHtml = `
+    <div class="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
+      <!-- Sisi Kiri: Filter Terpadu (Jenjang Otomatis, Multi-level Wilayah, Periode) -->
+      <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
+        <!-- Pilihan Jenjang Kompak (Otomatis Sesuai Checkbox KBM) -->
+        <select id="selJenjangAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer text-xs" title="Filter Jenjang">
+          <option value="caberawit" ${selectedJenjang === 'caberawit' ? 'selected' : ''}>👶 Caberawit (Sen-Jum)</option>
+          <option value="gp_reguler" ${selectedJenjang === 'gp_reguler' ? 'selected' : ''}>🎓 GP / SMP-SMA (Sen, Kam, Jum)</option>
+        </select>
+
+        ${wilayahFilterHtml}
+
+        <!-- Pilihan Bulan & Tahun -->
+        <select id="selBulanAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer text-xs" title="Pilih Bulan">
           ${BULAN_NAMES.map((bName, i) => `<option value="${i + 1}" ${currentMonthIdx === (i + 1) ? 'selected' : ''}>${bName}</option>`).join('')}
         </select>
 
-        <!-- Pilihan Tahun -->
-        <select id="selTahunAbsensi" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer">
+        <select id="selTahunAbsensi" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none cursor-pointer text-xs" title="Pilih Tahun">
           <option value="${currentYear - 1}">${currentYear - 1}</option>
           <option value="${currentYear}" selected>${currentYear}</option>
           <option value="${currentYear + 1}">${currentYear + 1}</option>
         </select>
-
-        ${!isKelompok ? `
-          <!-- Filter Kelompok untuk Pengurus Desa / Daerah -->
-          <select id="selKelompokAbsensi" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-medium outline-none cursor-pointer max-w-[170px]">
-            <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>Semua Kelompok</option>
-            ${allKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
-          </select>
-        ` : ''}
       </div>
 
-      <!-- Tombol Buat / Input Baru -->
-      <div class="flex items-center gap-2">
-        <button type="button" id="btnSyncCloudAbsensi" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors cursor-pointer" title="Sinkronkan dengan Database Cloud Supabase">
-          <span class="material-symbols-outlined text-[17px]">cloud_sync</span>
-        </button>
-        <button type="button" id="btnBukaGrafikTahunan" class="px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1.5 transition-all hover:bg-blue-100 cursor-pointer" title="Lihat Grafik Kehadiran Tahunan">
+      <!-- Sisi Kanan: Aksi (Grafik Tahunan & Input Absensi Baru) -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" id="btnBukaGrafikTahunan" class="px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1.5 transition-all hover:bg-blue-100 cursor-pointer text-xs" title="Lihat Grafik Kehadiran Tahunan">
           <span class="material-symbols-outlined text-[17px]">analytics</span>
           <span>Grafik Tahunan</span>
         </button>
-        <button type="button" id="btnInputAbsensiBaru" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer">
+        <button type="button" id="btnInputAbsensiBaru" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer text-xs">
           <span class="material-symbols-outlined text-[17px]">add_task</span>
           <span>Input Absensi Bulanan</span>
         </button>
@@ -266,66 +322,115 @@ export function renderAbsensiBulananTab(container, options = {}) {
   `;
 
   // ── Bind Listeners ──
-  container.querySelector('#tabJenjangCaberawit')?.addEventListener('click', () => {
-    renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: 'caberawit', desaId: selectedDesa, kelompokId: selectedKel });
+  container.querySelector('#selJenjangAbsensi')?.addEventListener('change', (e) => {
+    renderAbsensiBulananTab(container, {
+      tahun: currentYear,
+      bulanIndex: currentMonthIdx,
+      jenjang: e.target.value,
+      desaId: selectedDesa,
+      kelompokId: selectedKel
+    });
   });
 
-  container.querySelector('#tabJenjangGp')?.addEventListener('click', () => {
-    renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: 'gp_reguler', desaId: selectedDesa, kelompokId: selectedKel });
-  });
-
-  container.querySelector('#selBulanAbsensi')?.addEventListener('change', (e) => {
-    renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: Number(e.target.value), jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
-  });
-
-  container.querySelector('#selTahunAbsensi')?.addEventListener('change', (e) => {
-    renderAbsensiBulananTab(container, { tahun: Number(e.target.value), bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
-  });
-
-  container.querySelector('#selKelompokAbsensi')?.addEventListener('change', (e) => {
-    renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: e.target.value });
-  });
-
-  // Action Sync Cloud Database Supabase
-  container.querySelector('#btnSyncCloudAbsensi')?.addEventListener('click', async () => {
-    const btn = container.querySelector('#btnSyncCloudAbsensi');
-    const icon = btn?.querySelector('.material-symbols-outlined');
-    if (icon) icon.classList.add('animate-spin');
-    showToast('Menghubungkan ke Supabase Cloud...', 'info');
-    
-    const res = await syncAbsensiBulananFromSupabase();
-    if (icon) icon.classList.remove('animate-spin');
-    
-    renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
-    if (res.success) {
-      showToast(`Data absensi berhasil disinkronkan (${res.count} rekap dari Cloud)`, 'success');
-    } else {
-      showToast(res.error || 'Gagal tersambung ke Supabase Cloud', 'warning');
-    }
-  });
-
-  // Action Buka Form Input
-  const triggerInput = () => {
-    openFormAbsensiBulananModal({
+  container.querySelector('#selDesaAbsensi')?.addEventListener('change', (e) => {
+    renderAbsensiBulananTab(container, {
       tahun: currentYear,
       bulanIndex: currentMonthIdx,
       jenjang: selectedJenjang,
-      kelompokId: selectedKel !== 'all' ? selectedKel : currentKelId
-    }, () => {
-      renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
+      desaId: e.target.value,
+      kelompokId: 'all'
     });
+  });
+
+  container.querySelector('#selKelompokAbsensi')?.addEventListener('change', (e) => {
+    renderAbsensiBulananTab(container, {
+      tahun: currentYear,
+      bulanIndex: currentMonthIdx,
+      jenjang: selectedJenjang,
+      desaId: selectedDesa,
+      kelompokId: e.target.value
+    });
+  });
+
+  container.querySelector('#selBulanAbsensi')?.addEventListener('change', (e) => {
+    renderAbsensiBulananTab(container, {
+      tahun: currentYear,
+      bulanIndex: Number(e.target.value),
+      jenjang: selectedJenjang,
+      desaId: selectedDesa,
+      kelompokId: selectedKel
+    });
+  });
+
+  container.querySelector('#selTahunAbsensi')?.addEventListener('change', (e) => {
+    renderAbsensiBulananTab(container, {
+      tahun: Number(e.target.value),
+      bulanIndex: currentMonthIdx,
+      jenjang: selectedJenjang,
+      desaId: selectedDesa,
+      kelompokId: selectedKel
+    });
+  });
+
+  // Action Buka Form Input
+  const triggerInput = (rekapItem = null) => {
+    let inputPayload;
+    if (rekapItem) {
+      inputPayload = rekapItem;
+    } else {
+      let defaultKel = (selectedKel !== 'all' ? selectedKel : (isKelompok ? currentKelId : allKels[0]?.id));
+      if (selectedDesa !== 'all' && selectedKel === 'all') {
+        const kelInDesa = allKels.find(k => k.desaId === selectedDesa);
+        if (kelInDesa) defaultKel = kelInDesa.id;
+      }
+      inputPayload = {
+        tahun: currentYear,
+        bulanIndex: currentMonthIdx,
+        jenjang: selectedJenjang,
+        kelompokId: defaultKel
+      };
+    }
+
+    openFormAbsensiBulananModal(
+      inputPayload,
+      () => {
+        // Callback onSaved: Kembali ke tab rekap absensi bulanan
+        openRekapAbsensiBulananModal({
+          tahun: currentYear,
+          bulanIndex: currentMonthIdx,
+          jenjang: selectedJenjang,
+          desaId: selectedDesa,
+          kelompokId: selectedKel
+        });
+      },
+      () => {
+        // Callback onCancel: Kembali ke tab rekap absensi bulanan
+        openRekapAbsensiBulananModal({
+          tahun: currentYear,
+          bulanIndex: currentMonthIdx,
+          jenjang: selectedJenjang,
+          desaId: selectedDesa,
+          kelompokId: selectedKel
+        });
+      }
+    );
   };
 
-  container.querySelector('#btnInputAbsensiBaru')?.addEventListener('click', triggerInput);
-  container.querySelector('.btn-quick-create-rekap')?.addEventListener('click', triggerInput);
+  container.querySelector('#btnInputAbsensiBaru')?.addEventListener('click', () => triggerInput(null));
+  container.querySelector('.btn-quick-create-rekap')?.addEventListener('click', () => triggerInput(null));
 
   // Quick Print Kosong
   container.querySelector('.btn-quick-print-empty')?.addEventListener('click', () => {
+    let defaultKel = (selectedKel !== 'all' ? selectedKel : (isKelompok ? currentKelId : allKels[0]?.id));
+    if (selectedDesa !== 'all' && selectedKel === 'all') {
+      const kelInDesa = allKels.find(k => k.desaId === selectedDesa);
+      if (kelInDesa) defaultKel = kelInDesa.id;
+    }
     printLembarPresensiDoc(null, {
       tahun: currentYear,
       bulanIndex: currentMonthIdx,
       jenjang: selectedJenjang,
-      kelompokId: selectedKel !== 'all' ? selectedKel : currentKelId,
+      kelompokId: defaultKel,
       mode: 'empty'
     });
   });
@@ -336,9 +441,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
       const rId = btn.getAttribute('data-id');
       const rekap = getAbsensiBulananById(rId);
       if (rekap) {
-        openFormAbsensiBulananModal(rekap, () => {
-          renderAbsensiBulananTab(container, { tahun: currentYear, bulanIndex: currentMonthIdx, jenjang: selectedJenjang, desaId: selectedDesa, kelompokId: selectedKel });
-        });
+        triggerInput(rekap);
       }
     });
   });
@@ -400,7 +503,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
 /**
  * Modal Interaktif untuk Pengisian / Input Checklist Presensi Bulanan
  */
-export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = null) {
+export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = null, onCancelCallback = null) {
   const isDaerah = currentUser.tingkatan === 'daerah' || currentUser.isSuperadmin === true;
   const isDesa = currentUser.tingkatan === 'desa';
   const isKelompok = !isDaerah && !isDesa;
@@ -413,10 +516,10 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
   const bulanIndex = initialData.bulanIndex || (new Date().getMonth() + 1);
   const bulanName = BULAN_NAMES[bulanIndex - 1].toUpperCase();
   const jenjang = initialData.jenjang || 'caberawit';
-  const kelompokId = initialData.kelompokId || (isKelompok ? currentKelId : allKels[0].id);
+  let kelompokId = initialData.kelompokId || (isKelompok ? currentKelId : allKels[0].id);
 
-  const kelObj = allKels.find(k => k.id === kelompokId) || allKels[0];
-  const desaObj = desaList.find(d => d.id === kelObj.desaId) || desaList[0];
+  let kelObj = allKels.find(k => k.id === kelompokId) || allKels[0];
+  let desaObj = desaList.find(d => d.id === kelObj.desaId) || desaList[0];
 
   // Ambil daftar tanggal pertemuan
   let meetingDates = initialData.tanggalPertemuan;
@@ -531,9 +634,21 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
                 Absensi Bulan ${bulanName} ${tahun}
               </h3>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Kelompok <strong>${kelObj.nama}</strong> &bull; Desa ${desaObj.nama} &bull; Total <strong>${records.length} Santri</strong>
-            </p>
+            ${!initialData.id && (isDaerah || isDesa) ? `
+              <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span class="text-xs text-slate-600 dark:text-slate-300 font-bold">Pilih Kelompok:</span>
+                <select id="selFormKelompok" class="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none cursor-pointer">
+                  ${(isDaerah ? allKels : allKels.filter(k => k.desaId === currentUser.desaId)).map(k => `
+                    <option value="${k.id}" ${k.id === kelompokId ? 'selected' : ''}>Kel. ${k.nama} (Desa ${(desaList.find(d => d.id === k.desaId) || {}).nama || '-'})</option>
+                  `).join('')}
+                </select>
+                <span class="text-xs text-slate-500">&bull; Total <strong>${records.length} Santri</strong></span>
+              </div>
+            ` : `
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Kelompok <strong>${kelObj.nama}</strong> &bull; Desa ${desaObj.nama} &bull; Total <strong>${records.length} Santri</strong>
+              </p>
+            `}
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
@@ -611,7 +726,47 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
     openModal(`Input Rekap Absensi Bulanan (${jenjang === 'caberawit' ? 'Caberawit' : 'GP'})`, 'fact_check', contentHtml, 'wide');
 
     // ── Attach Listeners ──
-    document.getElementById('btnCancelFormAbsensi')?.addEventListener('click', closeModal);
+    // Tombol Batal: Kembali ke tab rekap absensi bulanan (bukan menutup modal)
+    document.getElementById('btnCancelFormAbsensi')?.addEventListener('click', () => {
+      if (typeof onCancelCallback === 'function') {
+        onCancelCallback();
+      } else {
+        openRekapAbsensiBulananModal({
+          tahun,
+          bulanIndex,
+          jenjang,
+          desaId: desaObj.id,
+          kelompokId
+        });
+      }
+    });
+
+    // Listener ganti kelompok (jika admin input baru)
+    document.getElementById('selFormKelompok')?.addEventListener('change', (e) => {
+      kelompokId = e.target.value;
+      kelObj = allKels.find(k => k.id === kelompokId) || allKels[0];
+      desaObj = desaList.find(d => d.id === kelObj.desaId) || desaList[0];
+      const newSiswaList = getSiswaByJenjangAndKelompok(jenjang, kelompokId);
+      records = newSiswaList.map(s => {
+        const kehadiranMap = {};
+        meetingDates.forEach(d => {
+          kehadiranMap[String(d)] = 'H';
+        });
+        return {
+          siswaId: s.id,
+          nama: s.nama_lengkap || s.nama,
+          kelompok: kelObj.nama,
+          kelas: s.jenjang_kelas || s.jenjang || '-',
+          kehadiran: kehadiranMap,
+          totalH: meetingDates.length,
+          totalS: 0,
+          totalI: 0,
+          totalA: 0,
+          persenHadir: 100
+        };
+      });
+      renderInnerContent();
+    });
 
     // Toggle status presensi saat tombol diklik
     document.querySelectorAll('.btn-toggle-absen').forEach(btn => {
@@ -701,11 +856,26 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
         }
       };
 
+      const btnSave = document.getElementById('btnSimpanRekapAbsensi');
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.classList.add('opacity-70');
+      }
+
+      showToast('Menyimpan & menyinkronkan ke Supabase Cloud...', 'info');
       await saveAbsensiBulanan(payload);
-      showToast('Rekap absensi bulanan berhasil disimpan ke database!', 'success');
-      closeModal();
+      showToast('Rekap absensi bulanan berhasil disimpan dan disinkronkan!', 'success');
+
       if (typeof onSavedCallback === 'function') {
         onSavedCallback(payload);
+      } else {
+        openRekapAbsensiBulananModal({
+          tahun,
+          bulanIndex,
+          jenjang,
+          desaId: desaObj.id,
+          kelompokId
+        });
       }
     });
 
