@@ -2291,3 +2291,103 @@ export async function syncProkerFromSupabase() {
   }
   return getProkerList();
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODUL DATA: REKAP ABSENSI BULANAN PER JENJANG (CABERAWIT & GP REGULER)
+   Format Presensi: H (Hadir), S (Sakit), I (Izin), A (Alpa)
+   Jadwal Default:
+   - Caberawit : Senin - Jumat (5 pertemuan sore hari)
+   - GP        : Senin, Kamis, Jumat (3 pertemuan malam hari)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ABSENSI_BULANAN_STORAGE_KEY = "ppg_absensi_bulanan_v1";
+
+/**
+ * Menghasilkan daftar tanggal pertemuan default dalam 1 bulan kalender
+ * @param {number} year - Tahun (misal: 2026)
+ * @param {number} monthIndex - Bulan 1 - 12 (1: Januari, 7: Juli)
+ * @param {string} jenjang - 'caberawit' | 'gp_reguler'
+ * @returns {number[]} Array tanggal (misal: [2, 3, 4, ...])
+ */
+export function getDefaultMeetingDates(year, monthIndex, jenjang = 'caberawit') {
+  const totalDays = new Date(year, monthIndex, 0).getDate();
+  const dates = [];
+
+  for (let d = 1; d <= totalDays; d++) {
+    const dt = new Date(year, monthIndex - 1, d);
+    const dayOfWeek = dt.getDay(); // 0: Min, 1: Sen, 2: Sel, 3: Rab, 4: Kam, 5: Jum, 6: Sab
+    if (jenjang === 'caberawit') {
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        dates.push(d);
+      }
+    } else {
+      // GP (SMP - SMA): Senin, Kamis, Jumat
+      if (dayOfWeek === 1 || dayOfWeek === 4 || dayOfWeek === 5) {
+        dates.push(d);
+      }
+    }
+  }
+  return dates;
+}
+
+/**
+ * Mengambil daftar rekap absensi bulanan dari storage
+ */
+export function getAbsensiBulananList(filter = {}) {
+  try {
+    const raw = localStorage.getItem(ABSENSI_BULANAN_STORAGE_KEY);
+    let list = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(list)) list = [];
+
+    if (filter.tahun) list = list.filter(item => String(item.tahun) === String(filter.tahun));
+    if (filter.bulanIndex) list = list.filter(item => Number(item.bulanIndex) === Number(filter.bulanIndex));
+    if (filter.jenjang && filter.jenjang !== 'all') list = list.filter(item => item.jenjang === filter.jenjang);
+    if (filter.desaId && filter.desaId !== 'all') list = list.filter(item => item.desaId === filter.desaId);
+    if (filter.kelompokId && filter.kelompokId !== 'all') list = list.filter(item => item.kelompokId === filter.kelompokId);
+
+    return list;
+  } catch (e) {
+    console.error("Error reading absensi bulanan list:", e);
+    return [];
+  }
+}
+
+/**
+ * Mengambil 1 dokumen rekap absensi bulanan berdasarkan ID
+ */
+export function getAbsensiBulananById(id) {
+  const list = getAbsensiBulananList();
+  return list.find(item => item.id === id) || null;
+}
+
+/**
+ * Menyimpan atau memperbarui dokumen rekap absensi bulanan
+ */
+export function saveAbsensiBulanan(data) {
+  const list = getAbsensiBulananList();
+  let saved = { ...data };
+
+  if (!saved.id) {
+    saved.id = `abs-bln-${saved.tahun}-${String(saved.bulanIndex).padStart(2, '0')}-${saved.kelompokId}-${saved.jenjang}`;
+  }
+  saved.updatedAt = new Date().toISOString();
+
+  const idx = list.findIndex(item => item.id === saved.id);
+  if (idx > -1) {
+    list[idx] = { ...list[idx], ...saved };
+  } else {
+    list.unshift(saved);
+  }
+
+  localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(list));
+  return saved;
+}
+
+/**
+ * Menghapus dokumen rekap absensi bulanan
+ */
+export function deleteAbsensiBulanan(id) {
+  const list = getAbsensiBulananList().filter(item => item.id !== id);
+  localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(list));
+  return true;
+}
+
