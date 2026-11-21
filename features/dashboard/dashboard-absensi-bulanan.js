@@ -137,6 +137,8 @@ export function renderAbsensiBulananTab(container, options = {}) {
   });
 
   // ── Multi-level Dropdown Wilayah (Desa & Kelompok) & Periode (Tahun & Bulan) ──
+  const selectChevronStyle = `appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:13px_13px] bg-[right_10px_center] bg-no-repeat`;
+
   let selDesaHtml = '';
   let selKelompokHtml = '';
 
@@ -146,13 +148,13 @@ export function renderAbsensiBulananTab(container, options = {}) {
       filteredKels = allKels.filter(k => k.desaId === selectedDesa);
     }
     selDesaHtml = `
-      <select id="selDesaAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Desa">
+      <select id="selDesaAbsensi" class="w-full px-3 py-2 pr-7 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs outline-none cursor-pointer hover:border-slate-300 transition-colors ${selectChevronStyle}" title="Pilih Desa">
         <option value="all" ${selectedDesa === 'all' ? 'selected' : ''}>Semua Desa</option>
         ${desaList.map(d => `<option value="${d.id}" ${selectedDesa === d.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
       </select>
     `;
     selKelompokHtml = `
-      <select id="selKelompokAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Kelompok">
+      <select id="selKelompokAbsensi" class="w-full px-3 py-2 pr-7 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs outline-none cursor-pointer hover:border-slate-300 transition-colors ${selectChevronStyle}" title="Pilih Kelompok">
         <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>${selectedDesa === 'all' ? 'Semua Kelompok' : 'Semua Kelompok di Desa Ini'}</option>
         ${filteredKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
       </select>
@@ -167,7 +169,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
       </div>
     `;
     selKelompokHtml = `
-      <select id="selKelompokAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Kelompok">
+      <select id="selKelompokAbsensi" class="w-full px-3 py-2 pr-7 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs outline-none cursor-pointer hover:border-slate-300 transition-colors ${selectChevronStyle}" title="Pilih Kelompok">
         <option value="all" ${selectedKel === 'all' ? 'selected' : ''}>Semua Kelompok</option>
         ${filteredKels.map(k => `<option value="${k.id}" ${selectedKel === k.id ? 'selected' : ''}>Kel. ${k.nama}</option>`).join('')}
       </select>
@@ -190,7 +192,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
   }
 
   const selTahunHtml = `
-    <select id="selTahunAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Tahun">
+    <select id="selTahunAbsensi" class="w-full px-3 py-2 pr-7 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs outline-none cursor-pointer hover:border-slate-300 transition-colors ${selectChevronStyle}" title="Pilih Tahun">
       <option value="${currentYear - 1}">${currentYear - 1}</option>
       <option value="${currentYear}" selected>${currentYear}</option>
       <option value="${currentYear + 1}">${currentYear + 1}</option>
@@ -198,17 +200,17 @@ export function renderAbsensiBulananTab(container, options = {}) {
   `;
 
   const selBulanHtml = `
-    <select id="selBulanAbsensi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-semibold text-xs outline-none cursor-pointer" title="Pilih Bulan">
+    <select id="selBulanAbsensi" class="w-full px-3 py-2 pr-7 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs outline-none cursor-pointer hover:border-slate-300 transition-colors ${selectChevronStyle}" title="Pilih Bulan">
       ${BULAN_NAMES.map((bName, i) => `<option value="${i + 1}" ${currentMonthIdx === (i + 1) ? 'selected' : ''}>${bName}</option>`).join('')}
     </select>
   `;
 
-  // ── Susun Filter Bar HTML Sesuai Mockup Gambar (2 Baris di Kiri, Aksi di Kanan) ──
+  // ── Susun Filter Bar HTML Sesuai Mockup Gambar (Mobile & Web View Tanpa Melebihi Border) ──
   const filterBarHtml = `
-    <div class="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+    <div class="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
         <!-- Sisi Kiri: 2 Baris Filter Grid (Desa + Kelompok, lalu Tahun + Bulan) -->
-        <div class="flex flex-col gap-2 w-full md:w-auto md:min-w-[280px] md:max-w-[360px]">
+        <div class="flex flex-col gap-2 w-full lg:max-w-md">
           <!-- Baris 1: Wilayah (Desa & Kelompok) -->
           <div class="grid grid-cols-2 gap-2">
             ${selDesaHtml}
@@ -222,13 +224,13 @@ export function renderAbsensiBulananTab(container, options = {}) {
         </div>
 
         <!-- Sisi Kanan: Tombol Aksi (Grafik Tahunan & Input Absensi Bulanan) -->
-        <div class="grid grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800/80">
-          <button type="button" id="btnBukaGrafikTahunan" class="w-full md:w-auto px-3 sm:px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center gap-1.5 transition-all hover:bg-blue-100 cursor-pointer text-[11px] sm:text-xs whitespace-nowrap" title="Lihat Grafik Kehadiran Tahunan">
-            <span class="material-symbols-outlined text-[16px] sm:text-[17px]">analytics</span>
+        <div class="flex items-center gap-2 w-full lg:w-auto justify-end flex-wrap sm:flex-nowrap pt-2.5 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800">
+          <button type="button" id="btnBukaGrafikTahunan" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-blue-400 dark:border-blue-600 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-semibold text-xs hover:bg-blue-50/70 dark:hover:bg-blue-950/40 transition-all cursor-pointer shadow-2xs shrink-0 whitespace-nowrap" title="Lihat Grafik Kehadiran Tahunan">
+            <span class="material-symbols-outlined text-[17px]">analytics</span>
             <span>Grafik Tahunan</span>
           </button>
-          <button type="button" id="btnInputAbsensiBaru" class="w-full md:w-auto px-3 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer text-[11px] sm:text-xs whitespace-nowrap">
-            <span class="material-symbols-outlined text-[16px] sm:text-[17px]">add_task</span>
+          <button type="button" id="btnInputAbsensiBaru" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs transition-all cursor-pointer shadow-sm hover:shadow shrink-0 whitespace-nowrap">
+            <span class="material-symbols-outlined text-[17px]">verified</span>
             <span>Input Absensi Bulanan</span>
           </button>
         </div>
@@ -260,16 +262,16 @@ export function renderAbsensiBulananTab(container, options = {}) {
     `;
   } else {
     cardsHtml = `
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
         ${savedRekapList.map(rekap => {
           const totalSiswa = rekap.records ? rekap.records.length : 0;
           const totalPertemuan = rekap.totalPertemuan || (rekap.tanggalPertemuan ? rekap.tanggalPertemuan.length : 0);
           const avgPercent = rekap.summary ? rekap.summary.rataRataKehadiran : 0;
-          const jenjangLabel = rekap.jenjang === 'caberawit' ? 'Caberawit (SD)' : 'GP (SMP - SMA)';
-          const badgeBg = rekap.jenjang === 'caberawit' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200';
+          const jenjangLabel = rekap.jenjang === 'caberawit' ? 'CABERAWIT (SD)' : 'GP (SMP - SMA)';
+          const badgeBg = rekap.jenjang === 'caberawit' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200/80 dark:border-indigo-800/60';
 
           return `
-            <div class="rounded-2xl p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-3.5">
+            <div class="rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3.5">
               <div>
                 <!-- Header Card: Badge + Title + Subtitle di Kiri, Persentase di Kanan -->
                 <div class="flex items-start justify-between gap-2">
@@ -277,49 +279,49 @@ export function renderAbsensiBulananTab(container, options = {}) {
                     <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${badgeBg} inline-block">
                       ${jenjangLabel}
                     </span>
-                    <h4 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 mt-1.5 truncate">
+                    <h4 class="font-extrabold text-sm sm:text-base text-slate-800 dark:text-slate-100 mt-2 truncate">
                       Kelompok ${rekap.kelompokNama || '-'}
                     </h4>
-                    <p class="text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                    <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5 truncate font-medium">
                       Periode: <strong>${(rekap.bulan || '').toUpperCase()} ${rekap.tahun}</strong>${rekap.desaNama ? ` &bull; Desa ${rekap.desaNama}` : ''}
                     </p>
                   </div>
                   <div class="text-right shrink-0">
-                    <span class="text-xl font-black ${avgPercent >= 85 ? 'text-emerald-600 dark:text-emerald-400' : (avgPercent >= 70 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400')}">
+                    <span class="text-2xl font-black ${avgPercent >= 85 ? 'text-emerald-600 dark:text-emerald-400' : (avgPercent >= 70 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400')} leading-none block">
                       ${avgPercent}%
                     </span>
-                    <span class="block text-[9.5px] text-slate-400 font-bold uppercase tracking-wider">Rerata Hadir</span>
+                    <span class="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">RERATA HADIR</span>
                   </div>
                 </div>
 
                 <!-- Stats Box (Total Santri & Pertemuan) Sesuai Mockup Gambar -->
-                <div class="grid grid-cols-2 gap-2 mt-3.5 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 text-xs">
+                <div class="grid grid-cols-2 gap-2 mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100/90 dark:border-slate-800/80 text-xs">
                   <div>
-                    <span class="text-[10.5px] text-slate-400 block font-medium">Total Santri</span>
-                    <strong class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">${totalSiswa} Siswa</strong>
+                    <span class="text-[10px] text-slate-400 block font-medium">Total Santri</span>
+                    <strong class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">${totalSiswa} Siswa</strong>
                   </div>
                   <div>
-                    <span class="text-[10.5px] text-slate-400 block font-medium">Pertemuan</span>
-                    <strong class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">${totalPertemuan} Sesi</strong>
+                    <span class="text-[10px] text-slate-400 block font-medium">Pertemuan</span>
+                    <strong class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">${totalPertemuan} Sesi</strong>
                   </div>
                 </div>
               </div>
 
-              <!-- Action buttons Sesuai Gambar: Isi/Edit di Kiri, Cetak + Excel + Delete di Kanan -->
-              <div class="flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" data-id="${rekap.id}" title="Isi atau Edit Absensi">
-                  <span class="material-symbols-outlined text-[16px]">edit_note</span>
+              <!-- Action buttons Sesuai Gambar: Isi/Edit di Kiri, Cetak + Excel/Copy + Delete di Kanan -->
+              <div class="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50/60 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all shrink-0" data-id="${rekap.id}" title="Isi atau Edit Absensi">
+                  <span class="material-symbols-outlined text-[15px]">edit</span>
                   <span>Isi / Edit</span>
                 </button>
-                <div class="flex items-center gap-1.5">
-                  <button type="button" class="btn-print-rekap px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 transition-all flex items-center gap-1 cursor-pointer" data-id="${rekap.id}" title="Cetak Lembar Presensi Lengkap (PDF A4 Landscape)">
+                <div class="flex items-center gap-1 shrink-0">
+                  <button type="button" class="btn-print-rekap px-3 py-1.5 rounded-xl border border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100/60 transition-all flex items-center gap-1 cursor-pointer shrink-0" data-id="${rekap.id}" title="Cetak Lembar Presensi Lengkap (PDF A4 Landscape)">
                     <span class="material-symbols-outlined text-[15px]">print</span>
                     <span>Cetak</span>
                   </button>
-                  <button type="button" class="btn-excel-rekap p-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 transition-all cursor-pointer flex items-center justify-center" data-id="${rekap.id}" title="Ekspor Lembar Excel">
-                    <span class="material-symbols-outlined text-[16px]">table_view</span>
+                  <button type="button" class="btn-excel-rekap w-8 h-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-all cursor-pointer flex items-center justify-center shrink-0" data-id="${rekap.id}" title="Ekspor Lembar Excel">
+                    <span class="material-symbols-outlined text-[16px]">content_copy</span>
                   </button>
-                  <button type="button" class="btn-delete-rekap p-1.5 px-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer flex items-center justify-center" data-id="${rekap.id}" title="Hapus Dokumen Rekap">
+                  <button type="button" class="btn-delete-rekap w-8 h-8 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer flex items-center justify-center shrink-0" data-id="${rekap.id}" title="Hapus Dokumen Rekap">
                     <span class="material-symbols-outlined text-[16px]">delete</span>
                   </button>
                 </div>

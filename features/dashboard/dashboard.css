@@ -1698,9 +1698,9 @@ body {
   }
 
   .btn-close-modal {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 10px !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 9999px !important;
     background: #f1f5f9;
     color: #64748b;
     display: inline-flex !important;
