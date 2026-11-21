@@ -488,33 +488,34 @@ export function renderKelompokGrid() {
       p => p.kelompokId === kel.id && p.isActive !== false
     );
     const hasPengurus = pengurusKelompok.length > 0;
-    card.className = `kelompok-card !p-2 sm:!p-2.5 flex flex-col justify-between rounded-xl border transition-all ${
+    card.className = `kelompok-card !p-2.5 sm:!p-3 flex flex-col justify-between rounded-xl border transition-all ${
       hasPengurus
-        ? 'border-slate-200 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 shadow-2xs'
-        : 'border-slate-200/60 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/40 opacity-70'
+        ? 'border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm'
+        : 'border-slate-200/60 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 opacity-70'
     }`;
 
     card.innerHTML = `
-      <div class="flex items-center justify-between w-full gap-1 mb-1">
-        <span class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+      <div class="flex items-center justify-between w-full gap-1 mb-1.5">
+        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
           hasPengurus
-            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300'
-            : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
+            : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
         }">
-          ${hasPengurus ? `${pengurusKelompok.length} Org` : '0 Org'}
+          <span class="w-1.5 h-1.5 rounded-full ${hasPengurus ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+          ${hasPengurus ? `${pengurusKelompok.length} Pamong` : '0 Pamong'}
         </span>
         <div>
           ${hasPengurus
-            ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center p-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/40 dark:hover:bg-blue-900/70 text-brandBlue dark:text-blue-400 transition-colors cursor-pointer" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak ${kel.nama}">
+            ? `<button type="button" class="btn-view-kontak-kel flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/40 dark:hover:bg-blue-900/70 text-brandBlue dark:text-blue-400 transition-colors cursor-pointer" data-desa="${currentDesa.id}" data-kelompok="${kel.id}" title="Lihat kontak ${kel.nama}">
                  <span class="material-symbols-outlined text-[15px]">visibility</span>
                </button>`
-            : `<button type="button" class="flex items-center justify-center p-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
+            : `<button type="button" class="flex items-center justify-center w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed" disabled>
                  <span class="material-symbols-outlined text-[15px]">visibility_off</span>
                </button>`
           }
         </div>
       </div>
-      <div class="font-extrabold text-[11px] sm:text-xs text-slate-800 dark:text-slate-100 truncate w-full" title="${kel.nama}">
+      <div class="font-bold text-[11px] sm:text-xs text-slate-800 dark:text-slate-100 truncate w-full" title="${kel.nama}">
         ${kel.nama}
       </div>
     `;

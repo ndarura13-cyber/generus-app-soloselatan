@@ -205,7 +205,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
 
   // ── Susun Filter Bar HTML Sesuai Mockup Gambar (2 Baris di Kiri, Aksi di Kanan) ──
   const filterBarHtml = `
-    <div class="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+    <div class="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <!-- Sisi Kiri: 2 Baris Filter Grid (Desa + Kelompok, lalu Tahun + Bulan) -->
         <div class="flex flex-col gap-2 w-full md:w-auto md:min-w-[280px] md:max-w-[360px]">
@@ -269,7 +269,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
           const badgeBg = rekap.jenjang === 'caberawit' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200';
 
           return `
-            <div class="rounded-2xl p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-3.5">
+            <div class="rounded-2xl p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-3.5">
               <div>
                 <!-- Header Card: Badge + Title + Subtitle di Kiri, Persentase di Kanan -->
                 <div class="flex items-start justify-between gap-2">
@@ -307,7 +307,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
 
               <!-- Action buttons Sesuai Gambar: Isi/Edit di Kiri, Cetak + Excel + Delete di Kanan -->
               <div class="flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all" data-id="${rekap.id}" title="Isi atau Edit Absensi">
+                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" data-id="${rekap.id}" title="Isi atau Edit Absensi">
                   <span class="material-symbols-outlined text-[16px]">edit_note</span>
                   <span>Isi / Edit</span>
                 </button>
@@ -670,11 +670,11 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" id="btnAturTanggalPertemuan" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs hover:bg-slate-50">
+            <button type="button" id="btnAturTanggalPertemuan" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm hover:bg-slate-50">
               <span class="material-symbols-outlined text-[16px] text-blue-600">calendar_month</span>
               <span>Atur Tanggal (${meetingDates.length} Sesi)</span>
             </button>
-            <button type="button" id="btnSetSemuaHadir" class="px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs hover:bg-emerald-100">
+            <button type="button" id="btnSetSemuaHadir" class="px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm hover:bg-emerald-100">
               <span class="material-symbols-outlined text-[16px]">done_all</span>
               <span>Set Semua Hadir (H)</span>
             </button>
@@ -692,7 +692,7 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
         </div>
 
         <!-- TABEL MATRIX SESUAI PDF RESMI -->
-        <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto shadow-2xs bg-white dark:bg-slate-900 max-h-[55vh]">
+        <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto shadow-sm bg-white dark:bg-slate-900 max-h-[55vh]">
           <table style="width:100%;border-collapse:collapse;min-width:760px;font-size:12px;">
             <thead>
               <tr style="background:#0b386b;color:#ffffff;font-size:11px;font-weight:800;text-transform:uppercase;">
@@ -1295,7 +1295,7 @@ export function openGrafikKehadiranTahunanModal(filterOptions = {}) {
       </div>
 
       <!-- Chart Container -->
-      <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+      <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
         <h4 class="font-extrabold text-xs text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[17px] text-blue-600">bar_chart</span>
           <span>Tingkat Partisipasi Santri (Januari – Desember ${tahun})</span>

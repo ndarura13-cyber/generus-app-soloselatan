@@ -75,183 +75,400 @@
     }
   </script>
 
-  <style type="text/tailwindcss">
-    @layer utilities {
-      /* Keep existing functional classes for JS compatibility */
+  <style>
+    /* Keep existing functional classes for JS compatibility (Native CSS) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    @media (min-width: 768px) {
       .modal-backdrop {
-        @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center p-0 md:p-4 opacity-0 pointer-events-none transition-opacity duration-300;
-        display: none;
+        align-items: center;
+        padding: 1rem;
       }
-      .confirm-backdrop {
-        @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300;
-        display: none;
-      }
-      .modal-backdrop.show, .confirm-backdrop.show {
-        display: flex !important;
-        @apply opacity-100 pointer-events-auto;
-      }
-      
+    }
+    .confirm-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-backdrop.show, .confirm-backdrop.show {
+      display: flex !important;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .modal-box {
+      background-color: #ffffff;
+      border-top-left-radius: 1.5rem;
+      border-top-right-radius: 1.5rem;
+      width: 100%;
+      max-width: 48rem;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dark .modal-box {
+      background-color: #0b1329;
+      border-color: #1e293b;
+    }
+    @media (min-width: 768px) {
       .modal-box {
-        @apply bg-white dark:bg-[#0b1329] rounded-t-3xl md:rounded-2xl w-full max-w-3xl max-h-[90vh] md:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 transform scale-95 transition-transform duration-300;
+        border-radius: 1rem;
+        max-height: 92vh;
       }
-      .modal-box.modal-wide {
-        max-width: 1100px !important;
-      }
-      .modal-box.modal-large {
-        max-width: 950px !important;
-      }
-      .modal-box.modal-medium {
-        max-width: 800px !important;
-      }
-      .modal-backdrop.show .modal-box {
-        @apply scale-100;
-      }
-      .modal-header {
-        @apply px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 flex justify-between items-center shrink-0 bg-white dark:bg-[#0b1329];
-      }
-      .modal-title-wrap {
-        @apply flex items-center gap-3.5;
-      }
-      .modal-icon-top {
-        @apply w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/80 text-brandBlue dark:text-sky-400 border border-transparent dark:border-blue-800/60 flex items-center justify-center shrink-0 text-xl;
-      }
-      .modal-title-wrap h3 {
-        @apply text-lg md:text-xl font-extrabold text-slate-900 dark:text-white;
-      }
-      .btn-close-modal {
-        @apply text-slate-400 hover:text-slate-600 dark:hover:text-white dark:hover:bg-slate-800/80 rounded-lg transition-colors p-1.5 text-2xl leading-none;
-      }
-      .modal-body {
-        @apply flex-1 overflow-y-auto p-5 md:p-6 bg-white dark:bg-[#0b1329] text-slate-900 dark:text-slate-100;
-      }
+    }
+    .modal-box.modal-wide {
+      max-width: 1100px !important;
+    }
+    .modal-box.modal-large {
+      max-width: 950px !important;
+    }
+    .modal-box.modal-medium {
+      max-width: 800px !important;
+    }
+    .modal-backdrop.show .modal-box {
+      transform: scale(1);
+    }
+    .modal-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(241, 245, 249, 1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      background-color: #ffffff;
+    }
+    .dark .modal-header {
+      border-bottom-color: rgba(30, 41, 59, 0.8);
+      background-color: #0b1329;
+    }
+    .modal-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+    .modal-icon-top {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.75rem;
+      background-color: #eff6ff;
+      color: #1a56c4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.25rem;
+    }
+    .dark .modal-icon-top {
+      background-color: rgba(23, 37, 84, 0.8);
+      color: #38bdf8;
+      border: 1px solid rgba(30, 58, 138, 0.6);
+    }
+    .modal-title-wrap h3 {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .dark .modal-title-wrap h3 {
+      color: #ffffff;
+    }
+    .btn-close-modal {
+      color: #94a3b8;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease;
+      padding: 0.375rem;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .btn-close-modal:hover {
+      color: #334155;
+    }
+    .dark .btn-close-modal:hover {
+      color: #ffffff;
+      background-color: rgba(30, 41, 59, 0.8);
+    }
+    .modal-body {
+      flex: 1 1 0%;
+      overflow-y: auto;
+      padding: 1.25rem 1.5rem;
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+    .dark .modal-body {
+      background-color: #0b1329;
+      color: #f1f5f9;
+    }
 
-      .confirm-card {
-        @apply bg-white dark:bg-[#0b1329] rounded-2xl w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl border border-slate-200 dark:border-slate-800 transform scale-95 transition-transform duration-300;
-      }
-      .confirm-backdrop.show .confirm-card { @apply scale-100; }
-      .confirm-icon-box {
-        @apply w-14 h-14 rounded-full bg-red-50 dark:bg-red-950/50 text-red-500 flex items-center justify-center mb-4 border border-transparent dark:border-red-800/40;
-      }
-      .confirm-icon-box .material-symbols-outlined { @apply text-2xl; }
-      .confirm-title { @apply text-lg font-bold text-slate-900 dark:text-white mb-2; }
-      .confirm-message { @apply text-sm text-slate-600 dark:text-slate-400 mb-6; }
-      .confirm-actions { @apply flex w-full gap-3; }
-      .btn-confirm-no { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 transition-colors; }
-      .btn-confirm-yes { @apply flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors; }
+    .confirm-card {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 24rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      border: 1px solid #e2e8f0;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dark .confirm-card {
+      background-color: #0b1329;
+      border-color: #1e293b;
+    }
+    .confirm-backdrop.show .confirm-card {
+      transform: scale(1);
+    }
+    .confirm-icon-box {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 9999px;
+      background-color: #fef2f2;
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .dark .confirm-icon-box {
+      background-color: rgba(69, 10, 10, 0.5);
+      border: 1px solid rgba(153, 27, 27, 0.4);
+    }
+    .confirm-icon-box .material-symbols-outlined { font-size: 1.5rem; }
+    .confirm-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+    .dark .confirm-title { color: #ffffff; }
+    .confirm-message {
+      font-size: 0.875rem;
+      color: #475569;
+      margin-bottom: 1.5rem;
+    }
+    .dark .confirm-message { color: #94a3b8; }
+    .confirm-actions {
+      display: flex;
+      width: 100%;
+      gap: 0.75rem;
+    }
+    .btn-confirm-no {
+      flex: 1 1 0%;
+      padding: 0.625rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #475569;
+      background-color: #f1f5f9;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-confirm-no:hover { background-color: #e2e8f0; }
+    .dark .btn-confirm-no {
+      color: #cbd5e1;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+    }
+    .dark .btn-confirm-no:hover { background-color: #334155; }
+    .btn-confirm-yes {
+      flex: 1 1 0%;
+      padding: 0.625rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #dc2626;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-confirm-yes:hover { background-color: #b91c1c; }
 
-      
-      /* Desktop Sidebar Collapse & Full Viewport Height */
+    /* Desktop Sidebar Collapse & Full Viewport Height */
+    aside#desktopSidebar {
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      min-height: 100vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    @media (max-width: 767px) {
       aside#desktopSidebar {
-        position: fixed !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        min-height: 100vh !important;
-        display: flex !important;
-        flex-direction: column !important;
+        display: none !important;
       }
-      @media (max-width: 767px) {
-        aside#desktopSidebar {
-          display: none !important;
-        }
-      }
-      body.sidebar-collapsed aside#desktopSidebar { width: 5rem; overflow: visible !important; }
-      body.sidebar-collapsed aside#desktopSidebar .sidebar-nav-container { overflow: visible !important; }
-      body.sidebar-collapsed aside#desktopSidebar .logo-text,
-      body.sidebar-collapsed aside#desktopSidebar .menu-text,
-      body.sidebar-collapsed aside#desktopSidebar .menu-arrow,
-      body.sidebar-collapsed aside#desktopSidebar .menu-label,
-      body.sidebar-collapsed aside#desktopSidebar .menu-collapsible { display: none !important; }
-      body.sidebar-collapsed aside#desktopSidebar .sidebar-header { justify-content: center; padding: 0 0.5rem; }
-      body.sidebar-collapsed aside#desktopSidebar .logo-img { margin: 0 auto; }
-      body.sidebar-collapsed aside#desktopSidebar a,
-      body.sidebar-collapsed aside#desktopSidebar button:not(#btnToggleSidebar) {
-        justify-content: center !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
-      body.sidebar-collapsed aside#desktopSidebar #btnToggleSidebar span { transform: rotate(180deg); }
-      @media (min-width: 768px) {
-        body.sidebar-collapsed header { margin-left: 5rem; width: calc(100% - 5rem); }
-        body.sidebar-collapsed main { margin-left: 5rem; max-width: calc(100% - 5rem); }
-        
-        body:not(.sidebar-collapsed) header { margin-left: 16rem; width: calc(100% - 16rem); }
-        body:not(.sidebar-collapsed) main { margin-left: 16rem; max-width: calc(100% - 16rem); }
-      }
-
-      /* Collapsed Sidebar Flyout Menu */
-      .side-fitur-flyout {
-        position: absolute;
-        left: calc(100% + 14px);
-        top: -6px;
-        width: 220px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
-        z-index: 100;
-      }
-      .dark .side-fitur-flyout {
-        background: #0f172a;
-        border-color: #1e293b;
-        box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.55);
-      }
-
+    }
+    body.sidebar-collapsed aside#desktopSidebar { width: 5rem; overflow: visible !important; }
+    body.sidebar-collapsed aside#desktopSidebar .sidebar-nav-container { overflow: visible !important; }
+    body.sidebar-collapsed aside#desktopSidebar .logo-text,
+    body.sidebar-collapsed aside#desktopSidebar .menu-text,
+    body.sidebar-collapsed aside#desktopSidebar .menu-arrow,
+    body.sidebar-collapsed aside#desktopSidebar .menu-label,
+    body.sidebar-collapsed aside#desktopSidebar .menu-collapsible { display: none !important; }
+    body.sidebar-collapsed aside#desktopSidebar .sidebar-header { justify-content: center; padding: 0 0.5rem; }
+    body.sidebar-collapsed aside#desktopSidebar .logo-img { margin: 0 auto; }
+    body.sidebar-collapsed aside#desktopSidebar a,
+    body.sidebar-collapsed aside#desktopSidebar button:not(#btnToggleSidebar) {
+      justify-content: center !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    body.sidebar-collapsed aside#desktopSidebar #btnToggleSidebar span { transform: rotate(180deg); }
+    @media (min-width: 768px) {
+      body.sidebar-collapsed header { margin-left: 5rem; width: calc(100% - 5rem); }
+      body.sidebar-collapsed main { margin-left: 5rem; max-width: calc(100% - 5rem); }
       
-      @supports (padding-bottom: env(safe-area-inset-bottom)) {
-        .pb-safe {
-          padding-bottom: calc(env(safe-area-inset-bottom) + 0.25rem);
-        }
-      }
-      #mobDropUpMenu.active {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0) translateX(-50%);
-      }
-      #mobDropUpBackdrop.active {
-        opacity: 1;
-        pointer-events: auto;
-      }
+      body:not(.sidebar-collapsed) header { margin-left: 16rem; width: calc(100% - 16rem); }
+      body:not(.sidebar-collapsed) main { margin-left: 16rem; max-width: calc(100% - 16rem); }
+    }
 
-      /* Drawer Logic */
-      #dashDrawerOverlay {
-        @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300;
-      }
-      #dashDrawerOverlay.visible {
-        @apply opacity-100 pointer-events-auto;
-      }
-      #dashDrawer {
-        @apply fixed inset-y-0 left-0 w-72 md:w-80 bg-slate-50 dark:bg-slate-900 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl;
-      }
-      #dashDrawer.open {
-        @apply translate-x-0;
-      }
-      
-      /* Active menu highlighting */
-      .desa-tabs {
-        @apply flex overflow-x-auto gap-2 pb-2;
-      }
-      .desa-tabs::-webkit-scrollbar { display: none; }
-      .btn-desa-tab {
-        @apply px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors;
-      }
-      .btn-desa-tab.active {
-        @apply bg-brandBlue text-white border-brandBlue shadow-md;
-      }
+    /* Collapsed Sidebar Flyout Menu */
+    .side-fitur-flyout {
+      position: absolute;
+      left: calc(100% + 14px);
+      top: -6px;
+      width: 220px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+      z-index: 100;
+    }
+    .dark .side-fitur-flyout {
+      background: #0f172a;
+      border-color: #1e293b;
+      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.55);
+    }
 
-      /* Clean Mobile Touch Scrollbars (Completely Hidden) */
-      @media (max-width: 768px), (pointer: coarse) {
-        * {
-          scrollbar-width: none !important;
-          -ms-overflow-style: none !important;
-        }
-        *::-webkit-scrollbar {
-          display: none !important;
-          width: 0 !important;
-          height: 0 !important;
-        }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .pb-safe {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 0.25rem);
+      }
+    }
+    #mobDropUpMenu.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) translateX(-50%);
+    }
+    #mobDropUpBackdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Drawer Logic */
+    #dashDrawerOverlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #dashDrawerOverlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #dashDrawer {
+      position: fixed;
+      inset-block: 0;
+      left: 0;
+      width: 18rem;
+      background-color: #f8fafc;
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .dark #dashDrawer {
+      background-color: #0f172a;
+    }
+    @media (min-width: 768px) {
+      #dashDrawer { width: 20rem; }
+    }
+    #dashDrawer.open {
+      transform: translateX(0);
+    }
+    
+    /* Active menu highlighting */
+    .desa-tabs {
+      display: flex;
+      overflow-x: auto;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .desa-tabs::-webkit-scrollbar { display: none; }
+    .btn-desa-tab {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      background-color: #ffffff;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .dark .btn-desa-tab {
+      background-color: #1e293b;
+      color: #94a3b8;
+      border-color: #334155;
+    }
+    .btn-desa-tab.active {
+      background-color: #1a56c4;
+      color: #ffffff;
+      border-color: #1a56c4;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Clean Mobile Touch Scrollbars (Completely Hidden) */
+    @media (max-width: 768px), (pointer: coarse) {
+      * {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+      *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
       }
     }
   </style>
@@ -474,36 +691,36 @@
 
       <!-- TOP COMPACT GREETING & COMMAND BAR -->
       <section
-        class="bg-white dark:bg-slate-800 rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        class="bg-gradient-to-r from-white via-blue-50/25 to-slate-50 dark:from-slate-800 dark:via-slate-800/90 dark:to-slate-800/70 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 transition-all">
         <!-- User Greeting & Scope Info -->
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center gap-3.5 min-w-0">
           <div
-            class="w-10 h-10 rounded-xl bg-brandBlue/10 text-brandBlue dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
+            class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-500/20">
             <span class="material-symbols-outlined text-[22px]">waving_hand</span>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Selamat bertugas,</span>
-              <span class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white truncate"
+              <span class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate"
                 id="headingUserName">Pengurus</span>
               <span
-                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/60"
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold border border-emerald-200/60 dark:border-emerald-800/60"
                 id="welcomeScope">
-                <span class="material-symbols-outlined text-[13px]">verified_user</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="scopeText">Daerah Solo Selatan</span>
               </span>
             </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate hidden sm:block">
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate hidden sm:block">
               Pusat Pembinaan Generus &bull; Implementasi 29 Karakter Luhur dalam Jamaah
             </p>
           </div>
         </div>
 
         <!-- Superadmin Quick Actions & Alert Pill (Mobile: Full Width & Center) -->
-        <div class="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end flex-wrap sm:flex-nowrap">
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end flex-wrap sm:flex-nowrap shrink-0">
           <!-- Pending Approval Alert Pill (Interactive) -->
           <button type="button" id="pillTopPendingApproval" style="display:none;"
-            class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm transition-all animate-pulse cursor-pointer shrink-0"
+            class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-all animate-pulse cursor-pointer shrink-0"
             title="Ada pendaftar yang menunggu verifikasi Superadmin">
             <span class="material-symbols-outlined text-[16px]">pending_actions</span>
             <span id="topPendingCountText">1 Menunggu</span>
@@ -511,7 +728,7 @@
 
           <!-- Kelola Hak Akses Superadmin Pill Button -->
           <button type="button" id="btnTopKelolaPengurus" style="display:none;"
-            class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-colors cursor-pointer shrink-0 text-center"
+            class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer shrink-0 shadow-xs text-center"
             title="Kelola Akun Pamong & Peran Hak Akses">
             <span
               class="material-symbols-outlined text-[16px] text-rose-600 dark:text-rose-400">admin_panel_settings</span>
@@ -525,39 +742,43 @@
       <div id="btnMenuPengurus" style="display:none;"></div>
 
       <!-- 4 INTEGRATED COMMAND CARDS (MODUL + STATISTIK REAL-TIME) -->
-      <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
 
         <!-- CARD 1: DATABASE GENERUS -->
         <div id="btnMenuSiswa"
-          class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600/50 transition-all flex flex-col justify-between cursor-pointer group">
+          class="bg-white dark:bg-slate-800 p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600/60 hover:-translate-y-0.5 transition-all flex flex-col justify-between cursor-pointer group">
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[18px]">database</span>
-                Database Generus
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-100 dark:border-purple-900/50">
+                  <span class="material-symbols-outlined text-[17px]">database</span>
+                </span>
+                <span>Database Generus</span>
               </span>
               <span
-                class="material-symbols-outlined text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+                class="w-6 h-6 rounded-md bg-slate-50 dark:bg-slate-700/50 text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:bg-purple-50 dark:group-hover:bg-purple-950/40 flex items-center justify-center text-xs transition-all">
+                <span class="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              </span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
               <span id="statTotal"
-                class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">1.250</span>
-              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Santri</span>
+                class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">1.250</span>
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Santri</span>
             </div>
           </div>
           <!-- Deep-Filter Jenjang Pills -->
-          <div class="flex items-center gap-1 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-700/60"
+          <div class="flex items-center gap-1.5 flex-wrap pt-2.5 border-t border-slate-100 dark:border-slate-700/60"
             id="cardGenerusChips">
             <button type="button" id="cardStatCaberawit" title="Filter Caberawit"
-              class="px-2 py-0.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60 transition-colors">
+              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60 transition-all cursor-pointer shadow-xs">
               CR: <span id="statCaberawit">410</span>
             </button>
             <button type="button" id="cardStatGp" title="Filter GP Reguler"
-              class="px-2 py-0.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-brandBlue dark:text-blue-300 text-[10px] font-bold border border-blue-200/60 dark:border-blue-800/60 transition-colors">
+              class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-brandBlue dark:text-blue-300 text-[10px] font-bold border border-blue-200/60 dark:border-blue-800/60 transition-all cursor-pointer shadow-xs">
               GP: <span id="statGp">560</span>
             </button>
             <button type="button" id="cardStatRemaja" title="Filter Remaja"
-              class="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/60 dark:border-emerald-800/60 transition-colors">
+              class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/60 dark:border-emerald-800/60 transition-all cursor-pointer shadow-xs">
               Rem: <span id="statRemaja">280</span>
             </button>
           </div>
@@ -565,30 +786,36 @@
 
         <!-- CARD 2: PROGRAM KERJA -->
         <div id="btnMenuProker"
-          class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600/50 transition-all flex flex-col justify-between cursor-pointer group">
+          class="bg-white dark:bg-slate-800 p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600/60 hover:-translate-y-0.5 transition-all flex flex-col justify-between cursor-pointer group">
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-[18px]">assignment</span>
-                Program Kerja
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/50">
+                  <span class="material-symbols-outlined text-[17px]">assignment</span>
+                </span>
+                <span>Program Kerja</span>
               </span>
               <span
-                class="material-symbols-outlined text-slate-400 group-hover:text-brandBlue dark:group-hover:text-blue-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+                class="w-6 h-6 rounded-md bg-slate-50 dark:bg-slate-700/50 text-slate-400 group-hover:text-brandBlue dark:group-hover:text-blue-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/40 flex items-center justify-center text-xs transition-all">
+                <span class="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              </span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
               <span id="cardProkerTotal"
-                class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">88</span>
-              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Agenda</span>
+                class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">88</span>
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Agenda</span>
             </div>
           </div>
           <!-- Status Breakdown Pills -->
-          <div class="flex items-center gap-1 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-700/60">
+          <div class="flex items-center gap-1.5 flex-wrap pt-2.5 border-t border-slate-100 dark:border-slate-700/60">
             <span id="cardProkerOngoing"
-              class="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/60 dark:border-emerald-800/60">
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200/60 dark:border-emerald-800/60 shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               12 Berjalan
             </span>
             <span id="cardProkerUpcoming"
-              class="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60">
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200/60 dark:border-amber-800/60 shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
               6 Mendatang
             </span>
           </div>
@@ -596,53 +823,59 @@
 
         <!-- CARD 3: JURNAL KBM -->
         <div id="btnMenuJurnalKbm"
-          class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-600/50 transition-all flex flex-col justify-between cursor-pointer group">
+          class="bg-white dark:bg-slate-800 p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-600/60 hover:-translate-y-0.5 transition-all flex flex-col justify-between cursor-pointer group">
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <span
-                  class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">menu_book</span>
-                Kegiatan Belajar Mengajar<!--  -->
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900/50">
+                  <span class="material-symbols-outlined text-[17px]">menu_book</span>
+                </span>
+                <span>Kegiatan KBM</span>
               </span>
               <span
-                class="material-symbols-outlined text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+                class="w-6 h-6 rounded-md bg-slate-50 dark:bg-slate-700/50 text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40 flex items-center justify-center text-xs transition-all">
+                <span class="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              </span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
               <span
-                class="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">Presensi
-                &amp; Jurnal KBM</span>
+                class="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">Presensi
+                &amp; Jurnal</span>
             </div>
           </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+          <div class="pt-2.5 border-t border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
               <span class="material-symbols-outlined text-emerald-500 text-[14px]">task_alt</span>
-              Kurikulum &amp; Karakter
+              <span>Kurikulum &amp; Karakter</span>
             </span>
           </div>
         </div>
 
         <!-- CARD 4: STRUKTUR PENGURUS -->
         <div id="btnMenuStrukturDaerah"
-          class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600/50 transition-all flex flex-col justify-between cursor-pointer group">
+          class="bg-white dark:bg-slate-800 p-4 sm:p-4.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600/60 hover:-translate-y-0.5 transition-all flex flex-col justify-between cursor-pointer group">
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <span
-                  class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[18px]">diversity_2</span>
-                Struktur Pengurus
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-100 dark:border-indigo-900/50">
+                  <span class="material-symbols-outlined text-[17px]">diversity_2</span>
+                </span>
+                <span>Struktur Pengurus</span>
               </span>
               <span
-                class="material-symbols-outlined text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+                class="w-6 h-6 rounded-md bg-slate-50 dark:bg-slate-700/50 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/40 flex items-center justify-center text-xs transition-all">
+                <span class="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              </span>
             </div>
             <div class="flex items-baseline gap-1.5 mb-2.5">
               <span id="cardStrukturTotal"
-                class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">57</span>
-              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pengurus</span>
+                class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">57</span>
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Pengurus</span>
             </div>
           </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1" id="strukturCardDesc">
-              14 Bidang &bull; Solo Selatan
+          <div class="pt-2.5 border-t border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium" id="strukturCardDesc">
+              <span>14 Bidang &bull; Solo Selatan</span>
             </span>
           </div>
         </div>
@@ -654,23 +887,23 @@
 
         <!-- KOLOM 1: PROGRAM KERJA BULAN INI -->
         <div id="sectionProkerTahunan"
-          class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+          class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs overflow-hidden flex flex-col hover:border-slate-300 dark:hover:border-slate-600 transition-all">
           <!-- Header Bar -->
           <div
-            class="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3">
+            class="p-4 sm:p-4.5 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 min-w-0">
               <div
-                class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-[18px]">event_note</span>
+                class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/50 shadow-xs">
+                <span class="material-symbols-outlined text-[19px]">event_note</span>
               </div>
               <div>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">Agenda Terdekat</h3>
-                <span class="text-[11px] text-slate-400" id="dashProkerHeaderTitle">September 2026</span>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">Agenda Terdekat</h3>
+                <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400" id="dashProkerHeaderTitle">September 2026</span>
               </div>
             </div>
 
             <button type="button" id="btnKelolaProkerDashboard"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer shrink-0">
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer shrink-0 shadow-xs">
               <span>Semua Agenda</span>
               <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
             </button>
@@ -679,17 +912,17 @@
           <!-- Sub-Tab Segment Switcher (Event vs Rutin) & Filter -->
           <div
             class="px-3.5 pt-2.5 pb-2 flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30">
-            <div class="inline-flex p-0.5 bg-slate-200/80 dark:bg-slate-700/60 rounded-xl text-xs font-bold"
+            <div class="inline-flex p-1 bg-slate-200/80 dark:bg-slate-700/60 rounded-xl text-xs font-bold shadow-xs"
               id="dashProkerSegmentBar">
               <button type="button"
-                class="dash-proker-segment-btn px-2.5 py-1 rounded-lg text-xs transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-xs cursor-pointer"
+                class="dash-proker-segment-btn px-3 py-1 rounded-lg text-xs transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-xs cursor-pointer font-bold"
                 data-segment="event">Event &amp; Agenda</button>
               <button type="button"
-                class="dash-proker-segment-btn px-2.5 py-1 rounded-lg text-xs transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer"
+                class="dash-proker-segment-btn px-3 py-1 rounded-lg text-xs transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer font-semibold"
                 data-segment="routine">
                 <span>Rutin</span>
                 <span
-                  class="px-1.5 py-0.2 rounded-full text-[9px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold ml-0.5"
+                  class="px-1.5 py-0.5 rounded-full text-[9px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-black ml-1"
                   id="dashProkerRoutineCount">0</span>
               </button>
             </div>
@@ -701,33 +934,33 @@
           </div>
 
           <!-- Agenda List Container -->
-          <div class="proker-list p-3 sm:p-4 divide-y divide-slate-100 dark:divide-slate-700/60" id="dashProkerList"
+          <div class="proker-list p-3.5 sm:p-4 divide-y divide-slate-100 dark:divide-slate-700/60" id="dashProkerList"
             style="min-height: 140px;"></div>
 
           <!-- Footer / Pagination Controls -->
-          <div class="border-t border-slate-100 dark:border-slate-800 p-2 bg-slate-50/60 dark:bg-slate-900/30"
+          <div class="border-t border-slate-100 dark:border-slate-800 p-2.5 bg-slate-50/60 dark:bg-slate-900/30"
             id="dashProkerPagination"></div>
         </div>
 
         <!-- KOLOM 2: MONITORING WILAYAH -->
         <div id="sectionMonitoringWilayah"
-          class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+          class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs overflow-hidden flex flex-col hover:border-slate-300 dark:hover:border-slate-600 transition-all">
           <!-- Header Bar (Mobile: Atas-Bawah Lega / Desktop: Side-by-Side) -->
           <div
-            class="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
+            class="p-4 sm:p-4.5 border-b border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
             <div class="flex items-center gap-2.5 min-w-0">
               <div
-                class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-[18px]">location_on</span>
+                class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900/50 shadow-xs">
+                <span class="material-symbols-outlined text-[19px]">location_on</span>
               </div>
               <div>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">Monitoring Wilayah</h3>
-                <span class="text-[11px] text-slate-400">5 Desa &bull; 27 Kelompok</span>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">Monitoring Wilayah</h3>
+                <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">5 Desa &bull; 27 Kelompok Binaan</span>
               </div>
             </div>
 
             <button type="button" id="btnKontakDesa"
-              class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer shrink-0">
+              class="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer shrink-0 shadow-xs">
               <span class="material-symbols-outlined text-[15px] text-emerald-600 dark:text-emerald-400">support_agent</span>
               <span id="btnKontakDesaText">Kontak Pamong</span>
             </button>
@@ -741,9 +974,9 @@
             </div>
           </div>
 
-          <!-- Kelompok Grid Container (Selected Desa) — 3-Column Grid -->
-          <div class="p-2.5 sm:p-4" style="min-height: 140px;">
-            <div id="kelompokGrid" class="grid grid-cols-3 gap-2 sm:gap-2.5">
+          <!-- Kelompok Grid Container (Selected Desa) — Responsive Grid -->
+          <div class="p-3 sm:p-4" style="min-height: 140px;">
+            <div id="kelompokGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
               <!-- Rendered by JS -->
             </div>
           </div>
