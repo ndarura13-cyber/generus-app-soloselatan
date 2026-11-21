@@ -233,121 +233,246 @@ export function bukaModal(key) {
                         : cfg.name;
   }
 
-  // Body Content (Summary + Distribution)
+  // Body Content (Summary Hero + Gender Breakdown + Distribution)
   let html = "";
 
-  // 1. Summary Block (Solid Blue)
+  // 1. Summary Hero Card (Modern Gradient & Stats Micro-Pills)
+  const totalKelompokAktif = desaSt.reduce((acc, d) => acc + (d.kelompokStats || []).length, 0);
   html += `
-    <div class="bg-brandBlue dark:bg-brandDarkBlue text-white p-6 pb-8 text-center relative overflow-hidden">
-      <!-- Subtle Background Detail -->
-      <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white p-5 sm:p-7 shadow-xs">
+      <!-- Decorative ambient glows -->
+      <div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+      <div class="absolute right-12 bottom-0 w-28 h-28 rounded-full bg-blue-300/15 blur-xl pointer-events-none"></div>
       
       <div class="relative z-10">
-        <h4 class="font-semibold text-sm opacity-90 mb-1">Ringkasan</h4>
-        <div class="text-5xl font-extrabold mb-1 tracking-tight">${total.toLocaleString("id-ID")}</div>
-        <div class="text-sm opacity-80 font-medium">${isWilayah ? "Total Wilayah" : "Total Generus"}</div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-blue-100 text-[11px] font-bold uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            ${isWilayah ? "Statistik Wilayah" : "Total Generus Terdata"}
+          </span>
+          <span class="text-xs text-blue-100/80 font-medium">Solo Selatan</span>
+        </div>
+
+        <div class="flex items-baseline gap-2 mb-3">
+          <div class="text-4xl sm:text-5xl font-black tracking-tight">${total.toLocaleString("id-ID")}</div>
+          <div class="text-sm sm:text-base font-semibold text-blue-100/90">${isWilayah ? (key === "desa" ? "Desa Binaan" : "Kelompok Binaan") : "Santri Aktif"}</div>
+        </div>
+
+        <!-- Quick Info Micro-Pills -->
+        <div class="flex flex-wrap items-center gap-2 pt-2.5 border-t border-white/15 text-xs text-blue-100/95 font-medium">
+          <div class="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-lg backdrop-blur-xs">
+            <span class="material-symbols-outlined text-[15px]">location_city</span>
+            <span>${desaSt.length} Desa Binaan</span>
+          </div>
+          ${!isWilayah ? `
+            <div class="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-lg backdrop-blur-xs">
+              <span class="material-symbols-outlined text-[15px]">home_work</span>
+              <span>${totalKelompokAktif} Kelompok</span>
+            </div>
+          ` : ''}
+          <div class="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-lg backdrop-blur-xs">
+            <span class="material-symbols-outlined text-[15px] text-emerald-300">verified</span>
+            <span>Status Sambung</span>
+          </div>
+        </div>
       </div>
     </div>
   `;
 
-  // 2. Gender Breakdown (if not wilayah and total > 0)
+  // 2. Gender Breakdown (Putra / Putri)
   if (!isWilayah && total > 0) {
     html += `
-      <div class="p-6 pb-2">
-        <h4 class="text-base font-bold text-slate-800 dark:text-white mb-4">Rincian Generus</h4>
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Putra -->
-          <div>
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-2xl">male</span>
+      <div class="p-5 sm:p-6 pb-2 border-b border-slate-100 dark:border-slate-800">
+        <div class="mb-3.5">
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-[18px]">wc</span>
+            Komposisi Gender Putra & Putri
+          </h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Perbandingan jumlah santri laki-laki dan perempuan</p>
+        </div>
+
+        <!-- Dual Cards Grid -->
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-3.5">
+          <!-- Putra Card -->
+          <div class="relative overflow-hidden p-3.5 sm:p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-800/60 transition-all hover:shadow-xs">
+            <div class="flex items-center justify-between mb-2">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                <span class="material-symbols-outlined text-[20px] sm:text-[22px]">male</span>
               </div>
-              <div>
-                <div class="text-xs text-slate-500 dark:text-slate-400">Putra</div>
-                <div class="font-bold text-slate-800 dark:text-white text-sm">${lCount} Putra</div>
-              </div>
+              <span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-[11px] sm:text-xs">
+                ${lPct}%
+              </span>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="h-1.5 flex-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500 rounded-full" style="width: ${lPct}%"></div>
-              </div>
-              <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 w-6">${lPct}%</span>
+            <div class="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">Putra (Laki-laki)</div>
+            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5 tracking-tight">
+              ${lCount.toLocaleString("id-ID")} <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Santri</span>
             </div>
           </div>
-          <!-- Putri -->
-          <div>
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-pink-600 dark:text-pink-400 text-2xl">female</span>
+
+          <!-- Putri Card -->
+          <div class="relative overflow-hidden p-3.5 sm:p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 transition-all hover:shadow-xs">
+            <div class="flex items-center justify-between mb-2">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-xs">
+                <span class="material-symbols-outlined text-[20px] sm:text-[22px]">female</span>
               </div>
-              <div>
-                <div class="text-xs text-slate-500 dark:text-slate-400">Putri</div>
-                <div class="font-bold text-slate-800 dark:text-white text-sm">${pCount} Putri</div>
-              </div>
+              <span class="px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-extrabold text-[11px] sm:text-xs">
+                ${pPct}%
+              </span>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="h-1.5 flex-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div class="h-full bg-pink-500 rounded-full" style="width: ${pPct}%"></div>
-              </div>
-              <span class="text-[10px] font-bold text-pink-600 dark:text-pink-400 w-6">${pPct}%</span>
+            <div class="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">Putri (Perempuan)</div>
+            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5 tracking-tight">
+              ${pCount.toLocaleString("id-ID")} <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Santri</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Segmented Dual Ratio Bar -->
+        <div class="bg-slate-50 dark:bg-slate-800/80 rounded-xl p-3 border border-slate-200/70 dark:border-slate-700/60">
+          <div class="flex items-center justify-between text-xs font-bold mb-1.5">
+            <span class="text-blue-600 dark:text-blue-400 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-blue-600"></span> Putra: ${lCount} (${lPct}%)
+            </span>
+            <span class="text-rose-500 dark:text-rose-400 flex items-center gap-1">
+              Putri: ${pCount} (${pPct}%) <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            </span>
+          </div>
+          <div class="h-2.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex">
+            <div class="h-full bg-blue-600 transition-all duration-500 rounded-l-full" style="width: ${lPct}%" title="Putra: ${lPct}%"></div>
+            <div class="h-full bg-rose-500 transition-all duration-500 rounded-r-full" style="width: ${pPct}%" title="Putri: ${pPct}%"></div>
           </div>
         </div>
       </div>
     `;
   } else if (!isWilayah) {
     html += `
-      <div class="p-6 pb-2 text-center text-sm text-slate-500 dark:text-slate-400">
-        Belum ada data terdaftar di jenjang ini.
+      <div class="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
+        <span class="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-600 mb-1">person_off</span>
+        <p>Belum ada santri terdaftar di jenjang ini.</p>
       </div>
     `;
   }
 
-  // 3. Desa / Kelompok Distribution Grid
-  html += `<div class="p-6 pt-4">`;
-  
-  // Memulai satu kesatuan kartu dengan garis pemisah (divide-y)
-  html += `<div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60 rounded-xl overflow-hidden divide-y divide-slate-200/60 dark:divide-slate-700/60">`;
+  // 3. Sebaran Wilayah (Desa & Kelompok)
+  html += `
+    <div class="p-5 sm:p-6 pt-4">
+      <div class="flex items-center justify-between mb-3.5">
+        <div>
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-brandBlue dark:text-blue-400 text-[18px]">map</span>
+            ${isWilayah ? "Daftar Wilayah Binaan" : "Sebaran Wilayah & Kelompok"}
+          </h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            ${isWilayah ? "Struktur pembagian desa dan kelompok binaan" : "Persebaran santri aktif per desa dan kelompok"}
+          </p>
+        </div>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+          ${isWilayah ? (key === 'desa' ? '5 Desa' : '27 Kelompok') : `${desaSt.length} Desa`}
+        </span>
+      </div>
+
+      <div class="space-y-3">
+  `;
 
   if (isWilayah) {
     html += (MASTER_WILAYAH.desa || []).map(function(desa) {
       const pills = (desa.kelompok || []).map(function(k) {
-        return `<span class="inline-block bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 mr-1.5 mb-1.5">&bull; ${k.nama}</span>`;
+        return `
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200/70 dark:border-slate-600/60">
+            <span class="w-1.5 h-1.5 rounded-full bg-brandBlue dark:bg-blue-400"></span>
+            <span>${k.nama}</span>
+          </div>
+        `;
       }).join("");
 
       return `
-        <div class="p-4 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-700/30 transition-colors">
-          <div class="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2 mb-2">
-            <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">location_city</span>
-            Desa ${desa.nama} <span class="font-normal text-slate-500 text-xs">(${desa.kelompok.length} Kelompok)</span>
+        <div class="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
+          <div class="flex items-center justify-between mb-2.5">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-100 dark:border-purple-900/40">
+                <span class="material-symbols-outlined text-[17px]">location_city</span>
+              </div>
+              <div class="font-bold text-slate-900 dark:text-white text-sm">Desa ${desa.nama}</div>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-800/60">
+              ${(desa.kelompok || []).length} Kelompok
+            </span>
           </div>
-          <div>${pills}</div>
+          <div class="flex flex-wrap gap-1.5 pt-1">${pills}</div>
         </div>
       `;
     }).join("");
   } else if (desaSt.length > 0) {
     html += desaSt.map(function(desa) {
-      const kDisplay = desa.kelompokStats.length > 0
+      const desaL = (desa.siswa || []).filter(s => (s.jenis_kelamin || '').toUpperCase() === 'L').length;
+      const desaP = (desa.siswa || []).filter(s => (s.jenis_kelamin || '').toUpperCase() === 'P').length;
+      const desaPct = total > 0 ? Math.round((desa.total / total) * 100) : 0;
+
+      const chipsHtml = desa.kelompokStats.length > 0
         ? desa.kelompokStats.map(function(k) {
-            return `<span class="text-[11.5px] text-slate-600 dark:text-slate-400 mr-2 mb-1 inline-block">&bull; ${k.nama} <span class="opacity-60">(${k.count})</span></span>`;
+            return `
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-700/60 hover:bg-blue-50 dark:hover:bg-blue-900/40 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200/70 dark:border-slate-600/60 transition-colors">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400"></span>
+                <span class="truncate max-w-[140px] sm:max-w-none">${k.nama}</span>
+                <span class="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 border border-slate-200/60 dark:border-slate-700 shadow-sm">${k.count}</span>
+              </div>
+            `;
           }).join("")
-        : `<span class="text-[11px] text-slate-400 italic">Belum ada data</span>`;
+        : `<div class="text-xs text-slate-400 italic">Belum ada data kelompok di desa ini</div>`;
 
       return `
-        <div class="p-4 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-700/30 transition-colors">
-          <div class="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2 mb-2">
-            <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">location_city</span>
-            Desa ${desa.nama} <span class="font-normal text-slate-500 text-xs">(${desa.total} Generus)</span>
+        <div class="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm hover:border-blue-300 dark:hover:border-blue-700/60 transition-all">
+          <!-- Header Desa -->
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/40">
+                <span class="material-symbols-outlined text-[17px]">location_city</span>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-slate-900 dark:text-white text-sm truncate">Desa ${desa.nama}</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
+                  <span class="text-blue-600 dark:text-blue-400 font-semibold">${desaL} Putra</span>
+                  <span class="text-slate-300 dark:text-slate-600">&bull;</span>
+                  <span class="text-rose-500 dark:text-rose-400 font-semibold">${desaP} Putri</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-right shrink-0">
+              <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 font-extrabold text-xs border border-blue-100 dark:border-blue-800/60">
+                ${desa.total} <span class="font-medium text-[10px] opacity-80">Santri</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-medium mt-0.5">${desaPct}% dari total</div>
+            </div>
           </div>
-          <div class="pl-6 ml-2">${kDisplay}</div>
+
+          <!-- Progress bar proporsi desa -->
+          <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
+            <div class="h-full bg-brandBlue dark:bg-blue-500 rounded-full" style="width: ${desaPct}%"></div>
+          </div>
+
+          <!-- Chips Kelompok -->
+          <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kelompok Terdaftar (${desa.kelompokStats.length})</div>
+            <div class="flex flex-wrap gap-1.5">
+              ${chipsHtml}
+            </div>
+          </div>
         </div>
       `;
     }).join("");
+  } else {
+    html += `
+      <div class="p-6 text-center text-xs text-slate-400">
+        Belum ada persebaran wilayah untuk kategori ini.
+      </div>
+    `;
   }
 
-  html += `</div>`; // akhir dari satu kesatuan kartu
-  html += `</div>`; // akhir padding wrapper
-  
+  html += `
+      </div>
+    </div>
+  `;
+
   if (elBody) {
     elBody.innerHTML = html;
   }
