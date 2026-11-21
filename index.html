@@ -93,38 +93,108 @@
   <!-- Optional: Keep original stylesheet just in case for some complex animations/overrides not covered here -->
   <link rel="stylesheet" href="src/style.css?v=5.0" />
 
-  <style type="text/tailwindcss">
-    /* Tailwind utilities specifically needed for smooth glassmorphism overriding style.css defaults */
+  <style>
     html { scroll-behavior: smooth; }
-    body { @apply bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300; }
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .dark body, html.dark body {
+      background-color: #0f172a;
+      color: #e2e8f0;
+    }
     
     /* Override existing style.css header */
-    .navbar { all: unset; position: fixed; top: 0; width: 100%; z-index: 50; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .navbar.scrolled { @apply bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl shadow-xs border-b border-slate-200/60 dark:border-slate-800/60; }
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 50;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .navbar.scrolled {
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .dark .navbar.scrolled {
+      background-color: rgba(15, 23, 42, 0.85);
+      border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+    }
     
-    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
     @media (max-width: 768px) {
       .nav-links {
-        display: flex; flex-direction: column; position: fixed; top: 0; right: -100%; left: auto !important; width: 280px; height: 100vh;
-        @apply bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-2xl border-l border-slate-200/80 dark:border-slate-800/80;
-        padding-top: 84px; padding-left: 20px; padding-right: 20px; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 100;
-        align-items: stretch; gap: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        left: auto !important;
+        width: 280px;
+        height: 100vh;
+        background-color: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+        border-left: 1px solid rgba(226, 232, 240, 0.8);
+        padding-top: 84px;
+        padding-left: 20px;
+        padding-right: 20px;
+        transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 100;
+        align-items: stretch;
+        gap: 0.5rem;
+      }
+      .dark .nav-links {
+        background-color: rgba(15, 23, 42, 0.98);
+        border-left: 1px solid rgba(30, 41, 59, 0.8);
       }
       .nav-links.open { right: 0 !important; left: auto !important; }
       .nav-links .nav-link {
-        @apply px-4 py-2.5 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-brandBlue dark:hover:text-blue-400 transition-all text-sm;
+        padding: 0.625rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #334155;
+        transition: all 0.2s ease;
+      }
+      .dark .nav-links .nav-link {
+        color: #e2e8f0;
+      }
+      .nav-links .nav-link:hover {
+        background-color: #eff6ff;
+        color: #1a56c4;
+      }
+      .dark .nav-links .nav-link:hover {
+        background-color: #1e293b;
+        color: #60a5fa;
       }
       .nav-links .nav-link.active {
-        @apply bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-400 font-extrabold;
+        background-color: #eff6ff;
+        color: #1a56c4;
+      }
+      .dark .nav-links .nav-link.active {
+        background-color: rgba(30, 58, 138, 0.4);
+        color: #93c5fd;
       }
       .nav-links .btn-signin {
-        @apply mt-6 w-full justify-center;
+        margin-top: 1.5rem;
+        width: 100%;
+        justify-content: center;
       }
     }
     
     .level-pill { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-    .level-pill:hover { @apply transform -translate-y-0.5 shadow-sm; }
-    .level-pill:active { @apply transform scale-95; }
+    .level-pill:hover { transform: translateY(-2px); }
+    .level-pill:active { transform: scale(0.95); }
 
     /* Clean Mobile Touch Scrollbars (Completely Hidden) */
     @media (max-width: 768px), (pointer: coarse) {
@@ -139,7 +209,23 @@
       }
     }
     .stat-card { transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-    .stat-card:hover { @apply transform -translate-y-1 shadow-xl; }
+    .stat-card:hover { transform: translateY(-4px); }
+
+    /* Subtle architectural grid decor */
+    .hero-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(to right, rgba(226, 232, 240, 0.5) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(226, 232, 240, 0.5) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, #000 70%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, #000 70%, transparent 100%);
+      pointer-events: none;
+    }
+    .dark .hero-bg-grid {
+      background-image: linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
+    }
     
     /* Fix Dark Mode overrides for JS generated content from style.css */
     .dark .proker-item { background-color: transparent !important; color: #f8fafc !important; border-color: rgba(255, 255, 255, 0.1) !important; }
@@ -153,8 +239,9 @@
     .dark .proker-status-badge.upcoming { background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.35) !important; }
     .dark .proker-status-badge.planned { background-color: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; border-color: rgba(96, 165, 250, 0.35) !important; }
     
-    /* Force hamburger color to Tailwind brand colors, ignoring style.css */
-    .hamburger span { @apply bg-brandBlue dark:bg-brandGold !important; }
+    /* Force hamburger color to brand colors */
+    .hamburger span { background-color: #1a56c4 !important; }
+    .dark .hamburger span { background-color: #d4a017 !important; }
   </style>
 </head>
 
@@ -300,7 +387,7 @@
   <section class="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden bg-slate-50 dark:bg-slate-900" id="beranda">
     <!-- Subtle Architectural Background Decor -->
     <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f080_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f080_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b50_1px,transparent_1px),linear-gradient(to_bottom,#1e293b50_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]"></div>
+      <div class="hero-bg-grid"></div>
       <div
         class="absolute top-0 right-0 w-[550px] h-[550px] bg-brandBlue/10 dark:bg-brandBlue/20 rounded-full blur-[90px] -translate-y-1/2 translate-x-1/3">
       </div>
@@ -312,7 +399,7 @@
     <div class="container mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-14">
       <div class="w-full lg:w-1/2 flex flex-col items-start text-left reveal">
         <div
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 text-xs font-bold mb-6 border border-blue-200/80 dark:border-blue-800/60 shadow-2xs">
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 text-xs font-bold mb-6 border border-blue-200/80 dark:border-blue-800/60 shadow-sm">
           <span class="w-2 h-2 rounded-full bg-brandBlue animate-pulse"></span>
           <span>PPG Solo Selatan &middot; Surakarta</span>
         </div>
@@ -334,7 +421,7 @@
             <span class="material-symbols-outlined text-[19px]">arrow_forward</span>
           </a>
           <a href="#tentang"
-            class="px-6 py-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-700/80 active:scale-95 transition-all shadow-2xs">
+            class="px-6 py-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-700/80 active:scale-95 transition-all shadow-sm">
             Tentang Kami
           </a>
         </div>
@@ -343,7 +430,7 @@
       <div class="w-full lg:w-1/2 reveal-right">
         <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/20 group border border-slate-200/50 dark:border-slate-700/60">
           <img src="src/image/hero.jpg" alt="Suasana belajar"
-            class="w-full h-auto object-cover transform group-hover:scale-103 transition-transform duration-700"
+            class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
             fetchpriority="high" />
           <div
             class="absolute inset-0 bg-gradient-to-t from-brandDarkBlue/85 via-brandDarkBlue/20 to-transparent">
@@ -351,7 +438,7 @@
 
           <!-- Interactive Badge -->
           <div
-            class="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/60 dark:border-slate-700/60 p-3.5 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3.5 cursor-pointer hover:scale-102 hover:shadow-2xl transition-all duration-300"
+            class="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/60 dark:border-slate-700/60 p-3.5 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3.5 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300"
             id="heroImgBadge" data-kategori-stat="all" title="Klik untuk melihat ringkasan data Generus">
             <div class="text-2xl sm:text-3xl font-black text-brandBlue dark:text-brandGold" id="heroGenerusCount" data-target="1250">1.250+</div>
             <div class="flex flex-col">
@@ -466,7 +553,7 @@
     <div class="container mx-auto px-4 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16 reveal">
         <span
-          class="inline-block px-3.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 text-xs font-bold rounded-full mb-4 border border-blue-200/80 dark:border-blue-800/60 shadow-2xs">Jenjang
+          class="inline-block px-3.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 text-xs font-bold rounded-full mb-4 border border-blue-200/80 dark:border-blue-800/60 shadow-sm">Jenjang
           Generus</span>
         <h2 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Kategori &amp;
           Jenjang</h2>
@@ -481,7 +568,7 @@
           <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400"></div>
           <div>
             <div class="flex items-center gap-4 mb-6">
-              <div class="w-13 h-13 sm:w-14 sm:h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-jenjang">child_care</span>
               </div>
               <div>
@@ -494,19 +581,19 @@
             </div>
             <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="PAUD">PAUD</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="TK A">TK A</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="TK B">TK B</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="1 SD">1-3 SD</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-slate-700 dark:text-slate-200 hover:text-amber-900 dark:hover:text-amber-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="4 SD">4-6 SD</button>
             </div>
             <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">Pembentukan karakter dasar melalui pembiasaan
@@ -525,7 +612,7 @@
           <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-brandBlue to-indigo-600"></div>
           <div>
             <div class="flex items-center gap-4 mb-6">
-              <div class="w-13 h-13 sm:w-14 sm:h-14 bg-brandBlue text-white rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-brandBlue text-white rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-jenjang">school</span>
               </div>
               <div>
@@ -539,10 +626,10 @@
             </div>
             <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-blue-100 dark:hover:bg-blue-950/60 text-slate-700 dark:text-slate-200 hover:text-blue-900 dark:hover:text-blue-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-blue-100 dark:hover:bg-blue-950/60 text-slate-700 dark:text-slate-200 hover:text-blue-900 dark:hover:text-blue-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="1 SMP">1-3 SMP</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-blue-100 dark:hover:bg-blue-950/60 text-slate-700 dark:text-slate-200 hover:text-blue-900 dark:hover:text-blue-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-blue-100 dark:hover:bg-blue-950/60 text-slate-700 dark:text-slate-200 hover:text-blue-900 dark:hover:text-blue-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="1 SMA">1-3 SMA</button>
             </div>
             <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">Penguatan aqidah, ibadah, dan kepemimpinan untuk
@@ -561,7 +648,7 @@
           <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-green-600 to-teal-500"></div>
           <div>
             <div class="flex items-center gap-4 mb-6">
-              <div class="w-13 h-13 sm:w-14 sm:h-14 bg-brandGreen text-white rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-brandGreen text-white rounded-2xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-jenjang">diversity_3</span>
               </div>
               <div>
@@ -575,13 +662,13 @@
             </div>
             <div class="flex flex-wrap gap-2 mb-6 jenjang-levels">
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-900 dark:hover:text-emerald-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-900 dark:hover:text-emerald-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="Pra-Nikah">Pra-Nikah</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-900 dark:hover:text-emerald-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-900 dark:hover:text-emerald-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="Mahasiswa">Mahasiswa</button>
               <button type="button"
-                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-900 dark:hover:text-emerald-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-2xs"
+                class="level-pill px-3 py-1.5 bg-slate-100 dark:bg-slate-700/70 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-900 dark:hover:text-emerald-300 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-600/80 transition-all cursor-pointer shadow-sm"
                 data-kategori="Bekerja">Bekerja</button>
             </div>
             <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">Persiapan kemandirian dan kehidupan berkeluarga dengan pembekalan nilai-nilai Islam.</p>
@@ -684,7 +771,7 @@
     <div class="container mx-auto px-4 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16 reveal">
         <span
-          class="inline-block px-3.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 text-xs font-bold rounded-full mb-4 border border-blue-200/80 dark:border-blue-800/60 shadow-2xs">Fitur
+          class="inline-block px-3.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 text-brandBlue dark:text-blue-300 text-xs font-bold rounded-full mb-4 border border-blue-200/80 dark:border-blue-800/60 shadow-sm">Fitur
           Aplikasi</span>
         <h2 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Semua yang Anda
           Butuhkan</h2>
@@ -700,7 +787,7 @@
           <div>
             <div class="flex items-center justify-between mb-6">
               <div
-                class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-brandBlue dark:text-blue-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-fitur">database</span>
               </div>
               <span class="text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/60 px-3 py-1 rounded-full border border-slate-200/60 dark:border-slate-600/50">Pusat Data</span>
@@ -728,7 +815,7 @@
           <div>
             <div class="flex items-center justify-between mb-6">
               <div
-                class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-fitur">calendar_month</span>
               </div>
               <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-3 py-1 rounded-full border border-indigo-200/60 dark:border-indigo-800/60">Agenda</span>
@@ -756,7 +843,7 @@
           <div>
             <div class="flex items-center justify-between mb-6">
               <div
-                class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-fitur">checklist</span>
               </div>
               <span class="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-3 py-1 rounded-full border border-amber-200/60 dark:border-amber-800/60">Karakter</span>
@@ -785,7 +872,7 @@
           <div>
             <div class="flex items-center justify-between mb-6">
               <div
-                class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-green-50 dark:bg-green-900/30 text-brandGreen dark:text-green-400 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-green-50 dark:bg-green-900/30 text-brandGreen dark:text-green-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                 <span class="material-symbols-outlined text-3xl ms-fitur">print</span>
               </div>
               <span class="text-xs font-bold text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/50 px-3 py-1 rounded-full border border-green-200/60 dark:border-green-800/60">Administrasi</span>
