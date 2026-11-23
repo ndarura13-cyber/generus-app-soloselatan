@@ -340,19 +340,23 @@
     body.sidebar-collapsed aside#desktopSidebar .menu-collapsible { display: none !important; }
     body.sidebar-collapsed aside#desktopSidebar .sidebar-header { justify-content: center; padding: 0 0.5rem; }
     body.sidebar-collapsed aside#desktopSidebar .logo-img { margin: 0 auto; }
-    body.sidebar-collapsed aside#desktopSidebar a,
-    body.sidebar-collapsed aside#desktopSidebar button:not(#btnToggleSidebar) {
+    body.sidebar-collapsed aside#desktopSidebar > .sidebar-nav-container > button,
+    body.sidebar-collapsed aside#desktopSidebar > .sidebar-nav-container > #sideFiturWrapper > button {
       justify-content: center !important;
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
     /* Sub menu Data & Fitur saat Sidebar Collapsed tetap rata kiri */
-    body.sidebar-collapsed aside#desktopSidebar .side-fitur-flyout button {
+    body.sidebar-collapsed aside#desktopSidebar #sideFiturFlyout button,
+    body.sidebar-collapsed aside#desktopSidebar .side-fitur-flyout button,
+    #sideFiturFlyout button,
+    .side-fitur-flyout button {
       justify-content: flex-start !important;
       padding-left: 0.75rem !important;
       padding-right: 0.75rem !important;
       text-align: left !important;
     }
+    body.sidebar-collapsed aside#desktopSidebar #sideFiturFlyout button span,
     body.sidebar-collapsed aside#desktopSidebar .side-fitur-flyout button span {
       text-align: left !important;
     }
@@ -922,17 +926,17 @@
           <!-- Sub-Tab Segment Switcher (Event vs Rutin) & Filter -->
           <div
             class="px-3.5 pt-2.5 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30">
-            <div class="inline-flex p-1 bg-slate-200/80 dark:bg-slate-700/60 rounded-xl text-xs font-bold shadow-xs shrink-0 self-start sm:self-auto"
+            <div class="w-full sm:w-auto flex sm:inline-flex p-1 bg-slate-200/80 dark:bg-slate-700/60 rounded-xl text-xs font-bold shadow-xs shrink-0"
               id="dashProkerSegmentBar">
               <button type="button"
-                class="dash-proker-segment-btn px-3 py-1 rounded-lg text-xs transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-xs cursor-pointer font-bold"
+                class="dash-proker-segment-btn flex-1 sm:flex-initial text-center justify-center px-3.5 py-1.5 rounded-lg text-xs transition-all active bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 shadow-xs cursor-pointer font-bold whitespace-nowrap"
                 data-segment="event">Event &amp; Agenda</button>
               <button type="button"
-                class="dash-proker-segment-btn px-3 py-1 rounded-lg text-xs transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer font-semibold"
+                class="dash-proker-segment-btn flex-1 sm:flex-initial text-center justify-center px-3.5 py-1.5 rounded-lg text-xs transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer font-semibold whitespace-nowrap inline-flex items-center"
                 data-segment="routine">
                 <span>Rutin</span>
                 <span
-                  class="px-1.5 py-0.5 rounded-full text-[9px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-black ml-1"
+                  class="px-1.5 py-0.5 rounded-full text-[9px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-black ml-1.5"
                   id="dashProkerRoutineCount">0</span>
               </button>
             </div>

@@ -11365,3 +11365,26 @@ body {
     justify-content: center !important;
   }
 }
+
+/* ── Submenu Data & Fitur saat Sidebar Collapsed: 100% Rata Kiri ── */
+body.sidebar-collapsed aside#desktopSidebar #sideFiturFlyout button,
+body.sidebar-collapsed aside#desktopSidebar .side-fitur-flyout button,
+#sideFiturFlyout button,
+.side-fitur-flyout button {
+  justify-content: flex-start !important;
+  text-align: left !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+body.sidebar-collapsed aside#desktopSidebar #sideFiturFlyout button span,
+body.sidebar-collapsed aside#desktopSidebar .side-fitur-flyout button span,
+#sideFiturFlyout button span,
+.side-fitur-flyout button span {
+  text-align: left !important;
+}
+
+/* ── Segment Button Event & Agenda: Single Line ── */
+.dash-proker-segment-btn {
+  white-space: nowrap !important;
+}
