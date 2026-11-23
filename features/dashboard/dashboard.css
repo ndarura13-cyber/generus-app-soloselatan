@@ -7444,15 +7444,16 @@ body {
 .dash-proker-filter-scroll {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
   overflow-x: auto !important;
   scroll-behavior: smooth !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
   padding: 4px 2px !important;
-  width: 100% !important;
   flex-wrap: nowrap !important;
+  overscroll-behavior-x: contain !important;
 }
 
 .dash-proker-filter-scroll::-webkit-scrollbar {
@@ -7497,10 +7498,8 @@ body {
   background: #334155 !important;
   color: #f8fafc !important;
 }
-  color: #ffffff !important;
-}
 
-/* Subtle Colored Filter Pills (Hijau untuk Berjalan, Oranye untuk Mendatang) */
+/* Subtle Colored Filter Pills */
 .dash-proker-filter-btn[data-filter="ongoing"] {
   border-color: rgba(16, 185, 129, 0.45) !important;
   color: #059669 !important;
@@ -7523,6 +7522,30 @@ body {
   border-color: rgba(251, 191, 36, 0.45) !important;
   color: #fbbf24 !important;
   background: rgba(245, 158, 11, 0.18) !important;
+}
+
+.dash-proker-filter-btn[data-filter="planned"] {
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #2563eb !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  font-weight: 600 !important;
+}
+.dark .dash-proker-filter-btn[data-filter="planned"] {
+  border-color: rgba(96, 165, 250, 0.45) !important;
+  color: #60a5fa !important;
+  background: rgba(59, 130, 246, 0.18) !important;
+}
+
+.dash-proker-filter-btn[data-filter="done"] {
+  border-color: rgba(100, 116, 139, 0.45) !important;
+  color: #475569 !important;
+  background: rgba(100, 116, 139, 0.08) !important;
+  font-weight: 600 !important;
+}
+.dark .dash-proker-filter-btn[data-filter="done"] {
+  border-color: rgba(148, 163, 184, 0.45) !important;
+  color: #94a3b8 !important;
+  background: rgba(100, 116, 139, 0.18) !important;
 }
 
 .dash-proker-filter-btn.active-ongoing {
