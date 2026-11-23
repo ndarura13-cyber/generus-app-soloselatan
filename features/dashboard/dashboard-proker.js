@@ -1396,17 +1396,17 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
                 </td>
                 <td></td>
               </tr>
-              <tr style="background:#e0f2fe;font-weight:900;border-top:2px solid #0284c7;">
-                <td colspan="6" style="text-align:right;padding:9px 10px;font-size:11.5px;color:#0369a1;">
+              <tr class="proker-total-row bg-blue-50/80 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 font-extrabold border-t-2 border-brandBlue">
+                <td colspan="6" style="text-align:right;padding:10px 12px;font-size:11.5px;color:var(--brandBlue, #1a56c4);" class="font-extrabold">
                   TOTAL KESELURUHAN (${filtered.length} PROGRAM):
                 </td>
-                <td style="text-align:right;padding:9px 10px;color:#057a55;font-size:12.5px;white-space:nowrap;">
+                <td style="text-align:right;padding:10px 12px;color:#057a55;font-size:12.5px;white-space:nowrap;" class="font-black">
                   Rp ${totalEstAll.toLocaleString('id-ID')}
                 </td>
-                <td colspan="3" style="text-align:right;padding:9px 10px;font-size:11.5px;color:#0369a1;">
+                <td colspan="3" style="text-align:right;padding:10px 12px;font-size:11.5px;color:var(--brandBlue, #1a56c4);" class="font-extrabold">
                   Total Realisasi LPJ:
                 </td>
-                <td style="text-align:right;padding:9px 10px;color:#1e40af;font-size:12.5px;white-space:nowrap;">
+                <td style="text-align:right;padding:10px 12px;color:#1e40af;font-size:12.5px;white-space:nowrap;" class="font-black">
                   Rp ${totalRealAll.toLocaleString('id-ID')}
                 </td>
                 <td></td>
@@ -1450,18 +1450,64 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       `;
 
       return `
-              <div class="proker-card-item" data-id="${p.id}">
-                <!-- MOBILE VIEW: JUDUL MEMANJANG & TOMBOL LIHAT LANGSUNG MASUK PLENO -->
-                <div class="proker-card-mobile-row flex md:hidden items-center justify-between gap-3 w-full" data-id="${p.id}" role="button" tabindex="0" title="Ketuk untuk langsung membuka Mode Pleno">
-                  <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                    <div class="flex-1 min-w-0 font-bold text-[13px] text-slate-800 dark:text-slate-100 leading-snug">
-                      ${p.kegiatan}
+              <div class="proker-card-item rounded-2xl bg-white dark:bg-slate-850 border border-slate-200/90 dark:border-slate-750 p-4 shadow-2xs hover:shadow-sm hover:border-blue-300 dark:hover:border-blue-600/50 transition-all" data-id="${p.id}">
+                <!-- MOBILE VIEW: KARTU PROKER ELEGAN & INFORMATIF -->
+                <div class="flex flex-col gap-2.5 md:hidden w-full">
+                  <!-- Header Mobile: Badge & Status Realisasi -->
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+                      ${p.kategori === 'KMM' ? `
+                        <span class="proker-sub-badge-kmm text-[10px] py-0.5 px-2 rounded-full font-bold">
+                          Divisi ${p.subBidang || 'Umum'}
+                        </span>
+                      ` : `
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-brandBlue dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/50">
+                          ${p.penanggungJawab || 'Pengurus PPG'}
+                        </span>
+                      `}
+                      ${isProkerRoutine(p) ? `
+                        <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                          Rutin
+                        </span>
+                      ` : (isProkerMatchingCurrentMonth(p, new Date().getMonth(), new Date().getFullYear()) && p.status !== 'done' && p.realisasiStatus !== 'terlaksana' ? `
+                        <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          Bulan Ini
+                        </span>
+                      ` : '')}
+                    </div>
+                    <div class="shrink-0">
+                      ${realisasiBadge}
                     </div>
                   </div>
-                  <button type="button" class="btn-proker-preview shrink-0" data-id="${p.id}" title="Buka Detail Pleno">
-                    <span class="material-symbols-outlined">visibility</span>
-                    <span>Lihat</span>
-                  </button>
+
+                  <!-- Judul Kegiatan Mobile -->
+                  <h4 class="font-extrabold text-[13.5px] text-slate-800 dark:text-white leading-snug">
+                    ${p.kegiatan}
+                  </h4>
+
+                  <!-- Waktu & Tempat Mobile -->
+                  <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-500 dark:text-slate-400 p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span class="material-symbols-outlined text-[14px] text-brandBlue shrink-0">calendar_today</span>
+                      <span class="truncate font-medium">${p.waktu || '-'}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <span class="material-symbols-outlined text-[14px] text-rose-500 shrink-0">location_on</span>
+                      <span class="truncate font-medium">${p.tempat || '-'}</span>
+                    </div>
+                  </div>
+
+                  <!-- Footer Mobile: Estimasi RAB & Tombol Aksi -->
+                  <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div class="text-xs">
+                      <span class="text-[10px] text-slate-400 uppercase font-bold block">Est. Anggaran</span>
+                      <strong class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">Rp ${(p.estBiaya || 0).toLocaleString('id-ID')}</strong>
+                    </div>
+                    <button type="button" class="btn-proker-preview shrink-0 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-brandBlue dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs" data-id="${p.id}" title="Buka Detail Pleno">
+                      <span class="material-symbols-outlined text-[15px]">visibility</span>
+                      <span>Detail Pleno</span>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- DESKTOP VIEW: HEADER LENGKAP DENGAN BADGE REALISASI & TOMBOL DETAIL -->
@@ -1554,7 +1600,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       <div class="flex items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
         <!-- Sisi Kiri: Tombol Back + Judul + Badge Angka -->
         <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Dashboard">
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
           <div class="flex items-center gap-2 min-w-0">
@@ -1861,7 +1907,7 @@ export async function renderProkerModal(filterBidang = 'all', filterStatus = 'al
       e.stopPropagation();
       const pId = btn.dataset.id;
       const targetMenu = prokerContainer.querySelector(`.proker-table-action-menu[data-id="${pId}"]`);
-      
+
       // Tutup menu lain yang terbuka
       prokerContainer.querySelectorAll('.proker-table-action-menu').forEach(m => {
         if (m !== targetMenu) m.classList.add('hidden');

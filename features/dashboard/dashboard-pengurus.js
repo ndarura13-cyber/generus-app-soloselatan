@@ -34,8 +34,8 @@ import {
 let strukturPageSize = 9;
 
 let appHooks = {
-  renderUserProfile: () => {},
-  renderKelompokGrid: () => {}
+  renderUserProfile: () => { },
+  renderKelompokGrid: () => { }
 };
 
 export function setPengurusHooks(hooks) {
@@ -469,7 +469,7 @@ export function renderStrukturDaerahModal(activeTab = 'all', searchQuery = '', f
       <div class="flex items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
         <!-- Sisi Kiri: Tombol Back + Judul + Badge Angka -->
         <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Dashboard">
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
           <div class="flex items-center gap-2 min-w-0">
@@ -992,16 +992,16 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
   const isNew = pengurusId === 'new' || !pengurusId;
   const p = isNew
     ? {
-        id: null,
-        nama: '',
-        email: '',
-        noWa: '',
-        tingkatan: 'kelompok',
-        peran: 'Pamong Caberawit (Paud - SD)',
-        desaId: 'desa-barat',
-        kelompokId: 'kel-gentan',
-        isActive: true
-      }
+      id: null,
+      nama: '',
+      email: '',
+      noWa: '',
+      tingkatan: 'kelompok',
+      peran: 'Pamong Caberawit (Paud - SD)',
+      desaId: 'desa-barat',
+      kelompokId: 'kel-gentan',
+      isActive: true
+    }
     : getPengurusById(pengurusId);
 
   if (!p) return;
@@ -1190,7 +1190,7 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
     }
 
     if (submitBtn) submitBtn.innerHTML = isNew ? 'Tambah Pengurus' : 'Simpan Perubahan';
-    
+
     if (res.success) {
       showToast(isNew ? `Pengurus baru "${updateData.nama}" berhasil ditambahkan!` : `Data pengurus "${updateData.nama}" berhasil diperbarui!`, 'success');
       appHooks.renderKelompokGrid();

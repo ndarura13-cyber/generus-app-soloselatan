@@ -349,21 +349,21 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
 
         <div class="space-y-3">
           ${desaStats.length > 0 ? desaStats.map(desa => {
-            const desaL = (desa.siswa || []).filter(s => (s.jenis_kelamin || '').toUpperCase() === 'L').length;
-            const desaP = (desa.siswa || []).filter(s => (s.jenis_kelamin || '').toUpperCase() === 'P').length;
-            const desaPct = total > 0 ? Math.round((desa.total / total) * 100) : 0;
+    const desaL = (desa.siswa || []).filter(s => (s.jenis_kelamin || '').toUpperCase() === 'L').length;
+    const desaP = (desa.siswa || []).filter(s => (s.jenis_kelamin || '').toUpperCase() === 'P').length;
+    const desaPct = total > 0 ? Math.round((desa.total / total) * 100) : 0;
 
-            const chipsHtml = desa.kelompokStats.length > 0
-              ? desa.kelompokStats.map(k => `
+    const chipsHtml = desa.kelompokStats.length > 0
+      ? desa.kelompokStats.map(k => `
                   <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-700/60 hover:bg-blue-50 dark:hover:bg-blue-900/40 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200/70 dark:border-slate-600/60 transition-colors">
                     <span class="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400"></span>
                     <span class="truncate max-w-[140px] sm:max-w-none">${k.nama}</span>
                     <span class="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 border border-slate-200/60 dark:border-slate-700 shadow-sm">${k.count}</span>
                   </div>
                 `).join('')
-              : '<div class="text-xs text-slate-400 italic">Belum ada data kelompok di desa ini</div>';
+      : '<div class="text-xs text-slate-400 italic">Belum ada data kelompok di desa ini</div>';
 
-            return `
+    return `
               <div class="bg-slate-50/70 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm hover:border-blue-300 dark:hover:border-blue-700/60 transition-all">
                 <!-- Header Desa -->
                 <div class="flex items-center justify-between gap-2 mb-2">
@@ -403,7 +403,7 @@ export function renderDetailRingkasanModal(activeKat = 'all') {
                 </div>
               </div>
             `;
-          }).join('') : '<div class="p-6 text-center text-xs text-slate-400">Belum ada data generus</div>'}
+  }).join('') : '<div class="p-6 text-center text-xs text-slate-400">Belum ada data generus</div>'}
         </div>
       </div>
 
@@ -1364,7 +1364,7 @@ export function renderSiswaModal() {
       <div class="flex items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
         <!-- Sisi Kiri: Tombol Back + Judul + Badge Angka -->
         <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
+          <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Dashboard">
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
           <div class="flex items-center gap-2 min-w-0">

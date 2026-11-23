@@ -193,9 +193,9 @@ export function renderJurnalKbmPageView() {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white dark:bg-slate-800/80 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
       <!-- Sisi Kiri: Tombol Back + Judul + Tingkatan Badge -->
       <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-        <button type="button" id="btnBackToDashboardBreadcrumb" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Beranda">
-          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-        </button>
+        <button type="button" class="btnBackToDashboardBreadcrumb p-1.5 -ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0" title="Kembali ke Dashboard">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+          </button>
         <div class="flex items-center gap-2 min-w-0">
           <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/50 dark:border-emerald-800/50">
             <span class="material-symbols-outlined text-[19px]">menu_book</span>
