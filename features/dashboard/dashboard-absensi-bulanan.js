@@ -654,12 +654,31 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
                 Absensi Bulan ${bulanName} ${tahun}
               </h3>
             </div>
-            ${!initialData.id && (isDaerah || isDesa) ? `
+            ${!initialData.id && isDaerah ? `
+              <!-- Multi Dropdown Tingkat Superadmin (Pilih Desa -> Pilih Kelompok) -->
+              <div class="flex items-center gap-2 mt-2 flex-wrap">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs text-slate-600 dark:text-slate-300 font-bold">Desa:</span>
+                  <select id="selFormDesa" class="px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none cursor-pointer">
+                    ${desaList.map(d => `<option value="${d.id}" ${d.id === desaObj.id ? 'selected' : ''}>Desa ${d.nama}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs text-slate-600 dark:text-slate-300 font-bold">Kelompok:</span>
+                  <select id="selFormKelompok" class="px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none cursor-pointer">
+                    ${allKels.filter(k => k.desaId === desaObj.id).map(k => `
+                      <option value="${k.id}" ${k.id === kelompokId ? 'selected' : ''}>Kel. ${k.nama}</option>
+                    `).join('')}
+                  </select>
+                </div>
+                <span class="text-xs text-slate-500">&bull; Total <strong>${records.length} Santri</strong></span>
+              </div>
+            ` : (!initialData.id && isDesa ? `
               <div class="flex items-center gap-2 mt-1.5 flex-wrap">
                 <span class="text-xs text-slate-600 dark:text-slate-300 font-bold">Pilih Kelompok:</span>
                 <select id="selFormKelompok" class="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none cursor-pointer">
-                  ${(isDaerah ? allKels : allKels.filter(k => k.desaId === currentUser.desaId)).map(k => `
-                    <option value="${k.id}" ${k.id === kelompokId ? 'selected' : ''}>Kel. ${k.nama} (Desa ${(desaList.find(d => d.id === k.desaId) || {}).nama || '-'})</option>
+                  ${allKels.filter(k => k.desaId === currentUser.desaId).map(k => `
+                    <option value="${k.id}" ${k.id === kelompokId ? 'selected' : ''}>Kel. ${k.nama}</option>
                   `).join('')}
                 </select>
                 <span class="text-xs text-slate-500">&bull; Total <strong>${records.length} Santri</strong></span>
@@ -668,7 +687,7 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Kelompok <strong>${kelObj.nama}</strong> &bull; Desa ${desaObj.nama} &bull; Total <strong>${records.length} Santri</strong>
               </p>
-            `}
+            `)}
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
@@ -683,14 +702,18 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
           </div>
         </div>
 
-        <!-- PETUNJUK CEPAT STATUS -->
-        <div class="flex items-center gap-4 px-2 text-[11px] text-slate-500 dark:text-slate-400">
-          <span class="font-bold text-slate-700 dark:text-slate-300">Keterangan:</span>
-          <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 inline-flex items-center justify-center font-bold text-[10px]">H</span> Hadir</span>
-          <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 inline-flex items-center justify-center font-bold text-[10px]">S</span> Sakit</span>
-          <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 inline-flex items-center justify-center font-bold text-[10px]">I</span> Izin</span>
-          <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 inline-flex items-center justify-center font-bold text-[10px]">A</span> Alpa</span>
-          <span class="italic text-[10.5px] ml-auto">*Klik pada kotak huruf tanggal untuk mengganti status santri secara langsung.</span>
+        <!-- PETUNJUK CEPAT STATUS (RESPONSIVE STACKED DI MOBILE) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-2 text-[11px] text-slate-500 dark:text-slate-400">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="font-bold text-slate-700 dark:text-slate-300">Keterangan:</span>
+            <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 inline-flex items-center justify-center font-bold text-[10px]">H</span> Hadir</span>
+            <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 inline-flex items-center justify-center font-bold text-[10px]">S</span> Sakit</span>
+            <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 inline-flex items-center justify-center font-bold text-[10px]">I</span> Izin</span>
+            <span class="flex items-center gap-1"><span class="w-4 h-4 rounded bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 inline-flex items-center justify-center font-bold text-[10px]">A</span> Alpa</span>
+          </div>
+          <p class="italic text-[10.5px] text-slate-400 dark:text-slate-500 m-0 leading-normal">
+            *Klik pada kotak huruf tanggal untuk mengganti status santri secara langsung.
+          </p>
         </div>
 
         <!-- TABEL MATRIX SESUAI PDF RESMI -->
@@ -759,6 +782,36 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
           kelompokId
         });
       }
+    });
+
+    // Listener ganti desa (khusus superadmin pada multi-dropdown)
+    document.getElementById('selFormDesa')?.addEventListener('change', (e) => {
+      const newDesaId = e.target.value;
+      desaObj = desaList.find(d => d.id === newDesaId) || desaList[0];
+      const filteredKels = allKels.filter(k => k.desaId === desaObj.id);
+      kelObj = filteredKels[0] || allKels[0];
+      kelompokId = kelObj.id;
+
+      const newSiswaList = getSiswaByJenjangAndKelompok(jenjang, kelompokId);
+      records = newSiswaList.map(s => {
+        const kehadiranMap = {};
+        meetingDates.forEach(d => {
+          kehadiranMap[String(d)] = 'H';
+        });
+        return {
+          siswaId: s.id,
+          nama: s.nama_lengkap || s.nama,
+          kelompok: kelObj.nama,
+          kelas: s.jenjang_kelas || s.jenjang || '-',
+          kehadiran: kehadiranMap,
+          totalH: meetingDates.length,
+          totalS: 0,
+          totalI: 0,
+          totalA: 0,
+          persenHadir: 100
+        };
+      });
+      renderInnerContent();
     });
 
     // Listener ganti kelompok (jika admin input baru)
@@ -882,20 +935,29 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
         btnSave.classList.add('opacity-70');
       }
 
-      showToast('Menyimpan & menyinkronkan ke Supabase Cloud...', 'info');
-      await saveAbsensiBulanan(payload);
-      showToast('Rekap absensi bulanan berhasil disimpan dan disinkronkan!', 'success');
+      try {
+        showToast('Menyimpan & menyinkronkan ke Supabase Cloud...', 'info');
+        await saveAbsensiBulanan(payload);
+        showToast('Rekap absensi bulanan berhasil disimpan dan disinkronkan ke Supabase!', 'success');
 
-      if (typeof onSavedCallback === 'function') {
-        onSavedCallback(payload);
-      } else {
-        openRekapAbsensiBulananModal({
-          tahun,
-          bulanIndex,
-          jenjang,
-          desaId: desaObj.id,
-          kelompokId
-        });
+        if (typeof onSavedCallback === 'function') {
+          onSavedCallback(payload);
+        } else {
+          openRekapAbsensiBulananModal({
+            tahun,
+            bulanIndex,
+            jenjang,
+            desaId: desaObj.id,
+            kelompokId
+          });
+        }
+      } catch (err) {
+        console.error("Error menyimpan absensi bulanan:", err);
+        showToast(`Gagal menyimpan: ${err.message || 'Koneksi Supabase terputus'}`, 'error');
+        if (btnSave) {
+          btnSave.disabled = false;
+          btnSave.classList.remove('opacity-70');
+        }
       }
     });
 

@@ -2364,20 +2364,27 @@ export function getAbsensiBulananById(id) {
 
 /**
  * Sinkronisasi data Rekap Absensi Bulanan dari Supabase Cloud
+ * Supabase adalah single source of truth utama.
  */
 export async function syncAbsensiBulananFromSupabase(filter = {}) {
-  if (!isSupabaseConfigured()) return { success: false, error: 'Supabase belum dikonfigurasi', data: getAbsensiBulananList(filter) };
+  if (!isSupabaseConfigured()) {
+    return { success: false, error: 'Supabase belum dikonfigurasi', data: getAbsensiBulananList(filter) };
+  }
   try {
     const res = await fetchAbsensiBulananFromSupabase(filter);
     if (res.success && Array.isArray(res.data)) {
-      // Gabungkan dengan cache lokal
-      const localList = getAbsensiBulananList();
-      const mergedMap = new Map();
-      localList.forEach(item => mergedMap.set(item.id, item));
-      res.data.forEach(item => mergedMap.set(item.id, item));
-
-      const mergedList = Array.from(mergedMap.values());
-      localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(mergedList));
+      // Supabase sebagai sumber kebenaran utama
+      if (!filter || Object.keys(filter).length === 0) {
+        // Tanpa filter: timpa seluruh cache lokal dengan data cloud terbaru
+        localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(res.data));
+      } else {
+        // Dengan filter: perbarui entri yang relevan ke dalam cache lokal
+        const localList = getAbsensiBulananList();
+        const mergedMap = new Map();
+        localList.forEach(item => mergedMap.set(item.id, item));
+        res.data.forEach(item => mergedMap.set(item.id, item));
+        localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(Array.from(mergedMap.values())));
+      }
       return { success: true, count: res.data.length, data: getAbsensiBulananList(filter) };
     }
     return { success: false, error: res.error || 'Tidak ada data', data: getAbsensiBulananList(filter) };
@@ -2389,9 +2396,9 @@ export async function syncAbsensiBulananFromSupabase(filter = {}) {
 
 /**
  * Menyimpan atau memperbarui dokumen rekap absensi bulanan ke Cloud Supabase & Local Cache
+ * Prioritas utama: Simpan langsung ke Supabase Cloud
  */
 export async function saveAbsensiBulanan(data) {
-  const list = getAbsensiBulananList();
   let saved = { ...data };
 
   if (!saved.id) {
@@ -2399,17 +2406,7 @@ export async function saveAbsensiBulanan(data) {
   }
   saved.updatedAt = new Date().toISOString();
 
-  const idx = list.findIndex(item => item.id === saved.id);
-  if (idx > -1) {
-    list[idx] = { ...list[idx], ...saved };
-  } else {
-    list.unshift(saved);
-  }
-
-  // Simpan ke local cache untuk responsivitas cepat
-  localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(list));
-
-  // Simpan langsung ke Supabase Cloud jika terkonfigurasi
+  // 1. Simpan langsung ke Supabase Cloud (Primary Storage)
   if (isSupabaseConfigured()) {
     try {
       const cloudRes = await upsertAbsensiBulananToSupabase(saved);
@@ -2417,9 +2414,20 @@ export async function saveAbsensiBulanan(data) {
         saved = { ...saved, ...cloudRes };
       }
     } catch (e) {
-      console.warn("Gagal menyimpan rekap absensi ke Supabase cloud:", e);
+      console.error("Gagal menyimpan rekap absensi ke Supabase cloud:", e);
+      throw new Error(`Koneksi Supabase bermasalah: ${e.message || 'Gagal menyimpan ke cloud'}`);
     }
   }
+
+  // 2. Perbarui cache runtime/lokal untuk respon instan UI
+  const list = getAbsensiBulananList();
+  const idx = list.findIndex(item => item.id === saved.id);
+  if (idx > -1) {
+    list[idx] = { ...list[idx], ...saved };
+  } else {
+    list.unshift(saved);
+  }
+  localStorage.setItem(ABSENSI_BULANAN_STORAGE_KEY, JSON.stringify(list));
 
   return saved;
 }
