@@ -637,103 +637,112 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
     const isActive = p.isActive !== false;
     const isPending = p.statusApproval === 'pending';
 
-    let levelBadgeBg = 'var(--blue-light)';
-    let levelBadgeColor = 'var(--blue-dark)';
+    let levelBadgeClass = 'bg-blue-50 dark:bg-blue-950/40 text-brandBlue dark:text-blue-300 border-blue-200/80 dark:border-blue-900/60';
     let levelLabel = 'Daerah (Superadmin)';
 
     if (p.tingkatan === 'desa') {
-      levelBadgeBg = 'var(--gold-light)';
-      levelBadgeColor = '#8a6a00';
-      levelLabel = p.desaNama || 'Desa';
+      levelBadgeClass = 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200/80 dark:border-amber-900/60';
+      levelLabel = p.desaNama ? `Desa ${p.desaNama}` : 'Desa';
     } else if (p.tingkatan === 'kelompok') {
-      levelBadgeBg = 'var(--green-pastel)';
-      levelBadgeColor = 'var(--green-dark)';
-      levelLabel = p.kelompokNama || 'Kelompok';
+      levelBadgeClass = 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/60';
+      levelLabel = p.kelompokNama ? `Kel. ${p.kelompokNama}` : 'Kelompok';
     }
 
     let statusChip = isActive
-      ? `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:#e8f7ee;color:#2e8b57;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;"><span class="dot ongoing" style="width:6px;height:6px;flex-shrink:0;"></span> Aktif</span>`
-      : `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:#fef2f2;color:#dc2626;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;"><span class="dot done" style="width:6px;height:6px;background:#dc2626;flex-shrink:0;"></span> Nonaktif</span>`;
+      ? `<span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Aktif</span>`
+      : `<span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200/80 inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Nonaktif</span>`;
 
     if (isPending) {
-      statusChip = `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--gold-light);color:#8a6a00;white-space:nowrap;flex-shrink:0;">Pending</span>`;
+      statusChip = `<span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/80 inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pending</span>`;
     }
 
     let toggleBtnHtml = '';
     if (!isSelf) {
       if (isActive) {
         toggleBtnHtml = `
-          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="false" style="padding:6px 10px;border-radius:8px;border:1px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Nonaktifkan akun">
-            <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">block</span>
+          <button type="button" class="btn-toggle-active px-2.5 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 text-xs font-bold hover:bg-rose-100/70 transition-all flex items-center gap-1 cursor-pointer shrink-0" data-id="${p.id}" data-name="${p.nama}" data-target="false" title="Nonaktifkan akun">
+            <span class="material-symbols-outlined text-[15px]">block</span>
             <span class="btn-label-text">Nonaktifkan</span>
           </button>
         `;
       } else {
         toggleBtnHtml = `
-          <button type="button" class="btn-toggle-active" data-id="${p.id}" data-name="${p.nama}" data-target="true" style="padding:6px 10px;border-radius:8px;border:none;background:var(--green-dark);color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Aktifkan akun">
-            <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">check_circle</span>
+          <button type="button" class="btn-toggle-active px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-2xs flex items-center gap-1 cursor-pointer shrink-0" data-id="${p.id}" data-name="${p.nama}" data-target="true" title="Aktifkan akun">
+            <span class="material-symbols-outlined text-[15px]">check_circle</span>
             <span class="btn-label-text">Aktifkan</span>
           </button>
         `;
       }
     } else {
-      toggleBtnHtml = `<span style="font-size:11px;color:var(--text-muted);font-style:italic;white-space:nowrap;">(Akun Anda)</span>`;
+      toggleBtnHtml = `<span class="text-xs text-slate-400 italic px-2 py-1 shrink-0">(Akun Anda)</span>`;
     }
 
     const editBtnHtml = `
-      <button type="button" class="btn-edit-pengurus" data-id="${p.id}" style="padding:6px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--blue);font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Edit data &amp; hak akses">
-        <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">edit_note</span>
+      <button type="button" class="btn-edit-pengurus px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-brandBlue dark:text-blue-400 text-xs font-bold hover:bg-blue-50/70 dark:hover:bg-blue-950/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0" data-id="${p.id}" title="Edit data &amp; hak akses">
+        <span class="material-symbols-outlined text-[15px]">edit_note</span>
         <span class="btn-label-text">Edit &amp; Hak Akses</span>
       </button>
     `;
 
-    // Tombol hapus — tidak muncul untuk diri sendiri & hanya 1 superadmin
+    // Tombol hapus — tidak muncul untuk diri sendiri
     const deleteBtnHtml = isSelf ? '' : `
-      <button type="button" class="btn-hapus-pengurus" data-id="${p.id}" data-name="${p.nama}" style="padding:6px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:var(--surface);color:#dc2626;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="Hapus akun pengurus">
-        <span class="material-symbols-outlined" style="font-size:15px;flex-shrink:0;">delete</span>
-        <span class="btn-label-text">Hapus</span>
+      <button type="button" class="btn-hapus-pengurus w-8 h-8 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer flex items-center justify-center shrink-0" data-id="${p.id}" data-name="${p.nama}" title="Hapus akun pengurus">
+        <span class="material-symbols-outlined text-[16px]">delete</span>
       </button>
     `;
 
     const roleDisplay = p.peran === 'Pengurus Kelompok' ? 'Pengurus' : (p.peran || p.jabatan || 'Pengurus');
     const asalTxt = p.kelompokNama ? `${p.kelompokNama} &bull; ${p.desaNama || '-'}` : (p.desaNama || '-');
 
+    const initials = (p.nama || 'Pengurus')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(w => w[0].toUpperCase())
+      .join('') || 'P';
+
     return `
-      <div style="background:var(--surface-2);border:1px solid ${isActive ? 'var(--border)' : '#fca5a5'};border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;transition:var(--transition);box-sizing:border-box;overflow:hidden;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-          <div style="flex:1;min-width:0;">
-            <strong style="font-size:14px;color:var(--text);word-break:break-word;display:block;">${p.nama}</strong>
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px;">
-              <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:${levelBadgeBg};color:${levelBadgeColor};max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${levelLabel}">${levelLabel}</span>
-              <span style="font-size:11.5px;color:var(--blue);font-weight:600;">${roleDisplay}</span>
+      <div class="rounded-2xl p-4 bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 shadow-2xs hover:shadow-sm transition-all flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3 min-w-0 flex-1">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-700 dark:to-slate-800 text-brandBlue dark:text-blue-300 font-extrabold text-xs flex items-center justify-center shrink-0 border border-blue-200/60 dark:border-slate-600 shadow-2xs select-none">
+              ${initials}
             </div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
-              <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">location_on</span>
-              <span>Asal: <strong>${asalTxt}</strong></span>
-            </div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;">
-              <span style="display:inline-flex;align-items:center;gap:3px;min-width:0;word-break:break-all;">
-                <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">mail</span>
-                <span style="word-break:break-all;">${p.email}</span>
-              </span>
-              ${p.noWa ? `
-                <span style="display:inline-flex;align-items:center;gap:3px;white-space:nowrap;flex-shrink:0;">
-                  <span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0;">call</span>
-                  <span>${p.noWa}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <strong class="font-extrabold text-sm text-slate-900 dark:text-white truncate">${p.nama}</strong>
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${levelBadgeClass} shrink-0">${levelLabel}</span>
+              </div>
+              <p class="text-xs font-semibold text-brandBlue dark:text-blue-400 mt-0.5 truncate">${roleDisplay}</p>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1 flex-wrap">
+                <span class="material-symbols-outlined text-[13px] text-brandBlue shrink-0">location_on</span>
+                <span>Asal: <strong>${asalTxt}</strong></span>
+              </div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span class="inline-flex items-center gap-1 min-w-0">
+                  <span class="material-symbols-outlined text-[13px] text-slate-400 shrink-0">mail</span>
+                  <span class="truncate">${p.email}</span>
                 </span>
-              ` : ''}
+                ${p.noWa ? `
+                  <a href="https://wa.me/${p.noWa.replace(/^0/, '62').replace(/\D/g, '')}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline font-medium shrink-0">
+                    <span class="material-symbols-outlined text-[13px] shrink-0">chat</span>
+                    <span>${p.noWa}</span>
+                  </a>
+                ` : ''}
+              </div>
             </div>
           </div>
-          <div style="flex-shrink:0;margin-left:4px;">
+          <div class="shrink-0">
             ${statusChip}
           </div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;gap:8px;flex-wrap:wrap;">
-          <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">
-            Tingkat: <strong style="text-transform:capitalize;">${p.tingkatan}</strong>
+        <!-- Action Bar -->
+        <div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/80 pt-2.5 mt-0.5 gap-2 flex-wrap">
+          <span class="text-[11px] text-slate-400 font-medium">
+            Tingkat: <strong class="text-slate-700 dark:text-slate-200 capitalize">${p.tingkatan}</strong>
           </span>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <div class="flex items-center gap-1.5 flex-wrap">
             ${editBtnHtml}
             ${toggleBtnHtml}
             ${deleteBtnHtml}
@@ -745,9 +754,10 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
 
   if (filtered.length === 0) {
     pengurusCardsHtml = `
-      <div style="text-align:center;padding:32px 10px;color:var(--text-muted);">
-        <span class="material-symbols-outlined" style="font-size:40px;color:var(--border);margin-bottom:6px;">person_search</span>
-        <p style="font-size:13px;">Tidak ada data pengurus yang sesuai filter.</p>
+      <div class="text-center py-12 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+        <span class="material-symbols-outlined text-[42px] text-slate-400 mb-2 block">person_search</span>
+        <h4 class="font-bold text-sm text-slate-700 dark:text-slate-200">Tidak ada pengurus ditemukan</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau tab filter tingkatan di atas.</p>
       </div>
     `;
   }
@@ -765,17 +775,17 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
 
     if (startPage > 1) {
       pageButtonsHtml += `
-        <button type="button" class="pengurus-page-btn" data-page="1" style="min-width:32px;height:32px;padding:0 6px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">1</button>
+        <button type="button" class="pengurus-page-btn w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 transition-colors" data-page="1">1</button>
       `;
       if (startPage > 2) {
-        pageButtonsHtml += `<span style="color:var(--text-muted);padding:0 2px;">&hellip;</span>`;
+        pageButtonsHtml += `<span class="text-slate-400 px-1">&hellip;</span>`;
       }
     }
 
     for (let pNum = startPage; pNum <= endPage; pNum++) {
       const isActivePage = pNum === currentPage;
       pageButtonsHtml += `
-        <button type="button" class="pengurus-page-btn ${isActivePage ? 'active' : ''}" data-page="${pNum}" style="min-width:32px;height:32px;padding:0 6px;border-radius:8px;border:1px solid ${isActivePage ? 'var(--blue)' : 'var(--border)'};background:${isActivePage ? 'var(--blue)' : 'var(--surface)'};color:${isActivePage ? '#ffffff' : 'var(--text)'};font-size:12px;font-weight:800;cursor:pointer;">
+        <button type="button" class="pengurus-page-btn w-8 h-8 rounded-lg border ${isActivePage ? 'border-brandBlue bg-brandBlue text-white font-extrabold shadow-xs' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50'} text-xs cursor-pointer transition-colors" data-page="${pNum}">
           ${pNum}
         </button>
       `;
@@ -783,26 +793,26 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pageButtonsHtml += `<span style="color:var(--text-muted);padding:0 2px;">&hellip;</span>`;
+        pageButtonsHtml += `<span class="text-slate-400 px-1">&hellip;</span>`;
       }
       pageButtonsHtml += `
-        <button type="button" class="pengurus-page-btn" data-page="${totalPages}" style="min-width:32px;height:32px;padding:0 6px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">${totalPages}</button>
+        <button type="button" class="pengurus-page-btn w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 transition-colors" data-page="${totalPages}">${totalPages}</button>
       `;
     }
 
     paginationHtml = `
-      <div class="pengurus-pagination-bar" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;margin-top:4px;">
-        <span style="font-size:12px;color:var(--text-muted);">
+      <div class="flex items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex-wrap text-xs">
+        <span class="text-slate-500 dark:text-slate-400">
           Menampilkan <strong>${startIndex + 1} &ndash; ${Math.min(startIndex + itemsPerPage, totalItems)}</strong> dari <strong>${totalItems}</strong> pengurus
         </span>
         ${totalPages > 1 ? `
-        <div style="display:flex;align-items:center;gap:4px;">
-          <button type="button" class="pengurus-page-btn btn-prev" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:11.5px;font-weight:700;cursor:${currentPage === 1 ? 'not-allowed' : 'pointer'};opacity:${currentPage === 1 ? '0.4' : '1'};display:inline-flex;align-items:center;gap:3px;" title="Halaman Sebelumnya">
-            <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span> <span class="btn-label-text">Prev</span>
+        <div class="flex items-center gap-1.5">
+          <button type="button" class="pengurus-page-btn btn-prev px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1 transition-colors ${currentPage === 1 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'}" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}" title="Halaman Sebelumnya">
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span> <span class="btn-label-text">Prev</span>
           </button>
           ${pageButtonsHtml}
-          <button type="button" class="pengurus-page-btn btn-next" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:11.5px;font-weight:700;cursor:${currentPage === totalPages ? 'not-allowed' : 'pointer'};opacity:${currentPage === totalPages ? '0.4' : '1'};display:inline-flex;align-items:center;gap:3px;" title="Halaman Selanjutnya">
-            <span class="btn-label-text">Next</span> <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
+          <button type="button" class="pengurus-page-btn btn-next px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1 transition-colors ${currentPage === totalPages ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'}" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}" title="Halaman Selanjutnya">
+            <span class="btn-label-text">Next</span> <span class="material-symbols-outlined text-[16px]">chevron_right</span>
           </button>
         </div>
         ` : ''}
@@ -812,41 +822,48 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
 
   openModal('Kelola Pengurus & Hak Akses (Superadmin)', 'manage_accounts', 'large');
   modalBody.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;background:var(--surface-2);padding:12px 16px;border-radius:12px;border:1px solid var(--border);">
-        <div style="text-align:center;">
-          <span style="font-size:11px;color:var(--text-muted);display:block;">Total Terdaftar</span>
-          <strong style="font-size:18px;color:var(--blue);">${totalCount}</strong>
+    <div class="space-y-3.5">
+      <!-- 3 KPI STAT CARDS POLISHED -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+        <div class="p-3 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 text-center flex flex-col items-center justify-center shadow-2xs">
+          <span class="text-[10px] sm:text-[10.5px] font-extrabold text-blue-700/80 dark:text-blue-300 uppercase tracking-wider block">Total Pengurus</span>
+          <strong class="text-lg sm:text-2xl font-black text-brandBlue dark:text-blue-400 mt-0.5 leading-tight">${totalCount}</strong>
         </div>
-        <div style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);">
-          <span style="font-size:11px;color:var(--text-muted);display:block;">Akun Aktif</span>
-          <strong style="font-size:18px;color:var(--green-dark);">${activeCount}</strong>
+        <div class="p-3 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/60 text-center flex flex-col items-center justify-center shadow-2xs">
+          <span class="text-[10px] sm:text-[10.5px] font-extrabold text-emerald-700/80 dark:text-emerald-300 uppercase tracking-wider block">Akun Aktif</span>
+          <strong class="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 leading-tight">${activeCount}</strong>
         </div>
-        <div style="text-align:center;">
-          <span style="font-size:11px;color:var(--text-muted);display:block;">Dinonaktifkan</span>
-          <strong style="font-size:18px;color:#dc2626;">${inactiveCount}</strong>
+        <div class="p-3 rounded-2xl bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-center flex flex-col items-center justify-center shadow-2xs">
+          <span class="text-[10px] sm:text-[10.5px] font-extrabold text-rose-700/80 dark:text-rose-300 uppercase tracking-wider block">Dinonaktifkan</span>
+          <strong class="text-lg sm:text-2xl font-black text-rose-600 dark:text-rose-400 mt-0.5 leading-tight">${inactiveCount}</strong>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <input type="text" id="inputSearchPengurus" placeholder="Cari nama, email, peran, wilayah..." value="${searchQuery}" style="flex:1;min-width:180px;box-sizing:border-box;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
-          <button type="button" id="btnTambahPengurusModal" style="padding:10px 14px;border-radius:10px;background:var(--blue);color:#fff;border:none;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;flex-shrink:0;" title="Tambah Pengurus Baru">
-            <span class="material-symbols-outlined" style="font-size:17px;">person_add</span>
+      <!-- SEARCH & FILTER TOOLBAR -->
+      <div class="flex flex-col gap-2.5">
+        <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+          <div class="relative flex items-center flex-1 min-w-[200px]">
+            <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-[18px] pointer-events-none">search</span>
+            <input type="text" id="inputSearchPengurus" placeholder="Cari nama, email, peran, wilayah..." value="${searchQuery}" class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
+          </div>
+          <button type="button" id="btnTambahPengurusModal" class="px-4 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer shrink-0" title="Tambah Pengurus Baru">
+            <span class="material-symbols-outlined text-[17px]">person_add</span>
             <span>Tambah Pengurus</span>
           </button>
         </div>
         
-        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="filterTabsWrap">
-          <button type="button" class="filter-tab-btn ${filterLevel === 'all' ? 'active-tab' : ''}" data-filter="all">Semua (${totalCount})</button>
-          <button type="button" class="filter-tab-btn ${filterLevel === 'daerah' ? 'active-tab' : ''}" data-filter="daerah">Daerah</button>
-          <button type="button" class="filter-tab-btn ${filterLevel === 'desa' ? 'active-tab' : ''}" data-filter="desa">Desa</button>
-          <button type="button" class="filter-tab-btn ${filterLevel === 'kelompok' ? 'active-tab' : ''}" data-filter="kelompok">Kelompok</button>
-          <button type="button" class="filter-tab-btn ${filterLevel === 'inactive' ? 'active-tab' : ''}" data-filter="inactive">Nonaktif (${inactiveCount})</button>
+        <!-- Filter Tabs (Segmented Pills) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1" id="filterTabsWrap">
+          <button type="button" class="filter-tab-btn px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer whitespace-nowrap transition-all border ${filterLevel === 'all' ? 'bg-brandBlue text-white border-brandBlue shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'}" data-filter="all">Semua (${totalCount})</button>
+          <button type="button" class="filter-tab-btn px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer whitespace-nowrap transition-all border ${filterLevel === 'daerah' ? 'bg-brandBlue text-white border-brandBlue shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'}" data-filter="daerah">Daerah</button>
+          <button type="button" class="filter-tab-btn px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer whitespace-nowrap transition-all border ${filterLevel === 'desa' ? 'bg-brandBlue text-white border-brandBlue shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'}" data-filter="desa">Desa</button>
+          <button type="button" class="filter-tab-btn px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer whitespace-nowrap transition-all border ${filterLevel === 'kelompok' ? 'bg-brandBlue text-white border-brandBlue shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'}" data-filter="kelompok">Kelompok</button>
+          <button type="button" class="filter-tab-btn px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer whitespace-nowrap transition-all border ${filterLevel === 'inactive' ? 'bg-brandBlue text-white border-brandBlue shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'}" data-filter="inactive">Nonaktif (${inactiveCount})</button>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px;">
+      <!-- CARDS LIST -->
+      <div class="space-y-3">
         ${pengurusCardsHtml}
       </div>
 
@@ -855,23 +872,6 @@ export function renderManagePengurusModal(filterLevel = 'all', searchQuery = '',
   `;
 
   modalBody.querySelectorAll('.filter-tab-btn').forEach(btn => {
-    btn.style.padding = '6px 12px';
-    btn.style.borderRadius = '50px';
-    btn.style.border = '1px solid var(--border)';
-    btn.style.fontSize = '11px';
-    btn.style.fontWeight = '700';
-    btn.style.cursor = 'pointer';
-    btn.style.whiteSpace = 'nowrap';
-
-    if (btn.classList.contains('active-tab')) {
-      btn.style.background = 'var(--blue)';
-      btn.style.color = '#ffffff';
-      btn.style.borderColor = 'var(--blue)';
-    } else {
-      btn.style.background = 'var(--surface-2)';
-      btn.style.color = 'var(--text-muted)';
-    }
-
     btn.addEventListener('click', () => {
       const selectedFilter = btn.dataset.filter;
       const currentQuery = document.getElementById('inputSearchPengurus')?.value || '';
@@ -1028,81 +1028,87 @@ export function renderEditPengurusModal(pengurusId, returnFilter = 'all', source
   const modalTitleText = isNew ? 'Tambah Pengurus Baru' : `Edit Pengurus: ${p.nama}`;
   const modalIconName = isNew ? 'person_add' : 'edit_note';
 
+  const selectChevronStyle = `appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:13px_13px] bg-[right_12px_center] bg-no-repeat`;
+
   openModal(modalTitleText, modalIconName, 'default');
   modalBody.innerHTML = `
-    <form id="formEditPengurus" style="display:flex;flex-direction:column;gap:14px;">
-      <div style="background:var(--gold-light);padding:12px 16px;border-radius:10px;border-left:4px solid var(--gold);font-size:12px;color:#715700;line-height:1.5;">
-        <strong>${isNew ? 'Tambah Akun Pengurus Baru:' : 'Kelola Hak Akses &amp; Asal Wilayah Pengurus:'}</strong><br/>
-        ${isNew ? 'Akun baru yang dibuat langsung aktif dan dapat digunakan login ke aplikasi.' : 'Setiap pengurus di tingkat Daerah, Desa, maupun Kelompok memiliki basis asal Kelompok dan Desa.'}
+    <form id="formEditPengurus" class="flex flex-col gap-3.5">
+      <!-- Info Header Banner -->
+      <div class="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-900/60 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2.5 shadow-2xs">
+        <span class="material-symbols-outlined text-[20px] text-amber-600 dark:text-amber-400 shrink-0 mt-0.5">info</span>
+        <div class="leading-relaxed">
+          <strong class="font-extrabold block text-amber-900 dark:text-amber-100">${isNew ? 'Tambah Akun Pengurus Baru' : 'Kelola Hak Akses &amp; Asal Wilayah Pengurus'}</strong>
+          <span class="text-[11.5px] opacity-90">${isNew ? 'Akun baru yang dibuat langsung aktif dan dapat langsung digunakan login.' : 'Setiap pengurus di tingkat Daerah, Desa, maupun Kelompok memiliki basis asal Kelompok dan Desa.'}</span>
+        </div>
       </div>
 
       <div>
-        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Nama Lengkap <span style="color:red;">*</span></label>
-        <input type="text" id="editNama" value="${p.nama}" required placeholder="Masukkan nama lengkap pengurus..." style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Nama Lengkap <span class="text-rose-500">*</span></label>
+        <input type="text" id="editNama" value="${p.nama}" required placeholder="Masukkan nama lengkap pengurus..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Email Akun <span style="color:red;">*</span></label>
-          <input type="email" id="editEmail" value="${p.email}" required placeholder="email@contoh.org" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Email Akun <span class="text-rose-500">*</span></label>
+          <input type="email" id="editEmail" value="${p.email}" required placeholder="email@contoh.org" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Nomor WhatsApp <span style="color:red;">*</span></label>
-          <input type="text" id="editNoWa" value="${p.noWa || ''}" required placeholder="08xxxxxxxxxx" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Nomor WhatsApp <span class="text-rose-500">*</span></label>
+          <input type="text" id="editNoWa" value="${p.noWa || ''}" required placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
         </div>
       </div>
 
       ${isNew ? `
       <div>
-        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Kata Sandi Awal (Password)</label>
-        <input type="password" id="editPassword" placeholder="Default: 123456 (Minimal 6 karakter)" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;" />
+        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Kata Sandi Awal (Password)</label>
+        <input type="password" id="editPassword" placeholder="Default: 123456 (Minimal 6 karakter)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
       </div>
       ` : ''}
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Tingkatan Hak Akses <span style="color:red;">*</span></label>
-          <select id="editTingkatan" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);font-weight:700;">
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Tingkatan Hak Akses <span class="text-rose-500">*</span></label>
+          <select id="editTingkatan" class="w-full px-3.5 py-2.5 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-bold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs cursor-pointer ${selectChevronStyle}">
             <option value="kelompok" ${currentTingkat === 'kelompok' ? 'selected' : ''}>Pamong Kelompok</option>
             <option value="desa" ${currentTingkat === 'desa' ? 'selected' : ''}>Koordinator Desa</option>
             <option value="daerah" ${currentTingkat === 'daerah' ? 'selected' : ''}>Superadmin Daerah (Pengurus PPG)</option>
           </select>
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Jabatan / Peran <span style="color:red;">*</span></label>
-          <select id="editPeran" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Jabatan / Peran <span class="text-rose-500">*</span></label>
+          <select id="editPeran" class="w-full px-3.5 py-2.5 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs cursor-pointer ${selectChevronStyle}">
             ${peranOptions}
           </select>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="rowWilayahSelect">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="rowWilayahSelect">
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Asal Desa <span style="color:red;">*</span></label>
-          <select id="editDesa" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Asal Desa <span class="text-rose-500">*</span></label>
+          <select id="editDesa" class="w-full px-3.5 py-2.5 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs cursor-pointer ${selectChevronStyle}">
             ${desaOptions}
           </select>
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Asal Kelompok <span style="color:red;">*</span></label>
-          <select id="editKelompok" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Asal Kelompok <span class="text-rose-500">*</span></label>
+          <select id="editKelompok" class="w-full px-3.5 py-2.5 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs cursor-pointer ${selectChevronStyle}">
             ${kelOptions}
           </select>
         </div>
       </div>
 
       <div>
-        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text);">Status Akun</label>
-        <select id="editStatusActive" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--surface);">
+        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Status Akun</label>
+        <select id="editStatusActive" class="w-full px-3.5 py-2.5 pr-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs cursor-pointer ${selectChevronStyle}">
           <option value="true" ${p.isActive !== false ? 'selected' : ''}>Aktif (Dapat Login)</option>
           <option value="false" ${p.isActive === false ? 'selected' : ''}>Dinonaktifkan (Tidak Dapat Login)</option>
         </select>
       </div>
 
       <!-- Info Keamanan: Kata sandi bersifat privat -->
-      <div style="background:var(--surface-alt, #f8fafc);border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:10px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--brandBlue, #3b82f6);flex-shrink:0;">lock</span>
-        <span>Kata sandi bersifat privat. Pengurus dapat memperbarui kata sandinya masing-masing secara mandiri melalui menu <b>Edit Profil</b>.</span>
+      <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2.5 shadow-2xs">
+        <span class="material-symbols-outlined text-[19px] text-brandBlue shrink-0">lock</span>
+        <span class="leading-relaxed">Kata sandi bersifat privat. Pengurus dapat memperbarui kata sandinya secara mandiri melalui menu <b>Edit Profil</b>.</span>
       </div>
 
       <!-- Sticky Actions Footer (Fixed docked at modal bottom) -->

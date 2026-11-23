@@ -202,85 +202,111 @@ setProkerHooks({
 export function renderSelfProfileModal() {
   // Label & styling lencana tingkatan hak akses (Read-Only)
   let levelBadgeLabel = 'Pamong Kelompok';
-  let levelBadgeBg = '#dbeafe';
-  let levelBadgeColor = '#1e40af';
+  let levelBadgeClass = 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
 
   if (currentUser.isSuperadmin || currentUser.tingkatan === 'daerah') {
     levelBadgeLabel = 'Superadmin Daerah';
-    levelBadgeBg = 'linear-gradient(135deg, #fef3c7, #fde68a)';
-    levelBadgeColor = '#92400e';
+    levelBadgeClass = 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
   } else if (currentUser.tingkatan === 'desa') {
-    levelBadgeLabel = `Koordinator ${currentUser.desaNama || ''}`;
-    levelBadgeBg = '#dcfce7';
-    levelBadgeColor = '#166534';
+    levelBadgeLabel = `Koordinator ${currentUser.desaNama || 'Desa'}`;
+    levelBadgeClass = 'bg-blue-50 dark:bg-blue-950/40 text-brandBlue dark:text-blue-300 border-blue-200 dark:border-blue-800';
   }
 
   const roleName = currentUser.peran || currentUser.jabatan || 'Pengurus';
   const wilayahTxt = `${currentUser.kelompokNama || '-'} &bull; ${currentUser.desaNama || '-'}`;
 
+  // Inisial avatar profil
+  const initials = (currentUser.nama || 'Pengurus')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join('') || 'P';
+
   const formHtml = `
-    <form id="formSelfProfile" class="flex flex-col gap-3">
-      <!-- KARTU INFORMASI HAK AKSES & WILAYAH (RINGKAS 1 BARIS) -->
-      <div class="bg-slate-50 dark:bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
-        <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
-          <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-xs inline-flex items-center gap-1 shrink-0" style="background:${levelBadgeBg};color:${levelBadgeColor};">
-            ${levelBadgeLabel}
-          </span>
-          <span class="font-bold text-slate-800 dark:text-slate-200 truncate">${roleName}</span>
-          <span class="text-slate-300 dark:text-slate-600 hidden sm:inline">&bull;</span>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-0.5 truncate">
-            <span class="material-symbols-outlined text-[13px] text-brandBlue shrink-0">location_on</span>
-            ${wilayahTxt}
+    <form id="formSelfProfile" class="flex flex-col gap-3.5">
+      <!-- KARTU INFORMASI PROFIL & HAK AKSES (POLISHED HERO CARD) -->
+      <div class="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/70 to-slate-50/70 dark:from-slate-900/80 dark:to-slate-800/80 border border-blue-100/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-brandBlue to-blue-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-sm border border-blue-400/30 select-none">
+            ${initials}
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h4 class="font-extrabold text-sm text-slate-900 dark:text-white leading-tight truncate">
+                ${currentUser.nama || 'Pengurus'}
+              </h4>
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border shadow-2xs inline-flex items-center gap-1 shrink-0 ${levelBadgeClass}">
+                ${levelBadgeLabel}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+              <span class="material-symbols-outlined text-[13px] text-brandBlue shrink-0">location_on</span>
+              <span class="font-medium">${wilayahTxt}</span>
+              <span class="text-slate-300 dark:text-slate-600">&bull;</span>
+              <span class="font-semibold text-brandBlue dark:text-blue-400">${roleName}</span>
+            </p>
+          </div>
+        </div>
+        <div class="shrink-0 text-right">
+          <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center gap-1 border border-slate-300/60 dark:border-slate-700" title="Hak akses & wilayah hanya dapat diubah oleh Superadmin Daerah">
+            <span class="material-symbols-outlined text-[12px]">lock</span>
+            <span class="hidden sm:inline">Akses Terkunci</span>
           </span>
         </div>
-        <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center gap-0.5 shrink-0" title="Hak akses & wilayah dikelola Superadmin">
-          <span class="material-symbols-outlined text-[11px]">lock</span> Terkunci
-        </span>
       </div>
 
       <!-- FORM DATA PRIBADI MANDIRI -->
-      <div>
-        <label class="block text-[11.5px] font-bold mb-1 text-slate-700 dark:text-slate-300">Nama Lengkap <span class="text-red-500">*</span></label>
-        <div class="relative flex items-center">
-          <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">person</span>
-          <input type="text" id="profNama" value="${currentUser.nama}" required class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">
+            Nama Lengkap <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[18px] pointer-events-none">person</span>
+            <input type="text" id="profNama" value="${currentUser.nama}" required class="w-full pl-9 pr-3.5 py-2 bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">
+              Email Akun <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative flex items-center">
+              <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[18px] pointer-events-none">mail</span>
+              <input type="email" id="profEmail" value="${currentUser.email}" required class="w-full pl-9 pr-3.5 py-2 bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">
+              Nomor WhatsApp <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative flex items-center">
+              <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[18px] pointer-events-none">chat</span>
+              <input type="tel" id="profNoWa" value="${currentUser.noWa || ''}" required placeholder="08xxxxxxxxxx" class="w-full pl-9 pr-3.5 py-2 bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-brandBlue focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-2xs" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-        <div>
-          <label class="block text-[11.5px] font-bold mb-1 text-slate-700 dark:text-slate-300">Email Akun <span class="text-red-500">*</span></label>
-          <div class="relative flex items-center">
-            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">mail</span>
-            <input type="email" id="profEmail" value="${currentUser.email}" required class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-[11.5px] font-bold mb-1 text-slate-700 dark:text-slate-300">Nomor WhatsApp <span class="text-red-500">*</span></label>
-          <div class="relative flex items-center">
-            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">chat</span>
-            <input type="tel" id="profNoWa" value="${currentUser.noWa || ''}" required placeholder="08xxxxxxxxxx" class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue" />
-          </div>
-        </div>
-      </div>
-
-      <!-- GANTI KATA SANDI (DENGAN TOMBOL IKON LIHAT PASSWORD) -->
-      <div class="border-t border-slate-200 dark:border-slate-800 pt-2.5 flex flex-col gap-2">
+      <!-- GANTI KATA SANDI (DENGAN KARTU TERPADU & TOGGLE EYE ICON) -->
+      <div class="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-900/40 border border-slate-200/90 dark:border-slate-800 flex flex-col gap-2.5 mt-0.5">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-1 font-bold text-xs text-slate-700 dark:text-slate-300">
-            <span class="material-symbols-outlined text-[16px] text-brandBlue dark:text-blue-400">key</span>
+          <div class="flex items-center gap-1.5 font-bold text-xs text-slate-800 dark:text-slate-200">
+            <span class="material-symbols-outlined text-[17px] text-brandBlue dark:text-blue-400">key</span>
             <span>Ganti Kata Sandi</span>
-            <span class="text-[10.5px] text-slate-400 font-normal">(Opsional)</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100/70 dark:bg-blue-900/40 text-brandBlue dark:text-blue-300">Opsional</span>
           </div>
-          <span class="text-[10px] text-slate-400 dark:text-slate-500">Kosongkan jika tak diubah</span>
+          <span class="text-[10.5px] text-slate-400 dark:text-slate-500">Kosongkan jika tak diubah</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
           <div>
-            <label class="block text-[11px] font-bold mb-1 text-slate-600 dark:text-slate-400">Kata Sandi Baru</label>
+            <label class="block text-[10.5px] font-bold mb-1 text-slate-600 dark:text-slate-400">Kata Sandi Baru</label>
             <div class="relative flex items-center">
               <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">lock</span>
-              <input type="password" id="profPassword" placeholder="Min. 6 karakter" autocomplete="new-password" style="padding-left:34px !important;padding-right:38px !important;" class="w-full py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+              <input type="password" id="profPassword" placeholder="Min. 6 karakter" autocomplete="new-password" style="padding-left:34px !important;padding-right:38px !important;" class="w-full py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400 transition-all shadow-2xs" />
               <button type="button" id="btnToggleProfPass" class="btn-toggle-password" aria-label="Lihat / Sembunyikan Password" title="Lihat / Sembunyikan Kata Sandi">
                 <span class="material-symbols-outlined text-[18px] block select-none pointer-events-none">visibility</span>
               </button>
@@ -288,10 +314,10 @@ export function renderSelfProfileModal() {
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold mb-1 text-slate-600 dark:text-slate-400">Ulangi Kata Sandi</label>
+            <label class="block text-[10.5px] font-bold mb-1 text-slate-600 dark:text-slate-400">Ulangi Kata Sandi Baru</label>
             <div class="relative flex items-center">
               <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[17px] pointer-events-none">lock_clock</span>
-              <input type="password" id="profPasswordConfirm" placeholder="Konfirmasi kata sandi" autocomplete="new-password" style="padding-left:34px !important;padding-right:38px !important;" class="w-full py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-brandBlue placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+              <input type="password" id="profPasswordConfirm" placeholder="Konfirmasi kata sandi" autocomplete="new-password" style="padding-left:34px !important;padding-right:38px !important;" class="w-full py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:border-brandBlue focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400 transition-all shadow-2xs" />
               <button type="button" id="btnToggleProfPassConfirm" class="btn-toggle-password" aria-label="Lihat / Sembunyikan Konfirmasi Password" title="Lihat / Sembunyikan Konfirmasi Kata Sandi">
                 <span class="material-symbols-outlined text-[18px] block select-none pointer-events-none">visibility</span>
               </button>

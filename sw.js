@@ -4,7 +4,7 @@
              Cache-First for static assets (images, icons, styles, fonts)
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'ppg-generus-v10.9';
+const CACHE_NAME = 'ppg-generus-v10.10';
 
 const STATIC_ASSETS = [
   '/',
