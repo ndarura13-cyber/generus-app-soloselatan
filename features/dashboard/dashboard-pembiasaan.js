@@ -82,8 +82,12 @@ function buildPaginationHtml(currentPage, totalPages, prevBtnId, nextBtnId, page
 
 let currentEventPage = 1;
 const eventItemsPerPage = 5;
+let currentPembiasaanJenjang = 'caberawit';
 
-export async function renderEventPembiasaanModal(skipSync = false, targetPage = 1) {
+export async function renderEventPembiasaanModal(skipSync = false, targetPage = 1, jenjang = null) {
+  if (jenjang === 'caberawit' || jenjang === 'gp_reguler') {
+    currentPembiasaanJenjang = jenjang;
+  }
   if (!skipSync && isSupabaseConfigured()) {
     try {
       await syncPembiasaanFromSupabase();
@@ -91,8 +95,11 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
       console.warn('Gagal sinkron pembiasaan dari Supabase:', err);
     }
   }
-  const events = getEventPembiasaanList();
+  const events = getEventPembiasaanList().filter(ev => (ev.jenjang || 'caberawit') === currentPembiasaanJenjang);
   const isSuperadminOrDaerah = currentUser.isSuperadmin || currentUser.tingkatan === 'daerah';
+  const isKelompokUser = !currentUser.isSuperadmin && currentUser.tingkatan === 'kelompok';
+  const isGpReadOnly = isKelompokUser && currentPembiasaanJenjang === 'gp_reguler';
+  const jenjangLabel = currentPembiasaanJenjang === 'gp_reguler' ? 'GP (Pra-Remaja)' : 'Caberawit';
 
   const totalPages = Math.ceil(events.length / eventItemsPerPage) || 1;
   currentEventPage = Math.max(1, Math.min(targetPage, totalPages));
@@ -139,7 +146,7 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
           <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
             ${(isSuperadminOrDaerah && e.status === 'berjalan') ? `<button class="btn-edit-event" data-id="${e.id}" style="padding:6px 10px;background:#f0f9ff;color:var(--blue);border:1px solid #bae6fd;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">edit</span> Edit</button>` : ''}
             <button class="btn-open-event" data-id="${e.id}" style="padding:6px 12px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-              <span class="material-symbols-outlined" style="font-size:15px;">edit_square</span> Isi Nilai
+              <span class="material-symbols-outlined" style="font-size:15px;">${(isGpReadOnly || e.status === 'selesai') ? 'visibility' : 'edit_square'}</span> ${(isGpReadOnly || e.status === 'selesai') ? 'Lihat Nilai' : 'Isi Nilai'}
             </button>
             ${isSuperadminOrDaerah ? `<button class="btn-delete-event" data-id="${e.id}" title="Hapus Event" style="padding:6px 10px;background:#fef2f2;color:var(--red);border:1px solid #fca5a5;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;"><span class="material-symbols-outlined" style="font-size:15px;">delete</span></button>` : ''}
           </div>
@@ -178,8 +185,8 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
                 <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
               </button>
             ` : ''}
-            <button type="button" class="btn-event-icon-only btn-event-icon-open btn-open-event" data-id="${e.id}" title="Isi Nilai Siswa">
-              <span class="material-symbols-outlined" style="font-size:16px;">edit_square</span>
+            <button type="button" class="btn-event-icon-only btn-event-icon-open btn-open-event" data-id="${e.id}" title="${(isGpReadOnly || e.status === 'selesai') ? 'Lihat Nilai' : 'Isi Nilai'}">
+              <span class="material-symbols-outlined" style="font-size:16px;">${(isGpReadOnly || e.status === 'selesai') ? 'visibility' : 'edit_square'}</span>
             </button>
             ${isSuperadminOrDaerah ? `
               <button type="button" class="btn-event-icon-only btn-event-icon-delete btn-delete-event" data-id="${e.id}" title="Hapus Periode">
@@ -221,11 +228,12 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
         </div>
       ` : ''}
 
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
         <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">
           <span class="material-symbols-outlined" style="font-size:18px;color:var(--blue);">calendar_month</span>
-          Daftar Periode Lembar Pembiasaan
+          <span>Daftar Periode &bull; ${jenjangLabel}</span>
         </div>
+        ${isGpReadOnly ? `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#f1f5f9;color:#475569;">Lihat Saja</span>` : ''}
       </div>
 
       <!-- 1. DESKTOP VIEW (Table) -->
@@ -265,7 +273,7 @@ export async function renderEventPembiasaanModal(skipSync = false, targetPage = 
     </div>
   `;
 
-  openModal(isSuperadminOrDaerah ? 'Kelola Lembar Pembiasaan' : 'Isi Nilai Lembar Pembiasaan', 'checklist', modalHtml, 'large');
+  openModal(`Lembar Pembiasaan (${jenjangLabel})`, 'checklist', modalHtml, 'large');
 
   // Accordion toggle click listener for mobile
   document.querySelectorAll('.btn-toggle-event-detail').forEach(btn => {
@@ -625,13 +633,14 @@ export function renderCreateEventForm(editEvent = null) {
       const newStatus = document.getElementById('evtStatus')?.value || editEvent.status;
       const res = await updateEventPembiasaan(editEvent.id, {
         judul_periode: judul,
+        jenjang: editEvent.jenjang || currentPembiasaanJenjang,
         status: newStatus,
         habits: habitNames,
         habit_max: habitMaxes
       });
       if (res.success) {
         showToast(`Periode pembiasaan "${judul}" berhasil diperbarui!`, 'success');
-        renderEventPembiasaanModal();
+        renderEventPembiasaanModal(false, 1, editEvent.jenjang || currentPembiasaanJenjang);
       } else {
         showToast(`Gagal: ${res.error || res.message}`, 'error');
         if (btnSubmit) {
@@ -642,13 +651,14 @@ export function renderCreateEventForm(editEvent = null) {
     } else {
       const res = await addEventPembiasaan({
         judul_periode: judul,
+        jenjang: currentPembiasaanJenjang,
         status: 'berjalan',
         habits: habitNames,
         habit_max: habitMaxes
       });
       if (res.success) {
         showToast(`Periode pembiasaan "${judul}" berhasil dibuat!`, 'success');
-        renderEventPembiasaanModal();
+        renderEventPembiasaanModal(false, 1, currentPembiasaanJenjang);
       } else {
         showToast(`Gagal: ${res.error || res.message}`, 'error');
         if (btnSubmit) {
@@ -676,6 +686,10 @@ export async function openEditableGridEvent(eventId, skipSync = false) {
   if (!event) return;
 
   const isSuperadminOrDaerah = currentUser.isSuperadmin || currentUser.tingkatan === 'daerah';
+  const eventJenjang = event.jenjang || currentPembiasaanJenjang || 'caberawit';
+  const isKelompokUser = !currentUser.isSuperadmin && currentUser.tingkatan === 'kelompok';
+  const isGpReadOnly = isKelompokUser && eventJenjang === 'gp_reguler';
+  const jenjangBadgeText = eventJenjang === 'gp_reguler' ? 'GP (Pra-Remaja) • SMP' : 'Caberawit • PAUD – SD';
 
   // Otomatis sesuaikan filter wilayah jika pamong kelompok atau koordinator desa
   if (!isSuperadminOrDaerah) {
@@ -715,37 +729,37 @@ export async function openEditableGridEvent(eventId, skipSync = false) {
               ${event.status === 'berjalan' ? 'BERJALAN' : 'SELESAI'}
             </span>
             <span style="font-size:11px;font-weight:800;background:var(--blue-light);color:var(--blue);padding:2px 8px;border-radius:12px;">
-              Total Bobot: ${totalMaxScore} Poin
+              Bobot ${totalMaxScore} Poin
             </span>
           </div>
-          <span style="font-size:12px;color:var(--text-muted);display:block;margin-top:2px;">Khusus Generus Caberawit (PAUD &ndash; SD)</span>
+          <span style="font-size:11.5px;color:var(--text-muted);display:block;margin-top:3px;">${jenjangBadgeText}</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <a href="../laporan/laporan-pembiasaan.html?event=${eventId}" target="_blank" style="text-decoration:none;padding:8px 12px;background:var(--blue-light);color:var(--blue);border:none;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-            <span class="material-symbols-outlined" style="font-size:16px;">public</span> Laporan Publik
+          <a href="../laporan/laporan-pembiasaan.html?event=${eventId}" target="_blank" style="text-decoration:none;padding:7px 12px;background:var(--blue-light);color:var(--blue);border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">public</span> Laporan
           </a>
           ${(isSuperadminOrDaerah && event.status === 'berjalan') ? `
-            <button id="btnCloseEvent" style="padding:8px 12px;background:#fef2f2;color:var(--red);border:1px solid #fca5a5;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-              <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Kunci &amp; Arsipkan
+            <button id="btnCloseEvent" style="padding:7px 12px;background:#fef2f2;color:var(--red);border:1px solid #fca5a5;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+              <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Arsipkan
             </button>
           ` : ''}
-          <button id="btnBackToEventList" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">← Kembali</button>
+          <button id="btnBackToEventList" style="padding:7px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">← Kembali</button>
         </div>
       </div>
 
-      <!-- FILTER BAR -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;background:var(--bg);padding:12px;border-radius:10px;border:1px solid var(--border);">
-        <input type="text" id="gridFilterSearch" value="${gridFilter.search || ''}" placeholder="Cari nama anak..." style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;" />
-        <select id="gridFilterDesa" style="padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;">
-          <option value="all">-- Semua Desa --</option>
+      <!-- FILTER BAR (RESPONSIVE MOBILE & DESKTOP) -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;background:var(--bg);padding:10px 12px;border-radius:12px;border:1px solid var(--border);">
+        <input type="text" id="gridFilterSearch" value="${gridFilter.search || ''}" placeholder="Cari nama santri..." style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;background:var(--surface);color:var(--text);" />
+        <select id="gridFilterDesa" style="padding:8px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;background:var(--surface);color:var(--text);">
+          <option value="all">Semua Desa</option>
           ${desaOptions}
         </select>
-        <select id="gridFilterKelompok" style="padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;">
-          <option value="all">-- Semua Kelompok --</option>
+        <select id="gridFilterKelompok" style="padding:8px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;background:var(--surface);color:var(--text);">
+          <option value="all">Semua Kelompok</option>
           ${kelOptions}
         </select>
-        <div id="gridSaveIndicator" style="display:flex;align-items:center;justify-content:flex-end;font-size:11px;font-weight:700;color:var(--green-dark);">
-          <span class="material-symbols-outlined" style="font-size:15px;margin-right:3px;">cloud_done</span> Auto-save Aktif
+        <div id="gridSaveIndicator" style="display:flex;align-items:center;justify-content:flex-end;font-size:11px;font-weight:700;color:${isGpReadOnly ? '#64748b' : 'var(--green-dark)'};">
+          <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">${isGpReadOnly ? 'visibility' : 'cloud_done'}</span> ${isGpReadOnly ? 'Lihat Saja' : 'Auto-save'}
         </div>
       </div>
 
@@ -787,28 +801,27 @@ export async function openEditableGridEvent(eventId, skipSync = false) {
       <!-- 3. PAGINATION BAR FOR GRID / MOBILE CARDS -->
       <div id="gridPaginationContainer"></div>
 
-      <!-- BOTTOM LEGEND & NOTE -->
-      <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-        <div style="display:flex;flex-wrap:gap:8px;">
-          ${event.habits.map((h, i) => {
-            const hMax = habitMax[i] || (i < 2 ? 30 : 10);
-            const isPenting = hMax >= 30;
-            return `
-              <span style="display:inline-flex;align-items:center;gap:3px;">
-                <span class="habit-badge-pill ${isPenting ? 'habit-badge-penting' : 'habit-badge-additional'}">${isPenting ? 'Penting' : 'Add.'} (Maks ${hMax})</span>
-                <strong>H${i + 1}:</strong> ${h}
-              </span>
-            `;
-          }).join('')}
-        </div>
-        <div>*Nilai otomatis tersimpan saat angka diubah.</div>
+      <!-- BOTTOM LEGEND -->
+      <div style="font-size:11px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:8px;">
+        ${event.habits.map((h, i) => {
+          const hMax = habitMax[i] || (i < 2 ? 30 : 10);
+          const isPenting = hMax >= 30;
+          return `
+            <span style="display:inline-flex;align-items:center;gap:4px;">
+              <span class="habit-badge-pill ${isPenting ? 'habit-badge-penting' : 'habit-badge-additional'}">${isPenting ? 'Penting' : 'Add.'} (${hMax})</span>
+              <strong>H${i + 1}:</strong> ${h}
+            </span>
+          `;
+        }).join('')}
       </div>
     </div>
   `;
 
-  openModal(`Nilai Pembiasaan: ${event.judul_periode}`, 'edit_document', modalHtml, 'wide');
+  openModal(`${event.judul_periode}`, isGpReadOnly ? 'visibility' : 'edit_document', modalHtml, 'wide');
 
-  document.getElementById('btnBackToEventList').addEventListener('click', renderEventPembiasaanModal);
+  document.getElementById('btnBackToEventList').addEventListener('click', () => {
+    renderEventPembiasaanModal(true, currentEventPage, eventJenjang);
+  });
   if (isSuperadminOrDaerah && event.status === 'berjalan') {
     document.getElementById('btnCloseEvent')?.addEventListener('click', () => {
       showConfirmModal({
@@ -860,13 +873,26 @@ export function renderGridRows(event) {
 
   const allSiswa = getSiswaList();
   const allNilai = getNilaiPembiasaanList().filter(n => n.event_id === event.id);
-  const isReadOnly = event.status === 'selesai';
+  const eventJenjang = event.jenjang || currentPembiasaanJenjang || 'caberawit';
+  const isKelompokUser = !currentUser.isSuperadmin && currentUser.tingkatan === 'kelompok';
+  const isGpReadOnly = isKelompokUser && eventJenjang === 'gp_reguler';
+  const isReadOnly = event.status === 'selesai' || isGpReadOnly;
 
   const habitMax = getEventHabitMax(event);
   const totalMaxScore = habitMax.reduce((a, b) => a + b, 0);
 
   const filtered = allSiswa.filter(s => {
-    if (s.kategori_usia !== 'caberawit') return false;
+    const kat = (s.kategori_usia || '').toLowerCase();
+    const jnj = (s.jenjang_kelas || s.jenjang || '').toLowerCase();
+    if (eventJenjang === 'gp_reguler') {
+      const isGp = kat === 'gp_reguler' || kat === 'pra_remaja' || kat === 'gp' || kat === 'remaja' ||
+        jnj.includes('smp') || jnj.includes('gp') || jnj.includes('pra-remaja') ||
+        ['7', '8', '9'].some(k => jnj === k || jnj === `kelas ${k}`);
+      if (!isGp) return false;
+    } else {
+      if (kat && kat !== 'caberawit') return false;
+      if (!kat && !(jnj.includes('paud') || jnj.includes('tk') || jnj.includes('sd') || jnj.includes('caberawit'))) return false;
+    }
     if (gridFilter.desa !== 'all' && s.desa_id !== gridFilter.desa) return false;
     if (gridFilter.kelompok !== 'all' && s.kelompok_id !== gridFilter.kelompok) return false;
     if (gridFilter.search && !s.nama_lengkap.toLowerCase().includes(gridFilter.search)) return false;
@@ -874,15 +900,16 @@ export function renderGridRows(event) {
   });
 
   if (filtered.length === 0) {
+    const emptyMsg = `Tidak ada santri ${eventJenjang === 'gp_reguler' ? 'GP' : 'Caberawit'} yang sesuai filter.`;
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="${4 + event.habits.length}" style="text-align:center;padding:24px;color:var(--text-muted);">Tidak ada siswa Caberawit yang sesuai filter.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${4 + event.habits.length}" style="text-align:center;padding:24px;color:var(--text-muted);">${emptyMsg}</td></tr>`;
     }
     if (tfoot) tfoot.innerHTML = '';
     if (mobContainer) {
       mobContainer.innerHTML = `
         <div style="text-align:center;padding:32px 16px;background:var(--surface-2);border-radius:12px;color:var(--text-muted);">
           <span class="material-symbols-outlined" style="font-size:36px;color:var(--border);">person_search</span>
-          <p style="font-size:13px;margin-top:6px;">Tidak ada siswa Caberawit yang sesuai filter.</p>
+          <p style="font-size:13px;margin-top:6px;">${emptyMsg}</p>
         </div>
       `;
     }

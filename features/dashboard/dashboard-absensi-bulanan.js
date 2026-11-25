@@ -113,6 +113,7 @@ export function renderAbsensiBulananTab(container, options = {}) {
   const selectedJenjang = options.jenjang || 'caberawit';
   const selectedDesa = options.desaId || (isDaerah ? 'all' : currentDesaId);
   const selectedKel = options.kelompokId || (isKelompok ? currentKelId : 'all');
+  const isReadOnly = Boolean(options.readOnly) || (isKelompok && selectedJenjang !== 'caberawit');
 
   // Sinkronisasi otomatis data terbaru dari Supabase Cloud saat pertama kali tab dibuka
   if (isSupabaseConfigured() && !container._hasAutoSynced) {
@@ -229,10 +230,16 @@ export function renderAbsensiBulananTab(container, options = {}) {
             <span class="material-symbols-outlined text-[17px]">analytics</span>
             <span>Grafik Tahunan</span>
           </button>
-          <button type="button" id="btnInputAbsensiBaru" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs transition-all cursor-pointer shadow-sm hover:shadow shrink-0 whitespace-nowrap">
-            <span class="material-symbols-outlined text-[17px]">verified</span>
-            <span>Input Absensi Bulanan</span>
-          </button>
+          ${!isReadOnly ? `
+            <button type="button" id="btnInputAbsensiBaru" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs transition-all cursor-pointer shadow-sm hover:shadow shrink-0 whitespace-nowrap">
+              <span class="material-symbols-outlined text-[17px]">verified</span>
+              <span>Input Absensi</span>
+            </button>
+          ` : `
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 font-bold text-[11px] inline-flex items-center gap-1 shrink-0">
+              <span class="material-symbols-outlined text-[15px]">visibility</span> Lihat Saja
+            </span>
+          `}
         </div>
       </div>
     </div>
@@ -249,13 +256,15 @@ export function renderAbsensiBulananTab(container, options = {}) {
           Pamong belum mengisi checklist presensi untuk jenjang <strong>${selectedJenjang === 'caberawit' ? 'Caberawit' : 'GP Reguler'}</strong> pada bulan <strong>${BULAN_NAMES[currentMonthIdx - 1]} ${currentYear}</strong>.
         </p>
         <div class="mt-4 flex flex-wrap items-center justify-center gap-2.5">
-          <button type="button" class="btn-quick-create-rekap px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer">
-            <span class="material-symbols-outlined text-[16px]">edit_note</span>
-            <span>Mulai Isi Absensi Bulan Ini</span>
-          </button>
+          ${!isReadOnly ? `
+            <button type="button" class="btn-quick-create-rekap px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">edit_note</span>
+              <span>Isi Absensi</span>
+            </button>
+          ` : ''}
           <button type="button" class="btn-quick-print-empty px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50">
             <span class="material-symbols-outlined text-[16px]">print</span>
-            <span>Cetak Lembar Presensi Kosong (Fisik)</span>
+            <span>Cetak Form Kosong</span>
           </button>
         </div>
       </div>
@@ -309,21 +318,23 @@ export function renderAbsensiBulananTab(container, options = {}) {
 
               <!-- Action buttons Sesuai Gambar: Isi/Edit di Kiri, Cetak + Excel/Copy + Delete di Kanan -->
               <div class="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50/60 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all shrink-0" data-id="${rekap.id}" title="Isi atau Edit Absensi">
-                  <span class="material-symbols-outlined text-[15px]">edit</span>
-                  <span>Isi / Edit</span>
+                <button type="button" class="btn-edit-rekap px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50/60 dark:hover:bg-blue-950/40 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all shrink-0" data-id="${rekap.id}" title="${isReadOnly ? 'Lihat Rekap' : 'Isi atau Edit Absensi'}">
+                  <span class="material-symbols-outlined text-[15px]">${isReadOnly ? 'visibility' : 'edit'}</span>
+                  <span>${isReadOnly ? 'Lihat' : 'Isi / Edit'}</span>
                 </button>
                 <div class="flex items-center gap-1 shrink-0">
-                  <button type="button" class="btn-print-rekap px-3 py-1.5 rounded-xl border border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100/60 transition-all flex items-center gap-1 cursor-pointer shrink-0" data-id="${rekap.id}" title="Cetak Lembar Presensi Lengkap (PDF A4 Landscape)">
+                  <button type="button" class="btn-print-rekap px-3 py-1.5 rounded-xl border border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100/60 transition-all flex items-center gap-1 cursor-pointer shrink-0" data-id="${rekap.id}" title="Cetak PDF">
                     <span class="material-symbols-outlined text-[15px]">print</span>
                     <span>Cetak</span>
                   </button>
-                  <button type="button" class="btn-excel-rekap w-8 h-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-all cursor-pointer flex items-center justify-center shrink-0" data-id="${rekap.id}" title="Ekspor Lembar Excel">
+                  <button type="button" class="btn-excel-rekap w-8 h-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-all cursor-pointer flex items-center justify-center shrink-0" data-id="${rekap.id}" title="Ekspor Excel">
                     <span class="material-symbols-outlined text-[16px]">content_copy</span>
                   </button>
-                  <button type="button" class="btn-delete-rekap w-8 h-8 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer flex items-center justify-center shrink-0" data-id="${rekap.id}" title="Hapus Dokumen Rekap">
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
+                  ${!isReadOnly ? `
+                    <button type="button" class="btn-delete-rekap w-8 h-8 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer flex items-center justify-center shrink-0" data-id="${rekap.id}" title="Hapus Dokumen Rekap">
+                      <span class="material-symbols-outlined text-[16px]">delete</span>
+                    </button>
+                  ` : ''}
                 </div>
               </div>
             </div>
@@ -396,8 +407,9 @@ export function renderAbsensiBulananTab(container, options = {}) {
   const triggerInput = (rekapItem = null) => {
     let inputPayload;
     if (rekapItem) {
-      inputPayload = rekapItem;
+      inputPayload = { ...rekapItem, readOnly: isReadOnly };
     } else {
+      if (isReadOnly) return;
       let defaultKel = (selectedKel !== 'all' ? selectedKel : (isKelompok ? currentKelId : allKels[0]?.id));
       if (selectedDesa !== 'all' && selectedKel === 'all') {
         const kelInDesa = allKels.find(k => k.desaId === selectedDesa);
@@ -536,6 +548,7 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
   const bulanIndex = initialData.bulanIndex || (new Date().getMonth() + 1);
   const bulanName = BULAN_NAMES[bulanIndex - 1].toUpperCase();
   const jenjang = initialData.jenjang || 'caberawit';
+  const isFormReadOnly = Boolean(initialData.readOnly) || (isKelompok && jenjang !== 'caberawit');
   let kelompokId = initialData.kelompokId || (isKelompok ? currentKelId : allKels[0].id);
 
   let kelObj = allKels.find(k => k.id === kelompokId) || allKels[0];
@@ -691,14 +704,21 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" id="btnAturTanggalPertemuan" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm hover:bg-slate-50">
-              <span class="material-symbols-outlined text-[16px] text-blue-600">calendar_month</span>
-              <span>Atur Tanggal (${meetingDates.length} Sesi)</span>
-            </button>
-            <button type="button" id="btnSetSemuaHadir" class="px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm hover:bg-emerald-100">
-              <span class="material-symbols-outlined text-[16px]">done_all</span>
-              <span>Set Semua Hadir (H)</span>
-            </button>
+            ${!isFormReadOnly ? `
+              <button type="button" id="btnAturTanggalPertemuan" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm hover:bg-slate-50">
+                <span class="material-symbols-outlined text-[16px] text-blue-600">calendar_month</span>
+                <span>Atur Tanggal (${meetingDates.length} Sesi)</span>
+              </button>
+              <button type="button" id="btnSetSemuaHadir" class="px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm hover:bg-emerald-100">
+                <span class="material-symbols-outlined text-[16px]">done_all</span>
+                <span>Set Semua Hadir (H)</span>
+              </button>
+            ` : `
+              <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 font-bold text-xs inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">visibility</span>
+                <span>Mode Lihat Saja (${meetingDates.length} Sesi)</span>
+              </span>
+            `}
           </div>
         </div>
 
@@ -756,10 +776,12 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
               <span class="material-symbols-outlined text-[17px]">print</span>
               <span>Cetak Hasil</span>
             </button>
-            <button type="button" id="btnSimpanRekapAbsensi" class="btn-sticky-save" title="Simpan Rekapitulasi Absensi">
-              <span class="material-symbols-outlined">save</span>
-              <span class="btn-text">Simpan Rekapitulasi</span>
-            </button>
+            ${!isFormReadOnly ? `
+              <button type="button" id="btnSimpanRekapAbsensi" class="btn-sticky-save" title="Simpan Rekapitulasi Absensi">
+                <span class="material-symbols-outlined">save</span>
+                <span class="btn-text">Simpan Rekapitulasi</span>
+              </button>
+            ` : ''}
           </div>
         </div>
 
@@ -842,21 +864,22 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
     });
 
     // Toggle status presensi saat tombol diklik
-    document.querySelectorAll('.btn-toggle-absen').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const rIdx = Number(btn.getAttribute('data-row'));
-        const dateKey = btn.getAttribute('data-date');
-        const currentVal = records[rIdx].kehadiran[dateKey] || 'H';
+    if (!isFormReadOnly) {
+      document.querySelectorAll('.btn-toggle-absen').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const rIdx = Number(btn.getAttribute('data-row'));
+          const dateKey = btn.getAttribute('data-date');
+          const currentVal = records[rIdx].kehadiran[dateKey] || 'H';
 
-        // Siklus status: H -> S -> I -> A -> H
-        let nextVal = 'H';
-        if (currentVal === 'H') nextVal = 'S';
-        else if (currentVal === 'S') nextVal = 'I';
-        else if (currentVal === 'I') nextVal = 'A';
-        else if (currentVal === 'A') nextVal = 'H';
+          // Siklus status: H -> S -> I -> A -> H
+          let nextVal = 'H';
+          if (currentVal === 'H') nextVal = 'S';
+          else if (currentVal === 'S') nextVal = 'I';
+          else if (currentVal === 'I') nextVal = 'A';
+          else if (currentVal === 'A') nextVal = 'H';
 
-        records[rIdx].kehadiran[dateKey] = nextVal;
-        btn.textContent = nextVal;
+          records[rIdx].kehadiran[dateKey] = nextVal;
+          btn.textContent = nextVal;
 
         // Update styling
         btn.className = `btn-toggle-absen cursor-pointer inline-flex items-center justify-center w-6 h-6 rounded font-black text-[10.5px] border transition-all active:scale-90 ${
@@ -873,8 +896,9 @@ export function openFormAbsensiBulananModal(initialData = {}, onSavedCallback = 
         document.getElementById(`valI_${rIdx}`).textContent = records[rIdx].totalI;
         document.getElementById(`valA_${rIdx}`).textContent = records[rIdx].totalA;
         document.getElementById(`valPct_${rIdx}`).textContent = `${records[rIdx].persenHadir}%`;
+        });
       });
-    });
+    }
 
     // Set Semua Hadir
     document.getElementById('btnSetSemuaHadir')?.addEventListener('click', () => {

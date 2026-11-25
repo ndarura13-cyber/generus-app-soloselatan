@@ -56,6 +56,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   const filterKel = options.filterKel || (isKelompok ? currentKelId : (options.filterKel || 'all'));
   const filterFormat = options.filterFormat || 'all';
   const scopeMode = options.scopeMode || (isKelompok ? 'kelompok_only' : 'all'); // 'kelompok_only' | 'desa_all'
+  const isViewOnlyContext = Boolean(options.readOnly) || (isKelompok && scopeMode !== 'kelompok_only') || (isDesa && scopeMode === 'all');
   const requestedPage = parseInt(options.page) || 1;
 
   // ── Saring Event Sesuai Hak Akses & Filter ──
@@ -127,7 +128,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   let agendaContentHtml = '';
 
   // ── Action Banner Buat Event (KBM) Model Mirip Generus ──
-  const bannerActionKbmHtml = `
+  const bannerActionKbmHtml = isViewOnlyContext ? '' : `
     <div class="banner-action-frame">
       <button type="button" id="btnBukaCreateEvent" class="btn-banner-action-blue" title="Buat Event KBM Baru">
         <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
@@ -227,12 +228,14 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         <span class="material-symbols-outlined" style="font-size:48px;color:#94a3b8;margin-bottom:8px;">event_busy</span>
         <h4 style="margin:0;font-size:14px;color:var(--text);font-weight:800;">Tidak Ada Event KBM yang Cocok</h4>
         <p style="margin:4px 0 16px;font-size:12px;color:var(--text-muted);">
-          Silakan sesuaikan filter wilayah di atas atau buat event KBM baru untuk mencetak lembar absensi.
+          Belum ada kegiatan pada filter ini.
         </p>
-        <button type="button" id="btnEmptyCreateEvent" class="btn-banner-action-blue" style="max-width:280px;margin:0 auto;" title="Buat Event KBM Baru">
-          <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
-          <span>Buat Event (KBM)</span>
-        </button>
+        ${!isViewOnlyContext ? `
+          <button type="button" id="btnEmptyCreateEvent" class="btn-banner-action-blue" style="max-width:280px;margin:0 auto;" title="Buat Event KBM Baru">
+            <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+            <span>Buat Event (KBM)</span>
+          </button>
+        ` : ''}
       </div>
     `;
   } else {
@@ -283,13 +286,14 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         wilayahLabel = foundDesa ? `Desa ${foundDesa.nama}` : 'Desa';
       }
 
-      let canManage = true;
-      let isReadOnly = false;
-      if (isKelompok) {
-        if (ev.kelompok_id && ev.kelompok_id !== 'all' && ev.kelompok_id !== currentKelId) {
-          canManage = false;
-          isReadOnly = true;
-        }
+      let canManage = !isViewOnlyContext;
+      let isReadOnly = isViewOnlyContext;
+      if (isKelompok && ev.kelompok_id !== currentKelId) {
+        canManage = false;
+        isReadOnly = true;
+      } else if (isDesa && ev.desa_id === 'all') {
+        canManage = false;
+        isReadOnly = true;
       }
 
       return `
@@ -397,13 +401,14 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         wilayahLabel = foundDesa ? `Desa ${foundDesa.nama}` : 'Desa';
       }
 
-      let canManage = true;
-      let isReadOnly = false;
-      if (isKelompok) {
-        if (ev.kelompok_id && ev.kelompok_id !== 'all' && ev.kelompok_id !== currentKelId) {
-          canManage = false;
-          isReadOnly = true;
-        }
+      let canManage = !isViewOnlyContext;
+      let isReadOnly = isViewOnlyContext;
+      if (isKelompok && ev.kelompok_id !== currentKelId) {
+        canManage = false;
+        isReadOnly = true;
+      } else if (isDesa && ev.desa_id === 'all') {
+        canManage = false;
+        isReadOnly = true;
       }
 
       return `
