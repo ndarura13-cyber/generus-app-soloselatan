@@ -259,7 +259,7 @@
     </h1>
 
     <a href="/index.html" class="btn-return-home" id="btnReturnHome">
-      <span class="btn-text">Return home</span>
+      <span class="btn-text" id="btnReturnText">Return home</span>
       <span class="btn-icon" aria-hidden="true">&#x2197;</span>
     </a>
   </main>
@@ -346,13 +346,16 @@
   </div>
 
   <script>
-    // Safeguard: Make Return Home button resilient in both root and sub-path deployments
-    document.getElementById('btnReturnHome')?.addEventListener('click', function(e) {
-      // In PWA or offline environments, smooth navigate to /index.html
-      if (window.location.pathname.endsWith('/404.html') || window.location.pathname.endsWith('/404')) {
-        // Normal navigation
+    // Jika berasal dari Dashboard, ubah tombol kembali agar langsung mengarah ke Dashboard
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const btn = document.getElementById('btnReturnHome');
+      const btnText = document.getElementById('btnReturnText');
+      if (params.get('from') === 'dashboard' && btn && btnText) {
+        btn.href = '/features/dashboard/dashboard.html';
+        btnText.textContent = 'Kembali ke Dashboard';
       }
-    });
+    })();
   </script>
 </body>
 </html>

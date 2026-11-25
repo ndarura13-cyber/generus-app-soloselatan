@@ -1272,3 +1272,97 @@ export async function deleteAbsensiBulananFromSupabase(rekapId) {
     return false;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LAPORAN MUSYAWAROH 5 UNSUR (LUPG) — CLOUD SYNC
+   ═══════════════════════════════════════════════════════════════ */
+
+export async function fetchMusyawarah5UnsurFromSupabase(filter = {}) {
+  const client = getSupabase();
+  if (!client) return { success: false, data: [], error: 'Supabase belum terkonfigurasi' };
+
+  try {
+    let query = client
+      .from('musyawarah_5_unsur')
+      .select('*')
+      .order('tanggal', { ascending: false })
+      .order('updated_at', { ascending: false });
+
+    if (filter.desaId && filter.desaId !== 'all') query = query.eq('desa_id', filter.desaId);
+    if (filter.kelompokId && filter.kelompokId !== 'all') query = query.eq('kelompok_id', filter.kelompokId);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const mapped = (data || []).map(row => ({
+      id: row.id,
+      tanggal: row.tanggal,
+      hariTanggalText: row.hari_tanggal_text || '',
+      desaId: row.desa_id,
+      desaNama: row.desa_nama,
+      kelompokId: row.kelompok_id,
+      kelompokNama: row.kelompok_nama,
+      wajibHadir: Number(row.wajib_hadir) || 0,
+      hadirLaki: Number(row.hadir_laki) || 0,
+      hadirPerempuan: Number(row.hadir_perempuan) || 0,
+      totalHadir: Number(row.total_hadir) || 0,
+      ijin: Number(row.ijin) || 0,
+      tanpaKeterangan: Number(row.tanpa_keterangan) || 0,
+      agendaPpg: row.agenda_ppg || '',
+      rangkumanHasil: row.rangkuman_hasil || '',
+      createdBy: row.created_by || '',
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+
+    return { success: true, data: mapped };
+  } catch (err) {
+    console.error("Supabase Error fetching Musyawarah 5 Unsur:", err);
+    const msg = err?.message || 'Gagal memuat data dari Supabase';
+    const tableMissing = err?.code === '42P01' || msg.toLowerCase().includes('does not exist') || msg.toLowerCase().includes('schema cache');
+    return { success: false, data: [], error: msg, tableMissing };
+  }
+}
+
+export async function upsertMusyawarah5UnsurToSupabase(doc) {
+  const client = getSupabase();
+  if (!client) throw new Error('Supabase belum terkonfigurasi.');
+
+  const record = {
+    id: doc.id,
+    tanggal: doc.tanggal,
+    hari_tanggal_text: doc.hariTanggalText || '',
+    desa_id: doc.desaId || null,
+    desa_nama: doc.desaNama || null,
+    kelompok_id: doc.kelompokId,
+    kelompok_nama: doc.kelompokNama,
+    wajib_hadir: Number(doc.wajibHadir) || 0,
+    hadir_laki: Number(doc.hadirLaki) || 0,
+    hadir_perempuan: Number(doc.hadirPerempuan) || 0,
+    total_hadir: (Number(doc.hadirLaki) || 0) + (Number(doc.hadirPerempuan) || 0),
+    ijin: Number(doc.ijin) || 0,
+    tanpa_keterangan: Number(doc.tanpaKeterangan) || 0,
+    agenda_ppg: doc.agendaPpg || '',
+    rangkuman_hasil: doc.rangkumanHasil || '',
+    created_by: doc.createdBy || '',
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await client
+    .from('musyawarah_5_unsur')
+    .upsert(record)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMusyawarah5UnsurFromSupabase(id) {
+  const client = getSupabase();
+  if (!client) throw new Error('Supabase belum terkonfigurasi.');
+
+  const { error } = await client.from('musyawarah_5_unsur').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
