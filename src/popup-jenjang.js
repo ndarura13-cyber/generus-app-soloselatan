@@ -76,7 +76,9 @@ function hitungStat(key) {
     }
   }
 
-  const total  = filtered.length;
+  const total  = isWilayah
+    ? (key === "desa" ? (MASTER_WILAYAH.desa || []).length : getAllKelompok().length)
+    : filtered.length;
   const lCount = filtered.filter(function(s) { return (s.jenis_kelamin || "").toUpperCase() === "L"; }).length;
   const pCount = filtered.filter(function(s) { return (s.jenis_kelamin || "").toUpperCase() === "P"; }).length;
 
@@ -256,17 +258,24 @@ export function bukaModal(key) {
         </div>
 
         <div class="flex items-center gap-5 sm:border-l sm:border-slate-200/80 dark:sm:border-slate-800 sm:pl-5 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800">
-          <div>
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Desa</div>
-            <div class="text-base font-extrabold text-slate-900 dark:text-white tabular-nums">${desaSt.length}</div>
-          </div>
-          ${!isWilayah ? `
-            <div class="h-6 w-px bg-slate-200/80 dark:bg-slate-800"></div>
+          ${isWilayah && key === "desa" ? `
             <div>
               <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Kelompok</div>
-              <div class="text-base font-extrabold text-slate-900 dark:text-white tabular-nums">${totalKelompokAktif}</div>
+              <div class="text-base font-extrabold text-slate-900 dark:text-white tabular-nums">${getAllKelompok().length}</div>
             </div>
-          ` : ''}
+          ` : `
+            <div>
+              <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Desa</div>
+              <div class="text-base font-extrabold text-slate-900 dark:text-white tabular-nums">${desaSt.length}</div>
+            </div>
+            ${!isWilayah ? `
+              <div class="h-6 w-px bg-slate-200/80 dark:bg-slate-800"></div>
+              <div>
+                <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Kelompok</div>
+                <div class="text-base font-extrabold text-slate-900 dark:text-white tabular-nums">${totalKelompokAktif}</div>
+              </div>
+            ` : ''}
+          `}
         </div>
       </div>
     </div>

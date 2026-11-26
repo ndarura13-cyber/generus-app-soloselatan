@@ -807,10 +807,7 @@
               <span class="font-bold text-base leading-tight tabular-nums" id="currentMonth">SEP</span>
               <span class="text-[11px] font-medium opacity-85 tabular-nums" id="currentYear">2026</span>
             </div>
-            <div>
-              <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Periode Berjalan</div>
-              <div class="font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white tracking-tight tabular-nums" id="prokerHeaderTitle">September 2026</div>
-            </div>
+            <span class="sr-only" id="prokerHeaderTitle">September 2026</span>
           </div>
 
           <div class="proker-filter-scroll" id="prokerStatusFilterBar">
@@ -841,18 +838,18 @@
             class="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold gap-1 sm:gap-0 border border-slate-200/70 dark:border-slate-700/60"
             id="prokerSegmentBar">
             <button type="button"
-              class="proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg transition-all duration-200 active bg-white dark:bg-slate-700 text-brandBlue dark:text-blue-400 shadow-2xs font-bold cursor-pointer whitespace-nowrap"
+              class="proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all duration-200 active bg-white dark:bg-slate-700 text-brandBlue dark:text-blue-400 shadow-2xs font-bold cursor-pointer whitespace-nowrap text-[11.5px] sm:text-xs"
               data-segment="event" title="Tampilkan Program Kerja Event / Insidental">
-              <span class="material-symbols-outlined text-[15px]">event_available</span>
+              <span class="material-symbols-outlined text-[15px] shrink-0">event_available</span>
               <span>Event &amp; Agenda</span>
             </button>
             <button type="button"
-              class="proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold cursor-pointer whitespace-nowrap"
+              class="proker-segment-btn w-full flex items-center justify-center text-center gap-1.5 px-2.5 sm:px-3.5 py-2 sm:py-1.5 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold cursor-pointer whitespace-nowrap text-[11.5px] sm:text-xs"
               data-segment="routine" title="Tampilkan Kegiatan Rutin Bulanan">
-              <span class="material-symbols-outlined text-[15px]">autorenew</span>
+              <span class="material-symbols-outlined text-[15px] shrink-0">autorenew</span>
               <span>Kegiatan Rutin</span>
               <span
-                class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-200/80 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 font-bold tabular-nums"
+                class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-200/80 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 font-bold tabular-nums shrink-0"
                 id="prokerRoutineCount">0</span>
             </button>
           </div>
@@ -1182,9 +1179,6 @@
             <span>Buka Portal</span>
             <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
           </a>
-          <button type="button"
-            class="px-4 py-2 rounded-xl bg-slate-200/80 hover:bg-slate-300/80 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs transition-colors cursor-pointer"
-            id="btnOkMj">Tutup</button>
         </div>
       </div>
     </div>
