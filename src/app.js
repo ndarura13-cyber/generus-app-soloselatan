@@ -327,7 +327,7 @@ function renderProker() {
     const statusLabel = getStatusLabel(rawStatus);
     const isTerlaksana = item.realisasiStatus === 'terlaksana';
     const realisasiBadge = isTerlaksana ? `
-      <span class="proker-realisasi-badge terlaksana" style="font-size:10px;padding:2px 7px;background:#dcfce7;color:#15803d;border-radius:4px;font-weight:700;">
+      <span class="proker-realisasi-badge terlaksana inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 rounded-md font-bold">
         Terlaksana
       </span>
     ` : '';
@@ -339,25 +339,25 @@ function renderProker() {
       </span>
     ` : '';
     const tujuanHtml = item.tujuan ? `
-      <div class="proker-tujuan-box">
-        <strong>Tujuan:</strong> ${item.tujuan}
+      <div class="mt-2.5 pl-3 border-l-2 border-brandBlue/40 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <span class="font-semibold text-slate-800 dark:text-slate-100">Tujuan:</span> ${item.tujuan}
       </div>
     ` : '';
 
     const isRoutine = isProkerRoutine(item);
     const routinePill = isRoutine ? `
-      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" title="Kegiatan Rutin Bulanan">
-        <span class="material-symbols-outlined text-[13px]">autorenew</span> Rutin
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700" title="Kegiatan Rutin Bulanan">
+        Rutin Bulanan
       </span>
       <span class="proker-meta-sep">&bull;</span>
     ` : (item.isAutoCurrentMonth ? `
-      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" title="Terjadwal di Bulan Berjalan">
-        <span class="material-symbols-outlined text-[13px]">alarm</span> Bulan Ini
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60" title="Terjadwal di Bulan Berjalan">
+        Bulan Ini
       </span>
       <span class="proker-meta-sep">&bull;</span>
     ` : (item.isAutoNextMonth ? `
-      <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800" title="Terjadwal di 1 Bulan Mendatang">
-        <span class="material-symbols-outlined text-[13px]">upcoming</span> Bulan Depan
+      <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60" title="Terjadwal di 1 Bulan Mendatang">
+        Bulan Depan
       </span>
       <span class="proker-meta-sep">&bull;</span>
     ` : ''));
@@ -408,18 +408,17 @@ function renderProker() {
             <div class="proker-meta">
               ${routinePill}
               ${item.kategori === 'KMM' ? `
-                <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                  <span class="material-symbols-outlined text-[12px]">diversity_3</span>
+                <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700">
                   Divisi ${item.subBidang || 'Umum'}
                 </span>
                 <span class="proker-meta-sep">&bull;</span>
               ` : `
-                <span class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/50 text-brandBlue dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/60">
                   ${item.penanggungJawab || 'PPG'}
                 </span>
                 <span class="proker-meta-sep">&bull;</span>
               `}
-              <span class="proker-meta-item">
+              <span class="proker-meta-item tabular-nums">
                 <span class="material-symbols-outlined ms-proker-ic">calendar_today</span>
                 <span>${item.waktu}</span>
               </span>
@@ -431,8 +430,8 @@ function renderProker() {
               </span>
               ${(item.estBiaya || 0) > 0 ? `
                 <span class="proker-meta-sep">&bull;</span>
-                <span class="proker-meta-item" style="color:#057a55;font-weight:700;">
-                  <span class="material-symbols-outlined ms-proker-ic" style="color:#057a55;">payments</span>
+                <span class="proker-meta-item tabular-nums text-emerald-700 dark:text-emerald-400 font-semibold">
+                  <span class="material-symbols-outlined ms-proker-ic">payments</span>
                   <span>RAB: Rp ${(item.estBiaya || 0).toLocaleString('id-ID')}</span>
                 </span>
               ` : ''}
