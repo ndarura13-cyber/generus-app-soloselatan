@@ -748,7 +748,10 @@ document.getElementById('cardStatRemaja')?.addEventListener('click', (e) => {
   mobDropUpBackdrop?.addEventListener('click', toggleDropUp);
 
   // Mobile Drop-Up Actions (4 Komponen Utama & Profil)
-  document.getElementById('mobBtnDashboardHome')?.addEventListener('click', () => { toggleDropUp(); openDashboardHome(); });
+  document.getElementById('mobBtnDashboardHome')?.addEventListener('click', () => {
+    if (mobDropUpMenu?.classList.contains('active')) toggleDropUp();
+    openDashboardHome();
+  });
   document.getElementById('mobBtnSiswa')?.addEventListener('click', () => { toggleDropUp(); openMenuSiswa(); });
   document.getElementById('mobBtnProker')?.addEventListener('click', () => { toggleDropUp(); openMenuProker(); });
   document.getElementById('mobBtnJurnalKbm')?.addEventListener('click', () => { toggleDropUp(); openMenuJurnalKbm(); });
