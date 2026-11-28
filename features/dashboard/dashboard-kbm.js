@@ -32,6 +32,14 @@ import {
    MODUL EVENT KBM & REKAP KEHADIRAN (MULTI-JENJANG & CETAK DOKUMEN FISIK)
    ═══════════════════════════════════════════════════════════════════════════ */
 
+let lastAgendaOptions = {};
+
+function getEventScopeLevel(ev) {
+  if (ev.kelompok_id && ev.kelompok_id !== 'all') return 'kelompok_only';
+  if (ev.desa_id && ev.desa_id !== 'all') return 'desa_all';
+  return 'daerah_only';
+}
+
 export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   // Jika tab rekap bulanan yang diminta, buka langsung modal khusus Laporan & Rekap Absensi Bulanan
   if (activeTab === 'rekap_bulanan') {
@@ -53,15 +61,53 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
 
   // State Filter & Pagination
   const filterDesa = options.filterDesa || (isDaerah ? 'all' : currentDesaId);
-  const filterKel = options.filterKel || (isKelompok ? currentKelId : (options.filterKel || 'all'));
+  const filterKel = options.filterKel || (isKelompok ? currentKelId : 'all');
   const filterFormat = options.filterFormat || 'all';
-  const scopeMode = options.scopeMode || (isKelompok ? 'kelompok_only' : 'all'); // 'kelompok_only' | 'desa_all'
-  const isViewOnlyContext = Boolean(options.readOnly) || (isKelompok && scopeMode !== 'kelompok_only') || (isDesa && scopeMode === 'all');
+  const isRemajaContext = Boolean(options.isRemaja) || filterFormat === 'remaja';
+  const scopeMode = options.scopeMode || (isRemajaContext ? (isDaerah ? 'daerah_only' : (isDesa ? 'desa_all' : 'kelompok_only')) : (isKelompok ? 'kelompok_only' : 'all'));
+  const isViewOnlyContext = Boolean(options.readOnly) || (isKelompok && scopeMode !== 'kelompok_only') || (isDesa && scopeMode === 'daerah_only');
   const requestedPage = parseInt(options.page) || 1;
 
-  // ── Saring Event Sesuai Hak Akses & Filter ──
+  if (activeTab === 'agenda') {
+    lastAgendaOptions = { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, readOnly: isViewOnlyContext, page: requestedPage };
+  }
+
+  // ── Saring Event Sesuai Hak Akses, Tingkat Kegiatan & Filter ──
   const filteredEvents = allEvents.filter(ev => {
-    // Filter Hak Akses Wilayah
+    // Filter Format KBM
+    if (filterFormat !== 'all' && ev.format_kbm !== filterFormat) {
+      return false;
+    }
+
+    // Filter ketat berdasarkan Tingkat Kegiatan (Kelompok / Desa / Daerah) pada Kegiatan Remaja
+    if (isRemajaContext && (scopeMode === 'kelompok_only' || scopeMode === 'desa_all' || scopeMode === 'daerah_only')) {
+      const evLevel = getEventScopeLevel(ev);
+      if (evLevel !== scopeMode) return false;
+
+      if (scopeMode === 'kelompok_only') {
+        if (isKelompok) return ev.kelompok_id === currentKelId;
+        if (isDesa) {
+          if (ev.desa_id !== currentDesaId) return false;
+          if (filterKel !== 'all' && ev.kelompok_id !== filterKel) return false;
+          return true;
+        }
+        // Daerah
+        if (filterDesa !== 'all' && ev.desa_id !== filterDesa) return false;
+        if (filterKel !== 'all' && ev.kelompok_id !== filterKel) return false;
+        return true;
+      }
+
+      if (scopeMode === 'desa_all') {
+        if (isKelompok || isDesa) return ev.desa_id === currentDesaId;
+        if (filterDesa !== 'all' && ev.desa_id !== filterDesa) return false;
+        return true;
+      }
+
+      // scopeMode === 'daerah_only' -> semua login bisa melihat kegiatan tingkat daerah
+      return true;
+    }
+
+    // Filter Hak Akses Wilayah (Non-Remaja / Umum)
     if (isKelompok) {
       const inDesa = (ev.desa_id === 'all' || ev.desa_id === currentDesaId);
       if (!inDesa) return false;
@@ -85,11 +131,6 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       if (filterKel !== 'all') {
         if (ev.kelompok_id !== 'all' && ev.kelompok_id !== filterKel) return false;
       }
-    }
-
-    // Filter Format KBM
-    if (filterFormat !== 'all' && ev.format_kbm !== filterFormat) {
-      return false;
     }
 
     return true;
@@ -127,19 +168,77 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   // ══════════════════════════════════════════════════════════════
   let agendaContentHtml = '';
 
-  // ── Action Banner Buat Event (KBM) Model Mirip Generus ──
-  const bannerActionKbmHtml = isViewOnlyContext ? '' : `
+  const scopeLabelMap = {
+    kelompok_only: 'Tingkat Kelompok',
+    desa_all: 'Tingkat Desa',
+    daerah_only: 'Tingkat Daerah'
+  };
+  const activeScopeLabel = scopeLabelMap[scopeMode] || 'Semua Tingkat';
+  const createBtnLabel = isRemajaContext ? `Buat Kegiatan Remaja (${activeScopeLabel})` : 'Buat Event (KBM)';
+
+  // ── Action Banner Buat Event / Info Hak Akses ──
+  const bannerActionKbmHtml = isViewOnlyContext ? `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:12px;">
+      <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;">visibility</span>
+      <span><strong>Mode Lihat &amp; Isi Jurnal:</strong> Agenda ${activeScopeLabel} dikelola pengurus ${scopeMode === 'daerah_only' ? 'Daerah' : 'Desa'}. Anda dapat mengisi jurnal serta melihat/mencetak laporan.</span>
+    </div>
+  ` : `
     <div class="banner-action-frame">
-      <button type="button" id="btnBukaCreateEvent" class="btn-banner-action-blue" title="Buat Event KBM Baru">
+      <button type="button" id="btnBukaCreateEvent" class="btn-banner-action-blue" title="${createBtnLabel}">
         <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
-        <span>Buat Event (KBM)</span>
+        <span>${createBtnLabel}</span>
       </button>
     </div>
   `;
 
   // Toolbar Filter
   let filterBarHtml = '';
-  if (isDaerah) {
+  if (isRemajaContext) {
+    const tingkatSelectHtml = `
+      <select id="kbmFilterTingkat" class="kbm-select" title="Filter Tingkat Kegiatan">
+        <option value="kelompok_only" ${scopeMode === 'kelompok_only' ? 'selected' : ''}>Tingkat Kelompok</option>
+        <option value="desa_all" ${scopeMode === 'desa_all' ? 'selected' : ''}>Tingkat Desa</option>
+        <option value="daerah_only" ${scopeMode === 'daerah_only' ? 'selected' : ''}>Tingkat Daerah</option>
+      </select>
+    `;
+    const desaFilterHtml = (isDaerah && scopeMode !== 'daerah_only') ? `
+      <select id="kbmFilterDesa" class="kbm-select" title="Filter Desa">
+        ${buildDesaOptions(filterDesa)}
+      </select>
+    ` : (isDesa && scopeMode !== 'daerah_only' ? `
+      <span style="font-size:12px;font-weight:700;background:var(--blue-light);color:var(--blue-dark);padding:6px 10px;border-radius:8px;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">domain</span>
+        Desa ${desaObj.nama}
+      </span>
+    ` : '');
+    const kelFilterHtml = ((isDaerah || isDesa) && scopeMode === 'kelompok_only') ? `
+      <select id="kbmFilterKelompok" class="kbm-select" title="Filter Kelompok">
+        ${buildKelOptions(isDaerah ? filterDesa : currentDesaId, filterKel)}
+      </select>
+    ` : (isKelompok && scopeMode === 'kelompok_only' ? `
+      <span style="font-size:11.5px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:6px 10px;border-radius:8px;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:15px;">location_on</span>
+        Kel. ${currentKelObj ? currentKelObj.nama : 'Kelompok Saya'}
+      </span>
+    ` : '');
+    const daerahBadgeHtml = scopeMode === 'daerah_only' ? `
+      <span style="font-size:12px;font-weight:700;background:#f3e8ff;color:#6d28d9;padding:6px 10px;border-radius:8px;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">public</span>
+        Daerah Solo Selatan
+      </span>
+    ` : '';
+
+    filterBarHtml = `
+      <div class="kbm-filter-bar">
+        <div class="kbm-filter-group" style="width:100%;">
+          ${tingkatSelectHtml}
+          ${desaFilterHtml}
+          ${kelFilterHtml}
+          ${daerahBadgeHtml}
+        </div>
+      </div>
+    `;
+  } else if (isDaerah) {
     filterBarHtml = `
       <div class="kbm-filter-bar">
         <div class="kbm-filter-group" style="width:100%;">
@@ -226,14 +325,14 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       ${filterBarHtml}
       <div style="text-align:center;padding:40px 20px;background:var(--bg);border-radius:12px;border:1.5px dashed var(--border);">
         <span class="material-symbols-outlined" style="font-size:48px;color:#94a3b8;margin-bottom:8px;">event_busy</span>
-        <h4 style="margin:0;font-size:14px;color:var(--text);font-weight:800;">Tidak Ada Event KBM yang Cocok</h4>
+        <h4 style="margin:0;font-size:14px;color:var(--text);font-weight:800;">${isRemajaContext ? `Belum Ada Kegiatan Remaja (${activeScopeLabel})` : 'Tidak Ada Event KBM yang Cocok'}</h4>
         <p style="margin:4px 0 16px;font-size:12px;color:var(--text-muted);">
           Belum ada kegiatan pada filter ini.
         </p>
         ${!isViewOnlyContext ? `
-          <button type="button" id="btnEmptyCreateEvent" class="btn-banner-action-blue" style="max-width:280px;margin:0 auto;" title="Buat Event KBM Baru">
+          <button type="button" id="btnEmptyCreateEvent" class="btn-banner-action-blue" style="max-width:280px;margin:0 auto;" title="${createBtnLabel}">
             <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
-            <span>Buat Event (KBM)</span>
+            <span>${createBtnLabel}</span>
           </button>
         ` : ''}
       </div>
@@ -327,28 +426,16 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
                 </span>
               `}
             </div>
-            <div style="display:inline-flex;gap:5px;align-items:center;">
-              <button type="button" class="kbm-action-btn kbm-action-btn-print btn-action-cetak-absensi" data-ev-id="${ev.id}" title="Cetak Lembar Presensi Santri">
-                <span class="material-symbols-outlined">print</span>
-                <span class="btn-text">Cetak Absen</span>
+            <div style="display:inline-flex;gap:6px;align-items:center;justify-content:center;">
+              <button type="button" class="btn-action-isi-jurnal" data-ev-id="${ev.id}" title="Isi / Lihat Jurnal Kegiatan" style="display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;white-space:nowrap;">
+                <span class="material-symbols-outlined" style="font-size:16px;">edit_note</span>
+                <span>Isi Jurnal</span>
               </button>
-              <button type="button" class="kbm-action-btn kbm-action-btn-journal btn-action-isi-jurnal" data-ev-id="${ev.id}" title="${isReadOnly ? 'Lihat Rekapitulasi' : 'Input Jurnal KBM'}">
-                <span class="material-symbols-outlined">edit_note</span>
-                <span class="btn-text">${isReadOnly ? 'Lihat' : 'Isi Jurnal'}</span>
+              <button type="button" class="btn-kbm-action-menu" data-ev-id="${ev.id}" data-can-manage="${canManage ? '1' : '0'}" data-judul="${(ev.judul || 'Kegiatan').replace(/"/g, '&quot;')}" title="Cetak Absen, Laporan &amp; Opsi Lainnya" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;background:var(--surface);color:var(--text);border:1px solid var(--border);white-space:nowrap;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#be185d;">description</span>
+                <span>Laporan &amp; Opsi</span>
+                <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted);">expand_more</span>
               </button>
-              <button type="button" class="kbm-action-btn kbm-action-btn-report btn-action-cetak-laporan" data-ev-id="${ev.id}" title="Laporan PDF Kehadiran Resmi">
-                <span class="material-symbols-outlined">description</span>
-                <span class="btn-text">Laporan</span>
-              </button>
-              ${canManage ? `
-                <button type="button" class="kbm-action-btn kbm-action-btn-edit btn-action-edit-event" data-ev-id="${ev.id}" title="Edit Data Event KBM">
-                  <span class="material-symbols-outlined">edit</span>
-                  <span class="btn-text">Edit</span>
-                </button>
-                <button type="button" class="kbm-action-btn kbm-action-btn-delete btn-action-hapus-event" data-ev-id="${ev.id}" data-judul="${ev.judul || 'Event KBM'}" title="Hapus Event">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
-              ` : ''}
             </div>
           </td>
         </tr>
@@ -441,28 +528,16 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
             </span>
           </div>
 
-          <div class="kbm-event-card-actions">
-            <button type="button" class="kbm-action-btn kbm-action-btn-print btn-action-cetak-absensi" data-ev-id="${ev.id}" title="Cetak Lembar Presensi">
-              <span class="material-symbols-outlined">print</span>
-              <span class="btn-text">Cetak</span>
+          <div class="kbm-event-card-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:10px;">
+            <button type="button" class="btn-action-isi-jurnal" data-ev-id="${ev.id}" title="Isi / Lihat Jurnal Kegiatan" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">
+              <span class="material-symbols-outlined" style="font-size:16px;">edit_note</span>
+              <span>Isi Jurnal</span>
             </button>
-            <button type="button" class="kbm-action-btn kbm-action-btn-journal btn-action-isi-jurnal" data-ev-id="${ev.id}" title="${isReadOnly ? 'Lihat Rekapitulasi' : 'Input Jurnal KBM'}">
-              <span class="material-symbols-outlined">edit_note</span>
-              <span class="btn-text">${isReadOnly ? 'Lihat' : 'Isi Jurnal'}</span>
+            <button type="button" class="btn-kbm-action-menu" data-ev-id="${ev.id}" data-can-manage="${canManage ? '1' : '0'}" data-judul="${(ev.judul || 'Kegiatan').replace(/"/g, '&quot;')}" title="Cetak Absen, Laporan &amp; Opsi Lainnya" style="display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:var(--surface);color:var(--text);border:1px solid var(--border);">
+              <span class="material-symbols-outlined" style="font-size:16px;color:#be185d;">description</span>
+              <span>Laporan &amp; Opsi</span>
+              <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted);">expand_more</span>
             </button>
-            <button type="button" class="kbm-action-btn kbm-action-btn-report btn-action-cetak-laporan" data-ev-id="${ev.id}" title="Laporan PDF">
-              <span class="material-symbols-outlined">description</span>
-              <span class="btn-text">Laporan</span>
-            </button>
-            ${canManage ? `
-              <button type="button" class="kbm-action-btn kbm-action-btn-edit btn-action-edit-event" data-ev-id="${ev.id}" title="Edit Data Event">
-                <span class="material-symbols-outlined">edit</span>
-                <span class="btn-text">Edit</span>
-              </button>
-              <button type="button" class="kbm-action-btn kbm-action-btn-delete btn-action-hapus-event" data-ev-id="${ev.id}" data-judul="${ev.judul || 'Event KBM'}" title="Hapus Event">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            ` : ''}
           </div>
         </div>
       `;
@@ -686,9 +761,12 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   `;
 
   const modalSize = isFormView ? 'medium' : 'wide';
+  const modalTitle = isRemajaContext
+    ? (isFormView ? (activeTab === 'create_event' ? 'Buat Kegiatan Remaja' : 'Edit Kegiatan Remaja') : `Kegiatan Remaja — ${activeScopeLabel}`)
+    : (isFormView ? (activeTab === 'create_event' ? 'Buat Agenda KBM Baru' : 'Edit Agenda KBM') : 'Agenda & Penyampaian KBM');
   openModal(
-    isFormView ? (activeTab === 'create_event' ? 'Buat Agenda KBM Baru' : 'Edit Agenda KBM') : 'Agenda & Kurikulum KBM',
-    isFormView ? 'edit_calendar' : 'menu_book',
+    modalTitle,
+    isFormView ? 'edit_calendar' : (isRemajaContext ? 'groups' : 'menu_book'),
     modalHtml,
     modalSize
   );
@@ -696,58 +774,88 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
   // ══════════════════════════════════════════════════════════════
   // EVENT LISTENERS & LOGIC BINDINGS
   // ══════════════════════════════════════════════════════════════
+  const removeFloatingMenu = () => {
+    document.getElementById('kbmFloatingActionMenu')?.remove();
+  };
+  removeFloatingMenu();
 
   // 1. Open Create Event Form
   document.getElementById('btnBukaCreateEvent')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
+    removeFloatingMenu();
+    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, page: currentPage });
   });
   document.getElementById('btnEmptyCreateEvent')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat, scopeMode, page: 1 });
+    removeFloatingMenu();
+    renderCetakAbsensiModal('create_event', { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, page: 1 });
   });
 
   // 2. Agenda View Listeners
   if (activeTab === 'agenda') {
+    document.getElementById('kbmFilterTingkat')?.addEventListener('change', (e) => {
+      removeFloatingMenu();
+      const nextScope = e.target.value;
+      const nextDesa = nextScope === 'daerah_only' ? 'all' : (isDaerah ? filterDesa : currentDesaId);
+      const nextKel = nextScope === 'kelompok_only' ? (isKelompok ? currentKelId : 'all') : 'all';
+      renderCetakAbsensiModal('agenda', {
+        filterDesa: nextDesa,
+        filterKel: nextKel,
+        filterFormat,
+        scopeMode: nextScope,
+        isRemaja: isRemajaContext,
+        page: 1
+      });
+    });
+
     document.getElementById('kbmFilterDesa')?.addEventListener('change', (e) => {
+      removeFloatingMenu();
       renderCetakAbsensiModal('agenda', {
         filterDesa: e.target.value,
         filterKel: 'all',
         filterFormat,
         scopeMode,
+        isRemaja: isRemajaContext,
         page: 1
       });
     });
 
     document.getElementById('kbmFilterKelompok')?.addEventListener('change', (e) => {
+      removeFloatingMenu();
       renderCetakAbsensiModal('agenda', {
         filterDesa,
         filterKel: e.target.value,
         filterFormat,
         scopeMode,
+        isRemaja: isRemajaContext,
         page: 1
       });
     });
 
     document.getElementById('kbmFilterFormat')?.addEventListener('change', (e) => {
+      removeFloatingMenu();
       renderCetakAbsensiModal('agenda', {
         filterDesa,
         filterKel,
         filterFormat: e.target.value,
         scopeMode,
+        isRemaja: isRemajaContext,
         page: 1
       });
     });
 
     document.getElementById('btnScopeKelompok')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'kelompok_only', page: 1 });
+      removeFloatingMenu();
+      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'kelompok_only', isRemaja: isRemajaContext, page: 1 });
     });
 
     document.getElementById('btnScopeDesa')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'desa_all', page: 1 });
+      removeFloatingMenu();
+      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode: 'desa_all', isRemaja: isRemajaContext, page: 1 });
     });
 
     // Pagination Listeners
     document.querySelectorAll('.btn-page-nav').forEach(btn => {
       btn.addEventListener('click', () => {
+        removeFloatingMenu();
         const targetPage = parseInt(btn.getAttribute('data-page'));
         if (targetPage && targetPage >= 1 && targetPage <= totalPages && targetPage !== currentPage) {
           renderCetakAbsensiModal('agenda', {
@@ -755,23 +863,17 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
             filterKel,
             filterFormat,
             scopeMode,
+            isRemaja: isRemajaContext,
             page: targetPage
           });
         }
       });
     });
 
-    // Action: Cetak Lembar Presensi
-    document.querySelectorAll('.btn-action-cetak-absensi').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const evId = btn.getAttribute('data-ev-id');
-        window.open(`../laporan/cetak-absensi.html?eventId=${encodeURIComponent(evId)}`, '_blank');
-      });
-    });
-
     // Action: Isi Jurnal (Direct Scope)
     document.querySelectorAll('.btn-action-isi-jurnal').forEach(btn => {
       btn.addEventListener('click', () => {
+        removeFloatingMenu();
         const evId = btn.getAttribute('data-ev-id');
         const ev = getKbmEventById(evId);
         if (!ev) return;
@@ -789,48 +891,108 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
       });
     });
 
-    // Action: Cetak Laporan PDF
-    document.querySelectorAll('.btn-action-cetak-laporan').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const evId = btn.getAttribute('data-ev-id');
-        window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(evId)}`, '_blank');
+    // Action: Dropdown Menu (Cetak Absen, Lihat/Cetak Laporan, Edit, Hapus)
+    const triggerDeleteEvent = (evId, judul) => {
+      showConfirmModal({
+        title: isRemajaContext ? 'Hapus Kegiatan Remaja' : 'Hapus Event KBM',
+        message: `Apakah Anda yakin ingin menghapus "${judul}" dari daftar event tersimpan?`,
+        icon: 'delete',
+        iconBg: '#fee2e2',
+        iconColor: '#dc2626',
+        confirmText: 'Ya, Hapus',
+        confirmBtnColor: 'var(--red)',
+        onConfirm: async () => {
+          await deleteKbmEvent(evId);
+          showToast('Kegiatan berhasil dihapus', 'success');
+          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, page: currentPage });
+        }
       });
-    });
+    };
 
-    // Action: Edit Event KBM
-    document.querySelectorAll('.btn-action-edit-event').forEach(btn => {
-      btn.addEventListener('click', () => {
+    document.querySelectorAll('.btn-kbm-action-menu').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const evId = btn.getAttribute('data-ev-id');
-        renderCetakAbsensiModal('edit_event', {
-          filterDesa,
-          filterKel,
-          filterFormat,
-          scopeMode,
-          page: currentPage,
-          editEventId: evId
+        const canManageEv = btn.getAttribute('data-can-manage') === '1';
+        const judul = btn.getAttribute('data-judul') || 'Kegiatan';
+        const existing = document.getElementById('kbmFloatingActionMenu');
+        if (existing && existing.getAttribute('data-ev-id') === evId) {
+          removeFloatingMenu();
+          return;
+        }
+        removeFloatingMenu();
+
+        const menu = document.createElement('div');
+        menu.id = 'kbmFloatingActionMenu';
+        menu.setAttribute('data-ev-id', evId);
+        menu.style.cssText = 'position:fixed;z-index:99999;min-width:205px;background:var(--surface,#fff);border:1px solid var(--border,#cbd5e1);border-radius:10px;box-shadow:0 10px 25px rgba(15,23,42,0.16);padding:6px;display:flex;flex-direction:column;gap:2px;';
+
+        const itemStyle = 'display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;background:transparent;border-radius:7px;font-size:12px;font-weight:600;color:var(--text,#0f172a);cursor:pointer;text-align:left;';
+        menu.innerHTML = `
+          <button type="button" data-menu-act="cetak_absen" style="${itemStyle}">
+            <span class="material-symbols-outlined" style="font-size:17px;color:#15803d;">print</span>
+            <span>Cetak Lembar Absensi</span>
+          </button>
+          <button type="button" data-menu-act="cetak_laporan" style="${itemStyle}">
+            <span class="material-symbols-outlined" style="font-size:17px;color:#be185d;">description</span>
+            <span>Lihat / Cetak Laporan</span>
+          </button>
+          ${canManageEv ? `
+            <div style="height:1px;background:var(--border,#e2e8f0);margin:3px 0;"></div>
+            <button type="button" data-menu-act="edit" style="${itemStyle}">
+              <span class="material-symbols-outlined" style="font-size:17px;color:#b45309;">edit</span>
+              <span>Edit Kegiatan</span>
+            </button>
+            <button type="button" data-menu-act="hapus" style="${itemStyle}color:#dc2626;">
+              <span class="material-symbols-outlined" style="font-size:17px;color:#dc2626;">delete</span>
+              <span>Hapus Kegiatan</span>
+            </button>
+          ` : ''}
+        `;
+
+        document.body.appendChild(menu);
+        const rect = btn.getBoundingClientRect();
+        const menuRect = menu.getBoundingClientRect();
+        const top = (rect.bottom + menuRect.height + 8 > window.innerHeight)
+          ? Math.max(8, rect.top - menuRect.height - 6)
+          : rect.bottom + 6;
+        const left = Math.min(window.innerWidth - menuRect.width - 8, Math.max(8, rect.right - menuRect.width));
+        menu.style.top = `${top}px`;
+        menu.style.left = `${left}px`;
+
+        menu.querySelectorAll('button').forEach(item => {
+          item.addEventListener('mouseenter', () => { item.style.background = 'var(--bg,#f1f5f9)'; });
+          item.addEventListener('mouseleave', () => { item.style.background = 'transparent'; });
+          item.addEventListener('click', () => {
+            const act = item.getAttribute('data-menu-act');
+            removeFloatingMenu();
+            if (act === 'cetak_absen') {
+              window.open(`../laporan/cetak-absensi.html?eventId=${encodeURIComponent(evId)}`, '_blank');
+            } else if (act === 'cetak_laporan') {
+              window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(evId)}`, '_blank');
+            } else if (act === 'edit') {
+              renderCetakAbsensiModal('edit_event', {
+                filterDesa,
+                filterKel,
+                filterFormat,
+                scopeMode,
+                isRemaja: isRemajaContext,
+                page: currentPage,
+                editEventId: evId
+              });
+            } else if (act === 'hapus') {
+              triggerDeleteEvent(evId, judul);
+            }
+          });
         });
-      });
-    });
 
-    // Action: Hapus Event
-    document.querySelectorAll('.btn-action-hapus-event').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const evId = btn.getAttribute('data-ev-id');
-        const judul = btn.getAttribute('data-judul') || 'Event KBM';
-        showConfirmModal({
-          title: 'Hapus Event KBM',
-          message: `Apakah Anda yakin ingin menghapus "${judul}" dari daftar event tersimpan?`,
-          icon: 'delete',
-          iconBg: '#fee2e2',
-          iconColor: '#dc2626',
-          confirmText: 'Ya, Hapus',
-          confirmBtnColor: 'var(--red)',
-          onConfirm: async () => {
-            await deleteKbmEvent(evId);
-            showToast('Event berhasil dihapus', 'success');
-            renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
+        const closeOnOutside = (evOutside) => {
+          if (!menu.contains(evOutside.target) && !btn.contains(evOutside.target)) {
+            removeFloatingMenu();
+            document.removeEventListener('click', closeOnOutside);
           }
-        });
+        };
+        setTimeout(() => document.addEventListener('click', closeOnOutside), 0);
       });
     });
   }
@@ -886,7 +1048,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
     }
 
     document.getElementById('btnBatalKeAgenda')?.addEventListener('click', () => {
-      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
+      renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, page: currentPage });
     });
 
     document.getElementById('btnCetakLangsungTanpaSimpan')?.addEventListener('click', () => {
@@ -946,7 +1108,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
         showToast('Perubahan event KBM berhasil disimpan!', 'success');
         setTimeout(() => {
           isSavingEventKbm = false;
-          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: currentPage });
+          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, page: currentPage });
         }, 250);
       } else {
         // Mode Buat Baru
@@ -981,7 +1143,7 @@ export function renderCetakAbsensiModal(activeTab = 'agenda', options = {}) {
 
         setTimeout(() => {
           isSavingEventKbm = false;
-          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, page: 1 });
+          renderCetakAbsensiModal('agenda', { filterDesa, filterKel, filterFormat, scopeMode, isRemaja: isRemajaContext, page: 1 });
         }, 250);
       }
     });
@@ -998,7 +1160,7 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
   const event = getKbmEventById(eventId);
   if (!event) {
     showToast('Event KBM tidak ditemukan', 'error');
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('agenda', lastAgendaOptions);
     return;
   }
 
@@ -1224,7 +1386,7 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
   openModal('Matrix Isian Rekapitulasi Kehadiran', 'edit_calendar', modalHtml, 'wide');
 
   document.getElementById('btnBackToJurnalTab')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('agenda', lastAgendaOptions);
   });
 
   document.getElementById('btnBukaCetakLaporanLangsung')?.addEventListener('click', () => {
@@ -1408,7 +1570,7 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
     await saveCurrentRekapData();
     if (btnSimpan) btnSimpan.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan Laporan`;
     showToast('Rekapitulasi kehadiran KBM berhasil disimpan!', 'success');
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('agenda', lastAgendaOptions);
   });
 
   document.getElementById('btnSimpanDanCetakLaporan')?.addEventListener('click', async () => {
@@ -1418,7 +1580,7 @@ export function renderFormRekapKehadiranModal(eventId, targetKelId = null) {
     if (btnSimpanCetak) btnSimpanCetak.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;">print</span> Simpan & Cetak`;
     showToast('Rekapitulasi disimpan! Membuka laporan PDF...', 'success');
     window.open(`../laporan/laporan-kehadiran.html?eventId=${encodeURIComponent(saved.id)}`, '_blank');
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('agenda', lastAgendaOptions);
   });
 }
 
@@ -1517,7 +1679,7 @@ export function renderSingleKelompokEditModal(event, kelId) {
   openModal(`Jurnal KBM Kel. ${kelNama}`, 'edit_note', modalHtml, 'medium');
 
   document.getElementById('btnBackToJurnalMonitoring')?.addEventListener('click', () => {
-    renderCetakAbsensiModal('agenda');
+    renderCetakAbsensiModal('agenda', lastAgendaOptions);
   });
 
   const iptH = document.getElementById('iptSingleHadir');
@@ -1593,7 +1755,7 @@ export function renderSingleKelompokEditModal(event, kelId) {
 
     showToast(`Jurnal Kel. ${kelNama} berhasil disimpan!`, 'success');
     setTimeout(() => {
-      renderCetakAbsensiModal('agenda');
+      renderCetakAbsensiModal('agenda', lastAgendaOptions);
     }, 250);
   });
 }

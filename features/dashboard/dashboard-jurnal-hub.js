@@ -579,7 +579,7 @@ function attachJurnalKbmHubListeners() {
       } else if (action === 'remaja_desa') {
         openKegiatanRemajaModal('desa_all');
       } else if (action === 'remaja_daerah') {
-        openKegiatanRemajaModal('all');
+        openKegiatanRemajaModal('daerah_only');
       } else if (action === 'musyawarah_5_unsur') {
         openForm5UnsurModule({
           desaId: selectedDesaId,
@@ -598,29 +598,26 @@ function openKegiatanRemajaModal(scopeMode) {
   let filterDesa = (isDesa || isKelompok) ? (currentUser?.desaId || selectedDesaId) : selectedDesaId;
   let filterKel = isKelompok ? (currentUser?.kelompokId || selectedKelompokId) : selectedKelompokId;
 
-  if (scopeMode === 'all') {
-    if (isDaerah) {
-      filterDesa = 'all';
-      filterKel = 'all';
-    } else if (isDesa) {
-      filterDesa = currentUser?.desaId || selectedDesaId;
-      filterKel = 'all';
-    }
+  if (scopeMode === 'daerah_only' || scopeMode === 'all') {
+    scopeMode = 'daerah_only';
+    filterDesa = 'all';
+    filterKel = 'all';
   } else if (scopeMode === 'desa_all') {
     filterKel = 'all';
   }
 
   // Enforce hak akses:
-  // - Kelompok: hanya bisa edit/buat di kelompok_only; desa_all & all -> readOnly
-  // - Desa: terbuka di kelompok_only & desa_all; all (Daerah) -> readOnly
+  // - Kelompok: hanya bisa edit/buat di kelompok_only; desa_all & daerah_only -> readOnly (isi jurnal & lihat/cetak laporan)
+  // - Desa: terbuka di kelompok_only & desa_all; daerah_only -> readOnly (isi jurnal & lihat/cetak laporan)
   // - Daerah: terbuka semua
-  const readOnlyMode = (isKelompok && scopeMode !== 'kelompok_only') || (isDesa && scopeMode === 'all');
+  const readOnlyMode = (isKelompok && scopeMode !== 'kelompok_only') || (isDesa && scopeMode === 'daerah_only');
 
   renderCetakAbsensiModal('agenda', {
     filterDesa,
     filterKel,
     filterFormat: 'remaja',
     scopeMode,
+    isRemaja: true,
     readOnly: readOnlyMode
   });
 }
